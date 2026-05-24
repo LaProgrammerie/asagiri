@@ -1,8 +1,45 @@
 ---
 title: Cost-aware workflows
-description: Design workflows with predictable cost and traceability.
+description: Estimate tokens and cost before execution; enforce budgets and routing.
 ---
 
 # Cost-aware workflows
 
-Describe how to keep workflows cost-aware (placeholder content).
+## Problem
+
+Agent runs can burn tokens unpredictably. Teams need **forecasts**, **budgets**, and **routing** that prefer cheaper paths when quality allows.
+
+## AgentFlow approach
+
+1. **Heuristic token counting** — chars-per-token ratios by content kind (`token_estimation` in config)
+2. **Pricing sheet** — manual `pricing.models` entries for cloud models (no hardcoded vendor prices in code)
+3. **Budgets** — per-run, per-task, daily caps with optional confirmation thresholds
+4. **Routing** — `routing.strategies` map step classes to local vs cloud-fast vs cloud-heavy agents
+
+```bash
+agentflow estimate billing-v2 --task task-003 --dry-run
+agentflow work "develop billing-v2" --estimate-only
+agentflow work "develop billing-v2" --budget 0.50 --allow-over-budget
+```
+
+<Callout type="cost">
+Estimates are **approximate**. Provider billing uses real tokenizers; AgentFlow does not yet ship provider-exact counters.
+</Callout>
+
+## Trade-offs
+
+| Improves | Does not solve |
+| --- | --- |
+| Surprises caught before `dev` | Penny-perfect invoices |
+| Policy via YAML budgets | Automatic cloud price discovery |
+| Explainable routing reasons | Optimal model selection without your config |
+
+## Configuration
+
+See [Budgets](/docs/configuration/budgets), [Routing](/docs/configuration/routing), and [Token estimation](/docs/cost-performance/token-estimation).
+
+## Related
+
+- [Cost-aware workflow guide](/docs/workflows/cost-aware-workflow)
+- [CLI: cost](/docs/cli/generated/cost)
+- [CLI: estimate](/docs/cli/generated/estimate)

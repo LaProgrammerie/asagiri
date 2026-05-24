@@ -8,6 +8,7 @@ Complements `AGENTS.md`: **where things live**, **who consumes what**, and **how
 |-------|----------------|
 | **AgentFlow consolidation (OSS / fiabilisation)** | `spec-postv123.md`, `docs/consolidation/` |
 | **Public documentation site** | `spec-doc.md`, `docs-site/` (Fumadocs → GitHub Pages `/hyper-fast-builder`) |
+| **Doc / code / spec drift tracker** | `problems.md` (repo root) |
 | **AgentFlow spec courante (cost/perf)** | `specv3.md` (repo root) |
 | **AgentFlow intent layer** | `specv2.md` (repo root) |
 | **AgentFlow V1 spec (historique)** | `spec.md` (repo root) |

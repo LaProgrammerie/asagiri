@@ -1,8 +1,39 @@
 ---
 title: Roadmap
-description: Planned improvements and themes.
+description: Delivered features, consolidation work, and prioritized next steps.
 ---
 
 # Roadmap
 
-Roadmap overview (placeholder content).
+Canonical roadmap: **[ROADMAP.md](https://github.com/LaProgrammerie/hyper-fast-builder/blob/main/ROADMAP.md)** at the repository root.
+
+## Delivered (V1 → V3)
+
+- CLI primitives: `init`, `spec`, `plan`, `dev`, `verify`, `review`, worktrees, SQLite
+- Intent layer: `work`, `continue`, `next`, Notion sync
+- Cost/perf: `estimate`, `investigate`, `context`, `cost`, MCP, TUI, metrics
+
+## In progress (consolidation)
+
+- Architecture/security/performance audits under `docs/consolidation/`
+- Public docs site (this site) + generated CLI reference
+- OSS readiness: Apache 2.0, CONTRIBUTING, examples
+
+## Prioritized next
+
+| Priority | Item |
+| --- | --- |
+| P0 | Coverage `workflow` / `intent/executor` > 50% |
+| P0 | Provider-exact tokenizers |
+| P1 | Persistent context pack cache between runs |
+| P1 | Full GitHub Actions CI (test, lint, release) |
+| P2 | Interactive bubbletea TUI |
+| P2 | Vector embeddings RAG |
+| P3 | Multi-repo / remote state |
+
+Detail: `docs/consolidation/TODO-prioritized.md`.
+
+## Related
+
+- [Contributing](/docs/contributing)
+- [Limits](/docs/security/limits)

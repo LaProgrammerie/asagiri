@@ -1,8 +1,39 @@
 ---
 title: Local models
-description: Using local models with predictable performance characteristics.
+description: When to prefer local agents and how routing selects them.
 ---
 
 # Local models
 
-Local model guidance (placeholder content).
+“Local” means **models served on your machine or LAN** (typically Ollama), with zero or configured marginal cost in `models.*.input_cost_per_1m_tokens: 0`.
+
+## When to use
+
+- Classifying intents and tasks
+- Enriching specs before cloud `dev`
+- Log analysis and pre-review
+- Air-gapped or cost-sensitive repos
+
+## Enable locally
+
+1. Configure `agents.ollama` and a `models` profile with `class: local`
+2. Set routing `prefer_local_for` step classes
+3. Run with `--prefer-local` or `--no-cloud` on `work`
+
+```bash
+agentflow work "add logging" --prefer-local --estimate-only
+```
+
+## Limits
+
+Local models may fail on large refactors or security-sensitive changes — routing can escalate to cloud when `use_cloud_heavy_for` matches and `--allow-cloud` is set.
+
+<Callout type="local-first">
+Local-first reduces cost and leakage; it does not replace validation or human review on critical paths.
+</Callout>
+
+## Related
+
+- [Ollama](/docs/agents/ollama)
+- [Local-first concepts](/docs/concepts/local-first)
+- [Routing](/docs/configuration/routing)

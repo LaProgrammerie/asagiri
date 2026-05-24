@@ -1,8 +1,55 @@
 ---
 title: Cost-aware workflow
-description: Operate workflows with explicit budgets and checkpoints.
+description: Estimate, optimize context, and cap spend before agent execution.
 ---
 
 # Cost-aware workflow
 
-Document a cost-aware operating model (placeholder content).
+Operational guide (`spec-doc` §11.4) using real flags and config keys.
+
+## 1. Per-task estimate
+
+```bash
+agentflow estimate billing-v2 --task task-003 --dry-run
+```
+
+Shows heuristic input/output tokens and estimated cost from your `pricing` sheet.
+
+## 2. Context optimization
+
+```bash
+agentflow context billing-v2 --task task-003 --optimize
+```
+
+Builds a reduced context pack before large agent prompts. Disable reduction with `agentflow work ... --no-context-reduction`.
+
+## 3. Run with budget
+
+```bash
+agentflow work "develop billing-v2" --budget 0.50 --estimate-only
+agentflow work "develop billing-v2" --budget 0.50
+```
+
+Config budgets (`budgets.per_run.max_estimated_cost`) apply when CLI `--budget` is zero. Over-budget runs block unless:
+
+- confirmation prompt accepted, or
+- `--yes` after `BudgetPendingConfirmError`, or
+- `--allow-over-budget` when `budgets.policies.allow_override_with_flag` is true
+
+## 4. Local preference
+
+```bash
+agentflow work "develop billing-v2" --prefer-local --no-cloud
+```
+
+`--allow-cloud` explicitly permits cloud routing when policies would otherwise restrict.
+
+## Explainability
+
+`work` and `estimate` print step summaries (routing choice, context bytes, budget checks). See [Token estimation](/docs/cost-performance/token-estimation).
+
+## Related
+
+- [Cost-aware concepts](/docs/concepts/cost-aware-workflows)
+- [Budgets](/docs/configuration/budgets)
+- [CLI: cost-report](/docs/cli/generated/cost-report)

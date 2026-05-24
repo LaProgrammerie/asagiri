@@ -1,20 +1,66 @@
 ---
 title: Architecture overview
-description: High-level pipeline view of Hyper Fast Builder.
+description: Go modules under application/internal and the execution pipeline.
 ---
 
 # Architecture overview
 
-This page includes a **Mermaid** diagram illustrating the documentation and automation pipeline.
+AgentFlow is a Go CLI (`application/cmd/agentflow`) with domain logic in `application/internal/` and shared types in `application/pkg/agentflow`.
 
-<Callout type="local-first">
+## Execution pipeline
 
-The pipeline emphasizes local execution where possible; remote steps should be explicit.
+```mermaid
+flowchart TD
+  A[User intent / CLI] --> B[intent resolver + planner]
+  B --> C[pipeline V3]
+  C --> D[investigation]
+  D --> E[contextopt]
+  E --> F[cost estimate + budgets]
+  F --> G[routing]
+  G --> H[workflow: plan enrich dev]
+  H --> I[worktree + agent exec]
+  I --> J[validation]
+  J --> K[review + report]
+```
 
-</Callout>
+## Internal modules
 
-<Mermaid chart="flowchart LR; spec[Kiro Spec] --> handoff[Handoff]; handoff --> cursor[Cursor / Agents]; cursor --> repo[Repo Changes]; repo --> ci[CI]; ci --> docsSite[Docs Site]" />
+| Package | Role |
+| --- | --- |
+| `cli` | Cobra commands, docgen, app context |
+| `config` | YAML load, defaults, path resolve |
+| `intent` | NL `work`/`continue`, hybrid resolver, executor |
+| `workflow` | State machine, plan/dev/verify/review, worktrees |
+| `worktree` | Git worktree lifecycle |
+| `agent` / `agent/exec` | Subprocess contracts |
+| `source` / `source/notion` | Spec ingestion |
+| `contextopt` | Context collect/reduce/pack |
+| `investigation` | Local grep/scan |
+| `cost` | Tokens, pricing, budgets |
+| `routing` | Step-class → agent/model |
+| `mcp` | Stdio MCP tools (optional) |
+| `store/sqlite` | Runs, tasks, metrics |
+| `report` | Run reports |
+| `tui` | Rich/plain/json UI |
+| `rag` | Chunk index (SQLite, non-vector) |
+| `bootstrap` | `init`, `doctor` |
+| `redact` | Log secret masking |
+| `validation` | External command runner |
 
-## Components (placeholder)
+## State storage
 
-Expand each stage with concrete repositories, environments, and artifacts.
+- **SQLite** at `state.path` (default `.agentflow/state.sqlite`)
+- Run artefacts: `.agentflow/runs/<run-id>/`
+
+## Extension points
+
+- New agents: config only
+- New validation commands: `validation.commands`
+- Custom routing strategies: `routing.strategies`
+- MCP tools when `mcp.enabled: true`
+
+## Related
+
+- [Configuration](/docs/configuration/config-file)
+- [Reliability: worktrees](/docs/reliability/worktree-isolation)
+- [MCP overview](/docs/mcp/overview)

@@ -1,0 +1,32 @@
+---
+title: MCP security
+description: Threat model and hardening for the local MCP server.
+---
+
+# MCP security
+
+## Threat model
+
+The MCP server runs as **your user** with repository access. Any client attached to stdio can invoke tools until disabled.
+
+## Defaults (safe)
+
+- `mcp.enabled: false`
+- Output and timeout caps
+- `secret_path_denylist` blocks reading common secret paths in investigation tools
+
+## Recommendations
+
+1. Enable MCP only on trusted machines
+2. Do not expose stdio to shared terminals or remote sessions without authentication
+3. Keep `secret_path_denylist` aligned with your repo (`.env`, keys, credentials)
+4. Pair with `policies.allow_network: false` when agents should stay offline — note MCP itself is local
+
+<Callout type="security">
+MCP does not sandbox tool implementations. Treat connected editors as fully trusted.
+</Callout>
+
+## Related
+
+- [Security overview](/docs/security)
+- [MCP overview](/docs/mcp/overview)

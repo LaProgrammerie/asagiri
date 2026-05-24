@@ -1,8 +1,48 @@
 ---
 title: Philosophy
-description: Core principles behind Hyper Fast Builder.
+description: Deterministic orchestration, validation before trust, and honest limits.
 ---
 
 # Philosophy
 
-Outline the product philosophy (placeholder content).
+## Problem
+
+AI coding agents are powerful but non-deterministic. Teams need **repeatable** workflows: known steps, isolated branches, external validation, cost visibility, and audit trails — not opaque “autonomous” runs.
+
+## AgentFlow approach
+
+AgentFlow orchestrates **spec → plan → implement → verify → review → report** with:
+
+1. **Explicit state** — SQLite-backed runs/tasks and a documented state machine
+2. **Local-first investigation** — grep, filesystem scan, and context packing before cloud calls
+3. **Cost awareness** — heuristic token estimates and budgets before execution
+4. **Git worktree isolation** — one task, one branch, one tree
+5. **Validation by your commands** — `go test`, linters, etc., not agent self-assessment
+6. **Reproducible reports** — markdown + JSON under `.agentflow/runs/`
+
+## What we do not claim
+
+<Callout type="warning">
+AgentFlow does not guarantee correctness, security, or production readiness. It coordinates tools; humans and your test suite remain the authority.
+</Callout>
+
+## Trade-offs
+
+| Gain | Cost |
+| --- | --- |
+| Predictable pipeline steps | Less “one-shot magic” than ad-hoc agent chats |
+| Cost estimates up front | Estimates are approximate (chars/token heuristics) |
+| Worktree safety | Extra disk and git complexity |
+| Pluggable agents | You must install and configure each CLI |
+
+## Configuration levers
+
+- `work.auto_verify`, `work.auto_review` — automation vs manual gates
+- `policies.require_clean_git` — block dirty trees
+- `budgets` — economic guardrails
+
+## Related
+
+- [Local-first](/docs/concepts/local-first)
+- [Cost-aware workflows](/docs/concepts/cost-aware-workflows)
+- [Limits](/docs/security/limits)

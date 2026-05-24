@@ -1,0 +1,43 @@
+---
+title: MCP overview
+description: Optional stdio MCP server exposing investigation and context tools.
+---
+
+# MCP overview
+
+AgentFlow can expose a minimal **stdio JSON-RPC** MCP server (`application/internal/mcp`) for editor integrations.
+
+<Callout type="experimental">
+MCP is disabled by default. Enable only in trusted environments after reviewing tool scopes.
+</Callout>
+
+## Enable
+
+```yaml
+mcp:
+  enabled: true
+  max_output_bytes: 1048576
+  command_timeout_seconds: 120
+```
+
+## Serve
+
+```bash
+agentflow mcp-serve
+```
+
+Supports `initialize`, `tools/list`, `tools/call` (newline-delimited JSON).
+
+## CLI wrapper
+
+```bash
+agentflow mcp
+```
+
+Inspect MCP-related commands — see generated [mcp](/docs/cli/generated/mcp) and [mcp-serve](/docs/cli/generated/mcp-serve).
+
+## Related
+
+- [MCP tools](/docs/mcp/tools)
+- [MCP security](/docs/mcp/security)
+- [Configuration: mcp](/docs/configuration/config-file#mcp)

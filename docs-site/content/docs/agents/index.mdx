@@ -1,8 +1,42 @@
 ---
-title: Agents
-description: How agents are modeled and invoked in Hyper Fast Builder.
+title: Agents overview
+description: External coding agents invoked by AgentFlow as subprocesses.
 ---
 
-# Agents
+# Agents overview
 
-Overview of agents (placeholder content).
+AgentFlow does not embed models. It **orchestrates** CLI tools you configure under `agents:` and selects them via routing, `work` defaults, or per-command flags.
+
+## Supported patterns
+
+| Agent id (example) | Typical role |
+| --- | --- |
+| `kiro` | Spec authoring (`agentflow spec`) |
+| `cursor` | Implementation (`dev`, default `work` agent) |
+| `codex` / `claude` | Review or heavy reasoning |
+| `ollama` | Local enrich, classify, cheap pre-review |
+
+Exact commands are **your** `config.yaml` entries — AgentFlow only spawns `command` + `args`.
+
+## Contracts
+
+- No shell interpolation — argv only
+- Timeouts from `agents.<id>.timeout`
+- Dry-run skips real execution
+- Logs pass through redaction (`application/internal/redact`)
+
+## Choose agents per step
+
+```bash
+agentflow spec feat --agent kiro
+agentflow enrich feat --agent ollama
+agentflow dev feat --agent cursor
+agentflow review feat --agent codex
+```
+
+## Related
+
+- [Agents configuration](/docs/configuration/agents)
+- [Ollama](/docs/agents/ollama)
+- [Local models](/docs/agents/local-models)
+- [Routing](/docs/configuration/routing)

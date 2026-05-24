@@ -1,8 +1,211 @@
 ---
 title: Configuration file
-description: Authoritative configuration keys and examples.
+description: Complete reference for .agentflow/config.yaml blocks and defaults.
 ---
 
 # Configuration file
 
-Explain the main configuration file (placeholder content).
+Path: **`.agentflow/config.yaml`** (created by `agentflow init` from `config.yaml.example`). All paths are resolved relative to the repository root unless absolute.
+
+JSON Schema (generated): `/schemas/config.schema.json` on the docs site.
+
+## `project`
+
+```yaml
+project:
+  name: my-project
+  default_branch: main
+```
+
+Repository display name and default branch for worktree operations.
+
+## `intent`
+
+Natural-language `work` / `continue` resolution (`application/internal/intent`).
+
+```yaml
+intent:
+  enabled: true
+  default_mode: guided   # guided | auto
+  resolver:
+    use_ollama_fallback: true
+    min_confidence: 0.75
+    ask_when_below_confidence: true
+```
+
+## `work`
+
+Defaults for orchestration and agent selection.
+
+```yaml
+work:
+  default_agent: cursor
+  default_reviewer: codex
+  default_enricher: ollama
+  stop_after: report
+  auto_verify: true
+  auto_review: false
+  max_tasks_per_run: 1
+  require_plan_confirmation: true
+```
+
+## `sources`
+
+| Block | Purpose |
+| --- | --- |
+| `sources.local` | Scan `.agentflow/specs`, `.kiro/specs`, `docs/ai/active` |
+| `sources.notion` | Optional Notion → local import (see [Notion](/docs/configuration/notion)) |
+
+```yaml
+sources:
+  local:
+    enabled: true
+    paths:
+      - .agentflow/specs
+      - .kiro/specs
+      - docs/ai/active
+  notion:
+    enabled: false
+    token_env: NOTION_TOKEN
+    specs_database_id: ""
+    import_path: .agentflow/specs
+```
+
+## `specs`, `state`, `worktrees`
+
+```yaml
+specs:
+  kiro_path: .kiro/specs
+  active_spec_path: docs/ai/active/current-spec.md
+  handoff_path: docs/ai/active/handoff.md
+
+state:
+  backend: sqlite
+  path: .agentflow/state.sqlite
+
+worktrees:
+  base_path: .agentflow/worktrees
+  branch_prefix: agentflow
+  cleanup_policy: keep_failed
+```
+
+## `agents`
+
+Map logical agent ids to subprocess commands. See [Agents configuration](/docs/configuration/agents).
+
+## `validation`
+
+```yaml
+validation:
+  commands:
+    - name: tests
+      command: go test ./...
+      required: true
+```
+
+Go repos receive defaults from bootstrap when `go.mod` exists.
+
+## `models`
+
+Logical profiles for routing and cost (`specv3`). Keys are arbitrary ids:
+
+```yaml
+models:
+  ollama_local_qwen:
+    provider: ollama
+    class: local
+    model: qwen2.5-coder:14b
+    input_cost_per_1m_tokens: 0
+    output_cost_per_1m_tokens: 0
+    usage: [summarize, classify, pre_review, context_selection]
+```
+
+## `budgets`
+
+See [Budgets](/docs/configuration/budgets).
+
+## `pricing`
+
+Manual price sheet — **no hardcoded cloud prices in code**.
+
+```yaml
+pricing:
+  currency: EUR
+  models:
+    gemini-3-flash-preview:
+      input_per_1m_tokens: 0.00
+      output_per_1m_tokens: 0.00
+      source: manual
+      updated_at: "2026-05-17"
+```
+
+## `token_estimation`
+
+Chars-per-token heuristics (`application/internal/cost/token_counter.go`):
+
+```yaml
+token_estimation:
+  default_chars_per_token: 4.0
+  code_chars_per_token: 3.2
+  markdown_chars_per_token: 4.2
+  json_chars_per_token: 3.6
+```
+
+<Callout type="cost">
+These ratios approximate tokens — they are not provider tokenizers.
+</Callout>
+
+## `routing`
+
+See [Routing](/docs/configuration/routing).
+
+## `ui`
+
+Terminal UX (`application/internal/tui`):
+
+```yaml
+ui:
+  mode: auto      # auto | rich | plain | json
+  live_logs: true
+  progress_bars: true
+  compact: false
+```
+
+## `mcp`
+
+Local MCP stdio server (`mcp.enabled` must be `true` to serve tools):
+
+```yaml
+mcp:
+  enabled: false
+  max_output_bytes: 1048576
+  command_timeout_seconds: 120
+  secret_path_denylist: [".env", "credentials.json", "id_rsa"]
+  investigation:
+    large_file_bytes: 524288
+    max_grep_output_bytes: 262144
+    command_timeout_seconds: 120
+    sensitive_globs: ["*.pem", ".git/*"]
+```
+
+## `policies`
+
+```yaml
+policies:
+  require_clean_git: true
+  forbid_untracked_secret_files: true
+  max_files_changed_per_task: 20
+  allow_network: false
+  require_human_approval_for:
+    - database_migration
+    - security_sensitive_change
+    - dependency_upgrade
+```
+
+## Validate changes
+
+```bash
+agentflow doctor
+```
+
+After editing YAML, run doctor before `work`.

@@ -1,8 +1,39 @@
 ---
 title: Limits
-description: Known limitations and operational guardrails.
+description: What AgentFlow does not guarantee and known product boundaries.
 ---
 
 # Limits
 
-Enumerate limitations and guardrails (placeholder content).
+Explicit trust boundaries (`spec-doc` §17.1).
+
+## AgentFlow does not
+
+- **Guarantee correctness** of generated code
+- **Replace your test suite** — validation runs commands you configure; failures are yours to fix
+- **Replace human review** for security, compliance, or architecture
+- **Prevent all prompt injection** — malicious specs or Notion content can steer agents
+- **Provide provider-exact token billing**
+- **Offer production SLA** — OSS orchestration CLI
+
+## What it does do
+
+- Enforce a **state machine** for pipeline steps
+- **Isolate** tasks in git worktrees
+- **Estimate** cost/tokens before runs
+- **Block** some policy violations (dirty git, secret filenames, budget caps)
+- **Record** runs for audit (`report`, SQLite)
+
+## Experimental capabilities
+
+Marked separately in docs — including full MCP surface, Notion sync, auto context compression tuning, non-dry-run auto-resume, and vector RAG.
+
+<Callout type="warning">
+Passing `verify` means configured commands exited 0 — not that the change is safe to ship.
+</Callout>
+
+## Related
+
+- [Philosophy](/docs/concepts/philosophy)
+- [Security overview](/docs/security)
+- [Roadmap](/docs/roadmap)

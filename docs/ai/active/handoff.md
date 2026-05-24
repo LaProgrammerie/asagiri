@@ -35,6 +35,7 @@ Site docs public Fumadocs (`docs-site/`), référence CLI générée, CI GitHub 
 - [x] `docs-site` build static (`out/`) + workflow Pages
 - [x] MVP pages EN + CLI ref générée (`docs generate-cli`)
 - [x] `TestCLICommandsDocumented` (docgen)
+- [x] **Tranche doc-content** : pages MVP `docs-site/content/docs/*` sans placeholder ; pages config/mcp/reference ; `problems.md` ; regen CLI
 
 ## Hors scope
 

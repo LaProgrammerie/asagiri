@@ -1,14 +1,29 @@
 ---
-title: Generated reference
-description: Placeholder for auto-generated CLI documentation.
+title: Generated CLI index
+description: Auto-generated command reference from Cobra definitions.
 ---
 
-# Generated reference
+# Generated CLI reference
 
-This page is reserved for **generated** CLI documentation (placeholder content).
+These pages are **generated** from live Cobra command definitions. Do not edit them by hand — changes will be overwritten.
 
-<Callout type="experimental">
+## Regenerate
 
-This section will be filled by your documentation generator in CI.
+```bash
+go run ./application/cmd/agentflow docs generate-cli \
+  --output docs-site/content/docs/cli/generated
+```
 
-</Callout>
+Or with a built binary:
+
+```bash
+./bin/agentflow docs generate-cli --output docs-site/content/docs/cli/generated
+```
+
+## Browse commands
+
+See the sidebar **CLI → generated** section, or start at [generated index](/docs/cli/generated/index).
+
+## Hand-written guides
+
+For workflows and concepts, use [CLI overview](/docs/cli), [First workflow](/docs/getting-started/first-workflow), and [Workflows](/docs/workflows/kiro-to-cursor).

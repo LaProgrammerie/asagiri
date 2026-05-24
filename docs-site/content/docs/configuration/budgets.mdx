@@ -1,0 +1,50 @@
+---
+title: Budgets
+description: Per-run, per-task, and daily estimated cost and token caps.
+---
+
+# Budgets
+
+Implemented in `application/internal/cost/budget.go` and enforced in the V3 pipeline before agent execution.
+
+## Schema
+
+```yaml
+budgets:
+  default_currency: EUR
+  per_run:
+    max_estimated_cost: 1.00
+    max_estimated_tokens: 500000
+    require_confirmation_above_cost: 0.20
+  per_task:
+    max_estimated_cost: 0.30
+    max_estimated_tokens: 150000
+  daily:
+    max_estimated_cost: 10.00
+  policies:
+    block_when_over_budget: true
+    allow_override_with_flag: true
+    override_flag: "--allow-over-budget"
+```
+
+## CLI interaction
+
+| Flag | Behavior |
+| --- | --- |
+| `--budget <EUR>` | Run-level cap for this invocation |
+| `--estimate-only` | Stop after estimate; no spend |
+| `--allow-over-budget` | Bypass block when policy allows |
+| `--yes` | Accept confirmation after `BudgetPendingConfirmError` |
+
+## Limitations
+
+Estimates use heuristic tokens × your `pricing` sheet. Real provider bills may differ.
+
+<Callout type="cost">
+Configure `pricing.models` with current rates. Zero prices make cost displays misleading but do not disable token caps.
+</Callout>
+
+## Related
+
+- [Cost-aware workflow](/docs/workflows/cost-aware-workflow)
+- [Token estimation](/docs/cost-performance/token-estimation)

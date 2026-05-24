@@ -1,8 +1,46 @@
 ---
 title: Worktree isolation
-description: Isolate work with Git worktrees to reduce cross-branch interference.
+description: One git worktree per task under .agentflow/worktrees.
 ---
 
 # Worktree isolation
 
-Describe worktree isolation patterns (placeholder content).
+Implementation: `application/internal/worktree` — created during `dev` in `workflow.Service.DevFeature`.
+
+## Behavior
+
+1. For each task, AgentFlow creates a worktree under `worktrees.base_path`
+2. Branch name uses `worktrees.branch_prefix` + feature/task id
+3. Agent subprocesses run with `WorkingDir` set to the worktree path
+4. `agentflow clean` removes worktrees per `cleanup_policy`
+
+```yaml
+worktrees:
+  base_path: .agentflow/worktrees
+  branch_prefix: agentflow
+  cleanup_policy: keep_failed   # keep_failed | always | ...
+```
+
+## Diagram
+
+```mermaid
+flowchart TB
+  R[Repo root] --> W1[worktree task-001]
+  R --> W2[worktree task-002]
+  W1 --> A1[cursor-agent in W1]
+  W2 --> A2[cursor-agent in W2]
+```
+
+## Dry-run
+
+With `--dry-run`, worktree creation is skipped or simulated — integration tests rely on this for CI-safe runs.
+
+## Policies
+
+`policies.max_files_changed_per_task` limits blast radius; combine with human review before merge.
+
+## Related
+
+- [Failure recovery](/docs/workflows/failure-recovery)
+- [CLI: clean](/docs/cli/generated/clean)
+- [CLI: dev](/docs/cli/generated/dev)

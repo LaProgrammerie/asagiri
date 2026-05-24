@@ -1,8 +1,68 @@
 ---
 title: Installation
-description: Install prerequisites and the project toolchain.
+description: Install AgentFlow and prepare a repository for orchestrated AI workflows.
 ---
 
 # Installation
 
-Document installation steps for Hyper Fast Builder (placeholder content).
+AgentFlow is a Go CLI that orchestrates specs, local investigation, git worktrees, external coding agents, and validation commands. Install the binary, initialize a repo, then verify the environment.
+
+## Requirements
+
+| Requirement | Notes |
+| --- | --- |
+| **Go 1.25+** | Build from source or use a released binary |
+| **Git** | Required for worktrees, status checks, and diffs |
+| **Configured agents** | At minimum, commands referenced in `.agentflow/config.yaml` (`cursor-agent`, `kiro`, `ollama`, etc.) |
+
+Optional: **Ollama** for local enrichment/routing, **Notion** token for sync (`NOTION_TOKEN`).
+
+## Install from source
+
+```bash
+git clone https://github.com/LaProgrammerie/hyper-fast-builder.git
+cd hyper-fast-builder
+make build
+# binary: ./bin/agentflow
+```
+
+Add `bin/` to your `PATH`, or copy `bin/agentflow` to a directory on `PATH`.
+
+## Initialize a repository
+
+From your project root:
+
+```bash
+agentflow init
+```
+
+This creates:
+
+- `.agentflow/` — config, SQLite state, runs, worktrees
+- `.agentflow/config.yaml` — copied from `config.yaml.example` when missing
+- `.agentflow/state.sqlite` — run and task bookkeeping
+
+Ensure `.agentflow/state.sqlite` and `.agentflow/worktrees/` are listed in `.gitignore` (init prints a reminder).
+
+## Verify setup
+
+```bash
+agentflow doctor
+```
+
+Doctor checks git, config presence, agent commands on `PATH`, and common misconfigurations. Fix reported issues before running `work`.
+
+## Configuration
+
+Copy and edit the example if you need custom agents or budgets:
+
+```bash
+cp .agentflow/config.yaml.example .agentflow/config.yaml
+```
+
+See [Configuration file](/docs/configuration/config-file) for every YAML block.
+
+## Next steps
+
+- [Quickstart](/docs/getting-started/quickstart)
+- [First workflow](/docs/getting-started/first-workflow)

@@ -1,4 +1,4 @@
 {
   "title": "Cost & Performance",
-  "pages": ["token-estimation"]
+  "pages": ["token-estimation", "context-optimization", "local-investigation"]
 }

@@ -1,0 +1,43 @@
+---
+title: MCP tools
+description: Tools exposed when mcp.enabled is true.
+---
+
+# MCP tools
+
+When `mcp.enabled: true`, `mcp-serve` registers tools backed by investigation and contextopt packages. Tool names and schemas are returned by `tools/list` at runtime.
+
+## Typical capabilities
+
+| Area | Purpose |
+| --- | --- |
+| Investigation | Bounded grep / repo scan consistent with CLI `investigate` |
+| Context | Build or summarize context packs |
+| Cost | Approximate token/cost for a payload |
+
+Exact tool IDs may change between releases — always call `tools/list` after upgrade.
+
+## Limits
+
+From config:
+
+- `max_output_bytes` — cap RPC payload size
+- `command_timeout_seconds` — per-tool execution
+- `investigation.*` — grep/file scan caps (shared with non-MCP investigation)
+
+## Example client flow
+
+```bash
+agentflow mcp-serve
+# Editor MCP client connects via stdio, sends:
+# {"jsonrpc":"2.0","id":1,"method":"tools/list"}
+```
+
+<Callout type="experimental">
+Tool surface is minimal and evolving. Do not depend on undocumented tools in production automation without pinning AgentFlow version.
+</Callout>
+
+## Related
+
+- [Local investigation](/docs/cost-performance/local-investigation)
+- [MCP security](/docs/mcp/security)

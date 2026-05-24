@@ -1,8 +1,83 @@
 ---
 title: First workflow
-description: Run your first workflow end-to-end.
+description: Complete AgentFlow flow from init through report with real CLI commands.
 ---
 
 # First workflow
 
-Walk through the first workflow (placeholder content).
+End-to-end flow aligned with `spec-doc` §11.1: initialize, verify, estimate, execute, inspect status, open the report.
+
+## Prerequisites
+
+- AgentFlow built and on `PATH`
+- Git repository with at least one spec under `.kiro/specs/<feature>/` or `.agentflow/specs/`
+- `.agentflow/config.yaml` with agent commands that exist on your machine
+
+## Steps
+
+### 1. Initialize and verify
+
+```bash
+agentflow init
+agentflow doctor
+```
+
+### 2. Estimate before spending
+
+```bash
+agentflow work "develop billing-v2" --estimate-only
+```
+
+Review token/cost estimates and budget prompts. Use `--budget 0.50` or config `budgets` to cap spend. Pass `--allow-over-budget` only when config allows overrides.
+
+### 3. Plan-only rehearsal
+
+```bash
+agentflow work "develop billing-v2" --plan-only
+```
+
+Confirms intent resolution and task selection without execution.
+
+### 4. Execute the run
+
+```bash
+agentflow work "develop billing-v2"
+```
+
+With `intent.default_mode: guided` and `work.require_plan_confirmation: true`, AgentFlow asks before executing unless you pass `--yes`.
+
+Pipeline stages (typical): resolve intent → plan/enrich context → dev in worktree → verify → optional review → report.
+
+### 5. Status and report
+
+```bash
+agentflow status
+agentflow report <run-id>
+```
+
+Replace `<run-id>` with the ID from `status` (format like `run-2026-05-17-…`).
+
+## What you should see
+
+- SQLite state under `.agentflow/state.sqlite`
+- Per-run artefacts under `.agentflow/runs/<run-id>/`
+- Git worktree under `.agentflow/worktrees/` for active dev tasks
+- Validation output from commands in `validation.commands` (e.g. `go test ./...`)
+
+## Resume and recovery
+
+```bash
+agentflow resume <run-id>
+```
+
+Without `--dry-run`, **`resume` prints the next step name only** — it does not automatically re-invoke agents. Use `continue` or re-run the suggested command (`plan`, `enrich`, `dev`, …). Automatic step chaining exists only as **`agentflow resume <run-id> --execute` with global `--dry-run`**.
+
+<Callout type="experimental">
+Full non-dry-run auto-resume is not implemented. Prefer `agentflow continue` for intent-based continuation.
+</Callout>
+
+## Related workflows
+
+- [Kiro → Cursor → Verify](/docs/workflows/kiro-to-cursor)
+- [Cost-aware workflow](/docs/workflows/cost-aware-workflow)
+- [Failure recovery](/docs/workflows/failure-recovery)

@@ -1,0 +1,54 @@
+---
+title: Notion sources
+description: Configure Notion sync into local spec snapshots.
+---
+
+# Notion sources
+
+Implementation: `application/internal/source/notion`. Execution always uses **local files** after sync.
+
+## Configuration
+
+```yaml
+sources:
+  notion:
+    enabled: true
+    token_env: NOTION_TOKEN
+    default_database_id: ""
+    specs_database_id: "<database-id>"
+    tasks_database_id: ""
+    status_property: Status
+    title_property: Name
+    updated_time_property: Last edited time
+    import_path: .agentflow/specs
+```
+
+Token is read from the env var named by `token_env` (default `NOTION_TOKEN`).
+
+## Commands
+
+```bash
+export NOTION_TOKEN="..."
+agentflow sync notion --page "https://notion.so/..."
+agentflow sync all
+agentflow inbox --source notion
+```
+
+## Safety
+
+- Disabled by default (`enabled: false`)
+- Dry-run: `agentflow --dry-run sync notion --page ...`
+- Overwrite prompts when local spec exists and stdin is a TTY
+
+<Callout type="experimental">
+Notion API schemas differ per workspace. Validate property names (`status_property`, etc.) before relying on sync in production.
+</Callout>
+
+<Callout type="security">
+Store tokens in environment or secret manager — never in committed YAML.
+</Callout>
+
+## Related
+
+- [Notion → code workflow](/docs/workflows/notion-to-code)
+- [CLI: sync](/docs/cli/generated/sync)
