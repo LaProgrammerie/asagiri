@@ -7,7 +7,7 @@ Complements `AGENTS.md`: **where things live**, **who consumes what**, and **how
 | Topic | Where it lives |
 |-------|----------------|
 | **AgentFlow consolidation (OSS / fiabilisation)** | `spec-postv123.md`, `docs/consolidation/` |
-| **Public documentation site** | `spec-doc.md`, `docs-site/` (Fumadocs → GitHub Pages `/hyper-fast-builder`) ; contenu `content/docs/{en,fr,de,es}/` — **en** défaut/fallback, référence CLI générée uniquement sous `en/cli/generated/` |
+| **Public documentation site** | `spec-doc.md`, `spec-deploy-doc.md`, `docs-site/` (Fumadocs → **Cloudflare Pages**) ; contenu `content/docs/{en,fr,de,es}/` — **en** défaut/fallback, référence CLI générée uniquement sous `en/cli/generated/` ; CI `.github/workflows/docs-cloudflare-pages.yml` |
 | **Doc / code / spec drift tracker** | `problems.md` (repo root) |
 | **AgentFlow spec courante (cost/perf)** | `specv3.md` (repo root) |
 | **AgentFlow intent layer** | `specv2.md` (repo root) |

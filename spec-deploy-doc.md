@@ -1,5 +1,7 @@
 Voici une spec prête à donner à tes agents.
 
+> **Implémenté (2026-05-17)** : workflows `docs-cloudflare-pages.yml` + `docs-check.yml` ; `docs.yml` (GitHub Pages) supprimé ; `docs-site/` migré **pnpm** (`pnpm-lock.yaml`). Le job CI exécute toujours `go run … docs generate-cli` avant le build Node (non montré dans le YAML minimal ci-dessous).
+
 # Spec — Déploiement Fumadocs sur Cloudflare Pages via GitHub Actions
 ## 1. Objectif
 Mettre en place le déploiement automatique de la documentation `docs-site/` sur Cloudflare Pages via GitHub Actions.

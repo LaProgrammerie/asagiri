@@ -2,12 +2,13 @@
   "name": "hyper-fast-builder-docs",
   "private": true,
   "type": "module",
+  "packageManager": "pnpm@10.11.0",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "docs:check": "npm run typecheck && npm run lint && npm run build"
+    "docs:check": "pnpm typecheck && pnpm lint && pnpm build"
   },
   "dependencies": {
     "country-flag-icons": "^1.6.17",

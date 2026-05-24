@@ -46,22 +46,17 @@ Primitive pipeline (Kiro → plan → dev → verify): [`spec.md`](spec.md) · I
 
 ## Documentation
 
-Public docs (Fumadocs, static export) — **en** (default), **fr**, **de**, **es**:
-
-| Locale | URL |
-|--------|-----|
-| English | https://laprogrammerie.github.io/hyper-fast-builder/docs/ |
-| Français | https://laprogrammerie.github.io/hyper-fast-builder/docs/fr/ |
-| Deutsch | https://laprogrammerie.github.io/hyper-fast-builder/docs/de/ |
-| Español | https://laprogrammerie.github.io/hyper-fast-builder/docs/es/ |
+Public docs (Fumadocs, static export on **Cloudflare Pages**) — **en** (default), **fr**, **de**, **es**. Production URL depends on your Pages project / custom domain (configure after first deploy).
 
 Build locally:
 
 ```bash
 go run ./application/cmd/agentflow docs generate-cli --output docs-site/content/docs/en/cli/generated
-cd docs-site && npm install && npm run build
+cd docs-site && corepack enable && pnpm install && pnpm run docs:check
 # static output: docs-site/out/
 ```
+
+**CI deploy** (push to `main` or PR preview): [`.github/workflows/docs-cloudflare-pages.yml`](.github/workflows/docs-cloudflare-pages.yml). Repository secrets (no values in repo): `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_PAGES_PROJECT`. See [`docs-site/README.md`](docs-site/README.md).
 
 ## Status
 

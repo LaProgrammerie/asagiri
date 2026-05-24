@@ -8,6 +8,7 @@ Public ADR excerpts for contributors. The canonical log lives in [`docs/ai/05-de
 | ADR-009 | Intent layer; Notion never executed without local snapshot |
 | ADR-010 | V3 cost/perf; pricing from config only; MCP off by default |
 | ADR-011 | Consolidation post-V3; Apache 2.0; `redact` package |
-| ADR-012 | Public docs: Fumadocs static site under `docs-site/`, GitHub Pages |
+| ADR-012 | Public docs: Fumadocs static site under `docs-site/` |
+| ADR-014 | Docs hosting: Cloudflare Pages (Wrangler CI), pnpm, `docs-check` for forks |
 
 Full table: [`docs/ai/05-decisions.md`](../ai/05-decisions.md).

@@ -5,12 +5,12 @@
 
 ## Immediate objective
 
-Site docs public Fumadocs (`docs-site/`), référence CLI générée, CI GitHub Pages — en parallèle de la consolidation OSS (`spec-postv123`).
+Site docs public Fumadocs (`docs-site/`), référence CLI générée, déploiement **Cloudflare Pages** (Wrangler via GitHub Actions) — en parallèle de la consolidation OSS (`spec-postv123`).
 
 ## Allowed scope (spec-postv123)
 
 - `docs-site/` (Fumadocs, contenu EN, static export)
-- `.github/workflows/docs.yml`
+- `.github/workflows/docs-cloudflare-pages.yml`, `.github/workflows/docs-check.yml`
 - `application/internal/cli/docgen/` + `docs` subcommand
 - `docs/decisions/`, `docs/contributing/`, `docs/specs/`
 - `CODE_OF_CONDUCT.md`, `SECURITY.md`
@@ -32,7 +32,7 @@ Site docs public Fumadocs (`docs-site/`), référence CLI générée, CI GitHub 
 - [x] LICENSE Apache 2.0, CONTRIBUTING, ROADMAP, examples/quickstart
 - [x] `make benchmark` / script dry-run
 - [ ] Couverture `workflow` / `intent` > 50 % (roadmap §6)
-- [x] `docs-site` build static (`out/`) + workflow Pages
+- [x] `docs-site` build static (`out/`) + workflow Cloudflare Pages (`docs-cloudflare-pages.yml`) + validation PR sans secrets (`docs-check.yml`)
 - [x] MVP pages EN + CLI ref générée (`docs generate-cli`)
 - [x] `TestCLICommandsDocumented` (docgen)
 - [x] **Tranche doc-content** : pages MVP `docs-site/content/docs/*` sans placeholder ; pages config/mcp/reference ; `problems.md` ; regen CLI
@@ -46,6 +46,7 @@ Site docs public Fumadocs (`docs-site/`), référence CLI générée, CI GitHub 
 
 ## References
 
+- [`spec-deploy-doc.md`](../../../spec-deploy-doc.md) (Cloudflare Pages CI)
 - [`spec-postv123.md`](../../../spec-postv123.md)
 - [`docs/consolidation/README.md`](../../consolidation/README.md)
 - [`specv3.md`](../../../specv3.md), [`specv2.md`](../../../specv2.md), [`spec.md`](../../../spec.md)
