@@ -1,0 +1,4 @@
+{
+  "title": "Configuración",
+  "pages": ["config-file", "agents", "budgets", "routing", "notion"]
+}

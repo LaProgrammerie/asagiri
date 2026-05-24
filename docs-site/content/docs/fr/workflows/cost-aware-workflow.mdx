@@ -1,0 +1,55 @@
+---
+title: Workflow conscient des coûts
+description: Estimer, optimiser le contexte et plafonner la dépense avant exécution agent.
+---
+
+# Workflow conscient des coûts
+
+Guide opérationnel (`spec-doc` §11.4) avec drapeaux et clés de config réels.
+
+## 1. Estimation par tâche
+
+```bash
+agentflow estimate billing-v2 --task task-003 --dry-run
+```
+
+Affiche les jetons entrée/sortie heuristiques et le coût estimé d'après votre grille `pricing`.
+
+## 2. Optimisation du contexte
+
+```bash
+agentflow context billing-v2 --task task-003 --optimize
+```
+
+Construit un paquet de contexte réduit avant les gros prompts agent. Désactivez la réduction avec `agentflow work ... --no-context-reduction`.
+
+## 3. Exécution avec budget
+
+```bash
+agentflow work "develop billing-v2" --budget 0.50 --estimate-only
+agentflow work "develop billing-v2" --budget 0.50
+```
+
+Les budgets config (`budgets.per_run.max_estimated_cost`) s'appliquent lorsque `--budget` CLI vaut zéro. Les exécutions au-delà du budget sont bloquées sauf :
+
+- acceptation de l'invite de confirmation, ou
+- `--yes` après `BudgetPendingConfirmError`, ou
+- `--allow-over-budget` lorsque `budgets.policies.allow_override_with_flag` est true
+
+## 4. Préférence locale
+
+```bash
+agentflow work "develop billing-v2" --prefer-local --no-cloud
+```
+
+`--allow-cloud` autorise explicitement le routage cloud lorsque les politiques le restreindraient sinon.
+
+## Explicabilité
+
+`work` et `estimate` affichent des résumés d'étapes (choix de routage, octets de contexte, contrôles budget). Voir [Estimation des jetons](/docs/fr/cost-performance/token-estimation).
+
+## Voir aussi
+
+- [Concepts conscients des coûts](/docs/fr/concepts/cost-aware-workflows)
+- [Budgets](/docs/fr/configuration/budgets)
+- [CLI : cost-report](/docs/cli/generated/cost-report)

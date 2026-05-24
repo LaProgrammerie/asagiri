@@ -1,0 +1,39 @@
+---
+title: Hoja de ruta
+description: Funciones entregadas, trabajo de consolidación y siguientes prioridades.
+---
+
+# Hoja de ruta
+
+Hoja de ruta canónica: **[ROADMAP.md](https://github.com/LaProgrammerie/hyper-fast-builder/blob/main/ROADMAP.md)** en la raíz del repositorio.
+
+## Entregado (V1 → V3)
+
+- Primitivas CLI: `init`, `spec`, `plan`, `dev`, `verify`, `review`, worktrees, SQLite
+- Capa de intención: `work`, `continue`, `next`, sync Notion
+- Coste/rendimiento: `estimate`, `investigate`, `context`, `cost`, MCP, TUI, métricas
+
+## En curso (consolidación)
+
+- Auditorías de arquitectura/seguridad/rendimiento bajo `docs/consolidation/`
+- Sitio de documentación pública (este sitio) + referencia CLI generada
+- Preparación OSS: Apache 2.0, CONTRIBUTING, ejemplos
+
+## Prioridades siguientes
+
+| Prioridad | Elemento |
+| --- | --- |
+| P0 | Cobertura `workflow` / `intent/executor` > 50 % |
+| P0 | Tokenizers exactos por proveedor |
+| P1 | Caché persistente del paquete de contexto entre ejecuciones |
+| P1 | CI completa en GitHub Actions (test, lint, release) |
+| P2 | TUI interactiva bubbletea |
+| P2 | Embeddings vectoriales RAG |
+| P3 | Multi-repo / estado remoto |
+
+Detalle: `docs/consolidation/TODO-prioritized.md`.
+
+## Ver también
+
+- [Contribuir](/docs/es/contributing)
+- [Límites](/docs/es/security/limits)

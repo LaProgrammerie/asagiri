@@ -1,0 +1,54 @@
+---
+title: Routing
+description: Kostenbewusstes Routing von Schrittklassen zu lokalen oder Cloud-Agents.
+---
+
+# Routing
+
+`application/internal/routing/router.go` wählt Agent/Modell aus der Config anhand von Schrittklassen-Strings (z. B. `summarize`, `implementation`, `pre_review`).
+
+## Konfiguration
+
+```yaml
+routing:
+  default_strategy: cost_aware
+  strategies:
+    cost_aware:
+      prefer_local_for: [summarize, classify, context_selection, pre_review, log_analysis]
+      use_cloud_fast_for: [implementation_medium, review_medium, planning_complex]
+      use_cloud_heavy_for: [architecture_critical, security_sensitive, large_refactor]
+      local_failures_before_cloud: 1
+      cloud_fast_failures_before_heavy: 1
+```
+
+## Entscheidungsfluss
+
+```mermaid
+flowchart TD
+  A[Schrittklasse] --> B{In prefer_local_for?}
+  B -->|ja| C[default_enricher / ollama]
+  B -->|nein| D{no_cloud ohne allow_cloud?}
+  D -->|ja| C
+  D -->|nein| E{In use_cloud_heavy_for?}
+  E -->|ja| F[claude-Profil]
+  E -->|nein| G{In use_cloud_fast_for?}
+  G -->|ja| H[default_agent / cursor]
+  G -->|nein| H
+```
+
+## CLI-Overrides
+
+| Flag | Wirkung |
+| --- | --- |
+| `--prefer-local` | Erzwingt lokalen Pfad, wenn Strategie passt |
+| `--no-cloud` | Blockiert Cloud außer mit `--allow-cloud` |
+| `--allow-cloud` | Explizite Cloud-Erlaubnis |
+
+<Callout type="experimental">
+Cloud-Routing-Qualität hängt vollständig von Ihren `models`- und `agents`-Einträgen ab — AgentFlow ruft keine Vendor-APIs zur automatischen Modellwahl auf.
+</Callout>
+
+## Siehe auch
+
+- [Kostenbewusste Konzepte](/docs/de/concepts/cost-aware-workflows)
+- [Modelle in der Konfigurationsdatei](/docs/de/configuration/config-file#models)

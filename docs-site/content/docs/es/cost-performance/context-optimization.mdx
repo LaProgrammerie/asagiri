@@ -1,0 +1,48 @@
+---
+title: Optimización de contexto
+description: Recopilar, puntuar, comprimir y empaquetar el contexto del repositorio antes de ejecutar agentes.
+---
+
+# Optimización de contexto
+
+Paquetes: `application/internal/contextopt` — recolector, puntuación de relevancia, reductor/compresor, empaquetador.
+
+## Pipeline
+
+```mermaid
+flowchart LR
+  C[Recopilar archivos] --> R[Puntuación de relevancia]
+  R --> X[Comprimir / reducir]
+  X --> P[Paquete de contexto]
+  P --> A[Prompt del agente]
+```
+
+## CLI
+
+```bash
+agentflow context billing-v2 --task task-003
+agentflow context billing-v2 --task task-003 --optimize
+agentflow work "develop billing-v2" --show-context-plan
+```
+
+`work` ejecuta optimización de contexto en el pipeline V3 salvo que se pase `--no-context-reduction`.
+
+## Configuración
+
+Los límites de investigación (compartidos con grep local) están bajo `mcp.investigation` en la config — aplican incluso con el servidor MCP desactivado.
+
+## Compromisos
+
+| Beneficio | Límite |
+| --- | --- |
+| Prompts más pequeños | puede descartar archivos relevantes si las heurísticas fallan |
+| Llamadas a la nube más rápidas | no sustituye leer rutas críticas manualmente |
+
+<Callout type="experimental">
+Las heurísticas de compresión evolucionan — compare la salida de `--show-context-plan` al depurar contexto faltante.
+</Callout>
+
+## Ver también
+
+- [Local primero](/docs/es/concepts/local-first)
+- [CLI: context](/docs/cli/generated/context)

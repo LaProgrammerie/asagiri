@@ -1,0 +1,50 @@
+---
+title: Budgets
+description: Geschätzte Kosten- und Token-Obergrenzen pro Lauf, Aufgabe und Tag.
+---
+
+# Budgets
+
+Implementiert in `application/internal/cost/budget.go` und im V3-Pipeline vor Agentenausführung erzwungen.
+
+## Schema
+
+```yaml
+budgets:
+  default_currency: EUR
+  per_run:
+    max_estimated_cost: 1.00
+    max_estimated_tokens: 500000
+    require_confirmation_above_cost: 0.20
+  per_task:
+    max_estimated_cost: 0.30
+    max_estimated_tokens: 150000
+  daily:
+    max_estimated_cost: 10.00
+  policies:
+    block_when_over_budget: true
+    allow_override_with_flag: true
+    override_flag: "--allow-over-budget"
+```
+
+## CLI-Interaktion
+
+| Flag | Verhalten |
+| --- | --- |
+| `--budget <EUR>` | Lauf-Level-Cap für diesen Aufruf |
+| `--estimate-only` | Stop nach Schätzung; keine Ausgaben |
+| `--allow-over-budget` | Umgehung der Sperre, wenn Policy es erlaubt |
+| `--yes` | Bestätigung nach `BudgetPendingConfirmError` akzeptieren |
+
+## Grenzen
+
+Schätzungen nutzen heuristische Token × Ihr `pricing`-Sheet. Reale Anbieterrechnungen können abweichen.
+
+<Callout type="cost">
+`pricing.models` mit aktuellen Tarifen pflegen. Nullpreise verzerren Kostenanzeigen, deaktivieren aber keine Token-Caps.
+</Callout>
+
+## Siehe auch
+
+- [Kostenbewusster Workflow](/docs/de/workflows/cost-aware-workflow)
+- [Token-Schätzung](/docs/de/cost-performance/token-estimation)

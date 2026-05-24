@@ -1,0 +1,48 @@
+---
+title: Philosophie
+description: Deterministische Orchestrierung, Validierung vor Vertrauen, klare Grenzen.
+---
+
+# Philosophie
+
+## Problem
+
+Coding-Agenten sind leistungsfähig, aber nicht deterministisch. Teams brauchen **wiederholbare** Workflows: bekannte Schritte, isolierte Branches, externe Validierung, Kostentransparenz und Audit-Trails — keine undurchsichtigen „autonomen“ Läufen.
+
+## AgentFlow-Ansatz
+
+AgentFlow orchestriert **spec → plan → implementieren → verifizieren → review → report** mit:
+
+1. **Explizitem Zustand** — SQLite-gestützte Läufe/Aufgaben und dokumentierte Zustandsmaschine
+2. **Lokal zuerst** — grep, Dateiscan und Kontext-Packing vor Cloud-Aufrufen
+3. **Kostenbewusstsein** — heuristische Token-Schätzungen und Budgets vor Ausführung
+4. **Git-Worktree-Isolation** — eine Aufgabe, ein Branch, ein Tree
+5. **Validierung durch Ihre Befehle** — `go test`, Linter usw., keine Selbsteinschätzung des Agenten
+6. **Reproduzierbare Reports** — Markdown + JSON unter `.agentflow/runs/`
+
+## Was wir nicht behaupten
+
+<Callout type="warning">
+AgentFlow garantiert keine Korrektheit, Sicherheit oder Produktionsreife. Es koordiniert Werkzeuge; Menschen und Ihre Testsuite bleiben die Autorität.
+</Callout>
+
+## Kompromisse
+
+| Gewinn | Kosten |
+| --- | --- |
+| Vorhersagbare Pipeline-Schritte | Weniger „Ein-Klick-Magie“ als Ad-hoc-Agent-Chats |
+| Kostenschätzungen im Voraus | Schätzungen sind näherungsweise (Zeichen/Token-Heuristiken) |
+| Worktree-Sicherheit | Mehr Platten- und Git-Komplexität |
+| Steckbare Agents | Sie müssen jede CLI installieren und konfigurieren |
+
+## Konfiguration
+
+- `work.auto_verify`, `work.auto_review` — Automatisierung vs. manuelle Gates
+- `policies.require_clean_git` — schmutzige Trees blockieren
+- `budgets` — wirtschaftliche Schranken
+
+## Siehe auch
+
+- [Lokal zuerst](/docs/de/concepts/local-first)
+- [Kostenbewusste Workflows](/docs/de/concepts/cost-aware-workflows)
+- [Grenzen](/docs/de/security/limits)

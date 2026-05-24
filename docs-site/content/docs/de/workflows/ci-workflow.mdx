@@ -1,0 +1,54 @@
+---
+title: CI-Workflow
+description: AgentFlow in CI mit Dry-Run, Validierung und Docs-Checks verwenden.
+---
+
+# CI-Workflow
+
+AgentFlow in CI sollte **nicht interaktiv**, **dry-run-freundlich** und ohne Secrets in Logs bleiben.
+
+## Empfohlenes Muster
+
+```yaml
+# Auszug — an Ihre CI anpassen
+- run: go build -o bin/agentflow ./application/cmd/agentflow
+- run: bin/agentflow init
+  working-directory: ${{ github.workspace }}
+- run: bin/agentflow doctor
+- run: bin/agentflow work "smoke feature" --dry-run --plan-only
+- run: go test -race ./...
+```
+
+## Umgebungsvariablen
+
+| Variable | Wirkung |
+| --- | --- |
+| `AGENTFLOW_DRY_RUN=1` | wie globales `--dry-run` |
+| `AGENTFLOW_YES=1` | Auto-Bestätigung (in CI vorsichtig) |
+| `NOTION_TOKEN` | nur für Notion-Sync-Jobs nötig |
+
+Siehe [Umgebungsvariablen](/docs/de/reference/environment-variables).
+
+## Docs-CI
+
+Dieses Repository baut die öffentliche Docs-Site bei Push:
+
+```bash
+cd docs-site && npm ci && npm run build
+go run ./application/cmd/agentflow docs generate-cli --output docs-site/content/docs/en/cli/generated
+go test ./application/internal/cli/docgen/...
+```
+
+Workflow-Datei: `.github/workflows/docs.yml`.
+
+## In CI vermeiden
+
+- Keine echten `dev`/`review` ohne gepinnte Agents und Secrets
+- Keine `.agentflow/config.yaml` mit Tokens committen
+- `--estimate-only` nicht als Ersatz für `go test` behandeln
+
+## Siehe auch
+
+- [Mitwirken](/docs/de/contributing)
+- [Sicherheit](/docs/de/security)
+- [CLI: verify](/docs/cli/generated/verify)

@@ -1,0 +1,39 @@
+---
+title: Feuille de route
+description: Fonctions livrées, chantiers de consolidation et prochaines priorités.
+---
+
+# Feuille de route
+
+Feuille de route canonique : **[ROADMAP.md](https://github.com/LaProgrammerie/hyper-fast-builder/blob/main/ROADMAP.md)** à la racine du dépôt.
+
+## Livré (V1 → V3)
+
+- Primitives CLI : `init`, `spec`, `plan`, `dev`, `verify`, `review`, worktrees, SQLite
+- Couche intention : `work`, `continue`, `next`, sync Notion
+- Coût/perf : `estimate`, `investigate`, `context`, `cost`, MCP, TUI, métriques
+
+## En cours (consolidation)
+
+- Audits architecture/sécurité/performance sous `docs/consolidation/`
+- Site doc public (ce site) + référence CLI générée
+- Préparation OSS : Apache 2.0, CONTRIBUTING, exemples
+
+## Priorités suivantes
+
+| Priorité | Élément |
+| --- | --- |
+| P0 | Couverture `workflow` / `intent/executor` > 50 % |
+| P0 | Tokenizers alignés fournisseur |
+| P1 | Cache persistant du paquet de contexte entre exécutions |
+| P1 | CI GitHub Actions complète (test, lint, release) |
+| P2 | TUI bubbletea interactive |
+| P2 | Embeddings vectoriels RAG |
+| P3 | Multi-dépôt / état distant |
+
+Détail : `docs/consolidation/TODO-prioritized.md`.
+
+## Voir aussi
+
+- [Contribution](/docs/fr/contributing)
+- [Limites](/docs/fr/security/limits)

@@ -1,0 +1,211 @@
+---
+title: Archivo de configuración
+description: Referencia completa de bloques y valores por defecto de .agentflow/config.yaml.
+---
+
+# Archivo de configuración
+
+Ruta: **`.agentflow/config.yaml`** (creado por `agentflow init` desde `config.yaml.example`). Las rutas se resuelven relativas a la raíz del repositorio salvo que sean absolutas.
+
+Esquema JSON (generado): `/schemas/config.schema.json` en el sitio de documentación.
+
+## `project`
+
+```yaml
+project:
+  name: my-project
+  default_branch: main
+```
+
+Nombre mostrado del repositorio y rama por defecto para operaciones de worktree.
+
+## `intent`
+
+Resolución en lenguaje natural para `work` / `continue` (`application/internal/intent`).
+
+```yaml
+intent:
+  enabled: true
+  default_mode: guided   # guided | auto
+  resolver:
+    use_ollama_fallback: true
+    min_confidence: 0.75
+    ask_when_below_confidence: true
+```
+
+## `work`
+
+Valores por defecto de orquestación y selección de agentes.
+
+```yaml
+work:
+  default_agent: cursor
+  default_reviewer: codex
+  default_enricher: ollama
+  stop_after: report
+  auto_verify: true
+  auto_review: false
+  max_tasks_per_run: 1
+  require_plan_confirmation: true
+```
+
+## `sources`
+
+| Bloque | Propósito |
+| --- | --- |
+| `sources.local` | Explorar `.agentflow/specs`, `.kiro/specs`, `docs/ai/active` |
+| `sources.notion` | Importación opcional Notion → local (véase [Notion](/docs/es/configuration/notion)) |
+
+```yaml
+sources:
+  local:
+    enabled: true
+    paths:
+      - .agentflow/specs
+      - .kiro/specs
+      - docs/ai/active
+  notion:
+    enabled: false
+    token_env: NOTION_TOKEN
+    specs_database_id: ""
+    import_path: .agentflow/specs
+```
+
+## `specs`, `state`, `worktrees`
+
+```yaml
+specs:
+  kiro_path: .kiro/specs
+  active_spec_path: docs/ai/active/current-spec.md
+  handoff_path: docs/ai/active/handoff.md
+
+state:
+  backend: sqlite
+  path: .agentflow/state.sqlite
+
+worktrees:
+  base_path: .agentflow/worktrees
+  branch_prefix: agentflow
+  cleanup_policy: keep_failed
+```
+
+## `agents`
+
+Asocie identificadores lógicos de agente a comandos subprocess. Vea [Configuración de agentes](/docs/es/configuration/agents).
+
+## `validation`
+
+```yaml
+validation:
+  commands:
+    - name: tests
+      command: go test ./...
+      required: true
+```
+
+Los repositorios Go reciben valores por defecto del bootstrap si existe `go.mod`.
+
+## `models`
+
+Perfiles lógicos para enrutamiento y coste (`specv3`). Las claves son ids arbitrarios:
+
+```yaml
+models:
+  ollama_local_qwen:
+    provider: ollama
+    class: local
+    model: qwen2.5-coder:14b
+    input_cost_per_1m_tokens: 0
+    output_cost_per_1m_tokens: 0
+    usage: [summarize, classify, pre_review, context_selection]
+```
+
+## `budgets`
+
+Vea [Presupuestos](/docs/es/configuration/budgets).
+
+## `pricing`
+
+Hoja de precios manual — **sin precios de nube codificados en código**.
+
+```yaml
+pricing:
+  currency: EUR
+  models:
+    gemini-3-flash-preview:
+      input_per_1m_tokens: 0.00
+      output_per_1m_tokens: 0.00
+      source: manual
+      updated_at: "2026-05-17"
+```
+
+## `token_estimation`
+
+Heurísticas de caracteres por token (`application/internal/cost/token_counter.go`):
+
+```yaml
+token_estimation:
+  default_chars_per_token: 4.0
+  code_chars_per_token: 3.2
+  markdown_chars_per_token: 4.2
+  json_chars_per_token: 3.6
+```
+
+<Callout type="cost">
+Estas proporciones aproximan tokens — no son tokenizers de proveedor.
+</Callout>
+
+## `routing`
+
+Vea [Enrutamiento](/docs/es/configuration/routing).
+
+## `ui`
+
+UX de terminal (`application/internal/tui`):
+
+```yaml
+ui:
+  mode: auto      # auto | rich | plain | json
+  live_logs: true
+  progress_bars: true
+  compact: false
+```
+
+## `mcp`
+
+Servidor MCP stdio local (`mcp.enabled` debe ser `true` para exponer herramientas):
+
+```yaml
+mcp:
+  enabled: false
+  max_output_bytes: 1048576
+  command_timeout_seconds: 120
+  secret_path_denylist: [".env", "credentials.json", "id_rsa"]
+  investigation:
+    large_file_bytes: 524288
+    max_grep_output_bytes: 262144
+    command_timeout_seconds: 120
+    sensitive_globs: ["*.pem", ".git/*"]
+```
+
+## `policies`
+
+```yaml
+policies:
+  require_clean_git: true
+  forbid_untracked_secret_files: true
+  max_files_changed_per_task: 20
+  allow_network: false
+  require_human_approval_for:
+    - database_migration
+    - security_sensitive_change
+    - dependency_upgrade
+```
+
+## Validar cambios
+
+```bash
+agentflow doctor
+```
+
+Tras editar YAML, ejecute `doctor` antes de `work`.

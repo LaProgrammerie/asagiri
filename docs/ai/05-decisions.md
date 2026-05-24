@@ -20,6 +20,7 @@ Suggested format per entry:
 | ADR-010 | 2026-05-17 | **V3 cost/perf** : packages `cost`, `contextopt`, `investigation`, `telemetry`, `tui` ; pipeline `RunV3Pipeline` ; prix **uniquement** via `pricing.models` (pas de hardcode) ; MCP stdio désactivé par défaut ; TUI isolée (`internal/tui`) | specv3 | Migration SQLite `run_metrics` / `step_metrics` ; `work --estimate-only` |
 | ADR-011 | 2026-05-17 | **Consolidation post-V3** : spec active `spec-postv123.md` ; collecte contexte via candidats investigation (`CollectForPipeline`) ; LICENSE **Apache 2.0** LaProgrammerie ; explainability dans sorties estimate/work ; package `redact` | Ouverture OSS, réduction I/O et dette | Audits `docs/consolidation/` ; pas de breaking CLI V1–V3 |
 | ADR-012 | 2026-05-17 | **Docs publiques** : `docs-site/` (Fumadocs + Next static export) ; `basePath` `/hyper-fast-builder` sur GitHub Pages ; référence CLI générée via `agentflow docs generate-cli` ; canon agents reste `docs/ai/` | `spec-doc.md` ; OSS international (EN) | CI `.github/workflows/docs.yml` ; ADR publics dans `docs/decisions/` |
+| ADR-013 | 2026-05-17 | **Docs i18n** : Fumadocs `parser: dir` — `content/docs/{en,fr,de,es}/` ; URLs `/docs` (en) et `/docs/{fr,de,es}/…` ; sélecteur de langue (navbar Fumadocs) ; CLI Cobra générée **en anglais** sous `en/cli/generated/` ; FR/DE/ES : pages manuelles traduites + stubs narratifs pour commandes clés | `spec-doc.md` ; demande OSS multilingue | `TestPublicDocsNoPlaceholders` parcourt les 4 locales ; pas de `--locale` docgen en V1 |
 
 ## Log
 

@@ -1,5 +1,7 @@
 Spec — Documentation publique AgentFlow
 
+> **i18n (2026-05-17)** : site en **en** (défaut), **fr**, **de**, **es** sous `docs-site/content/docs/{locale}/`. URLs : `/docs` (en), `/docs/fr|de|es/…`. Référence CLI générée : anglais uniquement (`en/cli/generated/`). Détail : ADR-013 dans `docs/ai/05-decisions.md`.
+
 1. Objectif
 
 Mettre en place une documentation publique complète, agréable, maintenable et prête pour l’open source.

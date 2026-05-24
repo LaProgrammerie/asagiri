@@ -1,0 +1,52 @@
+---
+title: CLI-Überblick
+description: AgentFlow-Befehlsgruppen und generierte Referenz pro Befehl.
+---
+
+# CLI-Überblick
+
+Einstiegsbinär: **`agentflow`** (`application/cmd/agentflow`).
+
+## Globale Flags
+
+| Flag | Beschreibung |
+| --- | --- |
+| `--dry-run` | simuliert ohne externe Agents oder Validierungs-Shells |
+| (persistent) | wird von allen Subbefehlen geerbt |
+
+Umgebung: `AGENTFLOW_DRY_RUN=1`, `AGENTFLOW_YES=1` — siehe [Umgebungsvariablen](/docs/de/reference/environment-variables).
+
+## Befehlsgruppen
+
+| Gruppe | Befehle |
+| --- | --- |
+| **Bootstrap** | `init`, `doctor`, `version` |
+| **Pipeline** | `spec`, `plan`, `enrich`, `dev`, `verify`, `review`, `pr` |
+| **Intent** | `work`, `continue`, `next`, `inbox` |
+| **Quellen** | `sync`, `index` |
+| **Kosten / Kontext** | `estimate`, `investigate`, `context`, `cost`, `cost-report`, `cost-models` |
+| **Inspect** | `inspect` (diff, symbol, tests) |
+| **Ops** | `status`, `resume`, `report`, `clean` |
+| **MCP** | `mcp`, `mcp-serve` |
+| **Meta** | `docs`, `help` |
+
+## Generierte Referenz
+
+Pro-Befehl-Seiten (Flags aus Cobra) liegen unter **[CLI generiert](/docs/de/cli/generated)** (Kurzfassungen auf Deutsch; vollständige Referenz auf Englisch unter `/docs/cli/generated`).
+
+Nach CLI-Änderungen neu generieren:
+
+```bash
+go run ./application/cmd/agentflow docs generate-cli \
+  --output docs-site/content/docs/en/cli/generated
+```
+
+## Einstieg
+
+```bash
+agentflow init
+agentflow doctor
+agentflow work "my feature" --dry-run --plan-only
+```
+
+Siehe [Schnellstart](/docs/de/getting-started/quickstart) und [Erster Workflow](/docs/de/getting-started/first-workflow).

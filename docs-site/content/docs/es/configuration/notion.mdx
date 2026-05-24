@@ -1,0 +1,54 @@
+---
+title: Fuentes Notion
+description: Configurar la sincronización de Notion hacia instantáneas de spec locales.
+---
+
+# Fuentes Notion
+
+Implementación: `application/internal/source/notion`. La ejecución siempre usa **archivos locales** tras la sincronización.
+
+## Configuración
+
+```yaml
+sources:
+  notion:
+    enabled: true
+    token_env: NOTION_TOKEN
+    default_database_id: ""
+    specs_database_id: "<database-id>"
+    tasks_database_id: ""
+    status_property: Status
+    title_property: Name
+    updated_time_property: Last edited time
+    import_path: .agentflow/specs
+```
+
+El token se lee desde la variable de entorno nombrada por `token_env` (por defecto `NOTION_TOKEN`).
+
+## Comandos
+
+```bash
+export NOTION_TOKEN="..."
+agentflow sync notion --page "https://notion.so/..."
+agentflow sync all
+agentflow inbox --source notion
+```
+
+## Seguridad
+
+- Desactivado por defecto (`enabled: false`)
+- Dry-run: `agentflow --dry-run sync notion --page ...`
+- Avisos de sobrescritura cuando existe una spec local y stdin es un TTY
+
+<Callout type="experimental">
+Los esquemas de la API de Notion difieren por espacio de trabajo. Valide los nombres de propiedades (`status_property`, etc.) antes de depender del sync en producción.
+</Callout>
+
+<Callout type="security">
+Guarde tokens en entorno o gestor de secretos — nunca en YAML versionado.
+</Callout>
+
+## Ver también
+
+- [Flujo Notion a código](/docs/es/workflows/notion-to-code)
+- [CLI: sync](/docs/cli/generated/sync)

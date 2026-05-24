@@ -1,0 +1,37 @@
+---
+title: Exit-Codes
+description: CLI-Exit-Verhalten bei Erfolg und Fehler.
+---
+
+# Exit-Codes
+
+AgentFlow folgt üblichen Go/Cobra-Konventionen:
+
+| Code | Bedeutung |
+| --- | --- |
+| **0** | Befehl ohne Fehler beendet |
+| **1** | allgemeiner Fehler (`RunE` lieferte Fehler — Config, Git, Workflow, Budget-Block, Agent-Fehler) |
+| **2** | Cobra-Usage-Fehler (unbekanntes Flag, falsche Arity) — typisch bei fehlerhaften Aufrufen |
+
+## Beispiele
+
+```bash
+agentflow work                    # Exit 2 — fehlendes Pflicht-Instruktionsargument
+agentflow doctor                  # Exit 0 wenn alle Checks passen
+agentflow work "x" --estimate-only # Exit 0 wenn Schätzung erfolgreich
+```
+
+Budget-Blocks und Validierungsfehler liefern **Exit 1** mit Meldung auf stderr.
+
+## Skripte
+
+```bash
+agentflow verify my-feature || echo "verify failed"
+```
+
+In CI `--dry-run` nutzen, um Non-Zero-Exits durch fehlende Agents zu vermeiden, wenn nur Orchestrierung getestet wird.
+
+## Siehe auch
+
+- [CLI-Überblick](/docs/de/cli)
+- [Fehlerbehebung](/docs/de/workflows/failure-recovery)

@@ -1,0 +1,43 @@
+---
+title: Vue d'ensemble MCP
+description: Serveur MCP stdio optionnel exposant investigation et contexte.
+---
+
+# Vue d'ensemble MCP
+
+AgentFlow peut exposer un serveur MCP **stdio JSON-RPC** minimal (`application/internal/mcp`) pour intégrations éditeur.
+
+<Callout type="experimental">
+MCP est désactivé par défaut. Activez-le uniquement dans des environnements de confiance après examen des périmètres d'outils.
+</Callout>
+
+## Activer
+
+```yaml
+mcp:
+  enabled: true
+  max_output_bytes: 1048576
+  command_timeout_seconds: 120
+```
+
+## Servir
+
+```bash
+agentflow mcp-serve
+```
+
+Prend en charge `initialize`, `tools/list`, `tools/call` (JSON délimité par nouvelles lignes).
+
+## Wrapper CLI
+
+```bash
+agentflow mcp
+```
+
+Inspecte les commandes liées à MCP — voir les pages générées [mcp](/docs/cli/generated/mcp) et [mcp-serve](/docs/cli/generated/mcp-serve).
+
+## Voir aussi
+
+- [Outils MCP](/docs/fr/mcp/tools)
+- [Sécurité MCP](/docs/fr/mcp/security)
+- [Configuration : mcp](/docs/fr/configuration/config-file#mcp)

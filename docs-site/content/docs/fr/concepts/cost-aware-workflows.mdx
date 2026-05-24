@@ -1,0 +1,45 @@
+---
+title: Workflows conscient des coûts
+description: Estimer jetons et coût avant exécution ; budgets et routage.
+---
+
+# Workflows conscient des coûts
+
+## Problème
+
+Les exécutions agent peuvent consommer des jetons de façon imprévisible. Les équipes ont besoin de **prévisions**, de **budgets** et d'un **routage** qui privilégie les chemins moins chers lorsque la qualité le permet.
+
+## Approche AgentFlow
+
+1. **Comptage heuristique des jetons** — ratios caractères par type de contenu (`token_estimation` dans la config)
+2. **Grille tarifaire** — entrées manuelles `pricing.models` pour les modèles cloud (pas de prix fournisseur codés en dur)
+3. **Budgets** — plafonds par exécution, par tâche, par jour avec seuils de confirmation optionnels
+4. **Routage** — `routing.strategies` associe classes d'étapes à agents local vs cloud rapide vs cloud lourd
+
+```bash
+agentflow estimate billing-v2 --task task-003 --dry-run
+agentflow work "develop billing-v2" --estimate-only
+agentflow work "develop billing-v2" --budget 0.50 --allow-over-budget
+```
+
+<Callout type="cost">
+Les estimations sont **approximatives**. La facturation fournisseur utilise de vrais tokenizers ; AgentFlow ne fournit pas encore des compteurs strictement alignés fournisseur.
+</Callout>
+
+## Compromis
+
+| Améliore | Ne résout pas |
+| --- | --- |
+| Surprises détectées avant `dev` | Factures à la centime près |
+| Politique via budgets YAML | Découverte automatique des prix cloud |
+| Raisons de routage explicables | Choix de modèle optimal sans votre config |
+
+## Configuration
+
+Voir [Budgets](/docs/fr/configuration/budgets), [Routage](/docs/fr/configuration/routing) et [Estimation des jetons](/docs/fr/cost-performance/token-estimation).
+
+## Voir aussi
+
+- [Guide workflow conscient des coûts](/docs/fr/workflows/cost-aware-workflow)
+- [CLI : cost](/docs/cli/generated/cost)
+- [CLI : estimate](/docs/cli/generated/estimate)

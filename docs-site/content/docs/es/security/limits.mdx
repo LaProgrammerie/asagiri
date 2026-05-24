@@ -1,0 +1,39 @@
+---
+title: Límites
+description: Lo que AgentFlow no garantiza y fronteras conocidas del producto.
+---
+
+# Límites
+
+Fronteras de confianza explícitas (`spec-doc` §17.1).
+
+## AgentFlow no
+
+- **Garantiza la corrección** del código generado
+- **Sustituye su suite de pruebas** — la validación ejecuta los comandos que configure; los fallos son su responsabilidad
+- **Sustituye la revisión humana** en seguridad, cumplimiento o arquitectura
+- **Impide todo prompt injection** — specs o contenido Notion malicioso pueden dirigir agentes
+- **Ofrece facturación de tokens exacta por proveedor**
+- **Ofrece SLA de producción** — CLI OSS de orquestación
+
+## Lo que sí hace
+
+- Aplica una **máquina de estados** a los pasos del pipeline
+- **Aísla** tareas en git worktrees
+- **Estima** coste/tokens antes de los lanzamientos
+- **Bloquea** algunas violaciones de política (git sucio, nombres de archivos secretos, techos de presupuesto)
+- **Registra** ejecuciones para auditoría (`report`, SQLite)
+
+## Capacidades experimentales
+
+Marcadas por separado en la documentación — superficie MCP completa, sync Notion, ajuste automático de compresión de contexto, reanudación automática fuera de dry-run y RAG vectorial.
+
+<Callout type="warning">
+Aprobar `verify` significa que los comandos configurados terminaron con código 0 — no que el cambio sea seguro para producción.
+</Callout>
+
+## Ver también
+
+- [Filosofía](/docs/es/concepts/philosophy)
+- [Descripción general de seguridad](/docs/es/security)
+- [Hoja de ruta](/docs/es/roadmap)

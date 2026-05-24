@@ -1,0 +1,43 @@
+---
+title: Sécurité
+description: Secrets, périmètre, MCP, agents et données envoyées aux fournisseurs.
+---
+
+# Sécurité
+
+AgentFlow orchestre des outils puissants. La sécurité est une **responsabilité partagée** : votre config, vos agents et votre processus de revue comptent autant que la CLI.
+
+## Synthèse par domaine
+
+| Domaine | Comportement |
+| --- | --- |
+| **Système de fichiers** | Opère sur le dépôt + worktrees ; l'investigation respecte les listes de refus |
+| **Secrets** | `token_env` pour Notion ; `secret_path_denylist` ; rédaction des journaux |
+| **Agents subprocess** | Pas de shell ; exec argv uniquement avec délais |
+| **Réseau** | `policies.allow_network: false` par défaut ; les agents peuvent néanmoins appeler le réseau |
+| **MCP** | Désactivé par défaut ; plafonds d'octets de sortie et délais de commande |
+| **Modèles cloud** | Les données quittent la machine lorsque les agents cloud s'exécutent — vous contrôlez les commandes |
+
+## Périmètre filesystem
+
+- Worktrees sous `.agentflow/worktrees/`
+- État et exécutions sous `.agentflow/`
+- Investigation : ignore des globs sensibles et chemins refusés (`.env`, clés)
+
+## Journaux sensibles
+
+`application/internal/redact` masque les motifs de jetons courants dans les sorties. Ne vous fiez pas seulement à la rédaction — évitez d'injecter des secrets dans les prompts agent.
+
+## Agents externes
+
+Les CLI configurés (`cursor-agent`, `codex`, etc.) s'exécurent avec les permissions de votre utilisateur. Traitez-les comme un outil CI avec accès au dépôt.
+
+## Signaler un problème
+
+Voir le [`SECURITY.md`](https://github.com/LaProgrammerie/hyper-fast-builder/blob/main/SECURITY.md) du dépôt pour le processus de divulgation.
+
+## Voir aussi
+
+- [Limites](/docs/fr/security/limits)
+- [Sécurité MCP](/docs/fr/mcp/security)
+- [Configuration Notion](/docs/fr/configuration/notion)

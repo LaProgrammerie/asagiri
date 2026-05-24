@@ -1,0 +1,83 @@
+---
+title: Premier workflow
+description: Parcours AgentFlow complet d'init au rapport avec de vraies commandes CLI.
+---
+
+# Premier workflow
+
+Parcours de bout en bout aligné sur `spec-doc` §11.1 : initialiser, vérifier, estimer, exécuter, consulter le statut, ouvrir le rapport.
+
+## Prérequis
+
+- AgentFlow compilé et dans le `PATH`
+- Dépôt Git avec au moins une spec sous `.kiro/specs/<feature>/` ou `.agentflow/specs/`
+- `.agentflow/config.yaml` avec des commandes d'agent présentes sur la machine
+
+## Étapes
+
+### 1. Initialiser et vérifier
+
+```bash
+agentflow init
+agentflow doctor
+```
+
+### 2. Estimer avant de dépenser
+
+```bash
+agentflow work "develop billing-v2" --estimate-only
+```
+
+Examinez les estimations de jetons/coût et les invites de budget. Utilisez `--budget 0.50` ou la section `budgets` de la config pour plafonner. Ne passez `--allow-over-budget` que si la configuration l'autorise.
+
+### 3. Répétition plan-only
+
+```bash
+agentflow work "develop billing-v2" --plan-only
+```
+
+Confirme la résolution d'intention et la sélection des tâches sans exécution.
+
+### 4. Lancer l'exécution
+
+```bash
+agentflow work "develop billing-v2"
+```
+
+Avec `intent.default_mode: guided` et `work.require_plan_confirmation: true`, AgentFlow demande confirmation avant exécution sauf si vous passez `--yes`.
+
+Étapes typiques du pipeline : résolution d'intention → plan/enrichissement du contexte → dev dans le worktree → verify → revue optionnelle → rapport.
+
+### 5. Statut et rapport
+
+```bash
+agentflow status
+agentflow report <run-id>
+```
+
+Remplacez `<run-id>` par l'identifiant issu de `status` (format du type `run-2026-05-17-…`).
+
+## Ce que vous devriez observer
+
+- État SQLite sous `.agentflow/state.sqlite`
+- Artefacts par exécution sous `.agentflow/runs/<run-id>/`
+- Git worktree sous `.agentflow/worktrees/` pour les tâches de dev actives
+- Sortie des commandes définies dans `validation.commands` (par ex. `go test ./...`)
+
+## Reprise et récupération
+
+```bash
+agentflow resume <run-id>
+```
+
+Sans `--dry-run`, **`resume` n'affiche que le nom de l'étape suivante** — il ne réinvoque pas automatiquement les agents. Utilisez `continue` ou relancez la commande suggérée (`plan`, `enrich`, `dev`, …). L'enchaînement automatique des étapes existe uniquement sous **`agentflow resume <run-id> --execute` avec `--dry-run` global**.
+
+<Callout type="experimental">
+La reprise automatique complète hors dry-run n'est pas implémentée. Préférez `agentflow continue` pour une continuation pilotée par l'intention.
+</Callout>
+
+## Workflows associés
+
+- [Kiro → Cursor → Vérification](/docs/fr/workflows/kiro-to-cursor)
+- [Workflow conscient des coûts](/docs/fr/workflows/cost-aware-workflow)
+- [Récupération après échec](/docs/fr/workflows/failure-recovery)

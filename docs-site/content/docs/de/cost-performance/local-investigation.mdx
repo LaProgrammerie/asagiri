@@ -1,0 +1,44 @@
+---
+title: Lokale Untersuchung
+description: Begrenztes grep und Dateiscan vor Cloud-Agent-Aufrufen.
+---
+
+# Lokale Untersuchung
+
+Quelle: `application/internal/investigation` — genutzt von `agentflow investigate` und dem V3-Pipeline-Prelude.
+
+## Funktion
+
+- **Grep** nach Feature-/Task-Mustern mit Ausgabe-Byte-Caps
+- **Scan** von Kandidatendateien; große Dateien oberhalb `large_file_bytes`
+- **Sensitive-Pfad**-Erkennung via `secret_path_denylist`
+- **Zugehörige Tests** heuristisch aus Kandidatenpfaden
+
+## CLI
+
+```bash
+agentflow investigate billing-v2
+agentflow investigate billing-v2 --task task-003
+agentflow inspect diff
+agentflow inspect symbol Handler
+agentflow inspect tests billing-v2
+```
+
+`inspect`-Subbefehle kapseln gezielte Untersuchungshelfer.
+
+## Grenzen
+
+```yaml
+mcp:
+  investigation:
+    large_file_bytes: 524288
+    max_grep_output_bytes: 262144
+    command_timeout_seconds: 120
+    sensitive_globs: ["*.pem", ".git/*"]
+```
+
+## Siehe auch
+
+- [Lokal-zuerst-Konzepte](/docs/de/concepts/local-first)
+- [CLI: investigate](/docs/cli/generated/investigate)
+- [MCP-Tools](/docs/de/mcp/tools) (optionale Exposition via MCP bei Aktivierung)

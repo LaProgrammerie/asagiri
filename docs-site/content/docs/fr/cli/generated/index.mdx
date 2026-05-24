@@ -1,0 +1,31 @@
+---
+title: Référence CLI générée (aperçus)
+description: Pages résumé en français ; référence complète des drapeaux en anglais.
+---
+
+# Référence CLI générée
+
+Les pages **complètes** (toutes les commandes, synchronisées avec Cobra) sont maintenues en **anglais** sous [`/docs/cli/generated`](/docs/cli/generated).
+
+Ce dossier fournit des **aperçus traduits** pour les commandes les plus utilisées : sections « Quand l'utiliser » et « Modes de défaillance », plus un lien vers la page anglaise détaillée.
+
+## Régénérer la documentation (contributeurs)
+
+```bash
+go run ./application/cmd/agentflow docs generate-cli \
+  --output docs-site/content/docs/en/cli/generated
+```
+
+## Commandes avec aperçu
+
+- [work](./work)
+- [init](./init)
+- [doctor](./doctor)
+- [plan](./plan)
+- [dev](./dev)
+- [verify](./verify)
+- [estimate](./estimate)
+- [sync](./sync)
+- [continue](./continue)
+
+Pour toute autre commande (`spec`, `review`, `inspect`, …), utilisez directement la [référence anglaise](/docs/cli/generated).

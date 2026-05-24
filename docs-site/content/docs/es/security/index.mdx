@@ -1,0 +1,43 @@
+---
+title: Seguridad
+description: Secretos, alcance, MCP, agentes y datos enviados a proveedores.
+---
+
+# Seguridad
+
+AgentFlow orquesta herramientas potentes. La seguridad es **responsabilidad compartida**: su configuración, agentes y proceso de revisión importan tanto como la CLI.
+
+## Resumen por área
+
+| Área | Comportamiento |
+| --- | --- |
+| **Sistema de archivos** | Opera sobre el repo + worktrees; la investigación respeta listas de denegación |
+| **Secretos** | `token_env` para Notion; `secret_path_denylist`; redacción de registros |
+| **Subprocess de agentes** | sin shell; solo argv con tiempos de espera |
+| **Red** | `policies.allow_network: false` por defecto; los agentes aún pueden usar red |
+| **MCP** | desactivado por defecto; límites de bytes de salida y tiempo de comando |
+| **Modelos en la nube** | Los datos salen de la máquina cuando corren agentes en la nube — usted controla qué comandos se ejecutan |
+
+## Alcance del sistema de archivos
+
+- Worktrees bajo `.agentflow/worktrees/`
+- Estado y ejecuciones bajo `.agentflow/`
+- La investigación omite globs sensibles y rutas bloqueadas (`.env`, claves)
+
+## Registros sensibles
+
+`application/internal/redact` enmascara patrones habituales de tokens. No confíe solo en la redacción — no inyecte secretos en prompts del agente.
+
+## Agentes externos
+
+Las CLIs configuradas (`cursor-agent`, `codex`, etc.) corren con los permisos de su usuario. Trátelas como cualquier herramienta de CI con acceso al repo.
+
+## Reportar problemas
+
+Vea [`SECURITY.md`](https://github.com/LaProgrammerie/hyper-fast-builder/blob/main/SECURITY.md) del repositorio para el proceso de divulgación.
+
+## Ver también
+
+- [Límites](/docs/es/security/limits)
+- [Seguridad MCP](/docs/es/mcp/security)
+- [Configuración de Notion](/docs/es/configuration/notion)

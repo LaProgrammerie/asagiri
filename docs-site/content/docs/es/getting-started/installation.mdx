@@ -1,0 +1,68 @@
+---
+title: Instalación
+description: Instalar AgentFlow y preparar un repositorio para flujos de IA orquestados.
+---
+
+# Instalación
+
+AgentFlow es una CLI en Go que orquesta especificaciones, investigación local, git worktrees, agentes externos y comandos de validación. Instale el binario, inicialice el repositorio y verifique el entorno.
+
+## Requisitos
+
+| Requisito | Notas |
+| --- | --- |
+| **Go 1.25+** | Compilar desde código o usar un binario publicado |
+| **Git** | Necesario para worktrees, estado y diffs |
+| **Agentes configurados** | Al menos los comandos referenciados en `.agentflow/config.yaml` (`cursor-agent`, `kiro`, `ollama`, etc.) |
+
+Opcional: **Ollama** para enriquecimiento/enrutamiento local, token de **Notion** para sincronización (`NOTION_TOKEN`).
+
+## Instalación desde código
+
+```bash
+git clone https://github.com/LaProgrammerie/hyper-fast-builder.git
+cd hyper-fast-builder
+make build
+# binario: ./bin/agentflow
+```
+
+Añada `bin/` al `PATH`, o copie `bin/agentflow` a un directorio del `PATH`.
+
+## Inicializar un repositorio
+
+Desde la raíz del proyecto:
+
+```bash
+agentflow init
+```
+
+Crea entre otros:
+
+- `.agentflow/` — configuración, estado SQLite, ejecuciones, worktrees
+- `.agentflow/config.yaml` — copiado de `config.yaml.example` si falta
+- `.agentflow/state.sqlite` — seguimiento de ejecuciones y tareas
+
+Asegúrese de que `.agentflow/state.sqlite` y `.agentflow/worktrees/` estén en `.gitignore` (`init` muestra un recordatorio).
+
+## Verificar la instalación
+
+```bash
+agentflow doctor
+```
+
+`doctor` comprueba git, la configuración, los comandos de agente en el `PATH` y errores habituales. Corrija lo indicado antes de ejecutar `work`.
+
+## Configuración
+
+Copie y edite el ejemplo si necesita agentes o presupuestos personalizados:
+
+```bash
+cp .agentflow/config.yaml.example .agentflow/config.yaml
+```
+
+Vea el [Archivo de configuración](/docs/es/configuration/config-file) para cada bloque YAML.
+
+## Siguientes pasos
+
+- [Inicio rápido](/docs/es/getting-started/quickstart)
+- [Primer flujo de trabajo](/docs/es/getting-started/first-workflow)

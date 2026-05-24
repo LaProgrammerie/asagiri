@@ -32,7 +32,7 @@ jobs:
           go-version-file: go.mod
 
       - name: Generate CLI reference
-        run: go run ./application/cmd/agentflow docs generate-cli --output docs-site/content/docs/cli/generated
+        run: go run ./application/cmd/agentflow docs generate-cli --output docs-site/content/docs/en/cli/generated
 
       - uses: actions/setup-node@v4
         with:

@@ -1,0 +1,39 @@
+---
+title: Lokale Modelle
+description: Wann lokale Agents bevorzugt werden und wie das Routing sie wählt.
+---
+
+# Lokale Modelle
+
+„Lokal“ meint **Modelle auf Ihrer Maschine oder LAN** (typischerweise Ollama), mit marginalen Kosten von 0 oder konfiguriert via `models.*.input_cost_per_1m_tokens: 0`.
+
+## Wann einsetzen
+
+- Intent- und Aufgabenklassifikation
+- Spec-Anreicherung vor Cloud-`dev`
+- Log-Analyse und Vor-Review
+- Air-Gap- oder kostensensible Repositories
+
+## Lokal aktivieren
+
+1. `agents.ollama` und ein `models`-Profil mit `class: local` konfigurieren
+2. Schrittklassen in `prefer_local_for` eintragen
+3. Mit `--prefer-local` oder `--no-cloud` bei `work` ausführen
+
+```bash
+agentflow work "add logging" --prefer-local --estimate-only
+```
+
+## Grenzen
+
+Lokale Modelle können bei großen Refactorings oder sicherheitskritischen Änderungen scheitern — Routing kann bei Treffer in `use_cloud_heavy_for` und gesetztem `--allow-cloud` auf Cloud eskalieren.
+
+<Callout type="local-first">
+Lokal-zuerst reduziert Kosten und Leakage; ersetzt keine Validierung oder menschliche Review auf kritischen Pfaden.
+</Callout>
+
+## Siehe auch
+
+- [Ollama](/docs/de/agents/ollama)
+- [Lokal-zuerst-Konzepte](/docs/de/concepts/local-first)
+- [Routing](/docs/de/configuration/routing)

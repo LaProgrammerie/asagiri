@@ -1,0 +1,32 @@
+---
+title: Generierter CLI-Index
+description: Auto-generierte Befehlsreferenz aus Cobra-Definitionen.
+---
+
+# Generierte CLI-Referenz
+
+Diese Seiten werden **generiert** aus den aktiven Cobra-Definitionen. Bitte nicht manuell bearbeiten — sie werden überschrieben.
+
+## Neu generieren
+
+```bash
+go run ./application/cmd/agentflow docs generate-cli \
+  --output docs-site/content/docs/en/cli/generated
+```
+
+Oder mit gebautem Binär:
+
+```bash
+./bin/agentflow docs generate-cli --output docs-site/content/docs/en/cli/generated
+```
+
+## Sprachen
+
+- **Vollständige Referenz (Englisch):** [CLI generiert — Englisch](/docs/cli/generated) — alle Befehle, alle Flags.
+- Dieser **deutsche** Bereich bietet Kurzseiten nur für Hauptbefehle; Optionsdetails bleiben in der englischen Generierung.
+
+Stöbern: Sidebar **CLI → generiert** oder Start bei [generiertem Index (EN)](/docs/cli/generated/index).
+
+## Handgeschriebene Guides
+
+Workflows und Konzepte: [CLI-Überblick](/docs/de/cli), [Erster Workflow](/docs/de/getting-started/first-workflow) und [Workflows](/docs/de/workflows/kiro-to-cursor).

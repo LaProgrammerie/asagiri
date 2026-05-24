@@ -1,0 +1,48 @@
+---
+title: Filosofía
+description: Orquestación determinista, validación antes de confiar, límites explícitos.
+---
+
+# Filosofía
+
+## Problema
+
+Los agentes de código son potentes pero no deterministas. Los equipos necesitan flujos de trabajo **reproducibles**: pasos conocidos, ramas aisladas, validación externa, visibilidad de coste y trazas de auditoría — no ejecuciones «autónomas» opacas.
+
+## Enfoque de AgentFlow
+
+AgentFlow orquesta **spec → plan → implementar → verificar → revisar → informar** con:
+
+1. **Estado explícito** — ejecuciones/tareas respaldadas por SQLite y máquina de estados documentada
+2. **Investigación local primero** — grep, recorrido de archivos y empaquetado de contexto antes de la nube
+3. **Conciencia de coste** — heurísticas de tokens y presupuestos antes de ejecutar
+4. **Aislamiento con git worktree** — una tarea, una rama, un árbol
+5. **Validación con sus comandos** — `go test`, linters, etc., no autoevaluación del agente
+6. **Informes reproducibles** — markdown + JSON bajo `.agentflow/runs/`
+
+## Lo que no afirmamos
+
+<Callout type="warning">
+AgentFlow no garantiza corrección, seguridad ni preparación para producción. Coordina herramientas; las personas y su batería de pruebas siguen siendo la autoridad.
+</Callout>
+
+## Compromisos
+
+| Ventaja | Coste |
+| --- | --- |
+| Pasos de pipeline previsibles | Menos «magia en un clic» que chats ad hoc |
+| Estimaciones de coste por adelantado | Las estimaciones son aproximadas (heurísticas carácter/token) |
+| Seguridad de worktree | Más disco y complejidad git |
+| Agentes enchufables | Debe instalar y configurar cada CLI |
+
+## Palancas de configuración
+
+- `work.auto_verify`, `work.auto_review` — automatización vs puertas manuales
+- `policies.require_clean_git` — bloquear árboles sucios
+- `budgets` — límites económicos
+
+## Ver también
+
+- [Local primero](/docs/es/concepts/local-first)
+- [Flujos conscientes del coste](/docs/es/concepts/cost-aware-workflows)
+- [Límites](/docs/es/security/limits)

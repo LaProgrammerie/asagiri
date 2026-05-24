@@ -1,0 +1,43 @@
+---
+title: Herramientas MCP
+description: Herramientas expuestas cuando mcp.enabled es true.
+---
+
+# Herramientas MCP
+
+Cuando `mcp.enabled: true`, `mcp-serve` registra herramientas respaldadas por los paquetes investigation y contextopt. Los nombres y esquemas las devuelve `tools/list` en tiempo de ejecución.
+
+## Capacidades típicas
+
+| Área | Propósito |
+| --- | --- |
+| Investigación | grep acotado / escaneo de repo alineado con la CLI `investigate` |
+| Contexto | Construir o resumir paquetes de contexto |
+| Coste | Aproximación de tokens/coste para una carga útil |
+
+Los IDs de herramienta pueden cambiar entre versiones — llame siempre `tools/list` tras actualizar.
+
+## Límites
+
+Desde la configuración:
+
+- `max_output_bytes` — tope del tamaño de la carga RPC
+- `command_timeout_seconds` — ejecución por herramienta
+- `investigation.*` — topes de grep/escaneo (compartidos con investigación sin MCP)
+
+## Flujo de cliente de ejemplo
+
+```bash
+agentflow mcp-serve
+# El cliente MCP del editor conecta por stdio y envía:
+# {"jsonrpc":"2.0","id":1,"method":"tools/list"}
+```
+
+<Callout type="experimental">
+La superficie de herramientas es mínima y evolutiva. No dependa de herramientas no documentadas en automatización de producción sin fijar la versión de AgentFlow.
+</Callout>
+
+## Ver también
+
+- [Investigación local](/docs/es/cost-performance/local-investigation)
+- [Seguridad MCP](/docs/es/mcp/security)

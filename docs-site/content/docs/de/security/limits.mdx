@@ -1,0 +1,39 @@
+---
+title: Grenzen
+description: Was AgentFlow nicht garantiert und bekannte Produktgrenzen.
+---
+
+# Grenzen
+
+Explizite Vertrauensgrenzen (`spec-doc` §17.1).
+
+## AgentFlow garantiert nicht
+
+- **Korrektheit** des erzeugten Codes
+- **Ersatz Ihrer Testsuite** — Validierung führt Ihre konfigurierten Befehle aus; Fehler sind zu beheben
+- **Ersatz menschlicher Review** für Sicherheit, Compliance oder Architektur
+- **Vollständigen Schutz vor Prompt-Injection** — bösartige Specs oder Notion-Inhalte können Agents lenken
+- **anbieterexakte Token-Abrechnung**
+- **Produktions-SLA** — OSS-Orchestrierungs-CLI
+
+## Was es tut
+
+- erzwingt eine **Zustandsmaschine** für Pipeline-Schritte
+- **isoliert** Aufgaben in Git-Worktrees
+- **schätzt** Kosten/Token vor Läufen
+- **blockiert** einige Policy-Verletzungen (dirty git, Secret-Dateinamen, Budget-Caps)
+- **protokolliert** Läufe für Audit (`report`, SQLite)
+
+## Experimentelle Fähigkeiten
+
+Separat in der Doku gekennzeichnet — vollständige MCP-Oberfläche, Notion-Sync, Auto-Kontextkompression, Non-Dry-Run-Auto-Resume und vektorielles RAG.
+
+<Callout type="warning">
+`verify` bestanden heißt: konfigurierte Befehle exit 0 — nicht dass die Änderung sicher ausgeliefert werden kann.
+</Callout>
+
+## Siehe auch
+
+- [Philosophie](/docs/de/concepts/philosophy)
+- [Sicherheitsüberblick](/docs/de/security)
+- [Roadmap](/docs/de/roadmap)

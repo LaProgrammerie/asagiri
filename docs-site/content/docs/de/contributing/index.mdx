@@ -1,0 +1,38 @@
+---
+title: Mitwirken
+description: Zu AgentFlow beitragen und Docs mit der CLI synchron halten.
+---
+
+# Mitwirken
+
+Vollständige Anleitung im Repository-Root: **[CONTRIBUTING.md](https://github.com/LaProgrammerie/hyper-fast-builder/blob/main/CONTRIBUTING.md)**.
+
+## Kurz-Checkliste
+
+1. `AGENTS.md` und `docs/ai/context-map.md` lesen
+2. Features an `docs/ai/active/handoff.md` und Produktspecs ausrichten (`spec-postv123.md`, usw.)
+3. `make build && go test -race ./...`
+4. CLI-Docs aktualisieren, wenn sich Befehle ändern:
+
+```bash
+go run ./application/cmd/agentflow docs generate-cli \
+  --output docs-site/content/docs/en/cli/generated
+```
+
+5. `cd docs-site && npm run build` bei MDX-Änderungen
+6. Ein PR pro zusammenhängendem Thema; keine Secrets in Commits
+
+## Dokumentation
+
+- Öffentliche Site: `docs-site/content/docs/` (Fumadocs, mehrsprachig)
+- Projekt-Kanon: `docs/ai/`
+- Doc/Code-Drift: [`problems.md`](https://github.com/LaProgrammerie/hyper-fast-builder/blob/main/problems.md) im Repo-Root
+
+## Architekturentscheidungen
+
+Dauerhafte Tradeoffs in `docs/ai/05-decisions.md` und `docs/decisions/` festhalten.
+
+## Siehe auch
+
+- [CI-Workflow](/docs/de/workflows/ci-workflow)
+- [Roadmap](/docs/de/roadmap)

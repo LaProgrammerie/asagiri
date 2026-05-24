@@ -1,0 +1,42 @@
+---
+title: Agents-Überblick
+description: Externe Coding-Agenten, die AgentFlow als Subprocess orchestriert.
+---
+
+# Agents-Überblick
+
+AgentFlow bettet keine Modelle ein. Es **orchestriert** CLI-Tools, die Sie unter `agents:` konfigurieren, und wählt sie per Routing, `work`-Defaults oder pro-Befehl-Flags.
+
+## Unterstützte Muster
+
+| Agent-ID (Beispiel) | Typische Rolle |
+| --- | --- |
+| `kiro` | Spec-Authoring (`agentflow spec`) |
+| `cursor` | Implementierung (`dev`, Standard-`work`-Agent) |
+| `codex` / `claude` | Review oder schwere Reasoning |
+| `ollama` | Lokales Enrich, Klassifikation, günstige Vor-Review |
+
+Exakte Befehle sind **Ihre** `config.yaml`-Einträge — AgentFlow startet nur `command` + `args`.
+
+## Verträge
+
+- Keine Shell-Interpolation — nur argv
+- Timeouts aus `agents.<id>.timeout`
+- Dry-Run überspringt echte Ausführung
+- Logs durch Redaction (`application/internal/redact`)
+
+## Agents pro Schritt wählen
+
+```bash
+agentflow spec feat --agent kiro
+agentflow enrich feat --agent ollama
+agentflow dev feat --agent cursor
+agentflow review feat --agent codex
+```
+
+## Siehe auch
+
+- [Agents-Konfiguration](/docs/de/configuration/agents)
+- [Ollama](/docs/de/agents/ollama)
+- [Lokale Modelle](/docs/de/agents/local-models)
+- [Routing](/docs/de/configuration/routing)

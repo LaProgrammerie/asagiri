@@ -1,0 +1,38 @@
+---
+title: Contribution
+description: Contribuer à AgentFlow et garder la doc alignée sur la CLI.
+---
+
+# Contribution
+
+Guide complet à la racine du dépôt : **[CONTRIBUTING.md](https://github.com/LaProgrammerie/hyper-fast-builder/blob/main/CONTRIBUTING.md)**.
+
+## Checklist rapide
+
+1. Lire `AGENTS.md` et `docs/ai/context-map.md`
+2. Aligner les fonctionnalités sur `docs/ai/active/handoff.md` et les specs produit (`spec-postv123.md`, etc.)
+3. `make build && go test -race ./...`
+4. Mettre à jour la doc CLI lorsque les commandes changent :
+
+```bash
+go run ./application/cmd/agentflow docs generate-cli \
+  --output docs-site/content/docs/en/cli/generated
+```
+
+5. `cd docs-site && npm run build` pour les changements MDX
+6. Une PR par sujet cohérent ; pas de secrets dans les commits
+
+## Documentation
+
+- Site public : `docs-site/content/docs/` (Fumadocs, plusieurs langues)
+- Canon projet : `docs/ai/`
+- Dérive doc/code : [`problems.md`](https://github.com/LaProgrammerie/hyper-fast-builder/blob/main/problems.md) à la racine
+
+## Décisions d'architecture
+
+Consigner les compromis durables dans `docs/ai/05-decisions.md` et `docs/decisions/`.
+
+## Voir aussi
+
+- [Workflow CI](/docs/fr/workflows/ci-workflow)
+- [Feuille de route](/docs/fr/roadmap)

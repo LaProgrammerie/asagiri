@@ -1,0 +1,83 @@
+---
+title: Erster Workflow
+description: Vollständiger AgentFlow-Ablauf von Init bis Report mit echten CLI-Befehlen.
+---
+
+# Erster Workflow
+
+Ende-zu-Ende gemäß `spec-doc` §11.1: initialisieren, prüfen, schätzen, ausführen, Status prüfen, Report öffnen.
+
+## Voraussetzungen
+
+- AgentFlow gebaut und im `PATH`
+- Git-Repository mit mindestens einer Spec unter `.kiro/specs/<feature>/` oder `.agentflow/specs/`
+- `.agentflow/config.yaml` mit auf dem Rechner vorhandenen Agent-Befehlen
+
+## Schritte
+
+### 1. Initialisieren und prüfen
+
+```bash
+agentflow init
+agentflow doctor
+```
+
+### 2. Vor Ausgaben schätzen
+
+```bash
+agentflow work "develop billing-v2" --estimate-only
+```
+
+Token-/Kostenschätzungen und Budget-Hinweise prüfen. `--budget 0.50` oder Config `budgets` nutzen. `--allow-over-budget` nur, wenn die Konfiguration Overrides erlaubt.
+
+### 3. Nur-Plan-Probe
+
+```bash
+agentflow work "develop billing-v2" --plan-only
+```
+
+Bestätigt Intent-Auflösung und Task-Auswahl ohne Ausführung.
+
+### 4. Lauf ausführen
+
+```bash
+agentflow work "develop billing-v2"
+```
+
+Mit `intent.default_mode: guided` und `work.require_plan_confirmation: true` fragt AgentFlow vor der Ausführung nach, sofern nicht `--yes`.
+
+Typische Pipeline-Stufen: Intent auflösen → Plan/Kontext anreichern → Dev im Worktree → verify → optionale Review → Report.
+
+### 5. Status und Report
+
+```bash
+agentflow status
+agentflow report <run-id>
+```
+
+`<run-id>` durch die ID aus `status` ersetzen (Format z. B. `run-2026-05-17-…`).
+
+## Erwartete Artefakte
+
+- SQLite-Zustand unter `.agentflow/state.sqlite`
+- Pro-Lauf-Artefakte unter `.agentflow/runs/<run-id>/`
+- Git-Worktree unter `.agentflow/worktrees/` für aktive Dev-Tasks
+- Validierungsausgabe der in `validation.commands` konfigurierten Befehle (z. B. `go test ./...`)
+
+## Wiederaufnahme und Recovery
+
+```bash
+agentflow resume <run-id>
+```
+
+Ohne `--dry-run` gibt **`resume` nur den nächsten Schrittnamen aus** — Agenten werden nicht automatisch erneut aufgerufen. `continue` nutzen oder den vorgeschlagenen Befehl (`plan`, `enrich`, `dev`, …) erneut ausführen. Automatische Ketten nur mit **`agentflow resume <run-id> --execute` und globalem `--dry-run`**.
+
+<Callout type="experimental">
+Vollständige Auto-Resume außerhalb von Dry-Run ist nicht implementiert. Bevorzugen Sie `agentflow continue` für intentionsbasierte Fortsetzung.
+</Callout>
+
+## Verwandte Workflows
+
+- [Kiro → Cursor → Verify](/docs/de/workflows/kiro-to-cursor)
+- [Kostenbewusster Workflow](/docs/de/workflows/cost-aware-workflow)
+- [Fehlerbehebung](/docs/de/workflows/failure-recovery)

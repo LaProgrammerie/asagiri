@@ -1,0 +1,47 @@
+---
+title: Estimation des jetons
+description: Comptages heuristiques de jetons et tarification pour les affichages de coût avant exécution.
+---
+
+# Estimation des jetons
+
+Sources : `application/internal/cost/token_counter.go` et `estimator.go`.
+
+## Fonctionnement
+
+1. Mesurer les longueurs de caractères pour fichiers ou blobs de texte
+2. Classer le type de contenu par extension (`code`, `markdown`, `json`, `default`)
+3. Diviser par `token_estimation.*_chars_per_token` et arrondir au supérieur
+
+```yaml
+token_estimation:
+  default_chars_per_token: 4.0
+  code_chars_per_token: 3.2
+  markdown_chars_per_token: 4.2
+  json_chars_per_token: 3.6
+```
+
+## Affichage du coût
+
+Jetons estimés × tarifs `pricing.models.<model-id>` → EUR estimé (ou `budgets.default_currency`).
+
+<Callout type="cost">
+**Pas de précision fournisseur.** OpenAI, Anthropic et Google facturent avec leurs propres tokenizers. Traitez les nombres comme des garde-fous d'ordre de grandeur.
+</Callout>
+
+## Commandes
+
+```bash
+agentflow estimate billing-v2 --task task-003
+agentflow work "develop billing-v2" --estimate-only
+agentflow cost billing-v2
+```
+
+## Tests golden
+
+La forme de l'estimateur est couverte par des tests golden dans `application/internal/cost/`. Mettez à jour les goldens avec `UPDATE_GOLDEN=1` uniquement lorsque vous modifiez les algorithmes intentionnellement.
+
+## Voir aussi
+
+- [Budgets](/docs/fr/configuration/budgets)
+- [Optimisation du contexte](/docs/fr/cost-performance/context-optimization)

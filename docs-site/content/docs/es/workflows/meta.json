@@ -1,0 +1,10 @@
+{
+  "title": "Flujos de trabajo",
+  "pages": [
+    "kiro-to-cursor",
+    "notion-to-code",
+    "cost-aware-workflow",
+    "failure-recovery",
+    "ci-workflow"
+  ]
+}

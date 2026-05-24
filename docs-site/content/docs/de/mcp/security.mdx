@@ -1,0 +1,32 @@
+---
+title: MCP-Sicherheit
+description: Bedrohungsmodell und Härtung für den lokalen MCP-Server.
+---
+
+# MCP-Sicherheit
+
+## Bedrohungsmodell
+
+Der MCP-Server läuft als **Ihr Benutzer** mit Repo-Zugriff. Jeder Client am stdio kann Tools aufrufen, bis deaktiviert.
+
+## Defaults (sicher)
+
+- `mcp.enabled: false`
+- Ausgabe- und Timeout-Caps
+- `secret_path_denylist` blockiert Lesen gängiger Secret-Pfade in Investigation-Tools
+
+## Empfehlungen
+
+1. MCP nur auf vertrauenswürdigen Maschinen aktivieren
+2. stdio nicht an geteilte Terminals oder Remote-Sessions ohne Auth exponieren
+3. `secret_path_denylist` mit Ihrem Repo abstimmen (`.env`, Keys, Credentials)
+4. Mit `policies.allow_network: false` koppeln, wenn Agents offline bleiben sollen — MCP selbst ist lokal
+
+<Callout type="security">
+MCP sandboxt Tool-Implementierungen nicht. Behandeln Sie verbundene Editoren als voll vertrauenswürdig.
+</Callout>
+
+## Siehe auch
+
+- [Sicherheitsüberblick](/docs/de/security)
+- [MCP-Überblick](/docs/de/mcp/overview)

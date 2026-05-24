@@ -1,0 +1,43 @@
+---
+title: Outils MCP
+description: Outils exposés lorsque mcp.enabled est true.
+---
+
+# Outils MCP
+
+Lorsque `mcp.enabled: true`, `mcp-serve` enregistre des outils basés sur les paquets investigation et contextopt. Les noms et schémas d'outils sont renvoyés par `tools/list` à l'exécution.
+
+## Capacités typiques
+
+| Domaine | Rôle |
+| --- | --- |
+| Investigation | Grep borné / scan dépôt aligné sur la CLI `investigate` |
+| Contexte | Construire ou résumer des paquets de contexte |
+| Coût | Approximation jeton/coût pour une charge utile |
+
+Les identifiants d'outil peuvent changer entre versions — appelez toujours `tools/list` après mise à jour.
+
+## Limites
+
+Depuis la config :
+
+- `max_output_bytes` — plafond de taille de charge RPC
+- `command_timeout_seconds` — exécution par outil
+- `investigation.*` — plafonds grep/scan (partagés avec l'investigation hors MCP)
+
+## Exemple de flux client
+
+```bash
+agentflow mcp-serve
+# Le client MCP de l'éditeur se connecte en stdio et envoie :
+# {"jsonrpc":"2.0","id":1,"method":"tools/list"}
+```
+
+<Callout type="experimental">
+La surface d'outils est minimale et en évolution. Ne dépendez pas d'outils non documentés en automatisation de production sans épingler la version d'AgentFlow.
+</Callout>
+
+## Voir aussi
+
+- [Investigation locale](/docs/fr/cost-performance/local-investigation)
+- [Sécurité MCP](/docs/fr/mcp/security)

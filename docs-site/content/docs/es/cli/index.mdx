@@ -1,0 +1,52 @@
+---
+title: Descripción general de la CLI
+description: Grupos de comandos AgentFlow y referencia generada por comando.
+---
+
+# Descripción general de la CLI
+
+Binario de entrada: **`agentflow`** (`application/cmd/agentflow`).
+
+## Banderas globales
+
+| Bandera | Descripción |
+| --- | --- |
+| `--dry-run` | Simula sin agentes externos ni shells de validación |
+| (persistente) | Heredada por todos los subcomandos |
+
+Entorno: `AGENTFLOW_DRY_RUN=1`, `AGENTFLOW_YES=1` — véase [Variables de entorno](/docs/es/reference/environment-variables).
+
+## Grupos de comandos
+
+| Grupo | Comandos |
+| --- | --- |
+| **Arranque** | `init`, `doctor`, `version` |
+| **Pipeline** | `spec`, `plan`, `enrich`, `dev`, `verify`, `review`, `pr` |
+| **Intención** | `work`, `continue`, `next`, `inbox` |
+| **Fuentes** | `sync`, `index` |
+| **Coste / contexto** | `estimate`, `investigate`, `context`, `cost`, `cost-report`, `cost-models` |
+| **Inspect** | `inspect` (diff, symbol, tests) |
+| **Ops** | `status`, `resume`, `report`, `clean` |
+| **MCP** | `mcp`, `mcp-serve` |
+| **Meta** | `docs`, `help` |
+
+## Referencia generada
+
+Las páginas por comando (banderas sincronizadas con Cobra) están bajo **[CLI generado](/docs/es/cli/generated)** (resúmenes traducidos; referencia completa en inglés en `/docs/cli/generated`).
+
+Regenerar tras cambios en la CLI:
+
+```bash
+go run ./application/cmd/agentflow docs generate-cli \
+  --output docs-site/content/docs/en/cli/generated
+```
+
+## Empezar
+
+```bash
+agentflow init
+agentflow doctor
+agentflow work "my feature" --dry-run --plan-only
+```
+
+Vea [Inicio rápido](/docs/es/getting-started/quickstart) y [Primer flujo de trabajo](/docs/es/getting-started/first-workflow).

@@ -1,0 +1,42 @@
+---
+title: Descripción general de agentes
+description: Agentes de codificación externos invocados por AgentFlow como subprocess.
+---
+
+# Descripción general de agentes
+
+AgentFlow no incrusta modelos. **Orquesta** herramientas CLI configuradas bajo `agents:` y las selecciona mediante enrutamiento, valores por defecto de `work` o banderas por comando.
+
+## Patrones admitidos
+
+| Id de agente (ejemplo) | Rol típico |
+| --- | --- |
+| `kiro` | Autoría de spec (`agentflow spec`) |
+| `cursor` | Implementación (`dev`, agente por defecto de `work`) |
+| `codex` / `claude` | Revisión o razonamiento profundo |
+| `ollama` | Enriquecimiento local, clasificación, pre-revisión económica |
+
+Los comandos exactos son **sus** entradas `config.yaml` — AgentFlow solo lanza `command` + `args`.
+
+## Contratos
+
+- Sin interpolación shell — solo argv
+- Tiempos de espera desde `agents.<id>.timeout`
+- Dry-run omite ejecución real
+- Los registros pasan por redacción (`application/internal/redact`)
+
+## Elegir agentes por paso
+
+```bash
+agentflow spec feat --agent kiro
+agentflow enrich feat --agent ollama
+agentflow dev feat --agent cursor
+agentflow review feat --agent codex
+```
+
+## Ver también
+
+- [Configuración de agentes](/docs/es/configuration/agents)
+- [Ollama](/docs/es/agents/ollama)
+- [Modelos locales](/docs/es/agents/local-models)
+- [Enrutamiento](/docs/es/configuration/routing)

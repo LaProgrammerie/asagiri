@@ -1,0 +1,47 @@
+---
+title: Estimación de tokens
+description: Recuentos heurísticos de tokens y precios para pantallas de coste previas a la ejecución.
+---
+
+# Estimación de tokens
+
+Fuentes: `application/internal/cost/token_counter.go` y `estimator.go`.
+
+## Funcionamiento
+
+1. Medir longitudes de caracteres en archivos o blobs de texto
+2. Clasificar el tipo de contenido por extensión (`code`, `markdown`, `json`, `default`)
+3. Dividir por `token_estimation.*_chars_per_token` y redondear hacia arriba
+
+```yaml
+token_estimation:
+  default_chars_per_token: 4.0
+  code_chars_per_token: 3.2
+  markdown_chars_per_token: 4.2
+  json_chars_per_token: 3.6
+```
+
+## Visualización del coste
+
+Tokens estimados × tarifas `pricing.models.<model-id>` → EUR estimado (o `budgets.default_currency`).
+
+<Callout type="cost">
+**No es exacto por proveedor.** OpenAI, Anthropic y Google facturan con sus propios tokenizers. Trate los números como umbrales de orden de magnitud.
+</Callout>
+
+## Comandos
+
+```bash
+agentflow estimate billing-v2 --task task-003
+agentflow work "develop billing-v2" --estimate-only
+agentflow cost billing-v2
+```
+
+## Pruebas golden
+
+La forma del estimador está cubierta por pruebas golden en `application/internal/cost/`. Actualice goldens con `UPDATE_GOLDEN=1` solo cuando cambie algoritmos intencionalmente.
+
+## Ver también
+
+- [Presupuestos](/docs/es/configuration/budgets)
+- [Optimización de contexto](/docs/es/cost-performance/context-optimization)

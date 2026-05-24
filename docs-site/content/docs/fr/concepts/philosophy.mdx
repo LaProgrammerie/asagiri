@@ -1,0 +1,48 @@
+---
+title: Philosophie
+description: Orchestration déterministe, validation avant confiance, limites assumées.
+---
+
+# Philosophie
+
+## Problème
+
+Les agents de code sont puissants mais non déterministes. Les équipes ont besoin de workflows **reproductibles** : étapes connues, branches isolées, validation externe, visibilité des coûts et pistes d'audit — pas d'exécutions « autonomes » opaques.
+
+## Approche AgentFlow
+
+AgentFlow orchestre **spec → plan → implémentation → vérification → revue → rapport** avec :
+
+1. **État explicite** — exécutions/tâches dans SQLite et machine d'état documentée
+2. **Investigation locale d'abord** — grep, parcours fichiers et paquetage de contexte avant le cloud
+3. **Conscience des coûts** — heuristiques de jetons et budgets avant exécution
+4. **Isolation par git worktree** — une tâche, une branche, un arbre
+5. **Validation par vos commandes** — `go test`, linters, etc., pas l'auto-évaluation de l'agent
+6. **Rapports reproductibles** — markdown + JSON sous `.agentflow/runs/`
+
+## Ce que nous ne prétendons pas
+
+<Callout type="warning">
+AgentFlow ne garantit pas la correction, la sécurité ni la prêt pour la production. Il coordonne des outils ; l'humain et votre suite de tests restent l'autorité.
+</Callout>
+
+## Compromis
+
+| Gain | Coût |
+| --- | --- |
+| Étapes de pipeline prévisibles | Moins de « magie en un clic » que les chats ad hoc |
+| Estimations de coût en amont | Approximations (heuristiques caractères/jeton) |
+| Sécurité des worktrees | Espace disque et complexité git supplémentaires |
+| Agents branchables | Vous devez installer et configurer chaque CLI |
+
+## Leviers de configuration
+
+- `work.auto_verify`, `work.auto_review` — automatisation vs barrières manuelles
+- `policies.require_clean_git` — bloquer les arbres dirty
+- `budgets` — garde-fous économiques
+
+## Voir aussi
+
+- [Local d'abord](/docs/fr/concepts/local-first)
+- [Workflows conscient des coûts](/docs/fr/concepts/cost-aware-workflows)
+- [Limites](/docs/fr/security/limits)

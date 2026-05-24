@@ -1,0 +1,64 @@
+---
+title: Agents-Konfiguration
+description: Agent-IDs auf CLI-Befehle und Timeouts in config.yaml abbilden.
+---
+
+# Agents-Konfiguration
+
+AgentFlow ruft externe CLIs als **Subprocess ohne Shell** auf (`application/internal/agent/exec`). Jeder Schlüssel unter `agents:` ist eine logische ID, referenziert von Flags (`--agent`, `work.default_agent`, Routing).
+
+## Beispiel
+
+```yaml
+agents:
+  kiro:
+    command: kiro
+    args: ["--cli"]
+  cursor:
+    command: cursor-agent
+    default_model: auto
+    timeout: 3600
+  codex:
+    command: codex
+    timeout: 3600
+  claude:
+    command: claude
+    timeout: 3600
+  ollama:
+    endpoint: http://localhost:11434
+    model: qwen2.5-coder:14b
+    embedding_model: nomic-embed-text
+    timeout: 300
+```
+
+## Felder
+
+| Feld | Verwendung |
+| --- | --- |
+| `command` | Ausführbarer Name im `PATH` |
+| `args` | zusätzliches argv (Kiro, Wrapper) |
+| `default_model` | übergeben, wenn der Agent Modell-Flags unterstützt |
+| `timeout` | Sekunden bis Kill |
+| `endpoint` | Ollama-HTTP-Basis-URL |
+| `model` / `embedding_model` | Ollama-Modell-Tags |
+
+## Defaults in `work`
+
+```yaml
+work:
+  default_agent: cursor
+  default_reviewer: codex
+  default_enricher: ollama
+```
+
+CLI-Overrides: `agentflow dev feat --agent cursor`, `agentflow review feat --agent codex`.
+
+## Dry-run
+
+Mit `--dry-run` überspringt die Exec-Schicht echte Subprozesse — nützlich für CI und Dokumentationsproben.
+
+## Siehe auch
+
+- [Agents-Überblick](/docs/de/agents)
+- [Ollama](/docs/de/agents/ollama)
+- [CLI: dev](/docs/cli/generated/dev)

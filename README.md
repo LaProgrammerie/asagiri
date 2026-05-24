@@ -46,12 +46,19 @@ Primitive pipeline (Kiro → plan → dev → verify): [`spec.md`](spec.md) · I
 
 ## Documentation
 
-Full docs (English): **https://laprogrammerie.github.io/hyper-fast-builder/docs/**
+Public docs (Fumadocs, static export) — **en** (default), **fr**, **de**, **es**:
+
+| Locale | URL |
+|--------|-----|
+| English | https://laprogrammerie.github.io/hyper-fast-builder/docs/ |
+| Français | https://laprogrammerie.github.io/hyper-fast-builder/docs/fr/ |
+| Deutsch | https://laprogrammerie.github.io/hyper-fast-builder/docs/de/ |
+| Español | https://laprogrammerie.github.io/hyper-fast-builder/docs/es/ |
 
 Build locally:
 
 ```bash
-go run ./application/cmd/agentflow docs generate-cli --output docs-site/content/docs/cli/generated
+go run ./application/cmd/agentflow docs generate-cli --output docs-site/content/docs/en/cli/generated
 cd docs-site && npm install && npm run build
 # static output: docs-site/out/
 ```

@@ -1,0 +1,21 @@
+{
+  "title": "AgentFlow",
+  "pages": [
+    "index",
+    "getting-started",
+    "concepts",
+    "cli",
+    "workflows",
+    "configuration",
+    "agents",
+    "cost-performance",
+    "reliability",
+    "architecture",
+    "security",
+    "mcp",
+    "reference",
+    "contributing",
+    "roadmap"
+  ],
+  "root": true
+}

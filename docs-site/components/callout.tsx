@@ -1,5 +1,8 @@
 'use client';
 
+import { calloutLabel } from '@/components/callout-labels';
+import { parseDocsSlug } from '@/lib/locale-routing';
+import { usePathname } from 'next/navigation';
 import type { ReactNode } from 'react';
 
 export type CalloutType =
@@ -12,40 +15,34 @@ export type CalloutType =
 
 const TYPE_STYLES: Record<
   CalloutType,
-  { label: string; border: string; bg: string; text: string }
+  { border: string; bg: string; text: string }
 > = {
   note: {
-    label: 'Note',
     border: 'border-blue-500/60',
     bg: 'bg-blue-500/10',
     text: 'text-blue-100',
   },
   warning: {
-    label: 'Warning',
     border: 'border-amber-500/60',
     bg: 'bg-amber-500/10',
     text: 'text-amber-100',
   },
   cost: {
-    label: 'Cost',
     border: 'border-emerald-500/60',
     bg: 'bg-emerald-500/10',
     text: 'text-emerald-100',
   },
   security: {
-    label: 'Security',
     border: 'border-red-500/60',
     bg: 'bg-red-500/10',
     text: 'text-red-100',
   },
   'local-first': {
-    label: 'Local-first',
     border: 'border-violet-500/60',
     bg: 'bg-violet-500/10',
     text: 'text-violet-100',
   },
   experimental: {
-    label: 'Experimental',
     border: 'border-fd-muted-foreground/40',
     bg: 'bg-fd-muted',
     text: 'text-fd-foreground',
@@ -58,9 +55,19 @@ type CalloutProps = {
   children: ReactNode;
 };
 
+function useDocsLocale() {
+  const pathname = usePathname();
+  const docsIndex = pathname.indexOf('/docs');
+  const afterDocs =
+    docsIndex >= 0 ? pathname.slice(docsIndex + '/docs'.length) : '';
+  const slugParts = afterDocs.replace(/^\/+/, '').split('/').filter(Boolean);
+  return parseDocsSlug(slugParts).locale;
+}
+
 export function Callout({ type = 'note', title, children }: CalloutProps) {
+  const locale = useDocsLocale();
   const styles = TYPE_STYLES[type];
-  const heading = title ?? styles.label;
+  const heading = title ?? calloutLabel(locale, type);
 
   return (
     <aside

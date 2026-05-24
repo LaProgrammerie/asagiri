@@ -1,0 +1,22 @@
+---
+title: dev · resumen CLI
+description: Ejecutar la implementación de una feature o tarea — resumen y enlace a la referencia completa.
+---
+
+# dev
+
+CLI: **`agentflow dev`**
+
+## Cuándo usarlo
+
+Los comandos de workflow hacen avanzar las funcionalidades seguidas a través de spec → plan → implementación → verificación → salvaguardas de informe antes de abrir una solicitud de fusión.
+
+## Modos de fallo
+
+- Cobra rechaza banderas desconocidas o errores de aridad antes de cualquier efecto en el repositorio.
+- AgentFlow no puede resolver el arranque si el comando se invoca fuera de un checkout inicializado.
+- Los subprocesos delegados (**git**, hosts MCP, agentes de editor, etc.) pueden terminar distinto de cero y propagar el error textualmente.
+
+## Referencia completa (inglés)
+
+[Banderas, ejemplos y detalles](/docs/cli/generated/dev)

@@ -16,30 +16,37 @@ func TestPublicDocsNoPlaceholders(t *testing.T) {
 		"Coming soon",
 	}
 	var hits []string
-	err := filepath.Walk(contentDir, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
+	locales := []string{"en", "fr", "de", "es"}
+	for _, loc := range locales {
+		localeDir := filepath.Join(contentDir, loc)
+		if _, statErr := os.Stat(localeDir); os.IsNotExist(statErr) {
+			continue
 		}
-		if info.IsDir() || filepath.Ext(path) != ".mdx" {
-			return nil
-		}
-		if strings.Contains(path, string(filepath.Separator)+"cli"+string(filepath.Separator)+"generated"+string(filepath.Separator)) {
-			return nil
-		}
-		data, err := os.ReadFile(path)
-		if err != nil {
-			return err
-		}
-		body := string(data)
-		for _, needle := range bad {
-			if strings.Contains(body, needle) {
-				hits = append(hits, path+": contains "+needle)
+		err := filepath.Walk(localeDir, func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				return err
 			}
+			if info.IsDir() || filepath.Ext(path) != ".mdx" {
+				return nil
+			}
+			if strings.Contains(path, string(filepath.Separator)+"cli"+string(filepath.Separator)+"generated"+string(filepath.Separator)) {
+				return nil
+			}
+			data, err := os.ReadFile(path)
+			if err != nil {
+				return err
+			}
+			body := string(data)
+			for _, needle := range bad {
+				if strings.Contains(body, needle) {
+					hits = append(hits, path+": contains "+needle)
+				}
+			}
+			return nil
+		})
+		if err != nil {
+			t.Fatal(err)
 		}
-		return nil
-	})
-	if err != nil {
-		t.Fatal(err)
 	}
 	if len(hits) > 0 {
 		t.Fatalf("placeholder or stale branding in public docs:\n%s", strings.Join(hits, "\n"))

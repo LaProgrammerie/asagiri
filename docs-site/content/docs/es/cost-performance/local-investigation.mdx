@@ -1,0 +1,44 @@
+---
+title: Investigación local
+description: Grep acotado y recorridos del sistema de archivos antes de llamadas a agentes en la nube.
+---
+
+# Investigación local
+
+Fuente: `application/internal/investigation` — usada por `agentflow investigate` y el preludio del pipeline V3.
+
+## Qué hace
+
+- **Grep** de patrones feature/tarea con límites de bytes de salida
+- **Escaneo** de archivos candidatos; aviso de archivos grandes por encima de `large_file_bytes`
+- **Detección de rutas sensibles** vía `secret_path_denylist`
+- **Tests relacionados** heurísticos desde rutas candidatas
+
+## CLI
+
+```bash
+agentflow investigate billing-v2
+agentflow investigate billing-v2 --task task-003
+agentflow inspect diff
+agentflow inspect symbol Handler
+agentflow inspect tests billing-v2
+```
+
+Los subcomandos `inspect` encapsulan ayudantes de investigación dirigida.
+
+## Límites
+
+```yaml
+mcp:
+  investigation:
+    large_file_bytes: 524288
+    max_grep_output_bytes: 262144
+    command_timeout_seconds: 120
+    sensitive_globs: ["*.pem", ".git/*"]
+```
+
+## Ver también
+
+- [Conceptos local-first](/docs/es/concepts/local-first)
+- [CLI: investigate](/docs/cli/generated/investigate)
+- [Herramientas MCP](/docs/es/mcp/tools) (exposición opcional vía MCP si está habilitado)

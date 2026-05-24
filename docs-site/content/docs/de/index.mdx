@@ -1,0 +1,33 @@
+---
+title: AgentFlow
+description: Deterministische Orchestrierung für KI-gestützte Coding-Workflows.
+---
+
+# AgentFlow
+
+Deterministische Orchestrierung für KI-gestützte Coding-Workflows.
+
+AgentFlow wandelt Spezifikationen in nachvollziehbare, kostenbewusste Entwicklungsläufe um: lokale Voruntersuchung, Git-Worktrees, Coding-Agenten, Validierungsbefehle und reproduzierbare Reports.
+
+```bash
+agentflow work "develop billing-v2"
+```
+
+## Kernideen
+
+- **Lokal zuerst** — Kontext vor Cloud-Aufrufen eingrenzen
+- **Kosten- und Token-Schätzung** — Ausgaben vor dem Lauf sehen
+- **Git-Worktree-Isolation** — eine Aufgabe, ein Branch, ein Tree
+- **Agent-Routing** — passendes Werkzeug pro Schritt
+- **Validierung vor Vertrauen** — externe Befehle, keine Selbstprüfung des Agenten
+- **Reproduzierbare Reports** — Markdown + JSON-Laufhistorie
+
+## Einstieg
+
+1. [Installation](/docs/de/getting-started/installation)
+2. [Schnellstart](/docs/de/getting-started/quickstart)
+3. [Erster Workflow](/docs/de/getting-started/first-workflow)
+
+<Callout type="warning">
+AgentFlow beweist keine Korrektheit. Validierung und menschliche Review bleiben für kritische Änderungen verpflichtend.
+</Callout>

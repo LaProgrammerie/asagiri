@@ -1,0 +1,22 @@
+---
+title: sync · resumen CLI
+description: Sincronizar una fuente externa al repositorio local — resumen y enlace a la referencia completa.
+---
+
+# sync
+
+CLI: **`agentflow sync`**
+
+## Cuándo usarlo
+
+Los comandos de orquestación coordinan cargas de alto nivel de AgentFlow: ingesta, sincronización, triaje de backlog, pasadas de investigación, cargas contextuales enriquecidas, estimaciones aproximadas y automatización propia del workspace.
+
+## Modos de fallo
+
+- Cobra rechaza banderas desconocidas o errores de aridad antes de cualquier efecto en el repositorio.
+- AgentFlow no puede resolver el arranque si el comando se invoca fuera de un checkout inicializado.
+- La automatización posterior puede fallar cuando credenciales, extremos de red o requisitos en caché dejan de coincidir con lo esperado.
+
+## Referencia completa (inglés)
+
+[Banderas, ejemplos y detalles](/docs/cli/generated/sync)

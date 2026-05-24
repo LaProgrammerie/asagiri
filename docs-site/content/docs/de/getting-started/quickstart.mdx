@@ -1,0 +1,69 @@
+---
+title: Schnellstart
+description: AgentFlow Ende-zu-Ende in unter zehn Minuten mit Dry-Run-Sicherheit ausführen.
+---
+
+# Schnellstart
+
+Dieser Pfad nutzt **`--dry-run`**, um die Orchestrierung zu erkunden, ohne externe Agenten oder Validierungs-Shells zu starten.
+
+## 1. Bauen und initialisieren
+
+```bash
+make build
+export PATH="$PWD/bin:$PATH"
+cd your-repo
+agentflow init
+agentflow doctor
+```
+
+## 2. Natural-Language-Workflow im Dry-Run
+
+```bash
+agentflow work "develop my-feature" --dry-run --plan-only
+agentflow work "develop my-feature" --dry-run --estimate-only
+```
+
+`--plan-only` löst die Intention auf und druckt den Ausführungsplan. `--estimate-only` führt die V3-Pipeline bis zur Kosten-/Kontextschätzung ohne Agentenausführung.
+
+## 3. Pipeline-Befehle inspizieren
+
+Mit vorhandenem Kiro-Spec-Ordner (z. B. `.kiro/specs/my-feature/`):
+
+```bash
+agentflow plan my-feature --dry-run
+agentflow enrich my-feature --dry-run
+agentflow dev my-feature --dry-run
+agentflow verify my-feature --dry-run
+agentflow review my-feature --dry-run
+agentflow status --dry-run
+```
+
+## 4. Reports
+
+Nach einem Dry-Run-`work`, das Lauf-Metadaten erzeugt:
+
+```bash
+agentflow status --dry-run
+agentflow report <run-id> --dry-run
+```
+
+Reports liegen unter `.agentflow/runs/<run-id>/report.md`.
+
+## Reale Ausführung
+
+`--dry-run` erst entfernen, wenn Agents und Validierungsbefehle konfiguriert sind und die Ausführung externer Prozesse akzeptiert wird:
+
+```bash
+agentflow work "develop my-feature" --estimate-only   # zuerst Kostenschranken
+agentflow work "develop my-feature"                   # standardmäßig geführte Bestätigung
+```
+
+<Callout type="warning">
+Dry-Run simuliert die Orchestrierung; er belegt keine Agenten-Outputqualität. Führen Sie stets Projektvalidierung (`go test`, Linter, menschliche Review) für echte Änderungen aus.
+</Callout>
+
+## Siehe auch
+
+- [Erster Workflow](/docs/de/getting-started/first-workflow)
+- [CLI-Referenz](/docs/cli/generated)

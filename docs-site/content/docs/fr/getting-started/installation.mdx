@@ -1,0 +1,68 @@
+---
+title: Installation
+description: Installer AgentFlow et préparer un dépôt pour des workflows IA orchestrés.
+---
+
+# Installation
+
+AgentFlow est une CLI Go qui orchestre les spécifications, l'investigation locale, les git worktrees, les agents externes et les commandes de validation. Installez le binaire, initialisez le dépôt, puis vérifiez l'environnement.
+
+## Prérequis
+
+| Prérequis | Notes |
+| --- | --- |
+| **Go 1.25+** | Compilation depuis les sources ou binaire publié |
+| **Git** | Requis pour les worktrees, le statut et les diffs |
+| **Agents configurés** | Au minimum les commandes référencées dans `.agentflow/config.yaml` (`cursor-agent`, `kiro`, `ollama`, etc.) |
+
+Facultatif : **Ollama** pour enrichissement/routage local, jeton **Notion** pour la synchronisation (`NOTION_TOKEN`).
+
+## Installation depuis les sources
+
+```bash
+git clone https://github.com/LaProgrammerie/hyper-fast-builder.git
+cd hyper-fast-builder
+make build
+# binaire : ./bin/agentflow
+```
+
+Ajoutez `bin/` au `PATH`, ou copiez `bin/agentflow` dans un répertoire du `PATH`.
+
+## Initialiser un dépôt
+
+À la racine du projet :
+
+```bash
+agentflow init
+```
+
+Crée notamment :
+
+- `.agentflow/` — configuration, état SQLite, exécutions, worktrees
+- `.agentflow/config.yaml` — copié depuis `config.yaml.example` s'il est absent
+- `.agentflow/state.sqlite` — suivi des exécutions et des tâches
+
+Veillez à ce que `.agentflow/state.sqlite` et `.agentflow/worktrees/` figurent dans `.gitignore` (`init` affiche un rappel).
+
+## Vérifier l'installation
+
+```bash
+agentflow doctor
+```
+
+`doctor` contrôle git, la présence de la config, les commandes d'agent dans le `PATH` et les erreurs de configuration courantes. Corrigez les problèmes signalés avant d'exécuter `work`.
+
+## Configuration
+
+Copiez et éditez l'exemple si vous avez besoin d'agents ou de budgets personnalisés :
+
+```bash
+cp .agentflow/config.yaml.example .agentflow/config.yaml
+```
+
+Voir [Fichier de configuration](/docs/fr/configuration/config-file) pour chaque bloc YAML.
+
+## Étapes suivantes
+
+- [Démarrage rapide](/docs/fr/getting-started/quickstart)
+- [Premier workflow](/docs/fr/getting-started/first-workflow)

@@ -1,0 +1,33 @@
+---
+title: AgentFlow
+description: Orchestration déterministe des workflows de développement assisté par IA.
+---
+
+# AgentFlow
+
+Orchestration déterministe des workflows de développement assisté par IA.
+
+AgentFlow transforme les spécifications en exécutions de développement auditables et conscientes des coûts, via investigation locale, git worktrees, agents de code, commandes de validation et rapports reproductibles.
+
+```bash
+agentflow work "develop billing-v2"
+```
+
+## Idées centrales
+
+- **Investigation locale d'abord** — réduire le contexte avant les appels cloud
+- **Estimation des coûts et des jetons** — voir la dépense avant d'exécuter
+- **Isolation par git worktree** — une tâche, une branche, un arbre
+- **Routage des agents** — choisir l'outil adapté à chaque étape
+- **Validation avant confiance** — commandes externes, pas d'auto-contrôle par l'agent
+- **Rapports reproductibles** — historique d'exécution en markdown + JSON
+
+## Démarrage
+
+1. [Installation](/docs/fr/getting-started/installation)
+2. [Démarrage rapide](/docs/fr/getting-started/quickstart)
+3. [Premier workflow](/docs/fr/getting-started/first-workflow)
+
+<Callout type="warning">
+AgentFlow ne prouve pas la correction. La validation et la revue humaine restent obligatoires pour les changements critiques.
+</Callout>

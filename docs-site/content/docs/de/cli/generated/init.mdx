@@ -1,0 +1,22 @@
+---
+title: init · CLI-Kurzreferenz
+description: AgentFlow im Repo initialisieren — Kurzfassung und Link zur vollständigen Referenz.
+---
+
+# init
+
+CLI: **`agentflow init`**
+
+## Wann einsetzen
+
+Bootstrap-Befehle richten den AgentFlow-Arbeitsbaum ein oder gleichen ihn ab, damit Workflow-Knoten zuverlässig Konfiguration und Repo-Metadaten auflösen können.
+
+## Fehlermodi
+
+- Cobra lehnt unbekannte Flags oder Arity-Fehler ab, bevor Repo-Seiteneffekte entstehen.
+- AgentFlow kann Bootstrap nicht auflösen, wenn der Befehl außerhalb eines initialisierten Checkouts läuft.
+- Nachgelagerte Automatisierung kann scheitern, wenn Credentials, Netzwerk-Endpunkte oder gecachte Voraussetzungen von den Erwartungen abweichen.
+
+## Vollständige Referenz (Englisch)
+
+[Flags, Beispiele und Details](/docs/cli/generated/init)

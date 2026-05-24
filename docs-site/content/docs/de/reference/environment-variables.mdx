@@ -1,0 +1,40 @@
+---
+title: Umgebungsvariablen
+description: Von AgentFlow zur Laufzeit gelesene Umgebungsvariablen.
+---
+
+# Umgebungsvariablen
+
+| Variable | Wirkung |
+| --- | --- |
+| `AGENTFLOW_DRY_RUN` | Bei `1` wie globales `--dry-run` (auch von Exec-Layer gesetzt) |
+| `AGENTFLOW_YES` | Bei `1` automatische Bestätigung interaktiver Prompts (`requireConfirm`) |
+| `NOTION_TOKEN` | Standard-Notion-API-Token wenn `sources.notion.token_env` = `NOTION_TOKEN` |
+| `NOTION_TEST_PAGE_ID` | nur Integrationstests (`source/notion/integration_test.go`) |
+| `UPDATE_GOLDEN` | Bei `1` Golden-Dateien im `cost`-Paket aktualisieren |
+
+## Eigenes Notion-Token-Env
+
+```yaml
+sources:
+  notion:
+    token_env: MY_NOTION_SECRET
+```
+
+```bash
+export MY_NOTION_SECRET="..."
+```
+
+## CI-Nutzung
+
+```yaml
+env:
+  AGENTFLOW_DRY_RUN: "1"
+```
+
+`AGENTFLOW_YES=1` vermeiden, außer die Pipeline soll Budget-Bestätigungen absichtlich umgehen.
+
+## Siehe auch
+
+- [Notion-Konfiguration](/docs/de/configuration/notion)
+- [CI-Workflow](/docs/de/workflows/ci-workflow)

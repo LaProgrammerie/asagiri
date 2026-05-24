@@ -1,0 +1,52 @@
+---
+title: CLI overview
+description: AgentFlow command groups and generated per-command reference.
+---
+
+# CLI overview
+
+Entry binary: **`agentflow`** (`application/cmd/agentflow`).
+
+## Global flags
+
+| Flag | Description |
+| --- | --- |
+| `--dry-run` | Simulate without external agents or validation shells |
+| (persistent) | Inherited by all subcommands |
+
+Environment: `AGENTFLOW_DRY_RUN=1`, `AGENTFLOW_YES=1` — see [Environment variables](/docs/reference/environment-variables).
+
+## Command groups
+
+| Group | Commands |
+| --- | --- |
+| **Bootstrap** | `init`, `doctor`, `version` |
+| **Pipeline** | `spec`, `plan`, `enrich`, `dev`, `verify`, `review`, `pr` |
+| **Intent** | `work`, `continue`, `next`, `inbox` |
+| **Sources** | `sync`, `index` |
+| **Cost / context** | `estimate`, `investigate`, `context`, `cost`, `cost-report`, `cost-models` |
+| **Inspect** | `inspect` (diff, symbol, tests) |
+| **Ops** | `status`, `resume`, `report`, `clean` |
+| **MCP** | `mcp`, `mcp-serve` |
+| **Meta** | `docs`, `help` |
+
+## Generated reference
+
+Per-command pages (flags synced from Cobra) live under **[CLI generated](/docs/cli/generated)**.
+
+Regenerate after CLI changes:
+
+```bash
+go run ./application/cmd/agentflow docs generate-cli \
+  --output docs-site/content/docs/en/cli/generated
+```
+
+## Getting started
+
+```bash
+agentflow init
+agentflow doctor
+agentflow work "my feature" --dry-run --plan-only
+```
+
+See [Quickstart](/docs/getting-started/quickstart) and [First workflow](/docs/getting-started/first-workflow).

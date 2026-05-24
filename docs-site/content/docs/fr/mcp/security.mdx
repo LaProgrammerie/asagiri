@@ -1,0 +1,32 @@
+---
+title: Sécurité MCP
+description: Modèle de menace et durcissement du serveur MCP local.
+---
+
+# Sécurité MCP
+
+## Modèle de menace
+
+Le serveur MCP s'exécute sous **votre utilisateur** avec accès au dépôt. Tout client attaché au stdio peut invoquer des outils tant que MCP est activé.
+
+## Défauts (prudents)
+
+- `mcp.enabled: false`
+- Plafonds de sortie et de délai
+- `secret_path_denylist` bloque la lecture de chemins secrets courants dans les outils d'investigation
+
+## Recommandations
+
+1. Activer MCP uniquement sur des machines de confiance
+2. Ne pas exposer le stdio à des terminaux partagés ou sessions distantes sans authentification
+3. Maintenir `secret_path_denylist` aligné sur votre dépôt (`.env`, clés, identifiants)
+4. Combiner avec `policies.allow_network: false` lorsque les agents doivent rester hors ligne — noter que MCP lui-même est local
+
+<Callout type="security">
+MCP ne sandbox pas les implémentations d'outils. Traitez les éditeurs connectés comme entièrement dignes de confiance.
+</Callout>
+
+## Voir aussi
+
+- [Vue d'ensemble sécurité](/docs/fr/security)
+- [Vue d'ensemble MCP](/docs/fr/mcp/overview)

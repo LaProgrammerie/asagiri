@@ -1,0 +1,71 @@
+---
+title: Notion → spec local → work
+description: Synchroniser les pages Notion vers des specs locales ; n'exécuter qu'à partir d'instantanés.
+---
+
+# Notion → spec local → work
+
+## Principe
+
+**Notion n'est jamais la source de vérité d'exécution.** AgentFlow travaille toujours à partir d'un **instantané local** sous `.agentflow/specs/` (ou les chemins de `sources.local.paths`). La synchronisation tire le contenu distant ; `work` lit les fichiers locaux et l'état SQLite.
+
+<Callout type="experimental">
+La synchronisation Notion nécessite configuration et jeton API valide. Traitez la sync comme expérimentale tant que le mappage de votre espace n'est pas validé.
+</Callout>
+
+## Configurer Notion
+
+```yaml
+sources:
+  notion:
+    enabled: true
+    token_env: NOTION_TOKEN
+    specs_database_id: "<your-database-id>"
+    import_path: .agentflow/specs
+```
+
+Exporter le jeton :
+
+```bash
+export NOTION_TOKEN="ntn_..."
+```
+
+## Synchroniser
+
+```bash
+agentflow sync notion --page "https://www.notion.so/..."
+# ou lister + synchroniser toutes les sources activées :
+agentflow sync all
+```
+
+Prévisualisation dry-run :
+
+```bash
+agentflow --dry-run sync notion --page "https://www.notion.so/..."
+```
+
+Le mode interactif peut demander confirmation avant d'écraser une spec locale modifiée.
+
+## Travailler depuis l'instantané local
+
+```bash
+agentflow inbox --source notion
+agentflow work "develop billing-v2" --source notion
+```
+
+## Compromis
+
+| Gain | Risque |
+| --- | --- |
+| Source adaptée aux PM dans Notion | Exposition du jeton si commitée |
+| Exécution hors ligne après sync | Dérive de schéma si les propriétés Notion changent |
+
+<Callout type="security">
+Ne jamais committer `NOTION_TOKEN`. Utilisez `token_env` et des secrets CI. Les journaux masquent les motifs de secrets courants.
+</Callout>
+
+## Voir aussi
+
+- [Configuration Notion](/docs/fr/configuration/notion)
+- [CLI : sync](/docs/cli/generated/sync)
+- [CLI : inbox](/docs/cli/generated/inbox)

@@ -1,0 +1,211 @@
+---
+title: Fichier de configuration
+description: Référence complète des blocs et valeurs par défaut de .agentflow/config.yaml.
+---
+
+# Fichier de configuration
+
+Chemin : **`.agentflow/config.yaml`** (créé par `agentflow init` depuis `config.yaml.example`). Les chemins sont résolus relativement à la racine du dépôt sauf mention contraire.
+
+Schéma JSON (généré) : `/schemas/config.schema.json` sur le site de documentation.
+
+## `project`
+
+```yaml
+project:
+  name: my-project
+  default_branch: main
+```
+
+Nom d'affichage du dépôt et branche par défaut pour les opérations worktree.
+
+## `intent`
+
+Résolution en langage naturel pour `work` / `continue` (`application/internal/intent`).
+
+```yaml
+intent:
+  enabled: true
+  default_mode: guided   # guided | auto
+  resolver:
+    use_ollama_fallback: true
+    min_confidence: 0.75
+    ask_when_below_confidence: true
+```
+
+## `work`
+
+Valeurs par défaut pour l'orchestration et le choix des agents.
+
+```yaml
+work:
+  default_agent: cursor
+  default_reviewer: codex
+  default_enricher: ollama
+  stop_after: report
+  auto_verify: true
+  auto_review: false
+  max_tasks_per_run: 1
+  require_plan_confirmation: true
+```
+
+## `sources`
+
+| Bloc | Rôle |
+| --- | --- |
+| `sources.local` | Parcourt `.agentflow/specs`, `.kiro/specs`, `docs/ai/active` |
+| `sources.notion` | Import Notion → local optionnel (voir [Notion](/docs/fr/configuration/notion)) |
+
+```yaml
+sources:
+  local:
+    enabled: true
+    paths:
+      - .agentflow/specs
+      - .kiro/specs
+      - docs/ai/active
+  notion:
+    enabled: false
+    token_env: NOTION_TOKEN
+    specs_database_id: ""
+    import_path: .agentflow/specs
+```
+
+## `specs`, `state`, `worktrees`
+
+```yaml
+specs:
+  kiro_path: .kiro/specs
+  active_spec_path: docs/ai/active/current-spec.md
+  handoff_path: docs/ai/active/handoff.md
+
+state:
+  backend: sqlite
+  path: .agentflow/state.sqlite
+
+worktrees:
+  base_path: .agentflow/worktrees
+  branch_prefix: agentflow
+  cleanup_policy: keep_failed
+```
+
+## `agents`
+
+Associe des identifiants logiques d'agent aux commandes subprocess. Voir [Configuration des agents](/docs/fr/configuration/agents).
+
+## `validation`
+
+```yaml
+validation:
+  commands:
+    - name: tests
+      command: go test ./...
+      required: true
+```
+
+Les dépôts Go reçoivent des valeurs par défaut au bootstrap si `go.mod` existe.
+
+## `models`
+
+Profils logiques pour routage et coût (`specv3`). Les clés sont des identifiants arbitraires :
+
+```yaml
+models:
+  ollama_local_qwen:
+    provider: ollama
+    class: local
+    model: qwen2.5-coder:14b
+    input_cost_per_1m_tokens: 0
+    output_cost_per_1m_tokens: 0
+    usage: [summarize, classify, pre_review, context_selection]
+```
+
+## `budgets`
+
+Voir [Budgets](/docs/fr/configuration/budgets).
+
+## `pricing`
+
+Grille tarifaire manuelle — **aucun prix cloud codé en dur**.
+
+```yaml
+pricing:
+  currency: EUR
+  models:
+    gemini-3-flash-preview:
+      input_per_1m_tokens: 0.00
+      output_per_1m_tokens: 0.00
+      source: manual
+      updated_at: "2026-05-17"
+```
+
+## `token_estimation`
+
+Heuristiques caractères/jeton (`application/internal/cost/token_counter.go`) :
+
+```yaml
+token_estimation:
+  default_chars_per_token: 4.0
+  code_chars_per_token: 3.2
+  markdown_chars_per_token: 4.2
+  json_chars_per_token: 3.6
+```
+
+<Callout type="cost">
+Ces ratios approximent les jetons — ce ne sont pas des tokenizers fournisseur.
+</Callout>
+
+## `routing`
+
+Voir [Routage](/docs/fr/configuration/routing).
+
+## `ui`
+
+UX terminal (`application/internal/tui`) :
+
+```yaml
+ui:
+  mode: auto      # auto | rich | plain | json
+  live_logs: true
+  progress_bars: true
+  compact: false
+```
+
+## `mcp`
+
+Serveur MCP stdio local (`mcp.enabled` doit être `true` pour exposer les outils) :
+
+```yaml
+mcp:
+  enabled: false
+  max_output_bytes: 1048576
+  command_timeout_seconds: 120
+  secret_path_denylist: [".env", "credentials.json", "id_rsa"]
+  investigation:
+    large_file_bytes: 524288
+    max_grep_output_bytes: 262144
+    command_timeout_seconds: 120
+    sensitive_globs: ["*.pem", ".git/*"]
+```
+
+## `policies`
+
+```yaml
+policies:
+  require_clean_git: true
+  forbid_untracked_secret_files: true
+  max_files_changed_per_task: 20
+  allow_network: false
+  require_human_approval_for:
+    - database_migration
+    - security_sensitive_change
+    - dependency_upgrade
+```
+
+## Valider les modifications
+
+```bash
+agentflow doctor
+```
+
+Après édition du YAML, exécutez `doctor` avant `work`.

@@ -1,0 +1,54 @@
+---
+title: Ollama
+description: Lokale Modelle für Enrichment, Routing und Intent-Fallback ausführen.
+---
+
+# Ollama
+
+AgentFlow nutzt Ollama für **lokale** Schritte: Enrichment, Intent-Resolver-Fallback (`intent.resolver.use_ollama_fallback`) und kostenbewusstes Routing zu `work.default_enricher`.
+
+## Konfiguration
+
+```yaml
+agents:
+  ollama:
+    endpoint: http://localhost:11434
+    model: qwen2.5-coder:14b
+    embedding_model: nomic-embed-text
+    timeout: 300
+
+models:
+  ollama_local_qwen:
+    provider: ollama
+    class: local
+    model: qwen2.5-coder:14b
+    usage: [summarize, classify, pre_review, context_selection]
+```
+
+## Voraussetzungen
+
+```bash
+ollama serve
+ollama pull qwen2.5-coder:14b
+agentflow doctor
+```
+
+## Nutzung
+
+```bash
+agentflow enrich billing-v2 --agent ollama
+agentflow work "refactor utils" --prefer-local
+```
+
+## Embeddings / RAG
+
+`embedding_model` ist für zukünftige RAG-Features konfiguriert. Der aktuelle Indexer (`agentflow index`) speichert **Text-Chunks** in SQLite — keine Vektor-Embeddings.
+
+<Callout type="experimental">
+Vektor-Embeddings und semantische RAG-Retrieval stehen auf der Roadmap (siehe `ROADMAP.md` im Repo-Root). Embedding-basierte Suche in v1 nicht erwarten.
+</Callout>
+
+## Siehe auch
+
+- [Lokale Modelle](/docs/de/agents/local-models)
+- [CLI: enrich](/docs/cli/generated/enrich)

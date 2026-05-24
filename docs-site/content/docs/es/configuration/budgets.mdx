@@ -1,0 +1,50 @@
+---
+title: Presupuestos
+description: Techos de coste y tokens estimados por ejecución, tarea y día.
+---
+
+# Presupuestos
+
+Implementado en `application/internal/cost/budget.go` y aplicado en el pipeline V3 antes de la ejecución del agente.
+
+## Esquema
+
+```yaml
+budgets:
+  default_currency: EUR
+  per_run:
+    max_estimated_cost: 1.00
+    max_estimated_tokens: 500000
+    require_confirmation_above_cost: 0.20
+  per_task:
+    max_estimated_cost: 0.30
+    max_estimated_tokens: 150000
+  daily:
+    max_estimated_cost: 10.00
+  policies:
+    block_when_over_budget: true
+    allow_override_with_flag: true
+    override_flag: "--allow-over-budget"
+```
+
+## Interacción CLI
+
+| Bandera | Comportamiento |
+| --- | --- |
+| `--budget <EUR>` | tope a nivel de ejecución para esta invocación |
+| `--estimate-only` | detiene tras la estimación; sin gasto |
+| `--allow-over-budget` | evita el bloqueo si la política lo permite |
+| `--yes` | acepta la confirmación tras `BudgetPendingConfirmError` |
+
+## Limitaciones
+
+Las estimaciones usan tokens heurísticos × su hoja `pricing`. Las facturas reales del proveedor pueden diferir.
+
+<Callout type="cost">
+Configure `pricing.models` con tarifas actuales. Precios a cero distorsionan la vista del coste pero no desactivan los topes de tokens.
+</Callout>
+
+## Ver también
+
+- [Flujo consciente del coste](/docs/es/workflows/cost-aware-workflow)
+- [Estimación de tokens](/docs/es/cost-performance/token-estimation)

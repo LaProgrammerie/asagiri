@@ -1,5 +1,8 @@
 import { getMDXComponents } from '@/components/mdx';
-import { source, type Page } from '@/lib/source';
+import { source } from '@/lib/source';
+import type { DocPage } from '@/lib/doc-page';
+import { docsSlugForPage, parseDocsSlug } from '@/lib/locale-routing';
+import { i18n } from '@/lib/i18n';
 import {
   DocsBody,
   DocsDescription,
@@ -14,8 +17,8 @@ type PageParams = { slug?: string[] };
 
 export default async function Page(props: { params: Promise<PageParams> }) {
   const params = await props.params;
-  const slug = params.slug ?? [];
-  const page = source.getPage(slug) as Page | undefined;
+  const { locale, pageSlug } = parseDocsSlug(params.slug);
+  const page = source.getPage(pageSlug, locale) as DocPage | undefined;
   if (!page) {
     notFound();
   }
@@ -38,15 +41,19 @@ export default async function Page(props: { params: Promise<PageParams> }) {
 }
 
 export function generateStaticParams() {
-  return source.generateParams();
+  return i18n.languages.flatMap((locale) =>
+    source.getPages(locale).map((page) => ({
+      slug: docsSlugForPage(locale, page.slugs),
+    })),
+  );
 }
 
 export async function generateMetadata(props: {
   params: Promise<PageParams>;
 }): Promise<Metadata> {
   const params = await props.params;
-  const slug = params.slug ?? [];
-  const page = source.getPage(slug);
+  const { locale, pageSlug } = parseDocsSlug(params.slug);
+  const page = source.getPage(pageSlug, locale);
   if (!page) {
     notFound();
   }

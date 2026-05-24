@@ -9,7 +9,7 @@ import (
 )
 
 func newDocsCmd() *cobra.Command {
-	const defaultOutputDir = "docs-site/content/docs/cli/generated"
+	const defaultOutputDir = "docs-site/content/docs/en/cli/generated"
 
 	var output string
 	gen := &cobra.Command{

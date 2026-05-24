@@ -1,0 +1,37 @@
+---
+title: Códigos de salida
+description: Comportamiento de salida de la CLI en éxito y fallo.
+---
+
+# Códigos de salida
+
+AgentFlow sigue las convenciones habituales de Go/Cobra:
+
+| Código | Significado |
+| --- | --- |
+| **0** | Comando completado sin error |
+| **1** | Error general (`RunE` devolvió error — configuración, git, workflow, bloqueo de presupuesto, fallo de agente) |
+| **2** | Error de uso de Cobra (bandera desconocida, aridad incorrecta) — típico en invocaciones mal formadas |
+
+## Ejemplos
+
+```bash
+agentflow work                    # salida 2 — falta argumento de instrucción obligatorio
+agentflow doctor                  # salida 0 si pasan todas las comprobaciones
+agentflow work "x" --estimate-only # salida 0 si la estimación tiene éxito
+```
+
+Los bloqueos de presupuesto y fallos de validación aparecen como **salida 1** con mensaje en stderr.
+
+## Scripts
+
+```bash
+agentflow verify my-feature || echo "verify failed"
+```
+
+Use `--dry-run` en CI para evitar salidas no nulas por agentes ausentes cuando solo prueba la orquestación.
+
+## Ver también
+
+- [Descripción general de la CLI](/docs/es/cli)
+- [Recuperación ante fallos](/docs/es/workflows/failure-recovery)

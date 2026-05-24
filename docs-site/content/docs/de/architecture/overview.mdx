@@ -1,0 +1,66 @@
+---
+title: Architekturüberblick
+description: Go-Module unter application/internal und Ausführungs-Pipeline.
+---
+
+# Architekturüberblick
+
+AgentFlow ist eine Go-CLI (`application/cmd/agentflow`) mit Domänenlogik in `application/internal/` und gemeinsamen Typen in `application/pkg/agentflow`.
+
+## Ausführungs-Pipeline
+
+```mermaid
+flowchart TD
+  A[Nutzerintention / CLI] --> B[Intent-Resolver + Planner]
+  B --> C[pipeline V3]
+  C --> D[investigation]
+  D --> E[contextopt]
+  E --> F[Kostenschätzung + Budgets]
+  F --> G[routing]
+  G --> H[workflow: plan enrich dev]
+  H --> I[worktree + agent exec]
+  I --> J[validation]
+  J --> K[review + report]
+```
+
+## Interne Module
+
+| Paket | Rolle |
+| --- | --- |
+| `cli` | Cobra-Befehle, Docgen, App-Kontext |
+| `config` | YAML-Laden, Defaults, Pfadauflösung |
+| `intent` | NL `work`/`continue`, Hybrid-Resolver, Executor |
+| `workflow` | Zustandsmaschine, plan/dev/verify/review, Worktrees |
+| `worktree` | Git-Worktree-Lebenszyklus |
+| `agent` / `agent/exec` | Subprocess-Verträge |
+| `source` / `source/notion` | Spec-Ingestion |
+| `contextopt` | Kontext sammeln/reduzieren/packen |
+| `investigation` | Lokales grep/Scan |
+| `cost` | Token, Pricing, Budgets |
+| `routing` | Schrittklasse → Agent/Modell |
+| `mcp` | stdio-MCP-Tools (optional) |
+| `store/sqlite` | Läufe, Aufgaben, Metriken |
+| `report` | Lauf-Reports |
+| `tui` | rich/plain/json-UI |
+| `rag` | Chunk-Index (SQLite, nicht vektoriel) |
+| `bootstrap` | `init`, `doctor` |
+| `redact` | Log-Secret-Masking |
+| `validation` | externer Befehls-Runner |
+
+## Zustandsspeicherung
+
+- **SQLite** bei `state.path` (Standard `.agentflow/state.sqlite`)
+- Lauf-Artefakte: `.agentflow/runs/<run-id>/`
+
+## Erweiterungspunkte
+
+- neue Agents: nur Config
+- neue Validierungsbefehle: `validation.commands`
+- eigene Routing-Strategien: `routing.strategies`
+- MCP-Tools bei `mcp.enabled: true`
+
+## Siehe auch
+
+- [Konfiguration](/docs/de/configuration/config-file)
+- [Zuverlässigkeit: Worktrees](/docs/de/reliability/worktree-isolation)
+- [MCP-Überblick](/docs/de/mcp/overview)

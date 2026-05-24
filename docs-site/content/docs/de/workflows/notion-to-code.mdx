@@ -1,0 +1,71 @@
+---
+title: Notion → lokale Spec → work
+description: Notion-Seiten mit lokalen Specs synchronisieren; Ausführung nur aus Snapshots.
+---
+
+# Notion → lokale Spec → work
+
+## Prinzip
+
+**Notion ist niemals die ausführungsrelevante Source of Truth.** AgentFlow arbeitet immer von einem **lokalen Snapshot** unter `.agentflow/specs/` (oder Pfaden in `sources.local.paths`). Sync holt Remote-Inhalt; `work` liest lokale Dateien und SQLite-Zustand.
+
+<Callout type="experimental">
+Notion-Sync erfordert Konfiguration und ein gültiges API-Token. Behandeln Sie Sync als experimentell, bis Ihr Workspace-Mapping validiert ist.
+</Callout>
+
+## Notion konfigurieren
+
+```yaml
+sources:
+  notion:
+    enabled: true
+    token_env: NOTION_TOKEN
+    specs_database_id: "<your-database-id>"
+    import_path: .agentflow/specs
+```
+
+Token exportieren:
+
+```bash
+export NOTION_TOKEN="ntn_..."
+```
+
+## Synchronisieren
+
+```bash
+agentflow sync notion --page "https://www.notion.so/..."
+# oder alle aktivierten Quellen auflisten und syncen:
+agentflow sync all
+```
+
+Dry-Run-Vorschau:
+
+```bash
+agentflow --dry-run sync notion --page "https://www.notion.so/..."
+```
+
+Der interaktive Modus kann vor dem Überschreiben einer geänderten lokalen Spec nachfragen.
+
+## Aus lokalem Snapshot arbeiten
+
+```bash
+agentflow inbox --source notion
+agentflow work "develop billing-v2" --source notion
+```
+
+## Kompromisse
+
+| Vorteil | Risiko |
+| --- | --- |
+| PM-freundliche Quelle in Notion | Token-Exposure bei Commit |
+| Offline-Ausführung nach Sync | Schema-Drift bei geänderten Notion-Properties |
+
+<Callout type="security">
+`NOTION_TOKEN` niemals committen. `token_env` und CI-Secrets verwenden. Logs redaktieren übliche Secret-Muster.
+</Callout>
+
+## Siehe auch
+
+- [Notion-Konfiguration](/docs/de/configuration/notion)
+- [CLI: sync](/docs/cli/generated/sync)
+- [CLI: inbox](/docs/cli/generated/inbox)
