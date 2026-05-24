@@ -9,11 +9,15 @@ description: Sync Notion pages to local specs; execute only from snapshots.
 
 **Notion is never the execution source of truth.** AgentFlow always works from a **local snapshot** under `.agentflow/specs/` (or paths in `sources.local.paths`). Sync pulls remote content; `work` reads local files and SQLite state.
 
+Product and design stakeholders can therefore keep authoring in Notion while engineering replay runs from immutable filesystem snapshots—a split that avoids surprise behaviour when editors rename properties or reorganize databases mid-flight.
+
 <Callout type="experimental">
 Notion sync requires configuration and a valid API token. Treat sync as experimental until your workspace mapping is validated.
 </Callout>
 
 ## Configure Notion
+
+YAML mirrors the authoritative schema: enable the connector, declare which environment variable exposes the PAT, tie it to your specs database identifier, and point imports at `.agentflow/specs` (overridable elsewhere if your layout differs).
 
 ```yaml
 sources:
@@ -32,6 +36,8 @@ export NOTION_TOKEN="ntn_..."
 
 ## Sync
 
+`sync notion` can target a canonical page URL, while **`sync all`** fans out across every configured source so auxiliary streams stay coherent.
+
 ```bash
 agentflow sync notion --page "https://www.notion.so/..."
 # or list + sync all enabled sources:
@@ -47,6 +53,8 @@ agentflow --dry-run sync notion --page "https://www.notion.so/..."
 Interactive mode may prompt before overwriting a modified local spec.
 
 ## Work from local snapshot
+
+Listing plus execution both consult the synced tree under `.agentflow/specs`:
 
 ```bash
 agentflow inbox --source notion

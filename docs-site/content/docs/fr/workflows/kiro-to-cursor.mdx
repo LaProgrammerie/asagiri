@@ -1,17 +1,19 @@
 ---
-title: Kiro → Cursor → Vérification
-description: Spec dans Kiro, implémentation avec Cursor, validation par les commandes du projet.
+title: Kiro → Cursor → Verify
+description: Spec dans Kiro, implémenter avec Cursor, valider avec commandes projet.
 ---
 
-# Kiro → Cursor → Vérification
+# Kiro → Cursor → Verify
 
-Workflow de transfert des specs Kiro vers l'implémentation Cursor avec les barrières AgentFlow (`spec-doc` §11.2).
+Ce passage à l’échelle aligne **`spec-doc` §11.2** avec portes AgentFlow — la rédaction reste sous **Kiro** (`.kiro/specs/<feature>/`), Cursor / `cursor-agent` portent l’implémentation où il excelle ; la CLI impose des étapes **verify**/**review** déterministes empêchant dérive muette.
 
-## Quand l'utiliser
+## Quand vous y recourez
 
-Vous conservez exigences et tâches dans **Kiro** (`.kiro/specs/<feature>/`) mais souhaitez **Cursor** (ou `cursor-agent`) pour l'implémentation, avec étapes verify/review obligatoires.
+Exigez specs + tâches Kiro mais mise en œuvre Cursor agentique avec garde fou verify/reviews obligés.
 
 ## Pipeline
+
+Représentation indicative — rapport final utilise toujours identifiants persistant :
 
 ```mermaid
 flowchart LR
@@ -25,7 +27,7 @@ flowchart LR
 
 ## Commandes
 
-Remplacez `billing-v2` par l'identifiant de votre feature :
+Remplacez `billing-v2` par votre feature :
 
 ```bash
 agentflow spec billing-v2 --agent kiro
@@ -37,15 +39,15 @@ agentflow review billing-v2 --agent codex
 agentflow report <run-id>
 ```
 
-Utilisez `--dry-run` sur chaque étape pendant la répétition :
+Répète possible avec `--dry-run` durant mise en plateau :
 
 ```bash
 agentflow dev billing-v2 --agent cursor --dry-run
 ```
 
-## Valeurs par défaut de configuration
+## Defaults configuration
 
-Depuis `.agentflow/config.yaml.example` :
+Snippet provenant exemple :
 
 ```yaml
 work:
@@ -56,26 +58,26 @@ work:
   auto_review: false
 ```
 
-Ne réglez `work.auto_review: true` que si vous souhaitez une revue après chaque verify réussi.
+Activer auto review seulement quand désirez revues systématiques à chaque verify vert.
 
-## Raccourci par intention
+## Raccourci intention
 
 ```bash
 agentflow work "develop billing-v2" --stop-after verify
 ```
 
-La résolution d'intention choisit la feature ; le pipeline V3 applique budgets et optimisation de contexte.
+Résolveur intentions choisi feature flux V3 impose budgets/context.
 
-## Modes de défaillance
+## Diagnostics
 
-| Symptôme | Correctif |
+| Symptôme | Remède |
 | --- | --- |
-| `kiro` absent du PATH | Définir `agents.kiro.command` ou installer la CLI Kiro |
-| Échec de verify | Corriger les tests localement ; utiliser `agentflow verify billing-v2 --force` seulement si la machine d'état l'autorise |
-| Git dirty bloqué | Commit/stash ou ajuster `policies.require_clean_git` |
+| `kiro` absent PATH | Ajuster agents.kiro.command ou installer CLI |
+| Verify échoue | Corrigez puis `--force` seulement où machine états permet |
+| git sale bloquant | commits stash ou assouplit policy clean |
 
 ## Voir aussi
 
-- [CLI : spec](/docs/cli/generated/spec)
-- [CLI : dev](/docs/cli/generated/dev)
-- [Vue d'ensemble architecture](/docs/fr/architecture/overview)
+- [CLI spec](/docs/fr/cli/generated/spec)
+- [CLI dev](/docs/fr/cli/generated/dev)
+- [Architecture](/docs/fr/architecture/overview)

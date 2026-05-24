@@ -5,7 +5,7 @@ description: Secrets, scope, MCP, agents, and data sent to providers.
 
 # Security
 
-AgentFlow orchestrates powerful tools. Security is **shared responsibility**: your config, agents, and review process matter as much as the CLI.
+AgentFlow stitches together compilers, MCP servers, subprocess agents, and optional cloud-hosted models—each layer amplifying whichever mistakes already exist in your repository hygiene. Expect **shared responsibility**: the CLI can enforce scaffolding, but privileged configuration choices and downstream review rituals remain firmly with your team.
 
 ## Model summary
 
@@ -20,9 +20,13 @@ AgentFlow orchestrates powerful tools. Security is **shared responsibility**: yo
 
 ## Filesystem scope
 
+Surface area stays bounded:
+
 - Worktrees under `.agentflow/worktrees/`
 - State and runs under `.agentflow/`
 - Investigation skips sensitive globs and denylisted paths (`.env`, keys)
+
+Everything else—including ignored secrets your editors never committed—is still reachable if an operator misroutes commands, so pairing these defaults with least-privilege agent profiles remains essential.
 
 ## Sensitive logs
 
@@ -34,7 +38,7 @@ Configured CLIs (`cursor-agent`, `codex`, etc.) run with your user permissions. 
 
 ## Reporting issues
 
-See repository [`SECURITY.md`](https://github.com/LaProgrammerie/hyper-fast-builder/blob/main/SECURITY.md) for disclosure process.
+See repository [`SECURITY.md`](https://github.com/LaProgrammerie/hyper-fast-builder/blob/main/SECURITY.md) for disclosure guidance whenever you uncover privilege escalations tied to orchestration workflows.
 
 ## Related
 

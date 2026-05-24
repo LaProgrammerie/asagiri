@@ -1,11 +1,13 @@
 ---
-title: Agents-Konfiguration
+title: Agenten-Konfiguration
 description: Agent-IDs auf CLI-Befehle und Timeouts in config.yaml abbilden.
 ---
 
-# Agents-Konfiguration
+# Agenten-Konfiguration
 
-AgentFlow ruft externe CLIs als **Subprocess ohne Shell** auf (`application/internal/agent/exec`). Jeder Schlüssel unter `agents:` ist eine logische ID, referenziert von Flags (`--agent`, `work.default_agent`, Routing).
+AgentFlow spricht keine proprietären Agent-APIs direkt an. Jeder Agent startet als **Subprocess ohne Shell** (`application/internal/agent/exec`) mit einem klaren `argv` aus Ihrer Konfiguration. Jeder Schlüssel unter `agents:` ist eine logische ID für `--agent`, `work.default_*` und Routing.
+
+Der folgende Block zeigt eine übliche Form: mehrere IDs, verschiedene Executables, optionale `args`, Modelle, Timeouts und — wo das Protokoll es erwartet — einen HTTP-Endpunkt für Ollama.
 
 ## Beispiel
 
@@ -33,16 +35,20 @@ agents:
 
 ## Felder
 
-| Feld | Verwendung |
+| Feld | Verwendung durch die Exec-Schicht |
 | --- | --- |
-| `command` | Ausführbarer Name im `PATH` |
-| `args` | zusätzliches argv (Kiro, Wrapper) |
-| `default_model` | übergeben, wenn der Agent Modell-Flags unterstützt |
-| `timeout` | Sekunden bis Kill |
-| `endpoint` | Ollama-HTTP-Basis-URL |
+| `command` | Executable-Name auf `PATH` |
+| `args` | Zusätzliches argv (Kiro, Wrapper) |
+| `default_model` | Wird übergeben, wenn der Agent Modell-Flags unterstützt |
+| `timeout` | Sekunden bis zum Abbruch |
+| `endpoint` | Basis-URL für Ollama |
 | `model` / `embedding_model` | Ollama-Modell-Tags |
 
-## Defaults in `work`
+Fehlt `timeout`, gelten Defaults anderweitig in der Konfiguration. Ollama-spezifische Felder wirken nur für Agenten, die dieses Protokoll nutzen.
+
+## Standardwerte in `work`
+
+Der Block `work` legt fest, welche logischen IDs laufen, wenn ein Befehl nichts überschreibt. Passen Sie das an, wenn Implementierung, Reviewer oder Enricher repo-weit wechseln sollen.
 
 ```yaml
 work:
@@ -51,14 +57,14 @@ work:
   default_enricher: ollama
 ```
 
-CLI-Overrides: `agentflow dev feat --agent cursor`, `agentflow review feat --agent codex`.
+Pro Aufruf überschreibbar, etwa `agentflow dev feat --agent cursor` oder `agentflow review feat --agent codex`.
 
 ## Dry-run
 
-Mit `--dry-run` überspringt die Exec-Schicht echte Subprozesse — nützlich für CI und Dokumentationsproben.
+Mit `--dry-run` werden keine echten Subprozesse gestartet — sinnvoll in CI zum Prüfen der Verdrahtung und zum Proben von Skripten ohne lange Laufzeiten.
 
 ## Siehe auch
 
-- [Agents-Überblick](/docs/de/agents)
+- [Agenten-Übersicht](/docs/de/agents)
 - [Ollama](/docs/de/agents/ollama)
-- [CLI: dev](/docs/cli/generated/dev)
+- [CLI: dev](/docs/de/cli/generated/dev)

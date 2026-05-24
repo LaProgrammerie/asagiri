@@ -5,59 +5,57 @@ description: Modules Go sous application/internal et pipeline d'exécution.
 
 # Vue d'ensemble de l'architecture
 
-AgentFlow est une CLI Go (`application/cmd/agentflow`) avec logique métier dans `application/internal/` et types partagés dans `application/pkg/agentflow`.
+AgentFlow est une CLI Go (`application/cmd/agentflow`) dont la majeure partie du comportement vit dans `application/internal/` et les contrats partagés dans `application/pkg/agentflow`. Cette séparation garde le binaire fin tout en isolant parsing, planification, investigation, coût et stockage derrière des packages explicites que vous pouvez raisonner depuis la seule arborescence.
 
 ## Pipeline d'exécution
 
+Le chemin de bout en bout part de la CLI, résout l'intention, exécute le pipeline V3 (investigation, optimisation du contexte, coût et budgets, routage), puis les étapes workflow — plan, enrich, dev — dans un worktree avant validation, revue optionnelle et rapport.
+
 ```mermaid
 flowchart TD
-  A[Intention utilisateur / CLI] --> B[Résolveur d'intention + planificateur]
+  A[User intent / CLI] --> B[intent resolver + planner]
   B --> C[pipeline V3]
   C --> D[investigation]
   D --> E[contextopt]
-  E --> F[estimation coût + budgets]
-  F --> G[routage]
-  G --> H[workflow : plan enrich dev]
-  H --> I[worktree + exec agent]
+  E --> F[cost estimate + budgets]
+  F --> G[routing]
+  G --> H[workflow: plan enrich dev]
+  H --> I[worktree + agent exec]
   I --> J[validation]
-  J --> K[revue + rapport]
+  J --> K[review + report]
 ```
 
 ## Modules internes
 
-| Paquet | Rôle |
+| Package | Rôle |
 | --- | --- |
-| `cli` | Commandes Cobra, docgen, contexte applicatif |
-| `config` | Chargement YAML, défauts, résolution des chemins |
+| `cli` | Commandes Cobra, docgen, contexte app |
+| `config` | Chargement YAML, défauts, résolution de chemins |
 | `intent` | NL `work`/`continue`, résolveur hybride, exécuteur |
-| `workflow` | Machine d'état, plan/dev/verify/revue, worktrees |
-| `worktree` | Cycle de vie des git worktrees |
+| `workflow` | Machine à états, plan/dev/verify/review, worktrees |
+| `worktree` | Cycle de vie git worktree |
 | `agent` / `agent/exec` | Contrats subprocess |
-| `source` / `source/notion` | Ingestion des specs |
-| `contextopt` | Collecte/réduction/paquetage du contexte |
-| `investigation` | Grep/scan local |
+| `source` / `source/notion` | Ingestion de specs |
+| `contextopt` | Collecte/réduction/pack de contexte |
+| `investigation` | grep/scan local |
 | `cost` | Jetons, tarification, budgets |
 | `routing` | Classe d'étape → agent/modèle |
 | `mcp` | Outils MCP stdio (optionnel) |
-| `store/sqlite` | Exécutions, tâches, métriques |
-| `report` | Rapports d'exécution |
+| `store/sqlite` | Runs, tâches, métriques |
+| `report` | Rapports de run |
 | `tui` | UI rich/plain/json |
-| `rag` | Index de morceaux (SQLite, non vectoriel) |
+| `rag` | Index de chunks (SQLite, non vectoriel) |
 | `bootstrap` | `init`, `doctor` |
-| `redact` | Masquage des secrets dans les journaux |
-| `validation` | Lanceur de commandes externes |
+| `redact` | Masquage de secrets dans les logs |
+| `validation` | Exécuteur de commandes externes |
 
 ## Stockage d'état
 
-- **SQLite** à `state.path` (défaut `.agentflow/state.sqlite`)
-- Artefacts d'exécution : `.agentflow/runs/<run-id>/`
+Runs et tâches persistent dans **SQLite** à `state.path` (défaut `.agentflow/state.sqlite`). Les artefacts de chaque run vont sous `.agentflow/runs/<run-id>/`, ce qui garde prompts, logs et sorties intermédiaires adressables sans relire la base.
 
 ## Points d'extension
 
-- Nouveaux agents : config uniquement
-- Nouvelles commandes de validation : `validation.commands`
-- Stratégies de routage personnalisées : `routing.strategies`
-- Outils MCP lorsque `mcp.enabled: true`
+Nouveaux agents via la config seule ; nouvelles portes qualité via `validation.commands` ; stratégies de routage sous `routing.strategies` ; outils MCP optionnels quand `mcp.enabled: true`. Ce sont des coutures intentionnelles : la plupart des équipes étendent AgentFlow sans forker le point d'entrée Go.
 
 ## Voir aussi
 

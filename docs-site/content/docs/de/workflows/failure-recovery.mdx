@@ -1,13 +1,15 @@
 ---
-title: Fehlerbehebung und Recovery
-description: Von fehlgeschlagenem Verify, Review oder unterbrochenem Lauf erholen.
+title: Recovery bei Fehlern
+description: Wiederanlauf nach fehlgeschlagener Verifikation, Review oder unterbrochenem Lauf.
 ---
 
-# Fehlerbehebung und Recovery
+# Recovery bei Fehlern
 
-## Zustandsmaschine
+AgentFlow speichert **explizite Aufgabenstatus** statt Fortschritt aus verstreuten Dateien zu rekonstruieren. Sauberes Wiederanlaufen bedeutet, diese Übergänge zu respektieren — oder dokumentierte Ausnahmen wie `--force` und Hilfsbefehle zur Wiederaufnahme zu nutzen, wo der Orchestrator Wiederholungen erlaubt.
 
-Aufgaben durchlaufen explizite Status, erzwungen in `workflow/state_machine.go`:
+## Zustandsautomat
+
+Aufgaben durchlaufen klare Statuswerte in `workflow/state_machine.go`:
 
 ```mermaid
 stateDiagram-v2
@@ -26,14 +28,15 @@ stateDiagram-v2
   review_failed --> verified
 ```
 
-Ungültige Übergänge liefern Fehler, außer `--force` ist für den konkreten Befehl erlaubt.
+Ungültige Übergänge liefern Fehler, es sei denn, der jeweilige Befehl erlaubt `--force` für diese Transition.
 
-## Typische Wiederherstellung
+## Häufige Wiederanlauf-Rezepte
 
-### Verify fehlgeschlagen
+### Verifikation fehlgeschlagen
+
+Code im zugehörigen Worktree korrigieren, dann erneut verifizieren:
 
 ```bash
-# Code im Worktree fixen, dann:
 agentflow verify billing-v2 --force
 ```
 
@@ -47,31 +50,33 @@ agentflow review billing-v2 --agent codex --force
 
 ```bash
 agentflow status
-agentflow resume <run-id>          # nächster Schritt: plan|enrich|dev|verify|review
-agentflow continue "resume billing-v2"   # intentionsbasierte Fortsetzung
+agentflow resume <run-id>          # gibt den nächsten Schritt aus: plan | enrich | dev | verify | review
+agentflow continue "resume billing-v2"
 ```
 
 <Callout type="experimental">
-`agentflow resume <run-id> --execute` verkettet Schritte nur mit globalem **`--dry-run`**. Außerhalb von Dry-Run ruft `resume` keine Agenten automatisch auf — führen Sie den gedruckten Schritt manuell aus oder nutzen Sie `continue`.
+`agentflow resume <run-id> --execute` verketten Schritte nur zusammen mit globalem **`--dry-run`**. Ohne Dry-Auto werden Agenten nicht automatisch erneut gestartet — den ausgegebenen Schritt manuell ausführen oder `continue` verwenden.
 </Callout>
 
-### Veraltete Worktrees aufräumen
+### Veraltete Worktrees entfernen
 
 ```bash
 agentflow clean
 ```
 
-Entfernt Worktrees gemäß `worktrees.cleanup_policy` (`keep_failed` behält fehlgeschlagene Task-Trees).
+Entfernt Worktrees gemäß `worktrees.cleanup_policy` (`keep_failed` behält Trees fehlgeschlagener Aufgaben).
 
-## Reports für Post-Mortems
+## Reports für die Nachbereitung
+
+Für Analyse im Nachhinein oder Abgleich mit Reviewern stehen **`report`** und zusammenfassende **`investigate`**-Ausgaben zur Verfügung:
 
 ```bash
 agentflow report <run-id>
 agentflow investigate billing-v2
 ```
 
-## Siehe auch
+## Verwandtes
 
 - [Worktree-Isolation](/docs/de/reliability/worktree-isolation)
-- [CLI: resume](/docs/cli/generated/resume)
-- [CLI: continue](/docs/cli/generated/continue)
+- [CLI: resume](/docs/de/cli/generated/resume)
+- [CLI: continue](/docs/de/cli/generated/continue)

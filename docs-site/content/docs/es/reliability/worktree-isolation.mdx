@@ -1,18 +1,20 @@
 ---
-title: Aislamiento de worktrees
-description: Un git worktree por tarea bajo .agentflow/worktrees.
+title: Aislamiento por worktrees
+description: Un worktree Git por tarea bajo .agentflow/worktrees.
 ---
 
-# Aislamiento de worktrees
+# Aislamiento por worktrees
 
-Implementación: `application/internal/worktree` — creado durante `dev` en `workflow.Service.DevFeature`.
+Implementación **`application/internal/worktree`** que entra cuando **`workflow.Service.DevFeature`** necesita zona aislada para **`dev`**.
 
 ## Comportamiento
 
-1. Por cada tarea, AgentFlow crea un worktree bajo `worktrees.base_path`
-2. El nombre de rama usa `worktrees.branch_prefix` + id de feature/tarea
-3. Los subprocess del agente se ejecutan con `WorkingDir` en la ruta del worktree
-4. `agentflow clean` elimina worktrees según `cleanup_policy`
+La aislamiento es predecible:
+
+1. Para cada tarea AgentFlow crea worktree debajo `worktrees.base_path`
+2. Rama con `worktrees.branch_prefix` + id feature/tarea
+3. Subprocesos agente ejecutan con `WorkingDir` en ese worktree
+4. `agentflow clean` borra conforme `cleanup_policy`
 
 ```yaml
 worktrees:
@@ -23,24 +25,26 @@ worktrees:
 
 ## Diagrama
 
+Las tareas concurrentes se bifurcan desde raíz oficial sin workspace sucio accidental compartido:
+
 ```mermaid
 flowchart TB
-  R[Raíz del repo] --> W1[worktree task-001]
+  R[Repo root] --> W1[worktree task-001]
   R --> W2[worktree task-002]
-  W1 --> A1[cursor-agent en W1]
-  W2 --> A2[cursor-agent en W2]
+  W1 --> A1[cursor-agent in W1]
+  W2 --> A2[cursor-agent in W2]
 ```
 
 ## Dry-run
 
-Con `--dry-run`, la creación del worktree se omite o simula — las pruebas de integración dependen de ello para ejecuciones seguras en CI.
+`--dry-run` omite/simula crear worktrees — integración puede depender cuando CI debe evitar ramas fugaces innecesarias.
 
-## Políticas
+## Policies
 
-`policies.max_files_changed_per_task` limita el radio de explosión; combínelo con revisión humana antes del merge.
+Combina **`policies.max_files_changed_per_task`** con revisión manual previa fusión ; limita alcance físico pero no vigilancia estratégica.
 
-## Ver también
+## Relacionado
 
 - [Recuperación ante fallos](/docs/es/workflows/failure-recovery)
-- [CLI: clean](/docs/cli/generated/clean)
-- [CLI: dev](/docs/cli/generated/dev)
+- [CLI: clean](/docs/es/cli/generated/clean)
+- [CLI: dev](/docs/es/cli/generated/dev)

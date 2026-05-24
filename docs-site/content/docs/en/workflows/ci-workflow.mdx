@@ -5,9 +5,11 @@ description: Use AgentFlow in CI with dry-run, validation, and docs checks.
 
 # CI workflow
 
-AgentFlow in CI should stay **non-interactive**, **dry-run friendly**, and free of secrets in logs.
+Continuous integration should exercise AgentFlow **without prompting**, ideally in **dry-run** mode where that matches your intent, and without ever echoing secrets into job logs.
 
 ## Recommended pattern
+
+A typical lane builds the CLI, initializes project metadata, runs `doctor`, and performs a **`work` dry-run plus plan-only** pass so pipelines stay fast and deterministic. Adapt paths and caching to your platform; the excerpt below sketches the ordering:
 
 ```yaml
 # excerpt — adapt to your CI
@@ -21,6 +23,8 @@ AgentFlow in CI should stay **non-interactive**, **dry-run friendly**, and free 
 
 ## Environment variables
 
+When you prefer flags-as-env rather than repeating CLI switches, AgentFlow honours the usual mirrors:
+
 | Variable | Effect |
 | --- | --- |
 | `AGENTFLOW_DRY_RUN=1` | Same as global `--dry-run` |
@@ -31,7 +35,7 @@ See [Environment variables](/docs/reference/environment-variables).
 
 ## Docs CI
 
-This repository builds the public docs site on push:
+This repository also validates that the published docs remain buildable and that CLI reference generation stays in sync with code. The sequence below mirrors what runs on push:
 
 ```bash
 cd docs-site && npm ci && npm run build
@@ -42,6 +46,8 @@ go test ./application/internal/cli/docgen/...
 Workflow file: `.github/workflows/docs.yml`.
 
 ## What not to do in CI
+
+Treat CI as rehearsal and hygiene, not unattended production automation unless you have deliberately pinned agents, secrets scopes, and review gates.
 
 - Do not run real `dev`/`review` without pinned agents and secrets
 - Do not commit `.agentflow/config.yaml` with tokens

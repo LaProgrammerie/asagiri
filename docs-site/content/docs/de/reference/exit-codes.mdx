@@ -1,37 +1,41 @@
 ---
 title: Exit-Codes
-description: CLI-Exit-Verhalten bei Erfolg und Fehler.
+description: CLI-Exit-Verhalten bei Erfolg oder Fehler.
 ---
 
 # Exit-Codes
 
-AgentFlow folgt üblichen Go/Cobra-Konventionen:
+AgentFlow folgt üblichen Go-/Cobra-Konventionen, damit Shell-Skripte und CI an `$?` ohne eigene Wrapper erkennen können, ob ein Befehl erfolgreich war.
 
 | Code | Bedeutung |
 | --- | --- |
 | **0** | Befehl ohne Fehler beendet |
-| **1** | allgemeiner Fehler (`RunE` lieferte Fehler — Config, Git, Workflow, Budget-Block, Agent-Fehler) |
-| **2** | Cobra-Usage-Fehler (unbekanntes Flag, falsche Arity) — typisch bei fehlerhaften Aufrufen |
+| **1** | Allgemeiner Fehler (`RunE` meldet einen Fehler — Konfiguration, Git, Workflow, Budgetblock, Agentfehler) |
+| **2** | Cobra-Nutzungsfehler (unbekanntes Flag, falsche Argumentzahl) — typisch bei falscher Aufrufsyntax |
 
 ## Beispiele
 
+Die folgenden Zeilen illustrieren den Unterschied zwischen Syntaxfehlern (**Exit 2**), erfolgreichen Pfaden (**Exit 0** bei `doctor` oder erfolgreicher Nur-Schätzung) und operativen Fehlern (**Exit 1** bei Budget oder Validierung, mit Kontext auf stderr).
+
 ```bash
-agentflow work                    # Exit 2 — fehlendes Pflicht-Instruktionsargument
-agentflow doctor                  # Exit 0 wenn alle Checks passen
-agentflow work "x" --estimate-only # Exit 0 wenn Schätzung erfolgreich
+agentflow work                    # Exit 2 — Pflichtargument für die Anweisung fehlt
+agentflow doctor                  # Exit 0, wenn alle Prüfungen bestehen
+agentflow work "x" --estimate-only # Exit 0, wenn die Schätzung erfolgreich ist
 ```
 
-Budget-Blocks und Validierungsfehler liefern **Exit 1** mit Meldung auf stderr.
+Budgets und Validierung melden sich typischerweise mit **Exit 1** und einer Meldung auf stderr.
 
 ## Skripte
+
+Mit `||` in Shell-Skripten kombinieren; `--dry-run` nutzen, wenn nur die Verdrahtung getestet werden soll und fehlende Agent-Binärdateien keinen Fehler auslösen sollen.
 
 ```bash
 agentflow verify my-feature || echo "verify failed"
 ```
 
-In CI `--dry-run` nutzen, um Non-Zero-Exits durch fehlende Agents zu vermeiden, wenn nur Orchestrierung getestet wird.
+In CI hilft `--dry-run`, wenn nur das Orchestrierungsgerüst geprüft wird und nicht die echte Agentenausführung.
 
-## Siehe auch
+## Verwandtes
 
 - [CLI-Überblick](/docs/de/cli)
-- [Fehlerbehebung](/docs/de/workflows/failure-recovery)
+- [Recovery bei Fehlern](/docs/de/workflows/failure-recovery)

@@ -1,31 +1,30 @@
 ---
-title: Agents-Überblick
-description: Externe Coding-Agenten, die AgentFlow als Subprocess orchestriert.
+title: Agenten-Übersicht
+description: Externe Coding-Agenten, die AgentFlow als Subprozesse aufruft.
 ---
 
-# Agents-Überblick
+# Agenten-Übersicht
 
-AgentFlow bettet keine Modelle ein. Es **orchestriert** CLI-Tools, die Sie unter `agents:` konfigurieren, und wählt sie per Routing, `work`-Defaults oder pro-Befehl-Flags.
+AgentFlow ist eine Orchestratorschicht: Es werden keine Modellgewichte mitgeliefert und kein Hersteller-Zugang „aus der Box“. Sie deklarieren **externe CLIs** unter `agents:`; Routing, Standardwerte in `work` oder Befehlszeilen-Flags entscheiden, welches Executable für einen Schritt startet.
 
 ## Unterstützte Muster
 
+Die Tabelle zeigt gängige logische IDs. Welches Binary tatsächlich läuft (`codex`, `cursor-agent`, Wrapper …) und welche statischen Argumente gesetzt werden, steht ausschließlich in **Ihrer** `config.yaml`. AgentFlow startet `command` ohne Shell mit optionalem `argv` und leitet Streams über den bestehenden Redaktionspfad für Geheimnisse.
+
 | Agent-ID (Beispiel) | Typische Rolle |
 | --- | --- |
-| `kiro` | Spec-Authoring (`agentflow spec`) |
-| `cursor` | Implementierung (`dev`, Standard-`work`-Agent) |
-| `codex` / `claude` | Review oder schwere Reasoning |
-| `ollama` | Lokales Enrich, Klassifikation, günstige Vor-Review |
+| `kiro` | Verfassen strukturierter Specs (`agentflow spec`) |
+| `cursor` | Umsetzung (`dev`, häufiger Standard für `work`) |
+| `codex` / `claude` | Review oder intensiveres Reasoning |
+| `ollama` | Lokales Anreichern, Klassifikation, günstiges Pre-Review |
 
-Exakte Befehle sind **Ihre** `config.yaml`-Einträge — AgentFlow startet nur `command` + `args`.
+## Verträge zwischen CLI und Agent
 
-## Verträge
+Die Exec-Schicht arbeitet ohne Shell-Interpolation und nur mit explizitem `argv`. Timeouts kommen aus `agents.<id>.timeout`. Unter `--dry-run` werden keine produktiven Subprozesse gestartet. Logausgaben durchlaufen die Redaktion in `application/internal/redact`.
 
-- Keine Shell-Interpolation — nur argv
-- Timeouts aus `agents.<id>.timeout`
-- Dry-Run überspringt echte Ausführung
-- Logs durch Redaction (`application/internal/redact`)
+## Agenten pro Schritt wählen
 
-## Agents pro Schritt wählen
+Wechseln Sie die Agent-ID pro Subbefehl, wenn sich die passende Werkbank zwischen Spezifikation, Implementierung und Review unterscheidet.
 
 ```bash
 agentflow spec feat --agent kiro
@@ -36,7 +35,7 @@ agentflow review feat --agent codex
 
 ## Siehe auch
 
-- [Agents-Konfiguration](/docs/de/configuration/agents)
+- [Agenten-Konfiguration](/docs/de/configuration/agents)
 - [Ollama](/docs/de/agents/ollama)
 - [Lokale Modelle](/docs/de/agents/local-models)
 - [Routing](/docs/de/configuration/routing)

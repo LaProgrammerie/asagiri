@@ -1,20 +1,21 @@
 ---
 title: Investigación local
-description: Grep acotado y recorridos del sistema de archivos antes de llamadas a agentes en la nube.
+description: Grep acotado y exploración del sistema de ficheros antes de llamadas a agentes cloud.
 ---
 
 # Investigación local
 
-Fuente: `application/internal/investigation` — usada por `agentflow investigate` y el preludio del pipeline V3.
+Antes de que AgentFlow reenvíe el contexto del repositorio a un agente cloud, **investiga el proyecto localmente**. La implementación está en `application/internal/investigation` y alimenta tanto `agentflow investigate` como el preludio del pipeline V3. La meta ingenieril es estrecha pero importante : **reducir el tamaño del prompt y poner sobre la mesas los ficheros que importan** con herramientas acotadas y repetibles — grep, barridos del árbol, heurísticas — en lugar de pedir a un modelo que ingiera el árbol entero.
 
-## Qué hace
+## Qué ocurre en su máquina
 
-- **Grep** de patrones feature/tarea con límites de bytes de salida
-- **Escaneo** de archivos candidatos; aviso de archivos grandes por encima de `large_file_bytes`
-- **Detección de rutas sensibles** vía `secret_path_denylist`
-- **Tests relacionados** heurísticos desde rutas candidatas
+Por lo habitual la investigación arranca con **grep** contra patrones de función o de tarea, con topes estrictos de bytes en la salida para que coincidencias patológicas no agoten el presupuesto de contexto. Un **barrido del sistema de ficheros** recorre rutas candidatas y marca cualquier cosa por encima de `large_file_bytes`, evitando empaquetar binarios gigantes o logs por error. La **detección de rutas sensibles** aplica `secret_path_denylist` y globs configurados para que llaves u credenciales entren menos a menudo en prompts o informes. Por último, **heurísticas relacionadas con pruebas** proponen pruebas ligadas a rutas fuente candidatas, apoyando pasos verify sin enumerar todo el repo.
 
-## CLI
+Esos artefactos alimentan el empaquetado de contexto y la estimación de costes. Son entradas, no veredictos: no sustituyen el juicio humano sobre alcance o seguridad.
+
+## Comandos CLI
+
+Use estos comandos para ejecutar o depurar la investigación fuera de un `work` completo:
 
 ```bash
 agentflow investigate billing-v2
@@ -24,9 +25,11 @@ agentflow inspect symbol Handler
 agentflow inspect tests billing-v2
 ```
 
-Los subcomandos `inspect` encapsulan ayudantes de investigación dirigida.
+Los subcomandos `inspect` envuelven utilidades enfocadas cuando ya sabe si le importan el diff, un símbolo o las asociaciones de pruebas.
 
-## Límites
+## Límites y configuración
+
+La investigación respeta tiempos de espera y topes en bytes desde la configuración. Valores ejemplo:
 
 ```yaml
 mcp:
@@ -37,8 +40,10 @@ mcp:
     sensitive_globs: ["*.pem", ".git/*"]
 ```
 
-## Ver también
+Endurecer intercambia recuerdo por seguridad y coste más estable. Aflojar puede mostrar más contexto circundante, pero aumenta el rieso de prompts desmesurados y exposición accidental de secretos.
+
+## Lecturas relacionadas
 
 - [Conceptos local-first](/docs/es/concepts/local-first)
-- [CLI: investigate](/docs/cli/generated/investigate)
+- [CLI: investigate](/docs/es/cli/generated/investigate)
 - [Herramientas MCP](/docs/es/mcp/tools) (exposición opcional vía MCP si está habilitado)

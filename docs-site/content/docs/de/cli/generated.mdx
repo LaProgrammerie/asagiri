@@ -1,32 +1,33 @@
 ---
 title: Generierter CLI-Index
-description: Auto-generierte Befehlsreferenz aus Cobra-Definitionen.
+description: Aus Cobra automatisch erzeugte Befehlsreferenz.
 ---
 
 # Generierte CLI-Referenz
 
-Diese Seiten werden **generiert** aus den aktiven Cobra-Definitionen. Bitte nicht manuell bearbeiten — sie werden überschrieben.
+Die Seiten in diesem Bereich entstehen nur über **`agentflow docs generate-cli`**. Manuelle Korrekturen wären kurzlebig: Der nächste Docgen-Lauf überschreibt sie.
 
-## Neu generieren
+**Generierte Inhalte nicht von Hand pflegen** — Änderungen gehören in den Go-Code oder die Docgen-Pipeline.
+
+## Neu erzeugen
 
 ```bash
 go run ./application/cmd/agentflow docs generate-cli \
   --output docs-site/content/docs/en/cli/generated
 ```
 
-Oder mit gebautem Binär:
+Mit bereits gebauter Binärdatei:
 
 ```bash
 ./bin/agentflow docs generate-cli --output docs-site/content/docs/en/cli/generated
 ```
 
-## Sprachen
+## Navigation
 
-- **Vollständige Referenz (Englisch):** [CLI generiert — Englisch](/docs/cli/generated) — alle Befehle, alle Flags.
-- Dieser **deutsche** Bereich bietet Kurzseiten nur für Hauptbefehle; Optionsdetails bleiben in der englischen Generierung.
+In der Sidebar unter **CLI → generiert**. Einstieg dieser Locale: [/docs/de/cli/generated/index](/docs/de/cli/generated/index).
 
-Stöbern: Sidebar **CLI → generiert** oder Start bei [generiertem Index (EN)](/docs/cli/generated/index).
+Alle Befehle und vollständige Flag-Listen stehen in der englischen Referenz unter [/docs/cli/generated](/docs/cli/generated); Docgen schreibt weiterhin dorthin die ausführlichste Variante.
 
-## Handgeschriebene Guides
+## Geschriebene Leitfäden
 
-Workflows und Konzepte: [CLI-Überblick](/docs/de/cli), [Erster Workflow](/docs/de/getting-started/first-workflow) und [Workflows](/docs/de/workflows/kiro-to-cursor).
+Für erklärende Texte nutzen Sie [CLI-Überblick](/docs/de/cli), [Erster Workflow](/docs/de/getting-started/first-workflow) und [Workflows](/docs/de/workflows/kiro-to-cursor).

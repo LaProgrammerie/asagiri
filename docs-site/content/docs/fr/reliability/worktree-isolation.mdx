@@ -1,17 +1,19 @@
 ---
-title: Isolation des worktrees
-description: Un git worktree par tâche sous .agentflow/worktrees.
+title: Isolation par worktree
+description: Un worktree Git par tâche sous .agentflow/worktrees.
 ---
 
-# Isolation des worktrees
+# Isolation par worktree
 
-Implémentation : `application/internal/worktree` — créé pendant `dev` dans `workflow.Service.DevFeature`.
+La logique se trouve dans **`application/internal/worktree`**, activée lorsque **`workflow.Service.DevFeature`** provisionne une zone isolée pour **`dev`**.
 
 ## Comportement
 
-1. Pour chaque tâche, AgentFlow crée un worktree sous `worktrees.base_path`
-2. Le nom de branche utilise `worktrees.branch_prefix` + identifiant feature/tâche
-3. Les subprocess agent s'exécutent avec `WorkingDir` pointant vers le worktree
+L’isolation reste prévisible :
+
+1. Pour chaque tâche AgentFlow crée un worktree sous `worktrees.base_path`
+2. Nom de branche `worktrees.branch_prefix` + id fonctionnalité/tâche
+3. Les sous-processus agents s’exécutent avec `WorkingDir` sur le chemin du worktree
 4. `agentflow clean` retire les worktrees selon `cleanup_policy`
 
 ```yaml
@@ -23,24 +25,26 @@ worktrees:
 
 ## Schéma
 
+Des tâches concurrentes peuvent donc rayonner depuis le checkout canonique sans se partager un working tree « sale » :
+
 ```mermaid
 flowchart TB
-  R[Racine dépôt] --> W1[worktree task-001]
+  R[Repo root] --> W1[worktree task-001]
   R --> W2[worktree task-002]
-  W1 --> A1[cursor-agent dans W1]
-  W2 --> A2[cursor-agent dans W2]
+  W1 --> A1[cursor-agent in W1]
+  W2 --> A2[cursor-agent in W2]
 ```
 
 ## Dry-run
 
-Avec `--dry-run`, la création de worktree est ignorée ou simulée — les tests d'intégration s'appuient là-dessus pour des exécutions sans risque en CI.
+`--dry-run` saute ou simule la création du worktree — les tests d’intégration s’appuient dessus lorsque CI ne doit pas matérialiser de branches fugaces.
 
 ## Politiques
 
-`policies.max_files_changed_per_task` limite le rayon d'explosion ; combinez avec revue humaine avant fusion.
+Coupler **`policies.max_files_changed_per_task`** avec examen humain avant fusion ; cette molette borne le rayon d’impact, pas la vigilance cognitive.
 
 ## Voir aussi
 
 - [Récupération après échec](/docs/fr/workflows/failure-recovery)
-- [CLI : clean](/docs/cli/generated/clean)
-- [CLI : dev](/docs/cli/generated/dev)
+- [CLI : clean](/docs/fr/cli/generated/clean)
+- [CLI : dev](/docs/fr/cli/generated/dev)

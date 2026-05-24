@@ -1,11 +1,11 @@
 ---
-title: Workflow conscient des coûts
-description: Estimer, optimiser le contexte et plafonner la dépense avant exécution agent.
+title: Workflow soucieux des coûts
+description: Estimer, optimiser contexte et plafonner avant d’inviter les agents.
 ---
 
-# Workflow conscient des coûts
+# Workflow soucieux des coûts
 
-Guide opérationnel (`spec-doc` §11.4) avec drapeaux et clés de config réels.
+Cette page opérationnalise **`spec-doc` §11.4** : chaque drapeau et clé listés existent bien dans vos builds AgentFlow et enchaîne estimation, optimisation des packs budgétés, puis préférences **locales** là où votre stratégie de routage permet — commandes verbatim reproduites pour écarter ambiguïtés.
 
 ## 1. Estimation par tâche
 
@@ -13,43 +13,39 @@ Guide opérationnel (`spec-doc` §11.4) avec drapeaux et clés de config réels.
 agentflow estimate billing-v2 --task task-003 --dry-run
 ```
 
-Affiche les jetons entrée/sortie heuristiques et le coût estimé d'après votre grille `pricing`.
+Affiche entrées/sorties heuristiques + coût estimé suivant tableau `pricing`.
 
-## 2. Optimisation du contexte
+## 2. Optimisation contextual
 
 ```bash
 agentflow context billing-v2 --task task-003 --optimize
 ```
 
-Construit un paquet de contexte réduit avant les gros prompts agent. Désactivez la réduction avec `agentflow work ... --no-context-reduction`.
+Construire pack avant gros prompts. Désactiver avec `agentflow work ... --no-context-reduction`.
 
-## 3. Exécution avec budget
+## 3. Lancer sous budget
 
 ```bash
 agentflow work "develop billing-v2" --budget 0.50 --estimate-only
 agentflow work "develop billing-v2" --budget 0.50
 ```
 
-Les budgets config (`budgets.per_run.max_estimated_cost`) s'appliquent lorsque `--budget` CLI vaut zéro. Les exécutions au-delà du budget sont bloquées sauf :
+`budgets.per_run.max_estimated_cost` s’active quand `--budget` vaut zero. Bloque si surcharge sauf confirmations prompt adoptées **`--yes` après BudgetPending**, ou **`--allow-over-budget`** autorisée par policies config.
 
-- acceptation de l'invite de confirmation, ou
-- `--yes` après `BudgetPendingConfirmError`, ou
-- `--allow-over-budget` lorsque `budgets.policies.allow_override_with_flag` est true
-
-## 4. Préférence locale
+## 4. Priorité locale
 
 ```bash
 agentflow work "develop billing-v2" --prefer-local --no-cloud
 ```
 
-`--allow-cloud` autorise explicitement le routage cloud lorsque les politiques le restreindraient sinon.
+`--allow-cloud` ré‑admet cloud où restrictions le demandent.
 
-## Explicabilité
+## Explainabilité
 
-`work` et `estimate` affichent des résumés d'étapes (choix de routage, octets de contexte, contrôles budget). Voir [Estimation des jetons](/docs/fr/cost-performance/token-estimation).
+`work` + `estimate` impriment jalons synthétiques : choix routing, octets contextual, validations budget voir aussi [Estimation jetons](/docs/fr/cost-performance/token-estimation).
 
 ## Voir aussi
 
-- [Concepts conscients des coûts](/docs/fr/concepts/cost-aware-workflows)
+- [Concept coût conscient](/docs/fr/concepts/cost-aware-workflows)
 - [Budgets](/docs/fr/configuration/budgets)
-- [CLI : cost-report](/docs/cli/generated/cost-report)
+- [CLI cost-report](/docs/fr/cli/generated/cost-report)

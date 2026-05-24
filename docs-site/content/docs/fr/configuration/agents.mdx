@@ -1,11 +1,13 @@
 ---
 title: Configuration des agents
-description: Associer les identifiants d'agent aux commandes CLI et délais dans config.yaml.
+description: Associer les identifiants d'agents aux commandes CLI et timeouts dans config.yaml.
 ---
 
 # Configuration des agents
 
-AgentFlow invoque des CLI externes en **subprocess sans shell** (`application/internal/agent/exec`). Chaque clé sous `agents:` est un identifiant logique référencé par les drapeaux (`--agent`, `work.default_agent`, routage).
+AgentFlow n'appelle pas les API d'agents directement. Il démarre chaque agent en **subprocess sans shell** (`application/internal/agent/exec`), avec un `argv` construit depuis votre config. Chaque clé sous `agents:` est un identifiant logique que vous référencez via les flags (`--agent`), `work.default_agent` et les règles de routage.
+
+Le bloc ci-dessous est une forme réaliste : plusieurs identifiants pointent vers des exécutables différents, avec `args`, modèles, timeouts optionnels, et un endpoint HTTP de style Ollama quand ce type d'agent l'attend.
 
 ## Exemple
 
@@ -33,16 +35,20 @@ agents:
 
 ## Champs
 
+Le tableau relie champ de config et usage dans la couche exec. Rien n'est implicite : sans `timeout`, les défauts ailleurs s'appliquent ; les clés Ollama ne comptent que pour un agent qui utilise ce protocole.
+
 | Champ | Utilisé par |
 | --- | --- |
-| `command` | Nom d'exécutable dans le `PATH` |
-| `args` | argv supplémentaire (Kiro, wrappers) |
-| `default_model` | transmis si l'agent supporte des drapeaux de modèle |
-| `timeout` | secondes avant arrêt forcé |
-| `endpoint` | URL HTTP de base Ollama |
-| `model` / `embedding_model` | tags de modèles Ollama |
+| `command` | Nom de l'exécutable sur le `PATH` |
+| `args` | argv supplémentaires (Kiro, wrappers) |
+| `default_model` | Transmis si l'agent supporte des flags modèle |
+| `timeout` | Secondes avant kill |
+| `endpoint` | URL de base HTTP Ollama |
+| `model` / `embedding_model` | Tags de modèles Ollama |
 
-## Valeurs par défaut dans `work`
+## Défauts dans `work`
+
+Le bloc `work` choisit quels identifiants logiques tournent quand une commande ne les surcharge pas. Ajustez quand l'implémentation, le relecteur ou l'enricheur par défaut doit changer à l'échelle du dépôt.
 
 ```yaml
 work:
@@ -51,14 +57,14 @@ work:
   default_enricher: ollama
 ```
 
-Surcharges CLI : `agentflow dev feat --agent cursor`, `agentflow review feat --agent codex`.
+Vous pouvez toujours surcharger par invocation, par exemple `agentflow dev feat --agent cursor` ou `agentflow review feat --agent codex`.
 
 ## Dry-run
 
-Avec `--dry-run`, la couche d'exécution ignore les subprocess réels — utile pour la CI et les répétitions doc.
+Avec `--dry-run`, la couche exec ne lance pas de vrais subprocess. Utile en CI pour valider le câblage, et pour répéter docs ou scripts qui attendraient sinon des agents longs.
 
 ## Voir aussi
 
-- [Vue d'ensemble agents](/docs/fr/agents)
+- [Vue d'ensemble des agents](/docs/fr/agents)
 - [Ollama](/docs/fr/agents/ollama)
-- [CLI : dev](/docs/cli/generated/dev)
+- [CLI : dev](/docs/fr/cli/generated/dev)

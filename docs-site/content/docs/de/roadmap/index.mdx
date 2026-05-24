@@ -1,39 +1,37 @@
 ---
 title: Roadmap
-description: Gelieferte Features, Konsolidierungsarbeit und priorisierte nächste Schritte.
+description: Bereits gelieferte Features, Konsolidierungsarbeit und priorisierte nächste Schritte.
 ---
 
 # Roadmap
 
-Kanonische Roadmap: **[ROADMAP.md](https://github.com/LaProgrammerie/hyper-fast-builder/blob/main/ROADMAP.md)** im Repository-Root.
+Maßgebende Reihenfolge und Erläuterungen stehen im **[ROADMAP.md](https://github.com/LaProgrammerie/hyper-fast-builder/blob/main/ROADMAP.md)** neben dem Code; diese Seite ist eine leicht lesbare Spiegelung für die Dokumentationswebsite.
 
-## Geliefert (V1 → V3)
+## Geliefert (V1 bis V3)
 
-- CLI-Primitives: `init`, `spec`, `plan`, `dev`, `verify`, `review`, Worktrees, SQLite
-- Intent-Schicht: `work`, `continue`, `next`, Notion-Sync
-- Kosten/Performance: `estimate`, `investigate`, `context`, `cost`, MCP, TUI, Metriken
+Die Kern-CLI-Workflows — etwa `init`, `spec`, `plan`, `dev`, `verify` und `review` mit Worktrees und SQLite — die naturalsprachliche Oberfläche (`work`, `continue`, `next`), Notion-Sync sowie Kostendiagnose und Observability rund um `estimate`, `investigate`, `context`, `cost`, MCP, die TUI und Metriken.
 
 ## In Arbeit (Konsolidierung)
 
-- Architektur-/Sicherheits-/Performance-Audits unter `docs/consolidation/`
-- Öffentliche Docs-Site (diese Site) + generierte CLI-Referenz
-- OSS-Bereitschaft: Apache 2.0, CONTRIBUTING, Beispiele
+Laufende Arbeit umfasst Konsolidierungsaudits unter `docs/consolidation/`, diese öffentliche Docs-Site inklusive generierter CLI-Referenz sowie OSS-Vorbereitung (Apache 2.0, `CONTRIBUTING`, kuratierte Beispiele).
 
-## Priorisiert als Nächstes
+## Priorisierte nächsten Schritte
 
-| Priorität | Punkt |
+Grobe Prioritäten — die tatsächliche Reihenfolge bleibt in `docs/consolidation/TODO-prioritized.md` diskutierbar.
+
+| Priorität | Thema |
 | --- | --- |
-| P0 | Coverage `workflow` / `intent/executor` > 50 % |
-| P0 | anbieterexakte Tokenizer |
-| P1 | persistenter Kontext-Pack-Cache zwischen Läufen |
-| P1 | vollständige GitHub Actions CI (test, lint, release) |
-| P2 | interaktive bubbletea-TUI |
-| P2 | Vektor-Embeddings RAG |
+| P0 | Testabdeckung `workflow` / `intent/executor` über 50 % |
+| P0 | Provider-genauer Tokenizer |
+| P1 | Persistenter Kontext-Pack-Cache zwischen Läufen |
+| P1 | Vollständige GitHub Actions CI (Test, Lint, Release) |
+| P2 | Interaktive bubbletea-TUI |
+| P2 | Vektor-Embeddings für RAG |
 | P3 | Multi-Repo / Remote-State |
 
-Detail: `docs/consolidation/TODO-prioritized.md`.
+Details: `docs/consolidation/TODO-prioritized.md`.
 
-## Siehe auch
+## Verwandtes
 
 - [Mitwirken](/docs/de/contributing)
 - [Grenzen](/docs/de/security/limits)

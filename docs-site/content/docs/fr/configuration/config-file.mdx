@@ -5,11 +5,13 @@ description: Référence complète des blocs et valeurs par défaut de .agentflo
 
 # Fichier de configuration
 
-Chemin : **`.agentflow/config.yaml`** (créé par `agentflow init` depuis `config.yaml.example`). Les chemins sont résolus relativement à la racine du dépôt sauf mention contraire.
+Le fichier canonique est **`.agentflow/config.yaml`**, créé par `agentflow init` à partir de `config.yaml.example`. Sauf chemin absolu, AgentFlow le résout depuis la racine du dépôt. Pour une validation lisible par machine, le schéma JSON généré est publié sur le site docs à `/schemas/config.schema.json`.
 
-Schéma JSON (généré) : `/schemas/config.schema.json` sur le site de documentation.
+Les sections qui suivent reprennent la disposition du fichier : chaque bloc pilote une facette du comportement (intention, paramètres d’exécution par défaut, sources, persistance, agents, validation, modèles, coût, routage, interface, MCP et politiques de dépôt).
 
 ## `project`
+
+`project` porte un nom lisible pour l’humain et la branche par défaut utilisée dans les flux orientés worktree.
 
 ```yaml
 project:
@@ -17,11 +19,9 @@ project:
   default_branch: main
 ```
 
-Nom d'affichage du dépôt et branche par défaut pour les opérations worktree.
-
 ## `intent`
 
-Résolution en langage naturel pour `work` / `continue` (`application/internal/intent`).
+Le bloc `intent` configure la résolution en langage naturel pour `work` et `continue` (`application/internal/intent`) : si le résolveur s’exécute, le mode utilisé et le comportement quand la confiance est faible ou qu’Ollama est disponible en repli.
 
 ```yaml
 intent:
@@ -35,7 +35,7 @@ intent:
 
 ## `work`
 
-Valeurs par défaut pour l'orchestration et le choix des agents.
+`work` fixe les paramètres transverses d’orchestration : quels agents assument quels rôles, où le pipeline s’arrête, les bascules de vérification et de revue, les limites de tâches, et si une confirmation du plan est exigée.
 
 ```yaml
 work:
@@ -51,10 +51,12 @@ work:
 
 ## `sources`
 
+Les sources locales parcourent des chemins fixes pour les specs et le handoff actif ; Notion est optionnel et tire des instantanés vers l’arbre local. Le tableau résume les deux blocs ; le YAML montre des chemins typiques et les espaces réservés Notion.
+
 | Bloc | Rôle |
 | --- | --- |
-| `sources.local` | Parcourt `.agentflow/specs`, `.kiro/specs`, `docs/ai/active` |
-| `sources.notion` | Import Notion → local optionnel (voir [Notion](/docs/fr/configuration/notion)) |
+| `sources.local` | Balayer `.agentflow/specs`, `.kiro/specs`, `docs/ai/active` |
+| `sources.notion` | Import facultatif Notion → local (voir [Notion](/docs/fr/configuration/notion)) |
 
 ```yaml
 sources:
@@ -72,6 +74,8 @@ sources:
 ```
 
 ## `specs`, `state`, `worktrees`
+
+Ces blocs raccordent les chemins de style Kiro vers les specs, l’état SQLite et la mise en page des worktrees. `cleanup_policy` fixe ce qu’il advient lorsqu’une exécution laisse des résidus sous `worktrees.base_path`.
 
 ```yaml
 specs:
@@ -91,9 +95,11 @@ worktrees:
 
 ## `agents`
 
-Associe des identifiants logiques d'agent aux commandes subprocess. Voir [Configuration des agents](/docs/fr/configuration/agents).
+Le mappage des identifiants d’agents logiques vers des commandes en sous-processus et des options spécifiques tient dans ce bloc ; la page dédiée décrit les champs et exemples : [configuration des agents](/docs/fr/configuration/agents).
 
 ## `validation`
+
+`validation.commands` liste les contrôles que le pipeline peut exiger (tests, linter, scripts personnalisés). Pour les dépôts Go, l’initialisation propose souvent des valeurs pertinentes lorsque `go.mod` est présent.
 
 ```yaml
 validation:
@@ -103,11 +109,9 @@ validation:
       required: true
 ```
 
-Les dépôts Go reçoivent des valeurs par défaut au bootstrap si `go.mod` existe.
-
 ## `models`
 
-Profils logiques pour routage et coût (`specv3`). Les clés sont des identifiants arbitraires :
+`models` regroupe les profils logiques utilisés pour le routage et le coût (`specv3`). Les clés sont des identifiants arbitraires ; chaque entrée lie un fournisseur, une classe de coût, un nom de modèle et les classes d’étapes autorisées.
 
 ```yaml
 models:
@@ -122,11 +126,11 @@ models:
 
 ## `budgets`
 
-Voir [Budgets](/docs/fr/configuration/budgets).
+Les plafonds par exécution, par tâche et quotidiens se trouvent sous `budgets`. Voir [Budgets](/docs/fr/configuration/budgets).
 
 ## `pricing`
 
-Grille tarifaire manuelle — **aucun prix cloud codé en dur**.
+Les taux marginaux pour le cloud et le local viennent de votre YAML — **aucun prix cloud n’est codé en dur dans le logiciel**. Maintenez `updated_at` honnête pour savoir quand quelqu’un a aligné les chiffres sur une grille tarifaire.
 
 ```yaml
 pricing:
@@ -141,7 +145,7 @@ pricing:
 
 ## `token_estimation`
 
-Heuristiques caractères/jeton (`application/internal/cost/token_counter.go`) :
+Le budget en jetons repose sur des heuristiques « caractères par jeton » (`application/internal/cost/token_counter.go`). Ajuster ces ratios rapproche les estimations du profil réel de vos contenus (code dense contre prose dense).
 
 ```yaml
 token_estimation:
@@ -152,16 +156,16 @@ token_estimation:
 ```
 
 <Callout type="cost">
-Ces ratios approximent les jetons — ce ne sont pas des tokenizers fournisseur.
+Ces ratios approximent les jetons — ce ne sont pas les tokenizers des fournisseurs.
 </Callout>
 
 ## `routing`
 
-Voir [Routage](/docs/fr/configuration/routing).
+Les classes d’étapes se mappent vers des agents locaux ou cloud via `routing`. Détails : [Routage](/docs/fr/configuration/routing).
 
 ## `ui`
 
-UX terminal (`application/internal/tui`) :
+Le comportement du terminal vit sous `ui` (`application/internal/tui`) : mode de rendu, journaux temps réel, barres de progression et sortie compacte.
 
 ```yaml
 ui:
@@ -173,7 +177,7 @@ ui:
 
 ## `mcp`
 
-Serveur MCP stdio local (`mcp.enabled` doit être `true` pour exposer les outils) :
+Lorsque `mcp.enabled` vaut `true`, AgentFlow peut exécuter un serveur MCP stdio local avec des délais d’outil, des limites de sortie, des plafonds d’investigation et des chemins que l’outillage ne doit pas lire.
 
 ```yaml
 mcp:
@@ -190,6 +194,8 @@ mcp:
 
 ## `policies`
 
+`policies` encode les garde-fous au niveau dépôt : git propre, motifs de fichiers secrets, nombre maximal de fichiers modifiés, autorisation réseau, et étiquettes exigeant validation humaine avant certaines familles de changements.
+
 ```yaml
 policies:
   require_clean_git: true
@@ -204,8 +210,8 @@ policies:
 
 ## Valider les modifications
 
+Après avoir édité le YAML, `agentflow doctor` est le contrôle rapide avant un `work` sur de vrais agents.
+
 ```bash
 agentflow doctor
 ```
-
-Après édition du YAML, exécutez `doctor` avant `work`.

@@ -1,17 +1,19 @@
 ---
-title: MCP-Überblick
-description: Optionaler stdio-MCP-Server für Investigation- und Kontext-Tools.
+title: MCP-Übersicht
+description: Optionaler stdio-MCP-Server für Investigation- und Kontextwerkzeuge.
 ---
 
-# MCP-Überblick
+# MCP-Übersicht
 
-AgentFlow kann einen minimalen **stdio JSON-RPC**-MCP-Server (`application/internal/mcp`) für Editor-Integrationen bereitstellen.
+Für Editoren und Clients, die **stdio JSON-RPC** nach dem MCP-Modell sprechen, kann AgentFlow einen kompakten Server in `application/internal/mcp` bereitstellen. Er ist absichtlich schmal gehalten: Tools auflisten, mit Begrenzungen aufrufen, strukturierte Ergebnisse zurückgeben — keine vollständige Remote-Agent-Plattform.
 
 <Callout type="experimental">
-MCP ist standardmäßig deaktiviert. Nur in vertrauenswürdigen Umgebungen aktivieren nach Prüfung der Tool-Scopes.
+MCP ist standardmäßig deaktiviert. Aktivieren Sie es nur in vertrauenswürdigen Umgebungen und nach Prüfung der Tool-Oberfläche.
 </Callout>
 
-## Aktivieren
+## Aktivierung
+
+`mcp.enabled` setzen und Sicherheitsgrenzen wie Ausgabe- und Zeitlimits konfigurieren, bevor ein externer Client stdio verbindet.
 
 ```yaml
 mcp:
@@ -20,23 +22,27 @@ mcp:
   command_timeout_seconds: 120
 ```
 
-## Servieren
+## Server starten
+
+`agentflow mcp-serve` nutzt den stdio-Transport. Clients senden newline-getrenntes JSON und erwarten JSON-RPC `initialize`, `tools/list` und `tools/call`.
 
 ```bash
 agentflow mcp-serve
 ```
 
-Unterstützt `initialize`, `tools/list`, `tools/call` (newline-delimited JSON).
+Unterstützt werden `initialize`, `tools/list` und `tools/call` (newline-getrenntes JSON).
 
-## CLI-Wrapper
+## CLI-Hilfsbefehl
+
+`agentflow mcp` bündelt MCP-bezogene Unterbefehle für lokale Inspektion — ergänzen Sie das bei Bedarf mit den generierten Referenzseiten für exakte Flags.
 
 ```bash
 agentflow mcp
 ```
 
-MCP-bezogene Befehle inspizieren — siehe generierte Seiten [mcp](/docs/cli/generated/mcp) und [mcp-serve](/docs/cli/generated/mcp-serve).
+Detail zu MCP-Befehlen: generierte Seiten [mcp](/docs/de/cli/generated/mcp) und [mcp-serve](/docs/de/cli/generated/mcp-serve).
 
-## Siehe auch
+## Verwandtes
 
 - [MCP-Tools](/docs/de/mcp/tools)
 - [MCP-Sicherheit](/docs/de/mcp/security)

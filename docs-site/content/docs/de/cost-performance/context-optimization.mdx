@@ -1,20 +1,20 @@
 ---
-title: Kontext-Optimierung
-description: Repo-Kontext sammeln, bewerten, komprimieren und vor Agent-Läufen packen.
+title: Kontextoptimierung
+description: Repo-Kontext sammeln, bewerten, komprimieren und packen, bevor Agents starten.
 ---
 
-# Kontext-Optimierung
+# Kontextoptimierung
 
-Pakete: `application/internal/contextopt` — Collector, Relevanz-Score, Reducer/Kompressor, Packer.
+Implementiert in `application/internal/contextopt`: Ein Collector sammelt Kandidaten, ein Relevanz-Scorer sortiert sie, Reduktion oder Kompression entfernt wenig wertvollen Inhalt, ein Packer erzeugt das Blob, das Agenten tatsächlich sehen. Ziel sind **kleinere, präziser zielende** Kontexte für kostenpflichtige APIs bei weiterhin über die CLI nachvollziehbaren Regeln.
 
 ## Pipeline
 
 ```mermaid
 flowchart LR
-  C[Dateien sammeln] --> R[Relevanz-Score]
-  R --> X[Komprimieren / reduzieren]
-  X --> P[Kontext-Pack]
-  P --> A[Agent-Prompt]
+  C[Collect files] --> R[Relevance score]
+  R --> X[Compress / reduce]
+  X --> P[Context pack]
+  P --> A[Agent prompt]
 ```
 
 ## CLI
@@ -25,24 +25,24 @@ agentflow context billing-v2 --task task-003 --optimize
 agentflow work "develop billing-v2" --show-context-plan
 ```
 
-`work` führt Kontextoptimierung in der V3-Pipeline aus, sofern nicht `--no-context-reduction` gesetzt ist.
+`work` führt in der V3-Pipeline die Kontextoptimierung aus, sofern nicht `--no-context-reduction` gesetzt ist.
 
 ## Konfiguration
 
-Untersuchungsgrenzen (geteilt mit lokalem grep) stehen unter `mcp.investigation` — sie gelten auch bei deaktiviertem MCP-Server.
+Die Byte-Limits für Grep und große Dateien werden mit der lokalen Investigation geteilt; sie stehen unter `mcp.investigation` und gelten **auch**, wenn der MCP-Server ausgeschaltet ist — sie begrenzen dieselbe lokale Werkzeugschicht, die den Collector speist.
 
-## Kompromisse
+## Abwägungen
 
 | Vorteil | Grenze |
 | --- | --- |
-| kleinere Prompts | kann relevante Dateien verlieren, wenn Heuristiken versagen |
-| schnellere Cloud-Calls | kein Ersatz für manuelles Lesen kritischer Pfade |
+| Kleinere Prompts | Kann relevante Dateien auslassen, wenn Heuristiken daneben greifen |
+| Schnellere Cloud-Aufrufe | Ersetzt nicht das bewusste Lesen kritischer Pfade |
 
 <Callout type="experimental">
-Kompressionsheuristiken entwickeln sich — vergleichen Sie `--show-context-plan`, wenn Kontext fehlt.
+Kompressionsheuristiken entwickeln sich — beim Debuggen fehlenden Kontexts Ausgaben von `--show-context-plan` vergleichen.
 </Callout>
 
-## Siehe auch
+## Verwandtes
 
-- [Lokal zuerst](/docs/de/concepts/local-first)
-- [CLI: context](/docs/cli/generated/context)
+- [Local-first-Konzepte](/docs/de/concepts/local-first)
+- [CLI: context](/docs/de/cli/generated/context)

@@ -5,6 +5,8 @@ description: Recover from failed verify, review, or interrupted runs.
 
 # Failure recovery
 
+AgentFlow persists explicit task states instead of implying progress from stray files. Recovering cleanly means respecting those transitions—or using documented overrides (`--force`, resume helpers) where the orchestrator allows retries.
+
 ## State machine
 
 Tasks move through explicit statuses enforced in `workflow/state_machine.go`:
@@ -29,6 +31,8 @@ stateDiagram-v2
 Invalid transitions return errors unless `--force` is allowed on the specific command.
 
 ## Common recoveries
+
+The recipes below mirror how teams unwind the most frequent stuck states once local fixes land in the worktree tied to that task.
 
 ### Verify failed
 
@@ -64,6 +68,8 @@ agentflow clean
 Removes worktrees according to `worktrees.cleanup_policy` (`keep_failed` keeps failed task trees).
 
 ## Reports for post-mortems
+
+When someone needs breadcrumbs after the fact—or you are reconciling timelines with reviewers—persisted run metadata is surfaced through **`report`** and cross-feature **`investigate`** summaries.
 
 ```bash
 agentflow report <run-id>

@@ -1,16 +1,18 @@
 ---
 title: Workflow CI
-description: Utiliser AgentFlow en CI avec dry-run, validation et contrôles de documentation.
+description: Utiliser AgentFlow en CI avec dry-run, validation et vérifications doc.
 ---
 
 # Workflow CI
 
-AgentFlow en CI doit rester **non interactif**, compatible **dry-run** et sans secrets dans les journaux.
+L’intégration continue doit piloter AgentFlow **sans prompts bloquants**, idéalement en **dry-run** quand cette lecture correspond à votre intention, et sans rejouer de secrets dans les journaux CI.
 
-## Modèle recommandé
+## Schéma recommandé
+
+Un couloir type compile la CLI, initialise les métadonnées projet, lance `doctor`, puis passe un **`work` dry-run + plan-only** afin que la pipeline demeure rapide et reproductible. Adaptez chemins caches à votre plateforme ; ci-dessous l’ordonnancement type :
 
 ```yaml
-# extrait — adaptez à votre CI
+# extrait — à adapter à votre CI
 - run: go build -o bin/agentflow ./application/cmd/agentflow
 - run: bin/agentflow init
   working-directory: ${{ github.workspace }}
@@ -19,19 +21,21 @@ AgentFlow en CI doit rester **non interactif**, compatible **dry-run** et sans s
 - run: go test -race ./...
 ```
 
-## Variables d'environnement
+## Variables d’environnement
+
+Quand vous préférez l’ENV aux drapeaux, AgentFlow respecte ces miroirs :
 
 | Variable | Effet |
 | --- | --- |
-| `AGENTFLOW_DRY_RUN=1` | Équivalent au `--dry-run` global |
-| `AGENTFLOW_YES=1` | Confirme automatiquement les invites (à utiliser avec prudence en CI) |
-| `NOTION_TOKEN` | Requis uniquement pour les jobs de sync Notion |
+| `AGENTFLOW_DRY_RUN=1` | Équivalent global `--dry-run` |
+| `AGENTFLOW_YES=1` | Confirme les invites automatiquement (CI prudente seulement) |
+| `NOTION_TOKEN` | Requis uniquement pour jobs Notion-sync |
 
-Voir [Variables d'environnement](/docs/fr/reference/environment-variables).
+Voir [Variables d’environnement](/docs/fr/reference/environment-variables).
 
-## CI documentation
+## Docs CI
 
-Ce dépôt construit le site public à chaque push :
+Ce repo valide également que docs publique buildent encore et CLI référence reste synchro :
 
 ```bash
 cd docs-site && npm ci && npm run build
@@ -39,16 +43,18 @@ go run ./application/cmd/agentflow docs generate-cli --output docs-site/content/
 go test ./application/internal/cli/docgen/...
 ```
 
-Fichier workflow : `.github/workflows/docs.yml`.
+Fichier orchestrateur : `.github/workflows/docs.yml`.
 
 ## À éviter en CI
 
-- Ne pas lancer de vrais `dev`/`review` sans agents épinglés et secrets
-- Ne pas committer `.agentflow/config.yaml` avec des jetons
-- Ne pas traiter `--estimate-only` comme un substitut aux tests pour `go test`
+Considérez CI comme mise en boucle et hygienics, pas prod non surveillée sauf pinning agents scopes secrets définitifs :
+
+- Jamais `dev`/`review` réels sans agents figés scopes secrets circonscris
+- Ne committez pas `config.yaml` avec jetons vivants dedans
+- Ne remplacez pas `go test` par `--estimate-only` tout seul
 
 ## Voir aussi
 
-- [Contribution](/docs/fr/contributing)
+- [Contribuer](/docs/fr/contributing)
 - [Sécurité](/docs/fr/security)
-- [CLI : verify](/docs/cli/generated/verify)
+- [CLI : verify](/docs/fr/cli/generated/verify)

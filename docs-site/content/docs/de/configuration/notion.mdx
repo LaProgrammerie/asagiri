@@ -5,9 +5,11 @@ description: Notion-Sync in lokale Spec-Snapshots konfigurieren.
 
 # Notion-Quellen
 
-Implementierung: `application/internal/source/notion`. Ausführung nutzt immer **lokale Dateien** nach dem Sync.
+Die Integration liegt in `application/internal/source/notion`. Entscheidend ist dieses Invariant: **Nach dem Sync lesen Ausführung und Indexierung lokale Dateien**, nicht die Notion-API bei jedem Schritt. Sync ist ein Snapshot-Schritt: Er zieht Seiten in den Spec-Baum Ihres Repositories.
 
 ## Konfiguration
+
+Property-Namen müssen zu Ihrem Workspace-Schema passen; AgentFlow errät keine Notion-Layouts.
 
 ```yaml
 sources:
@@ -23,9 +25,11 @@ sources:
     import_path: .agentflow/specs
 ```
 
-Token wird aus der von `token_env` benannten Umgebungsvariable gelesen (Standard `NOTION_TOKEN`).
+Das API-Token wird aus der Umgebungsvariable gelesen, die `token_env` benennt (üblicherweise `NOTION_TOKEN`).
 
 ## Befehle
+
+Token setzen, `sync` auf eine Seiten-URL oder einen vollständigen Sync ausweiten, importierte Specs wie jede andere Quelle über `inbox` nutzen.
 
 ```bash
 export NOTION_TOKEN="..."
@@ -34,21 +38,19 @@ agentflow sync all
 agentflow inbox --source notion
 ```
 
-## Sicherheit
+## Sicherheit und Probebetrieb
 
-- Standardmäßig deaktiviert (`enabled: false`)
-- Dry-Run: `agentflow --dry-run sync notion --page ...`
-- Überschreiben mit Rückfrage, wenn lokale Spec existiert und stdin ein TTY ist
+Notion bleibt **deaktiviert**, bis `enabled: true` gesetzt ist. Mit `agentflow --dry-run sync notion --page …` lässt sich der Pfad ohne unbeabsichtigte Seiteneffekte üben. Existiert bereits eine lokale Spec und stdin ist ein Terminal, erscheinen Rückfragen vor dem Überschreiben — stilles Vernichten lokaler Arbeit ist nicht vorgesehen.
 
 <Callout type="experimental">
-Notion-API-Schemas unterscheiden sich pro Workspace. Property-Namen (`status_property`, usw.) vor Produktiv-Sync validieren.
+Notion-Schemas unterscheiden sich je Workspace. Property-Namen (`status_property` und andere) validieren, bevor Sie auf Sync in Produktion setzen.
 </Callout>
 
 <Callout type="security">
-Token in Umgebung oder Secret-Store halten — niemals in committed YAML.
+Tokens nur in Umgebung oder Secret-Manager — nie in committed YAML ablegen.
 </Callout>
 
 ## Siehe auch
 
-- [Notion-zu-Code-Workflow](/docs/de/workflows/notion-to-code)
-- [CLI: sync](/docs/cli/generated/sync)
+- [Notion → Code-Workflow](/docs/de/workflows/notion-to-code)
+- [CLI: sync](/docs/de/cli/generated/sync)

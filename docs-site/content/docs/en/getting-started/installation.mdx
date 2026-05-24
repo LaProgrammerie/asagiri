@@ -5,7 +5,7 @@ description: Install AgentFlow and prepare a repository for orchestrated AI work
 
 # Installation
 
-AgentFlow is a Go CLI that orchestrates specs, local investigation, git worktrees, external coding agents, and validation commands. Install the binary, initialize a repo, then verify the environment.
+AgentFlow is a Go CLI that ties together specs, local investigation, git worktrees, external coding agents, and validation commands. The installation path is deliberate: you get a single binary, point it at a repository, and the tool owns the lifecycle of runs, worktrees, and state on disk. This page walks through building or placing that binary, initializing `.agentflow/` in a project, and confirming that git, config, and agent commands line up before you run `work`.
 
 ## Requirements
 
@@ -15,9 +15,11 @@ AgentFlow is a Go CLI that orchestrates specs, local investigation, git worktree
 | **Git** | Required for worktrees, status checks, and diffs |
 | **Configured agents** | At minimum, commands referenced in `.agentflow/config.yaml` (`cursor-agent`, `kiro`, `ollama`, etc.) |
 
-Optional: **Ollama** for local enrichment/routing, **Notion** token for sync (`NOTION_TOKEN`).
+Optional: **Ollama** for local enrichment or routing, and a **Notion** token for sync (`NOTION_TOKEN`).
 
 ## Install from source
+
+Clone the repository, build with the project `Makefile`, and use the binary under `bin/`:
 
 ```bash
 git clone https://github.com/LaProgrammerie/hyper-fast-builder.git
@@ -26,11 +28,11 @@ make build
 # binary: ./bin/agentflow
 ```
 
-Add `bin/` to your `PATH`, or copy `bin/agentflow` to a directory on `PATH`.
+Add `bin/` to your `PATH`, or copy `bin/agentflow` into any directory that is already on `PATH`.
 
 ## Initialize a repository
 
-From your project root:
+From your project root, run `agentflow init`. The command scaffolds the local AgentFlow surface area so later commands share one config file and one SQLite database.
 
 ```bash
 agentflow init
@@ -42,27 +44,28 @@ This creates:
 - `.agentflow/config.yaml` — copied from `config.yaml.example` when missing
 - `.agentflow/state.sqlite` — run and task bookkeeping
 
-Ensure `.agentflow/state.sqlite` and `.agentflow/worktrees/` are listed in `.gitignore` (init prints a reminder).
+Ensure `.agentflow/state.sqlite` and `.agentflow/worktrees/` are listed in `.gitignore`. `init` prints a reminder because those paths must not be committed.
 
 ## Verify setup
+
+Run `agentflow doctor` after install or whenever something feels miswired. Doctor exercises git, checks that config exists, confirms agent commands resolve on `PATH`, and surfaces common misconfigurations before you spend time on a failing `work` run.
 
 ```bash
 agentflow doctor
 ```
 
-Doctor checks git, config presence, agent commands on `PATH`, and common misconfigurations. Fix reported issues before running `work`.
+Fix anything it reports before running `work`.
 
 ## Configuration
 
-Copy and edit the example if you need custom agents or budgets:
+Copy and edit the example when you need custom agents, budgets, or routing:
 
 ```bash
 cp .agentflow/config.yaml.example .agentflow/config.yaml
 ```
 
-See [Configuration file](/docs/configuration/config-file) for every YAML block.
+For every YAML block and default, see [Configuration file](/docs/configuration/config-file).
 
 ## Next steps
 
-- [Quickstart](/docs/getting-started/quickstart)
-- [First workflow](/docs/getting-started/first-workflow)
+Continue with [Quickstart](/docs/getting-started/quickstart), then walk an end-to-end run in [First workflow](/docs/getting-started/first-workflow).

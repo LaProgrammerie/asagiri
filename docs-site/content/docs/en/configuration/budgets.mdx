@@ -5,7 +5,9 @@ description: Per-run, per-task, and daily estimated cost and token caps.
 
 # Budgets
 
-Implemented in `application/internal/cost/budget.go` and enforced in the V3 pipeline before agent execution.
+Budgets give you predictable ceilings on estimated spend and token volume before agents run. They are implemented in `application/internal/cost/budget.go` and applied in the V3 pipeline ahead of agent execution, so a run can stop or ask for confirmation instead of drifting past what you consider acceptable.
+
+The YAML block below is the full shape: currency default, per-run and per-task caps, a daily aggregate cap, and policy flags that control blocking versus explicit override.
 
 ## Schema
 
@@ -29,6 +31,8 @@ budgets:
 
 ## CLI interaction
 
+These flags interact with the same numbers and policies: tighten a single run, exit after estimation only, or bypass a block when policy permits. `--yes` is the escape hatch after `BudgetPendingConfirmError` when you have already reviewed the estimate and want to proceed.
+
 | Flag | Behavior |
 | --- | --- |
 | `--budget <EUR>` | Run-level cap for this invocation |
@@ -38,7 +42,7 @@ budgets:
 
 ## Limitations
 
-Estimates use heuristic tokens × your `pricing` sheet. Real provider bills may differ.
+Estimates multiply heuristic token counts by the rates in your `pricing` sheet. Provider invoices can diverge from that model, especially when vendors change tiers or bill by factors AgentFlow does not model.
 
 <Callout type="cost">
 Configure `pricing.models` with current rates. Zero prices make cost displays misleading but do not disable token caps.

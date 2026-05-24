@@ -1,13 +1,15 @@
 ---
 title: Sources Notion
-description: Configurer la synchronisation Notion vers des instantanés de spec locaux.
+description: Configurer la synchronisation Notion vers des snapshots de spec locaux.
 ---
 
 # Sources Notion
 
-Implémentation : `application/internal/source/notion`. L'exécution utilise toujours **des fichiers locaux** après synchronisation.
+L'intégration Notion vit dans `application/internal/source/notion`. L'invariant important : après sync, l'exécution et l'indexation lisent des **fichiers locaux** sur disque, pas l'API Notion à chaque étape. Voyez la sync comme une étape de snapshot qui tire les pages dans l'arbre de specs du dépôt.
 
 ## Configuration
+
+Les noms de propriétés doivent correspondre au schéma de votre workspace ; AgentFlow ne devine pas les layouts Notion.
 
 ```yaml
 sources:
@@ -23,9 +25,11 @@ sources:
     import_path: .agentflow/specs
 ```
 
-Le jeton est lu depuis la variable d'environnement nommée par `token_env` (défaut `NOTION_TOKEN`).
+Le jeton API est lu depuis la variable d'environnement nommée par `token_env` (par convention `NOTION_TOKEN`).
 
 ## Commandes
+
+Exportez le jeton, pointez `sync` vers une URL de page ou lancez une sync complète, puis consommez les specs importées via `inbox` comme toute autre source.
 
 ```bash
 export NOTION_TOKEN="..."
@@ -36,19 +40,17 @@ agentflow inbox --source notion
 
 ## Sécurité
 
-- Désactivé par défaut (`enabled: false`)
-- Dry-run : `agentflow --dry-run sync notion --page ...`
-- Invites d'écrasement lorsqu'une spec locale existe et que stdin est un TTY
+Notion reste **désactivé** tant que `enabled: true` n'est pas défini. Pour répéter, `agentflow --dry-run sync notion --page ...` exerce le chemin sans effets de bord non voulus. Quand une spec locale existe déjà et stdin est un TTY, des invites d'écrasement évitent d'écraser silencieusement du travail.
 
 <Callout type="experimental">
-Les schémas API Notion diffèrent selon l'espace de travail. Validez les noms de propriétés (`status_property`, etc.) avant de dépendre de la sync en production.
+Les schémas API Notion diffèrent par workspace. Validez les noms de propriétés (`status_property`, etc.) avant de compter sur la sync en production.
 </Callout>
 
 <Callout type="security">
-Conservez les jetons dans l'environnement ou un gestionnaire de secrets — jamais dans le YAML commité.
+Stockez les jetons en environnement ou gestionnaire de secrets — jamais dans du YAML commité.
 </Callout>
 
 ## Voir aussi
 
-- [Workflow Notion vers code](/docs/fr/workflows/notion-to-code)
-- [CLI : sync](/docs/cli/generated/sync)
+- [Workflow Notion → code](/docs/fr/workflows/notion-to-code)
+- [CLI : sync](/docs/fr/cli/generated/sync)

@@ -7,15 +7,17 @@ description: Investigate and narrow context locally before calling cloud models.
 
 ## Problem
 
-Sending entire repositories to cloud models is slow, expensive, and leaky. Most engineering questions can be narrowed with **local tools**: search, file scan, symbol lookup, and structured context packing.
+Pushing an entire repository through a cloud model is slow, expensive, and often leaks more code than the task requires. Many engineering questions shrink once you search the tree, list candidate files, and apply structured packing—work that belongs on your machine with ordinary tools, not in a remote prompt.
 
 ## AgentFlow approach
 
-Before expensive agent steps, AgentFlow can:
+AgentFlow treats **local investigation and context reduction** as a first-class prelude. Before the expensive steps, AgentFlow can narrow what leaves the repo:
 
 1. **`agentflow investigate <feature>`** — bounded grep, candidate files, large-file warnings, related tests
 2. **`agentflow context <feature> --optimize`** — collect, score, compress context into a pack
-3. **Routing** — prefer Ollama/local profiles for summarize, classify, `pre_review`, `context_selection` (see `routing.strategies.cost_aware`)
+3. **Routing** — prefer Ollama or local profiles for `summarize`, `classify`, `pre_review`, and `context_selection` when `routing.strategies.cost_aware` is in play
+
+The flow is linear in practice: the user's intent feeds investigation, investigation feeds a context pack, routing chooses local versus cloud execution, and both paths converge on validation.
 
 ```mermaid
 flowchart LR
@@ -29,6 +31,8 @@ flowchart LR
 ```
 
 ## Example
+
+The sequence below runs investigation and context optimization for a feature, then previews a `work` run with local preference and estimate-only:
 
 ```bash
 agentflow investigate billing-v2 --task task-003
@@ -46,6 +50,8 @@ agentflow work "develop billing-v2" --prefer-local --estimate-only
 
 ## Configuration
 
+The snippet below turns on cost-aware routing and sets shared investigation byte limits. Those limits apply even when `mcp.enabled` is false: they live under `mcp.investigation` as shared configuration for local tools.
+
 ```yaml
 routing:
   default_strategy: cost_aware
@@ -58,8 +64,6 @@ mcp:
     large_file_bytes: 524288
     max_grep_output_bytes: 262144
 ```
-
-Investigation limits apply even when `mcp.enabled` is false — they are shared config under `mcp.investigation`.
 
 ## Related
 

@@ -5,14 +5,16 @@ description: Ein Git-Worktree pro Aufgabe unter .agentflow/worktrees.
 
 # Worktree-Isolation
 
-Implementierung: `application/internal/worktree` — erzeugt während `dev` in `workflow.Service.DevFeature`.
+Implementierung in **`application/internal/worktree`**. Aktiv wird sie, wenn **`workflow.Service.DevFeature`** für **`dev`** eine isolierte Arbeitsumgebung bereitstellt.
 
 ## Verhalten
 
-1. Pro Aufgabe erstellt AgentFlow einen Worktree unter `worktrees.base_path`
-2. Branch-Name nutzt `worktrees.branch_prefix` + Feature-/Task-ID
-3. Agent-Subprozesse laufen mit `WorkingDir` auf dem Worktree-Pfad
-4. `agentflow clean` entfernt Worktrees gemäß `cleanup_policy`
+Die Isolation bleibt nachvollziehbar:
+
+1. Pro Aufgabe legt AgentFlow einen Worktree unter `worktrees.base_path` an
+2. Der Branchname setzt sich aus `worktrees.branch_prefix` und Feature- bzw. Task-ID zusammen
+3. Agent-Subprozesse erhalten als Arbeitsverzeichnis den Pfad des Worktrees
+4. `agentflow clean` entfernt Worktrees entsprechend `cleanup_policy`
 
 ```yaml
 worktrees:
@@ -23,9 +25,11 @@ worktrees:
 
 ## Diagramm
 
+Parallele Aufgaben verzweigen sich vom kanonischen Checkout aus; sie teilen sich nicht unbeabsichtigt denselben „schmutzigen“ Arbeitsbaum.
+
 ```mermaid
 flowchart TB
-  R[Repo-Root] --> W1[worktree task-001]
+  R[Repo root] --> W1[worktree task-001]
   R --> W2[worktree task-002]
   W1 --> A1[cursor-agent in W1]
   W2 --> A2[cursor-agent in W2]
@@ -33,14 +37,14 @@ flowchart TB
 
 ## Dry-run
 
-Mit `--dry-run` wird Worktree-Erstellung übersprungen oder simuliert — Integrationstests nutzen das für CI-sichere Läufe.
+Mit `--dry-run` kann die Worktree-Erzeugung übersprungen oder simuliert werden — etwa damit CI keine kurzlebigen Branches anlegt, wenn nur das Verhalten getestet wird.
 
 ## Richtlinien
 
-`policies.max_files_changed_per_task` begrenzt die Blast-Radius; kombinieren Sie mit menschlicher Review vor dem Merge.
+**`policies.max_files_changed_per_task`** mit menschlicher Review vor dem Merge kombinieren — der Schalter begrenzt das Ausmaß möglicher Änderungen, ersetzt aber keine inhaltliche Prüfung.
 
-## Siehe auch
+## Verwandtes
 
-- [Fehlerbehebung](/docs/de/workflows/failure-recovery)
-- [CLI: clean](/docs/cli/generated/clean)
-- [CLI: dev](/docs/cli/generated/dev)
+- [Recovery bei Fehlern](/docs/de/workflows/failure-recovery)
+- [CLI: clean](/docs/de/cli/generated/clean)
+- [CLI: dev](/docs/de/cli/generated/dev)

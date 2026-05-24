@@ -1,20 +1,20 @@
 ---
 title: Optimización de contexto
-description: Recopilar, puntuar, comprimir y empaquetar el contexto del repositorio antes de ejecutar agentes.
+description: Recolectar, puntuar, comprimir y empaquetar el contexto del repositorio antes de los agentes.
 ---
 
 # Optimización de contexto
 
-Paquetes: `application/internal/contextopt` — recolector, puntuación de relevancia, reductor/compresor, empaquetador.
+La implementación reside en `application/internal/contextopt` : un recolector agrupa ficheros candidatos, un puntuador de relevancia los ordena, un reductor o compresor elimina material de bajo valor y un empacador emite el blob que los agentes realmente ven. La intención es enviar contexto **más pequeño y mejor orientado** a APIs de pago manteniendo reglas de reducción inspeccionables desde la CLI.
 
 ## Pipeline
 
 ```mermaid
 flowchart LR
-  C[Recopilar archivos] --> R[Puntuación de relevancia]
-  R --> X[Comprimir / reducir]
-  X --> P[Paquete de contexto]
-  P --> A[Prompt del agente]
+  C[Collect files] --> R[Relevance score]
+  R --> X[Compress / reduce]
+  X --> P[Context pack]
+  P --> A[Agent prompt]
 ```
 
 ## CLI
@@ -25,24 +25,24 @@ agentflow context billing-v2 --task task-003 --optimize
 agentflow work "develop billing-v2" --show-context-plan
 ```
 
-`work` ejecuta optimización de contexto en el pipeline V3 salvo que se pase `--no-context-reduction`.
+`work` ejecuta la optimización en el pipeline V3 salvo si se establece `--no-context-reduction`.
 
 ## Configuración
 
-Los límites de investigación (compartidos con grep local) están bajo `mcp.investigation` en la config — aplican incluso con el servidor MCP desactivado.
+Los límites de investigación que acotan la salida de grep y archivos grandes se comparten con la investigación local : viven bajo `mcp.investigation` en la configuración y **aplican aun cuando el servidor MCP está desactivado**, porque gobiernan la herramienta local que alimenta al recolector.
 
-## Compromisos
+## Compensaciones
 
 | Beneficio | Límite |
 | --- | --- |
-| Prompts más pequeños | puede descartar archivos relevantes si las heurísticas fallan |
-| Llamadas a la nube más rápidas | no sustituye leer rutas críticas manualmente |
+| Prompts más pequeños | Puede descartar archivos relevantes si las heurísticas fallan |
+| Llamadas cloud más rápidas | No sustituye leer rutas críticas a mano |
 
 <Callout type="experimental">
-Las heurísticas de compresión evolucionan — compare la salida de `--show-context-plan` al depurar contexto faltante.
+Las heurísticas de compresión automática evolucionan — compare la salida de `--show-context-plan` al depurar contexto perdido.
 </Callout>
 
-## Ver también
+## Relacionado
 
-- [Local primero](/docs/es/concepts/local-first)
-- [CLI: context](/docs/cli/generated/context)
+- [Local-first](/docs/es/concepts/local-first)
+- [CLI: context](/docs/es/cli/generated/context)

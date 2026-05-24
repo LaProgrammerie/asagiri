@@ -1,39 +1,37 @@
 ---
 title: Feuille de route
-description: Fonctions livrées, chantiers de consolidation et prochaines priorités.
+description: Fonctions livrées, travaux de consolidation et prochaines priorités.
 ---
 
 # Feuille de route
 
-Feuille de route canonique : **[ROADMAP.md](https://github.com/LaProgrammerie/hyper-fast-builder/blob/main/ROADMAP.md)** à la racine du dépôt.
+L’ordre de priorité officiel vit dans **[ROADMAP.md](https://github.com/LaProgrammerie/hyper-fast-builder/blob/main/ROADMAP.md)** aux côtés du code ; cette page en est une vitrine lisible depuis le site.
 
 ## Livré (V1 → V3)
 
-- Primitives CLI : `init`, `spec`, `plan`, `dev`, `verify`, `review`, worktrees, SQLite
-- Couche intention : `work`, `continue`, `next`, sync Notion
-- Coût/perf : `estimate`, `investigate`, `context`, `cost`, MCP, TUI, métriques
+La livraison couvre workflows CLI centraux (`init`, `spec`, `plan`, `dev`, `verify`, `review` avec worktrees et SQLite), la surface intention en langage naturel (`work`, `continue`, `next`) ainsi que la synchro Notion, et tout l’échelon observabilité/coût (`estimate`, `investigate`, `context`, `cost`), MCP, TUI ou métriques.
 
 ## En cours (consolidation)
 
-- Audits architecture/sécurité/performance sous `docs/consolidation/`
-- Site doc public (ce site) + référence CLI générée
-- Préparation OSS : Apache 2.0, CONTRIBUTING, exemples
+Le chantier présent passe par audits de consolidation sous `docs/consolidation/`, la mise à l’air du docs site vous étant affichée avec références CLI régénérées, et quelques chantiers OSS (Apache 2.0, `CONTRIBUTING`, exemples cueillis).
 
-## Priorités suivantes
+## Prochain pas prioritaire
+
+Ce tableau agrège une pile grossière ; l’ordre d’exécution repose encore sur `docs/consolidation/TODO-prioritized.md`.
 
 | Priorité | Élément |
 | --- | --- |
 | P0 | Couverture `workflow` / `intent/executor` > 50 % |
-| P0 | Tokenizers alignés fournisseur |
-| P1 | Cache persistant du paquet de contexte entre exécutions |
-| P1 | CI GitHub Actions complète (test, lint, release) |
+| P0 | Tokenizers exact fournisseur |
+| P1 | Cache persistant packs de contexte entre runs |
+| P1 | GitHub Actions CI complet (test, lint, release) |
 | P2 | TUI bubbletea interactive |
-| P2 | Embeddings vectoriels RAG |
-| P3 | Multi-dépôt / état distant |
+| P2 | RAG embeddings vecteurs |
+| P3 | Multi-depôt / état distant |
 
 Détail : `docs/consolidation/TODO-prioritized.md`.
 
 ## Voir aussi
 
-- [Contribution](/docs/fr/contributing)
+- [Contribuer](/docs/fr/contributing)
 - [Limites](/docs/fr/security/limits)

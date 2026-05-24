@@ -1,66 +1,64 @@
 ---
-title: Descripción general de la arquitectura
+title: Resumen de arquitectura
 description: Módulos Go bajo application/internal y pipeline de ejecución.
 ---
 
-# Descripción general de la arquitectura
+# Resumen de arquitectura
 
-AgentFlow es una CLI en Go (`application/cmd/agentflow`) con lógica de dominio en `application/internal/` y tipos compartidos en `application/pkg/agentflow`.
+AgentFlow es una CLI Go (`application/cmd/agentflow`) con la mayor parte del comportamiento en `application/internal/` y contratos compartidos en `application/pkg/agentflow`. Esta división mantiene el binario fino mientras aísla parsing, planificación, investigación, coste y almacenamiento tras paquetes explícitos que puedes razonar solo con el layout del árbol.
 
 ## Pipeline de ejecución
 
+La ruta de extremo a extremo empieza en la CLI, resuelve intención, ejecuta el pipeline V3 (investigación, optimización de contexto, coste y presupuestos, enrutamiento), luego etapas de workflow — plan, enrich, dev — en un worktree antes de validación, revisión opcional e informe.
+
 ```mermaid
 flowchart TD
-  A[Intención del usuario / CLI] --> B[Resolvedor de intención + planificador]
+  A[User intent / CLI] --> B[intent resolver + planner]
   B --> C[pipeline V3]
-  C --> D[investigación]
+  C --> D[investigation]
   D --> E[contextopt]
-  E --> F[estimación de coste + presupuestos]
-  F --> G[enrutamiento]
+  E --> F[cost estimate + budgets]
+  F --> G[routing]
   G --> H[workflow: plan enrich dev]
-  H --> I[worktree + exec de agente]
-  I --> J[validación]
-  J --> K[revisión + informe]
+  H --> I[worktree + agent exec]
+  I --> J[validation]
+  J --> K[review + report]
 ```
 
 ## Módulos internos
 
 | Paquete | Rol |
 | --- | --- |
-| `cli` | Comandos Cobra, docgen, contexto de la app |
-| `config` | Carga YAML, valores por defecto, resolución de rutas |
+| `cli` | Comandos Cobra, docgen, contexto app |
+| `config` | Carga YAML, valores por defecto, rutas |
 | `intent` | NL `work`/`continue`, resolvedor híbrido, ejecutor |
 | `workflow` | Máquina de estados, plan/dev/verify/review, worktrees |
-| `worktree` | Ciclo de vida de git worktrees |
-| `agent` / `agent/exec` | Contratos de subprocess |
-| `source` / `source/notion` | Ingestión de specs |
-| `contextopt` | Recolectar/reducir/empaquetar contexto |
-| `investigation` | grep/scan local |
-| `cost` | tokens, precios, presupuestos |
-| `routing` | clase de paso → agente/modelo |
-| `mcp` | herramientas MCP stdio (opcional) |
-| `store/sqlite` | ejecuciones, tareas, métricas |
-| `report` | informes de ejecución |
+| `worktree` | Ciclo de vida git worktree |
+| `agent` / `agent/exec` | Contratos de subproceso |
+| `source` / `source/notion` | Ingesta de specs |
+| `contextopt` | Recoger/reducir/pack de contexto |
+| `investigation` | grep/escaneo local |
+| `cost` | Tokens, precios, presupuestos |
+| `routing` | Clase de paso → agente/modelo |
+| `mcp` | Herramientas MCP stdio (opcional) |
+| `store/sqlite` | Runs, tareas, métricas |
+| `report` | Informes de run |
 | `tui` | UI rich/plain/json |
-| `rag` | índice de fragmentos (SQLite, no vectorial) |
+| `rag` | Índice de chunks (SQLite, no vectorial) |
 | `bootstrap` | `init`, `doctor` |
-| `redact` | enmascarado de secretos en registros |
-| `validation` | ejecutor de comandos externos |
+| `redact` | Enmascarado de secretos en logs |
+| `validation` | Ejecutor de comandos externos |
 
 ## Almacenamiento de estado
 
-- **SQLite** en `state.path` (por defecto `.agentflow/state.sqlite`)
-- Artefactos de ejecución: `.agentflow/runs/<run-id>/`
+Runs y tareas persisten en **SQLite** en `state.path` (por defecto `.agentflow/state.sqlite`). Los artefactos de cada run van bajo `.agentflow/runs/<run-id>/`, manteniendo prompts, logs y salidas intermedias localizables sin releer la base.
 
 ## Puntos de extensión
 
-- Nuevos agentes: solo configuración
-- Nuevos comandos de validación: `validation.commands`
-- Estrategias de enrutamiento personalizadas: `routing.strategies`
-- Herramientas MCP cuando `mcp.enabled: true`
+Nuevos agentes solo con config; quality gates vía `validation.commands`; estrategias de enrutamiento bajo `routing.strategies`; herramientas MCP opcionales con `mcp.enabled: true`. Costuras intencionales: la mayoría de equipos extienden AgentFlow sin bifurcar el entrypoint Go.
 
-## Ver también
+## Relacionado
 
 - [Configuración](/docs/es/configuration/config-file)
 - [Fiabilidad: worktrees](/docs/es/reliability/worktree-isolation)
-- [Descripción general MCP](/docs/es/mcp/overview)
+- [Resumen MCP](/docs/es/mcp/overview)

@@ -7,7 +7,7 @@ description: Deterministische Orchestrierung für KI-gestützte Coding-Workflows
 
 Deterministische Orchestrierung für KI-gestützte Coding-Workflows.
 
-AgentFlow wandelt Spezifikationen in nachvollziehbare, kostenbewusste Entwicklungsläufe um: lokale Voruntersuchung, Git-Worktrees, Coding-Agenten, Validierungsbefehle und reproduzierbare Reports.
+AgentFlow verwandelt Spezifikationen in nachvollziehbare, kostenbewusste Entwicklungsläufe. Die Pipeline verbindet lokale Voruntersuchung, Git-Worktrees, externe Coding-Agenten und von Ihnen definierte Validierungsbefehle; reproduzierbare Reports dokumentieren jeden Lauf. So bleibt nachvollziehbar, was passiert ist — statt eines undurchsichtigen Chat-Verlaufs.
 
 ```bash
 agentflow work "develop billing-v2"
@@ -15,19 +15,26 @@ agentflow work "develop billing-v2"
 
 ## Kernideen
 
-- **Lokal zuerst** — Kontext vor Cloud-Aufrufen eingrenzen
-- **Kosten- und Token-Schätzung** — Ausgaben vor dem Lauf sehen
-- **Git-Worktree-Isolation** — eine Aufgabe, ein Branch, ein Tree
-- **Agent-Routing** — passendes Werkzeug pro Schritt
-- **Validierung vor Vertrauen** — externe Befehle, keine Selbstprüfung des Agenten
-- **Reproduzierbare Reports** — Markdown + JSON-Laufhistorie
+**Local-first investigation:** Bevor Cloud-Modelle ins Spiel kommen, untersucht AgentFlow das Repository mit begrenztem Grep und kontrolliertem Dateisystem-Durchlauf und verkleinert den Kontext. Standardmäßig landen nicht ganze Verzeichnisbäume bei Remote-APIs.
+
+**Kosten- und Token-Schätzung:** Erwartete Ausgaben werden vor der Ausführung sichtbar. Heuristische Zähler und konfigurierbare Preisblätter liefern Größenordnungen; Budgets können Überschreitungen vor dem Agentenstart blockieren oder eine ausdrückliche Bestätigung einfordern.
+
+**Git-Worktree-Isolation:** Jede Aufgabe läuft auf eigenem Branch und eigenem Arbeitsbaum unter `.agentflow/worktrees/`. Parallele Features stoßen seltener mit einem gemeinsamen Checkout zusammen.
+
+**Agent-Routing:** Schrittklassen der Pipeline werden den Agentenprofilen aus Ihrer Konfiguration zugeordnet — etwa lokales Ollama für Triage, Cloud-CLIs für aufwendigere Implementierung — gesteuert durch Strategie und Policies in YAML.
+
+**Validierung vor Vertrauen:** AgentFlow führt **Ihre** Befehle aus (`go test`, Linter, eigene Skripte), nicht die Selbsteinschätzung des Agenten. Ein Schritt gilt erst nach erfolgreichen Checks als abgeschlossen.
+
+**Reproduzierbare Reports:** Markdown und JSON liegen unter `.agentflow/runs/<run-id>/`, damit Sie später prüfen können, was gelaufen ist, welche Kosten angefallen sind und was die Validierung gemeldet hat.
 
 ## Einstieg
+
+Beim Onboarding eines Repositories diese Seiten der Reihe nach durchgehen:
 
 1. [Installation](/docs/de/getting-started/installation)
 2. [Schnellstart](/docs/de/getting-started/quickstart)
 3. [Erster Workflow](/docs/de/getting-started/first-workflow)
 
 <Callout type="warning">
-AgentFlow beweist keine Korrektheit. Validierung und menschliche Review bleiben für kritische Änderungen verpflichtend.
+AgentFlow beweist keine Korrektheit. Validierung und menschliche Review bleiben für kritische Änderungen Pflicht.
 </Callout>

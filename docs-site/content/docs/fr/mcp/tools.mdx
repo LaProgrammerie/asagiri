@@ -1,40 +1,44 @@
 ---
 title: Outils MCP
-description: Outils exposés lorsque mcp.enabled est true.
+description: Outils exposés lorsque mcp.enabled vaut true.
 ---
 
 # Outils MCP
 
-Lorsque `mcp.enabled: true`, `mcp-serve` enregistre des outils basés sur les paquets investigation et contextopt. Les noms et schémas d'outils sont renvoyés par `tools/list` à l'exécution.
+Quand `mcp.enabled` vaut `true`, `mcp-serve` enregistre des outils déléguant aux mêmes paquets investigation et optimisation de contexte que la CLI emploie. Noms et schémas JSON ne sont pas figés dans cette page — appelez `tools/list` après chaque mise à jour pour inspecter la surface réelle.
 
 ## Capacités typiques
 
+Ce tableau décrit grossièrement sans prétendre à l’exhaustivité : investigation garde des lectures borner comme `investigate` en CLI ; les aides context assemblent ou résument les paquets ; le volet cost réutilise les heuristiques de jetons pour prévisualiser des charges utiles aux clients.
+
 | Domaine | Rôle |
 | --- | --- |
-| Investigation | Grep borné / scan dépôt aligné sur la CLI `investigate` |
-| Contexte | Construire ou résumer des paquets de contexte |
-| Coût | Approximation jeton/coût pour une charge utile |
+| Investigation | Grep/repo borné aligné avec `investigate` en CLI |
+| Contexte | Construire ou résumer les paquets |
+| Coût | Approximer jetons/coûts pour une charge utile |
 
-Les identifiants d'outil peuvent changer entre versions — appelez toujours `tools/list` après mise à jour.
+Les identifiants d’outil peuvent changer par release — après upgrade, systématiquement refaire `tools/list`.
 
 ## Limites
 
-Depuis la config :
+La configuration réplique les garde-corps CLI : globalement `max_output_bytes` et `command_timeout_seconds`, plus les plafonds `investigation.*` partagés avec les chemins d’investigation hors MCP.
 
-- `max_output_bytes` — plafond de taille de charge RPC
+- `max_output_bytes` — borne la réponse RPC
 - `command_timeout_seconds` — exécution par outil
-- `investigation.*` — plafonds grep/scan (partagés avec l'investigation hors MCP)
+- `investigation.*` — plafonds grep/scan fichier (également utilisés hors MCP)
 
-## Exemple de flux client
+## Flux client exemple
+
+Lancez le serveur, branchez votre client MCP sur stdio, puis émettez `tools/list` au format JSON-RPC attendu.
 
 ```bash
 agentflow mcp-serve
-# Le client MCP de l'éditeur se connecte en stdio et envoie :
+# Éditeur MCP connecté via stdio, envoie:
 # {"jsonrpc":"2.0","id":1,"method":"tools/list"}
 ```
 
 <Callout type="experimental">
-La surface d'outils est minimale et en évolution. Ne dépendez pas d'outils non documentés en automatisation de production sans épingler la version d'AgentFlow.
+La surface d’outil reste minimale et en mouvance. N’épousez pas d’outil non documenté en automatisation prod sans épingle de version AgentFlow.
 </Callout>
 
 ## Voir aussi

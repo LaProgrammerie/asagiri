@@ -5,9 +5,11 @@ description: When to prefer local agents and how routing selects them.
 
 # Local models
 
-“Local” means **models served on your machine or LAN** (typically Ollama), with zero or configured marginal cost in `models.*.input_cost_per_1m_tokens: 0`.
+“Local” here means **models you serve on the same machine or LAN**, usually via Ollama. In `models`, local profiles typically carry zero marginal rates (`input_cost_per_1m_tokens: 0` / `output_cost_per_1m_tokens: 0`) so cost-aware routing can prefer them when the step class allows.
 
 ## When to use
+
+Local models shine when latency to a cloud API is undesirable or when you want bounded spend: intent classification, spec enrichment before a cloud `dev` pass, log triage, and lightweight pre-review are typical. They are also the default answer for air-gapped trees or repos where every cent and every byte out of the network matters.
 
 - Classifying intents and tasks
 - Enriching specs before cloud `dev`
@@ -15,6 +17,8 @@ description: When to prefer local agents and how routing selects them.
 - Air-gapped or cost-sensitive repos
 
 ## Enable locally
+
+Wire `agents.ollama` (or another local protocol you configure), add a `models` profile with `class: local`, extend `routing.prefer_local_for` with the step classes you want to keep home, and use `--prefer-local` or `--no-cloud` on `work` when you need a one-off constraint without editing YAML.
 
 1. Configure `agents.ollama` and a `models` profile with `class: local`
 2. Set routing `prefer_local_for` step classes
@@ -26,7 +30,7 @@ agentflow work "add logging" --prefer-local --estimate-only
 
 ## Limits
 
-Local models may fail on large refactors or security-sensitive changes — routing can escalate to cloud when `use_cloud_heavy_for` matches and `--allow-cloud` is set.
+Local weights are smaller and context windows shorter; large refactors or security-sensitive reviews may still need a cloud profile. When `use_cloud_heavy_for` matches and you pass `--allow-cloud`, routing is allowed to escalate after the configured failure thresholds — check your strategy numbers before assuming a command stayed entirely local.
 
 <Callout type="local-first">
 Local-first reduces cost and leakage; it does not replace validation or human review on critical paths.

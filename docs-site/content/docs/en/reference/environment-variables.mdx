@@ -5,6 +5,8 @@ description: Environment variables read by AgentFlow at runtime.
 
 # Environment variables
 
+AgentFlow reads a small, explicit set of environment variables. They exist so CI, shells, and wrappers can flip global behavior without rewriting configs.
+
 | Variable | Effect |
 | --- | --- |
 | `AGENTFLOW_DRY_RUN` | When `1`, same as global `--dry-run` (also set by exec layer) |
@@ -14,6 +16,8 @@ description: Environment variables read by AgentFlow at runtime.
 | `UPDATE_GOLDEN` | When `1`, refresh golden test files in `cost` package |
 
 ## Custom Notion token env
+
+If you rename the secret env var, keep `token_env` in sync so sync commands and Notion API calls agree on where to read credentials.
 
 ```yaml
 sources:
@@ -26,6 +30,8 @@ export MY_NOTION_SECRET="..."
 ```
 
 ## CI usage
+
+`AGENTFLOW_DRY_RUN=1` is the usual way to exercise orchestration in pipelines without spawning configured binaries. Reserve `AGENTFLOW_YES=1` for jobs that must auto-accept prompts **after** you are certain budget confirmations should not block the job.
 
 ```yaml
 env:

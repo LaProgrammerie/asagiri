@@ -5,9 +5,11 @@ description: Configure Notion sync into local spec snapshots.
 
 # Notion sources
 
-Implementation: `application/internal/source/notion`. Execution always uses **local files** after sync.
+Notion integration lives in `application/internal/source/notion`. The important invariant: after sync, execution and indexing read **local files** on disk, not the Notion API on every step. Think of sync as a snapshot step that pulls pages into your repo’s spec tree.
 
 ## Configuration
+
+Property names must match your workspace schema; AgentFlow does not guess Notion layouts for you.
 
 ```yaml
 sources:
@@ -23,9 +25,11 @@ sources:
     import_path: .agentflow/specs
 ```
 
-Token is read from the env var named by `token_env` (default `NOTION_TOKEN`).
+The API token is read from whatever environment variable `token_env` names (by convention `NOTION_TOKEN`).
 
 ## Commands
+
+Export the token, point `sync` at a page URL or run a full sync, then consume imported specs through `inbox` like any other source.
 
 ```bash
 export NOTION_TOKEN="..."
@@ -36,9 +40,7 @@ agentflow inbox --source notion
 
 ## Safety
 
-- Disabled by default (`enabled: false`)
-- Dry-run: `agentflow --dry-run sync notion --page ...`
-- Overwrite prompts when local spec exists and stdin is a TTY
+Notion stays **off** unless you set `enabled: true`. For rehearsal, `agentflow --dry-run sync notion --page ...` exercises the path without committing side effects you did not intend. When a local spec already exists and stdin is a TTY, you get overwrite prompts so imports do not silently clobber work.
 
 <Callout type="experimental">
 Notion API schemas differ per workspace. Validate property names (`status_property`, etc.) before relying on sync in production.

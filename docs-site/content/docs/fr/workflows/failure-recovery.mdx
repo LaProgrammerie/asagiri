@@ -1,13 +1,15 @@
 ---
 title: Récupération après échec
-description: Reprendre après verify, revue ou exécution interrompue.
+description: Rétablissement après une vérification, revue ratée ou exécution interrompue.
 ---
 
 # Récupération après échec
 
-## Machine d'état
+AgentFlow matérialise des états de tâches explicites plutôt qu’imaginer progression à partir fichiers perdus récupération propre exige suivre ces transitions ou utiliser surcharges orchestrateur (`--force`, helpers resume) où supporté.
 
-Les tâches passent par des statuts explicites appliqués dans `workflow/state_machine.go` :
+## Machine à états
+
+Statuts forcés depuis `workflow/state_machine.go`:
 
 ```mermaid
 stateDiagram-v2
@@ -26,18 +28,18 @@ stateDiagram-v2
   review_failed --> verified
 ```
 
-Les transitions invalides renvoient une erreur sauf si `--force` est autorisé sur la commande.
+Transitions hors graphe erreur sauf commandes précises autorisées `--force`.
 
-## Récupérations courantes
+## Recettes fréquentes
 
-### Échec de verify
+### Échec verify
 
 ```bash
-# corriger le code dans le worktree, puis :
+# corriger code dans worktree ensuite:
 agentflow verify billing-v2 --force
 ```
 
-### Échec de revue
+### Échec review
 
 ```bash
 agentflow review billing-v2 --agent codex --force
@@ -47,23 +49,25 @@ agentflow review billing-v2 --agent codex --force
 
 ```bash
 agentflow status
-agentflow resume <run-id>          # affiche l'étape suivante : plan|enrich|dev|verify|review
-agentflow continue "resume billing-v2"   # continuation par intention
+agentflow resume <run-id>          # affiche prochain étape possible plan|enrich|dev...
+agentflow continue "resume billing-v2"   # continuation intentionnelle
 ```
 
 <Callout type="experimental">
-`agentflow resume <run-id> --execute` enchaîne les étapes uniquement avec **`--dry-run` global**. Hors dry-run, `resume` ne réinvoque pas les agents — exécutez l'étape affichée manuellement ou utilisez `continue`.
+`agentflow resume <run-id> --execute` enchaîne sous global **`dry-run`** seulement — hors celui-ci aucune relance automatique agents : exécutez manuellement imprimées ou passez via `continue`.
 </Callout>
 
-### Nettoyer les worktrees obsolètes
+### Nettoyage worktrees
 
 ```bash
 agentflow clean
 ```
 
-Retire les worktrees selon `worktrees.cleanup_policy` (`keep_failed` conserve les arbres des tâches en échec).
+Supprime suivant policy `cleanup_policy` (`keep_failed` conserve arbres erreur).
 
-## Rapports pour post-mortems
+## Rapports après incident
+
+Pour relire pistes après coup ou aligner timelines reviews combinez rapport ID + investigative scans:
 
 ```bash
 agentflow report <run-id>
@@ -72,6 +76,6 @@ agentflow investigate billing-v2
 
 ## Voir aussi
 
-- [Isolation des worktrees](/docs/fr/reliability/worktree-isolation)
-- [CLI : resume](/docs/cli/generated/resume)
-- [CLI : continue](/docs/cli/generated/continue)
+- [Isolation worktree](/docs/fr/reliability/worktree-isolation)
+- [CLI resume](/docs/fr/cli/generated/resume)
+- [CLI continue](/docs/fr/cli/generated/continue)

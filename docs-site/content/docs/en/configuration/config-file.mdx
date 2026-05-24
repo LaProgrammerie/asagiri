@@ -5,11 +5,13 @@ description: Complete reference for .agentflow/config.yaml blocks and defaults.
 
 # Configuration file
 
-Path: **`.agentflow/config.yaml`** (created by `agentflow init` from `config.yaml.example`). All paths are resolved relative to the repository root unless absolute.
+The canonical file is **`.agentflow/config.yaml`**, created by `agentflow init` from `config.yaml.example`. Unless a path is absolute, AgentFlow resolves it from the repository root. For machine-readable validation, the generated JSON Schema lives at `/schemas/config.schema.json` on the docs site.
 
-JSON Schema (generated): `/schemas/config.schema.json` on the docs site.
+The sections that follow mirror the file layout: each block controls a slice of behavior (intent, work defaults, sources, persistence, agents, validation, models, cost, routing, UI, MCP, and repo policies).
 
 ## `project`
+
+`project` carries a human-facing name and the default branch AgentFlow uses for worktree-oriented flows.
 
 ```yaml
 project:
@@ -17,11 +19,9 @@ project:
   default_branch: main
 ```
 
-Repository display name and default branch for worktree operations.
-
 ## `intent`
 
-Natural-language `work` / `continue` resolution (`application/internal/intent`).
+The `intent` block configures natural-language resolution for `work` and `continue` (`application/internal/intent`): whether the resolver runs, which mode it uses, and how it behaves when confidence is low or Ollama is available as a fallback.
 
 ```yaml
 intent:
@@ -35,7 +35,7 @@ intent:
 
 ## `work`
 
-Defaults for orchestration and agent selection.
+`work` sets repo-wide defaults for orchestration: which agents run which roles, where the pipeline stops, verification and review toggles, task limits, and whether plan confirmation is required.
 
 ```yaml
 work:
@@ -50,6 +50,8 @@ work:
 ```
 
 ## `sources`
+
+Local sources scan fixed paths for specs and active handoff material; Notion is optional and pulls snapshots into the tree. The table summarizes the two blocks; the YAML shows typical paths and Notion placeholders.
 
 | Block | Purpose |
 | --- | --- |
@@ -73,6 +75,8 @@ sources:
 
 ## `specs`, `state`, `worktrees`
 
+These blocks wire Kiro-style spec paths, SQLite state, and worktree layout. `cleanup_policy` controls what happens when a run leaves debris under `worktrees.base_path`.
+
 ```yaml
 specs:
   kiro_path: .kiro/specs
@@ -91,9 +95,11 @@ worktrees:
 
 ## `agents`
 
-Map logical agent ids to subprocess commands. See [Agents configuration](/docs/configuration/agents).
+Map logical agent ids to subprocess commands and agent-specific options. The dedicated page walks through fields and examples: [Agents configuration](/docs/configuration/agents).
 
 ## `validation`
+
+`validation.commands` lists checks the pipeline can require (tests, linters, custom scripts). Go repositories often get sensible defaults from bootstrap when `go.mod` exists.
 
 ```yaml
 validation:
@@ -103,11 +109,9 @@ validation:
       required: true
 ```
 
-Go repos receive defaults from bootstrap when `go.mod` exists.
-
 ## `models`
 
-Logical profiles for routing and cost (`specv3`). Keys are arbitrary ids:
+`models` holds logical profiles for routing and cost (`specv3`). Keys are arbitrary ids; each entry ties a provider, cost class, model name, and which step classes may use it.
 
 ```yaml
 models:
@@ -122,11 +126,11 @@ models:
 
 ## `budgets`
 
-See [Budgets](/docs/configuration/budgets).
+Per-run, per-task, and daily caps live under `budgets`. See [Budgets](/docs/configuration/budgets).
 
 ## `pricing`
 
-Manual price sheet — **no hardcoded cloud prices in code**.
+Cloud and local marginal rates come from your YAML — **there are no hardcoded cloud prices in code**. Keep `updated_at` honest so you know when someone last aligned numbers with a price list.
 
 ```yaml
 pricing:
@@ -141,7 +145,7 @@ pricing:
 
 ## `token_estimation`
 
-Chars-per-token heuristics (`application/internal/cost/token_counter.go`):
+Token counts for budgeting use character-per-token heuristics (`application/internal/cost/token_counter.go`). Tuning these ratios nudges estimates closer to how your content looks (code-heavy versus prose-heavy).
 
 ```yaml
 token_estimation:
@@ -157,11 +161,11 @@ These ratios approximate tokens — they are not provider tokenizers.
 
 ## `routing`
 
-See [Routing](/docs/configuration/routing).
+Step classes map to local versus cloud agents through `routing`. Details: [Routing](/docs/configuration/routing).
 
 ## `ui`
 
-Terminal UX (`application/internal/tui`):
+Terminal behavior is configured under `ui` (`application/internal/tui`): rendering mode, live logs, progress bars, and compact output.
 
 ```yaml
 ui:
@@ -173,7 +177,7 @@ ui:
 
 ## `mcp`
 
-Local MCP stdio server (`mcp.enabled` must be `true` to serve tools):
+When `mcp.enabled` is `true`, AgentFlow can run a local stdio MCP server with tool timeouts, output limits, investigation caps, and paths that investigation tooling must not read.
 
 ```yaml
 mcp:
@@ -190,6 +194,8 @@ mcp:
 
 ## `policies`
 
+`policies` encodes guardrails at repo level: clean git, secret file patterns, changed-file limits, network allowance, and labels that require human approval before certain classes of change proceed.
+
 ```yaml
 policies:
   require_clean_git: true
@@ -204,8 +210,8 @@ policies:
 
 ## Validate changes
 
+After you edit YAML, `agentflow doctor` is the fast sanity check before you run `work` against real agents.
+
 ```bash
 agentflow doctor
 ```
-
-After editing YAML, run doctor before `work`.

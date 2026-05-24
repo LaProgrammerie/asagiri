@@ -1,17 +1,19 @@
 ---
-title: Descripción general de MCP
+title: Resumen MCP
 description: Servidor MCP stdio opcional que expone herramientas de investigación y contexto.
 ---
 
-# Descripción general de MCP
+# Resumen MCP
 
-AgentFlow puede exponer un servidor MCP **stdio JSON-RPC** mínimo (`application/internal/mcp`) para integraciones con editores.
+Para puentes de editor que hablan MCP **stdio JSON-RPC**, AgentFlow puede exponer un servidor pequeño implementado en `application/internal/mcp`. Es deliberadamente reducido: listar herramientas, invocarlas con límites y devolver resultados estructurados — no una plataforma remota completa para agentes.
 
 <Callout type="experimental">
-MCP está desactivado por defecto. Actívelo solo en entornos de confianza tras revisar el alcance de las herramientas.
+MCP viene desactivado por defecto. Actívelo solo tras revisar alcances en entornos confiables.
 </Callout>
 
-## Activar
+## Habilitación
+
+Configure `mcp.enabled` y ajustes de seguridad antes de arrancar nada que conecte un cliente externo por stdio.
 
 ```yaml
 mcp:
@@ -20,23 +22,27 @@ mcp:
   command_timeout_seconds: 120
 ```
 
-## Servir
+## Servicio
+
+`agentflow mcp-serve` ejecuta el transporte stdio; los clientes envían JSON separado por saltos de línea y esperan `initialize`, `tools/list` y `tools/call` como JSON-RPC.
 
 ```bash
 agentflow mcp-serve
 ```
 
-Admite `initialize`, `tools/list`, `tools/call` (JSON delimitado por nuevas líneas).
+Soporta `initialize`, `tools/list`, `tools/call` (JSON delimitado por nuevas líneas).
 
 ## Wrapper CLI
+
+`agentflow mcp` es la ayuda que agrupa subcomandos MCP para inspección local — júntelo con las referencias generadas cuando necesite flags exactos.
 
 ```bash
 agentflow mcp
 ```
 
-Inspeccione comandos relacionados con MCP — véase la documentación generada [mcp](/docs/cli/generated/mcp) y [mcp-serve](/docs/cli/generated/mcp-serve).
+Inspeccione comandos MCP — véase referencia generada [mcp](/docs/es/cli/generated/mcp) y [mcp-serve](/docs/es/cli/generated/mcp-serve).
 
-## Ver también
+## Relacionado
 
 - [Herramientas MCP](/docs/es/mcp/tools)
 - [Seguridad MCP](/docs/es/mcp/security)

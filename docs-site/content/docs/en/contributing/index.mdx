@@ -5,9 +5,11 @@ description: How to contribute to AgentFlow and keep docs in sync with the CLI.
 
 # Contributing
 
-Full guide at the repository root: **[CONTRIBUTING.md](https://github.com/LaProgrammerie/hyper-fast-builder/blob/main/CONTRIBUTING.md)**.
+The living checklist, review expectations, and repository policies live in **[CONTRIBUTING.md](https://github.com/LaProgrammerie/hyper-fast-builder/blob/main/CONTRIBUTING.md)** at the repo root — start there for anything beyond this short map.
 
 ## Quick checklist
+
+Before you open a PR, load project context, align scope with active handoff and product specs, prove the Go tree still builds and tests clean, regenerate CLI reference when commands move, run the docs site build for MDX edits, and keep each PR focused without leaking secrets.
 
 1. Read `AGENTS.md` and `docs/ai/context-map.md`
 2. Align features with `docs/ai/active/handoff.md` and product specs (`spec-postv123.md`, etc.)
@@ -24,13 +26,11 @@ go run ./application/cmd/agentflow docs generate-cli \
 
 ## Documentation
 
-- Public site: `docs-site/content/docs/` (English, Fumadocs)
-- Project canon: `docs/ai/`
-- Doc/code drift tracker: [`problems.md`](https://github.com/LaProgrammerie/hyper-fast-builder/blob/main/problems.md) at repo root
+Public prose targets `docs-site/content/docs/` (English site uses Fumadocs). Internal canon and steering notes stay under `docs/ai/`. When code and docs disagree, [`problems.md`](https://github.com/LaProgrammerie/hyper-fast-builder/blob/main/problems.md) at the root tracks known drift.
 
 ## Architecture decisions
 
-Record durable tradeoffs in `docs/ai/05-decisions.md` and `docs/decisions/`.
+When you change a durable tradeoff, record it where future contributors look: `docs/ai/05-decisions.md` plus structured entries in `docs/decisions/` if your team uses that folder layout.
 
 ## Related
 

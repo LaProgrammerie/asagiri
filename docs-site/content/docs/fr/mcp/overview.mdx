@@ -1,17 +1,19 @@
 ---
-title: Vue d'ensemble MCP
-description: Serveur MCP stdio optionnel exposant investigation et contexte.
+title: Vue d’ensemble MCP
+description: Serveur MCP stdio optionnel exposant outils d’investigation et de contexte.
 ---
 
-# Vue d'ensemble MCP
+# Vue d’ensemble MCP
 
-AgentFlow peut exposer un serveur MCP **stdio JSON-RPC** minimal (`application/internal/mcp`) pour intégrations éditeur.
+Pour ponts éditeurs parlant MCP **stdio JSON-RPC**, AgentFlow peut exposer un serveur léger implanté dans `application/internal/mcp`. Il reste délibérément étroit : lister les outils, les appeler avec des bornes et renvoyer des résultats structurés — pas une plateforme d’agent distant complète.
 
 <Callout type="experimental">
-MCP est désactivé par défaut. Activez-le uniquement dans des environnements de confiance après examen des périmètres d'outils.
+MCP est désactivé par défaut. Activez-le seulement dans des environnements de confiance après revue des portées des outils.
 </Callout>
 
 ## Activer
+
+Basculez `mcp.enabled` et réglez les paramètres de sécurité avant de lancer quelque chose qui rattache un client externe au stdio.
 
 ```yaml
 mcp:
@@ -22,19 +24,23 @@ mcp:
 
 ## Servir
 
+`agentflow mcp-serve` exécute le transport stdio ; les clients envoient du JSON délimité par des retours ligne et attendent `initialize`, `tools/list`, et `tools/call` en JSON-RPC.
+
 ```bash
 agentflow mcp-serve
 ```
 
-Prend en charge `initialize`, `tools/list`, `tools/call` (JSON délimité par nouvelles lignes).
+Prend en charge `initialize`, `tools/list`, `tools/call` (JSON délimité par des sauts de ligne).
 
 ## Wrapper CLI
+
+`agentflow mcp` est l’aide qui remonte les sous-commandes MCP pour inspection locale — associez-le aux références générées si vous cherchez des drapeaux exacts.
 
 ```bash
 agentflow mcp
 ```
 
-Inspecte les commandes liées à MCP — voir les pages générées [mcp](/docs/cli/generated/mcp) et [mcp-serve](/docs/cli/generated/mcp-serve).
+Inspecter les commandes MCP — références générées [mcp](/docs/fr/cli/generated/mcp) et [mcp-serve](/docs/fr/cli/generated/mcp-serve).
 
 ## Voir aussi
 

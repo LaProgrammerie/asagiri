@@ -5,17 +5,23 @@ description: Threat model and hardening for the local MCP server.
 
 # MCP security
 
+Treat the MCP server like any other local automation entry point: it inherits your user identity, your checkout, and whatever tools AgentFlow compiled in.
+
 ## Threat model
 
-The MCP server runs as **your user** with repository access. Any client attached to stdio can invoke tools until disabled.
+The process runs as **your user** with full repository access. Any client attached to the same stdio pipe may invoke registered tools until you disable MCP or cut the connection — there is no secondary password inside the protocol.
 
 ## Defaults (safe)
+
+Out of the box, MCP stays off, responses and runtimes are capped, and investigation tooling refuses a short list of obvious secret paths via `secret_path_denylist`. These defaults reduce accidental leakage; they are not a sandbox boundary.
 
 - `mcp.enabled: false`
 - Output and timeout caps
 - `secret_path_denylist` blocks reading common secret paths in investigation tools
 
 ## Recommendations
+
+Use MCP only on machines you physically control and where editor extensions are already trusted. Avoid multiplexing stdio through shared tmux sessions or remote shells unless you understand who else can attach. Extend `secret_path_denylist` whenever your repo holds keys outside the stock examples. Finally, `policies.allow_network: false` keeps agents from dialing outbound — MCP remains local, but pairing policies reduces blast radius when an agent run follows a tool call.
 
 1. Enable MCP only on trusted machines
 2. Do not expose stdio to shared terminals or remote sessions without authentication

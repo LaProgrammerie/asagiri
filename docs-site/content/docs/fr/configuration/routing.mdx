@@ -1,13 +1,15 @@
 ---
 title: Routage
-description: Routage conscient des coûts des classes d'étapes vers agents locaux ou cloud.
+description: Routage soucieux des coûts des classes d’étapes vers des agents locaux ou cloud.
 ---
 
 # Routage
 
-`application/internal/routing/router.go` sélectionne agent/modèle depuis la config à partir de chaînes de classe d'étape (par ex. `summarize`, `implementation`, `pre_review`).
+`application/internal/routing/router.go` associe chaque étape à un agent et à un modèle à l’aide de chaînes de **classe d’étape** telles que `summarize`, `implementation` ou `pre_review`. Le routeur lit `routing` dans `config.yaml`; il ne contacte pas les fournisseurs pour « découvrir » des modèles — vos entrées `models` et `agents` font autorité.
 
 ## Configuration
+
+Les stratégies regroupent des préférences : quelles classes restent sur la pile locale, lesquelles justifient un profil cloud rapide, lesquelles méritent un profil plus lourd, et combien d’échecs déclenchent un chemin de repli.
 
 ```yaml
 routing:
@@ -21,34 +23,38 @@ routing:
       cloud_fast_failures_before_heavy: 1
 ```
 
-## Flux de décision
+## Graphe de décision
+
+Le schéma reflète l’ordre de décision dans le code : préférence locale d’abord, puis règles de blocage cloud, puis compartiments cloud lourd versus rapide, avec des replis raisonnables lorsqu’une classe ne correspond pas étroitement.
 
 ```mermaid
 flowchart TD
-  A[Classe d'étape] --> B{Dans prefer_local_for ?}
-  B -->|oui| C[default_enricher / ollama]
-  B -->|non| D{no_cloud sans allow_cloud ?}
-  D -->|oui| C
-  D -->|non| E{Dans use_cloud_heavy_for ?}
-  E -->|oui| F[profil claude]
-  E -->|non| G{Dans use_cloud_fast_for ?}
-  G -->|oui| H[default_agent / cursor]
-  G -->|non| H
+  A[Step class] --> B{In prefer_local_for?}
+  B -->|yes| C[default_enricher / ollama]
+  B -->|no| D{no_cloud without allow_cloud?}
+  D -->|yes| C
+  D -->|no| E{In use_cloud_heavy_for?}
+  E -->|yes| F[claude profile]
+  E -->|no| G{In use_cloud_fast_for?}
+  G -->|yes| H[default_agent / cursor]
+  G -->|no| H
 ```
 
-## Surcharges CLI
+## Overrides CLI
 
-| Drapeau | Effet |
+Ces bascules modulent le même graphe de décision sans toucher au YAML : forcer le chemin local quand la stratégie le permet, retirer le cloud sauf si vous associez explicitement les drapeaux d’autorisation.
+
+| Option | Effet |
 | --- | --- |
-| `--prefer-local` | Force le chemin local lorsque la stratégie correspond |
+| `--prefer-local` | Force le chemin local quand la stratégie correspond |
 | `--no-cloud` | Bloque le cloud sauf avec `--allow-cloud` |
 | `--allow-cloud` | Autorisation cloud explicite |
 
 <Callout type="experimental">
-La qualité du routage cloud dépend entièrement de vos entrées `models` et `agents` — AgentFlow n'appelle pas d'API fournisseur pour choisir les modèles automatiquement.
+La qualité du routage cloud dépend entièrement de vos entrées `models` et `agents` — AgentFlow n’appelle pas les API fournisseur pour choisir les modèles automatiquement.
 </Callout>
 
 ## Voir aussi
 
-- [Concepts conscients des coûts](/docs/fr/concepts/cost-aware-workflows)
+- [Concepts soucieux des coûts](/docs/fr/concepts/cost-aware-workflows)
 - [Modèles dans le fichier de configuration](/docs/fr/configuration/config-file#models)

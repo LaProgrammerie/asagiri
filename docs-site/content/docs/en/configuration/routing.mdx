@@ -5,9 +5,11 @@ description: Cost-aware routing of step classes to local or cloud agents.
 
 # Routing
 
-`application/internal/routing/router.go` selects agent/model from config using step class strings (e.g. `summarize`, `implementation`, `pre_review`).
+`application/internal/routing/router.go` maps each step to an agent and model using **step class** strings such as `summarize`, `implementation`, or `pre_review`. The router consults `routing` in `config.yaml`; it does not phone home to vendors to “discover” models — your `models` and `agents` tables are the source of truth.
 
 ## Configuration
+
+Strategies bundle preferences: which classes stay on local stack, which justify a fast cloud profile, which warrant a heavier one, and how many failures trigger a fallback path.
 
 ```yaml
 routing:
@@ -23,6 +25,8 @@ routing:
 
 ## Decision flow
 
+The diagram mirrors the decision order in code: local preference first, then cloud blocking rules, then heavy versus fast cloud buckets, with sane fallbacks when a class does not match tightly.
+
 ```mermaid
 flowchart TD
   A[Step class] --> B{In prefer_local_for?}
@@ -37,6 +41,8 @@ flowchart TD
 ```
 
 ## CLI overrides
+
+These flags shift the same decision graph without editing YAML: force local when the strategy allows it, withhold cloud unless you pair permission flags explicitly.
 
 | Flag | Effect |
 | --- | --- |

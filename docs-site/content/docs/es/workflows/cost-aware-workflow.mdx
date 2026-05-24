@@ -1,55 +1,51 @@
 ---
-title: Flujo consciente del coste
-description: Estimar, optimizar contexto y limitar gasto antes de ejecutar el agente.
+title: Flujo sensible al coste
+description: Estimar, optimizar contexto y frenar gasto antes ejecutar agentes.
 ---
 
-# Flujo consciente del coste
+# Flujo sensible al coste
 
-Guía operativa (`spec-doc` §11.4) con banderas y claves de configuración reales.
+Aquí **`spec-doc` §11.4** tiene equivalente ejecutable cada flag existe en builds vigentes orden estimación compaction budget preferencia locale según rutas config.
 
-## 1. Estimación por tarea
+## 1 Estimar tarea puntual
 
 ```bash
 agentflow estimate billing-v2 --task task-003 --dry-run
 ```
 
-Muestra tokens de entrada/salida heurísticos y coste estimado según su hoja `pricing`.
+Muestra heurísticas IO tokens + cost estimado usando su `pricing`.
 
-## 2. Optimización de contexto
+## 2 Optimizar paquete contexto
 
 ```bash
 agentflow context billing-v2 --task task-003 --optimize
 ```
 
-Construye un paquete de contexto reducido antes de prompts grandes al agente. Desactive la reducción con `agentflow work ... --no-context-reduction`.
+Construye packs reducidos antes prompts enormes puede desactivar `work ... --no-context-reduction`.
 
-## 3. Ejecución con presupuesto
+## 3 Correr dentro presupuesto
 
 ```bash
 agentflow work "develop billing-v2" --budget 0.50 --estimate-only
 agentflow work "develop billing-v2" --budget 0.50
 ```
 
-Los presupuestos de configuración (`budgets.per_run.max_estimated_cost`) aplican cuando la bandera CLI `--budget` es cero. Las ejecuciones que superan el presupuesto bloquean salvo:
+YAML `budgets.per_run.max_estimated_cost` actúa con `--budget` cero Sobrecoste bloqueando salvo consenso usuario (`--yes` tras pendiente Budget) ó `--allow-over-budget` permisible tras policy.
 
-- aceptación del aviso de confirmación, o
-- `--yes` tras `BudgetPendingConfirmError`, o
-- `--allow-over-budget` cuando `budgets.policies.allow_override_with_flag` es true
-
-## 4. Preferencia local
+## 4 Preferir localmente
 
 ```bash
 agentflow work "develop billing-v2" --prefer-local --no-cloud
 ```
 
-`--allow-cloud` permite explícitamente el enrutamiento a la nube cuando las políticas lo restringirían.
+Combine `--allow-cloud` si estrategía exige reaperturas cloud conscientes.
 
 ## Explicabilidad
 
-`work` y `estimate` imprimen resúmenes de paso (elección de ruta, bytes de contexto, comprobaciones de presupuesto). Vea [Estimación de tokens](/docs/es/cost-performance/token-estimation).
+`work` / `estimate` imprimen rutas contextual bytes checkpoints ver [Estimación tokens](/docs/es/cost-performance/token-estimation).
 
-## Ver también
+## Relacionado
 
-- [Conceptos conscientes del coste](/docs/es/concepts/cost-aware-workflows)
-- [Presupuestos](/docs/es/configuration/budgets)
-- [CLI: cost-report](/docs/cli/generated/cost-report)
+- [Workflow coste conceptos](/docs/es/concepts/cost-aware-workflows)
+- [Budgets configuración](/docs/es/configuration/budgets)
+- [CLI cost-report](/docs/es/cli/generated/cost-report)

@@ -1,48 +1,59 @@
 ---
 title: Philosophie
-description: Orchestration déterministe, validation avant confiance, limites assumées.
+description: Orchestration déterministe, validation avant confiance et limites assumées.
 ---
 
 # Philosophie
 
-## Problème
+## Le problème d’ingénierie
 
-Les agents de code sont puissants mais non déterministes. Les équipes ont besoin de workflows **reproductibles** : étapes connues, branches isolées, validation externe, visibilité des coûts et pistes d'audit — pas d'exécutions « autonomes » opaques.
+Les agents de codage IA sont puissants, mais leurs sorties ne sont pas déterministes. Les équipes ont toutefois besoin de workflows **répétables** : étapes connues, branches isolées, validation externe, visibilité des coûts et pistes d’audit — pas des exécutions opaques où personne ne peut expliquer ce qui s’est passé ni pourquoi.
 
-## Approche AgentFlow
+AgentFlow existe pour rendre l’orchestration explicite. Vous configurez le pipeline, les commandes de validation et les garde-fous économiques ; l’outil coordonne l’exécution et enregistre ce qui a tourné.
 
-AgentFlow orchestre **spec → plan → implémentation → vérification → revue → rapport** avec :
+## Comment AgentFlow s’y prend
 
-1. **État explicite** — exécutions/tâches dans SQLite et machine d'état documentée
-2. **Investigation locale d'abord** — grep, parcours fichiers et paquetage de contexte avant le cloud
-3. **Conscience des coûts** — heuristiques de jetons et budgets avant exécution
-4. **Isolation par git worktree** — une tâche, une branche, un arbre
-5. **Validation par vos commandes** — `go test`, linters, etc., pas l'auto-évaluation de l'agent
-6. **Rapports reproductibles** — markdown + JSON sous `.agentflow/runs/`
+Le modèle mental par défaut est **spec → plan → implémentation → vérification → revue → rapport**. Chaque phase a une place définie dans la machine à états et dans les rapports sous `.agentflow/runs/`.
+
+**L’état explicite** signifie que les exécutions et les tâches sont portées par SQLite avec une machine à états documentée. Vous pouvez inspecter le statut, reprendre une exécution et corréler les rapports avec des identifiants d’exécution plutôt que de deviner à partir de l’historique du terminal.
+
+**L’investigation locale d’abord** exécute grep, des parcours du système de fichiers et l’empaquetage du contexte sur votre machine avant les appels cloud. L’objectif est des prompts plus petits et plus pertinents — pas d’expédier tout le dépôt vers un modèle par commodité.
+
+**La conscience des coûts** applique des estimations heuristiques de jetons et des budgets configurables **avant** l’exécution. Les estimations sont approximatives, mais elles valent mieux que de découvrir la facture seulement après une longue session agent.
+
+**L’isolation par git worktree** retient une tâche, une branche et un arbre de travail. Le travail parallèle reste séparé de votre checkout principal.
+
+**La validation par vos commandes** signifie `go test`, les linters et les scripts en lesquels vous avez confiance — pas l’affirmation de l’agent qu’« tout va bien ». AgentFlow planifie ces contrôles ; il ne remplace pas votre suite de tests.
+
+**Les rapports reproductibles** capturent des artefacts Markdown et JSON pour que les opérateurs et les relecteurs puissent auditer une exécution des jours plus tard.
 
 ## Ce que nous ne prétendons pas
 
 <Callout type="warning">
-AgentFlow ne garantit pas la correction, la sécurité ni la prêt pour la production. Il coordonne des outils ; l'humain et votre suite de tests restent l'autorité.
+AgentFlow ne garantit ni correction, ni sécurité, ni préparation à la production. Il coordonne des outils ; les humains et votre suite de tests restent l’autorité.
 </Callout>
 
-## Compromis
+## Compromis à comprendre
 
 | Gain | Coût |
 | --- | --- |
-| Étapes de pipeline prévisibles | Moins de « magie en un clic » que les chats ad hoc |
-| Estimations de coût en amont | Approximations (heuristiques caractères/jeton) |
-| Sécurité des worktrees | Espace disque et complexité git supplémentaires |
+| Étapes de pipeline prévisibles | Moins de « magie one-shot » qu’un chat agent ad hoc |
+| Estimations de coût en amont | Estimations approximatives (heuristiques caractères / jeton) |
+| Sécurité accrue des worktrees | Disque et complexité git supplémentaires |
 | Agents branchables | Vous devez installer et configurer chaque CLI |
+
+Ces compromis sont intentionnels. AgentFlow privilégie le **contrôle et l’auditabilité** à l’illusion d’un codage entièrement autonome.
 
 ## Leviers de configuration
 
-- `work.auto_verify`, `work.auto_review` — automatisation vs barrières manuelles
-- `policies.require_clean_git` — bloquer les arbres dirty
-- `budgets` — garde-fous économiques
+Une fois ce modèle accepté, quelques réglages comptent plus que d’autres :
 
-## Voir aussi
+- `work.auto_verify`, `work.auto_review` — équilibre entre automatisation et portillons manuels
+- `policies.require_clean_git` — bloque les arbres de travail « sales » lorsque la politique l’exige
+- `budgets` — garde-fous économiques avant les étapes coûteuses
 
-- [Local d'abord](/docs/fr/concepts/local-first)
-- [Workflows conscient des coûts](/docs/fr/concepts/cost-aware-workflows)
+## Pour aller plus loin
+
+- [Local d’abord](/docs/fr/concepts/local-first)
+- [Workflows conscients des coûts](/docs/fr/concepts/cost-aware-workflows)
 - [Limites](/docs/fr/security/limits)

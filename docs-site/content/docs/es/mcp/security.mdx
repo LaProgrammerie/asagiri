@@ -5,28 +5,34 @@ description: Modelo de amenaza y endurecimiento del servidor MCP local.
 
 # Seguridad MCP
 
+Trate MCP como cualquier punto de entrada de automatización local: hereda la identidad de usuario, la copia de trabajo compartida y las herramientas que compiló AgentFlow.
+
 ## Modelo de amenaza
 
-El servidor MCP corre como **su usuario** con acceso al repositorio. Cualquier cliente adjunto a stdio puede invocar herramientas hasta que se desactiva.
+El proceso ejecuta como **su usuario** con acceso íntegro al repo. Cualquier cliente unido al mismo pipe stdio puede invocar las herramientas registradas mientras MCP esté habilitado o la conexión siga abierta — el protocolo no incorpora segunda contraseña.
 
-## Valores por defecto (seguros)
+## Predeterminados (seguros)
+
+En la entrega MCP arranca desactivado, tiempo y tamaño están acotados, y la herramienta de investigación evita algunas rutas obvias vía `secret_path_denylist`. Estas medidas amortiguan fugas accidentales pero no bastan como sandbox firme.
 
 - `mcp.enabled: false`
-- Topes de salida y tiempo de espera
-- `secret_path_denylist` bloquea lecturas de rutas secretas habituales en herramientas de investigación
+- Límites de salida y tiempo
+- `secret_path_denylist` bloquea lecturas triviales de secretos en herramientas de investigación
 
 ## Recomendaciones
 
-1. Activar MCP solo en máquinas de confianza
-2. No exponer stdio a terminales compartidas o sesiones remotas sin autenticación
-3. Mantener `secret_path_denylist` alineado con su repo (`.env`, claves, credenciales)
-4. Combinar con `policies.allow_network: false` cuando los agentes deban permanecer offline — tenga en cuenta que MCP en sí es local
+Active MCP sólo en máquinas físicamente bajo su control donde las extensiones de editor ya fueron evaluadas. Evite multiplexar stdio mediante tmux/sesiones remotas compartidas salvo conocer bien quién más puede pegarse. Amplíe `secret_path_denylist` donde el repo albergue más claves fuera del set de ejemplo. `policies.allow_network: false` evita llamadas externas desde agentes — MCP sigue local, pero combinado reduce el alcance después de ejecutar herramientas sensibles.
+
+1. Habilitar MCP solo en equipos que considere fiables
+2. No exponer stdio a terminales o sesiones remotas compartidas sin autenticación clara
+3. Mantenga `secret_path_denylist` alineado con `.env`, llaves u credenciales reales del repo
+4. Emparelle `policies.allow_network: false` cuando los agentes deban estar fuera de red — MCP en sí mismo es local
 
 <Callout type="security">
-MCP no aísla las implementaciones de herramientas. Trate los editores conectados como plenamente confiables.
+MCP no aisla sandbox en las herramientas. Considere editores enlazados plenamente de confianza.
 </Callout>
 
-## Ver también
+## Relacionado
 
-- [Descripción general de seguridad](/docs/es/security)
-- [Descripción general de MCP](/docs/es/mcp/overview)
+- [Perspectiva de seguridad](/docs/es/security)
+- [Resumen MCP](/docs/es/mcp/overview)

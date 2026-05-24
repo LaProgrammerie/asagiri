@@ -1,13 +1,17 @@
 ---
 title: Inicio rápido
-description: Ejecutar AgentFlow de extremo a extremo en menos de diez minutos con seguridad de dry-run.
+description: Recorrer AgentFlow de extremo a extremo en menos de diez minutos con la seguridad del dry-run.
 ---
 
 # Inicio rápido
 
-Esta ruta usa **`--dry-run`** para explorar la orquestación sin invocar agentes externos ni shells de validación.
+Esta guía recorre AgentFlow en menos de diez minutos usando **`--dry-run`**. Verá cómo la intención se resuelve en un plan y en una estimación de coste sin invocar agentes externos ni *shells* de validación: una forma segura de explorar la orquestación sobre un repositorio real.
+
+Cuando domine el flujo, quite `--dry-run` solo después de tener configurados los agentes y los comandos de validación.
 
 ## 1. Compilar e inicializar
+
+Parta de un binario compilado y de un árbol de proyecto limpio:
 
 ```bash
 make build
@@ -17,18 +21,22 @@ agentflow init
 agentflow doctor
 ```
 
-## 2. Dry-run de un flujo en lenguaje natural
+El comando `doctor` muestra lagunas de configuración (agentes ausentes, ajustes de MCP, archivos de presupuesto) antes de gastar tokens en una ejecución completa.
+
+## 2. Probar en dry-run un flujo en lenguaje natural
+
+El comando `work` con lenguaje natural es el punto de entrada de más alto nivel. Los siguientes comandos muestran planificación y estimación sin efectos secundarios:
 
 ```bash
 agentflow work "develop my-feature" --dry-run --plan-only
 agentflow work "develop my-feature" --dry-run --estimate-only
 ```
 
-`--plan-only` resuelve la intención e imprime el plan. `--estimate-only` ejecuta el pipeline V3 hasta la estimación de coste/contexto sin ejecutar agentes.
+`--plan-only` resuelve la intención e imprime el plan de ejecución. `--estimate-only` recorre el pipeline V3 hasta la estimación de coste y de contexto **sin** llamar a las CLIs de agentes externos.
 
-## 3. Inspeccionar comandos del pipeline
+## 3. Inspeccionar comandos aislados del pipeline
 
-Con una carpeta de spec Kiro existente (p. ej. `.kiro/specs/my-feature/`):
+Si ya mantiene una carpeta de especificaciones Kiro (por ejemplo `.kiro/specs/my-feature/`), puede ejecutar cada paso del pipeline de forma aislada:
 
 ```bash
 agentflow plan my-feature --dry-run
@@ -39,31 +47,35 @@ agentflow review my-feature --dry-run
 agentflow status --dry-run
 ```
 
-## 4. Informes
+En este contexto, *dry-run* significa que la orquestación y el registro se ejecutan en local; no se lanzan procesos externos.
 
-Tras un `work` en dry-run que cree metadatos de ejecución:
+## 4. Leer los informes de ejecución
+
+Tras un `work` en *dry-run* que cree metadatos de corrida, inspeccione los artefactos:
 
 ```bash
 agentflow status --dry-run
 agentflow report <run-id> --dry-run
 ```
 
-Los informes quedan en `.agentflow/runs/<run-id>/report.md`.
+Los informes se escriben bajo `.agentflow/runs/<run-id>/report.md`, con JSON complementario para herramientas.
 
 ## Ejecución real
 
-Quite `--dry-run` solo cuando los agentes y los comandos de validación estén configurados y acepte procesos externos:
+Cuando la configuración esté lista y acepte la ejecución de procesos externos, escale de forma deliberada:
 
 ```bash
-agentflow work "develop my-feature" --estimate-only   # primero el umbral de coste
+agentflow work "develop my-feature" --estimate-only   # primero la compuerta de coste
 agentflow work "develop my-feature"                   # confirmación guiada por defecto
 ```
 
+Use `--estimate-only` como compuerta económica antes de pagar tiempo de agente. La ruta por defecto de `work` sigue pidiendo confirmación a menos que opte por los indicadores no interactivos documentados en la referencia de la CLI.
+
 <Callout type="warning">
-El dry-run simula la orquestación; no garantiza la calidad de salida de los agentes. Ejecute siempre la validación del proyecto (`go test`, linters, revisión humana) sobre cambios reales.
+El *dry-run* simula la orquestación; no garantiza la calidad de la salida de los agentes. En cambios reales, ejecute siempre la validación del proyecto (`go test`, linters, revisión humana).
 </Callout>
 
-## Ver también
+## Lecturas relacionadas
 
 - [Primer flujo de trabajo](/docs/es/getting-started/first-workflow)
-- [Referencia CLI](/docs/cli/generated)
+- [Referencia de la CLI](/docs/es/cli/generated)

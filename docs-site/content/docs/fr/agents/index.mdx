@@ -5,27 +5,29 @@ description: Agents de code externes invoqués par AgentFlow en subprocess.
 
 # Vue d'ensemble des agents
 
-AgentFlow n'embarque pas de modèles. Il **orchestre** des outils CLI configurés sous `agents:` et les sélectionne via le routage, les défauts de `work` ou les drapeaux par commande.
+AgentFlow est une couche d’orchestration : il n’embarque ni poids de modèles ni accès propriétaire. Vous déclarez des **CLI externes** sous `agents:` ; le routage, les valeurs par défaut de `work` ou les drapeaux par commande déterminent quel binaire s’exécute pour une étape donnée.
 
-## Modèles pris en charge
+## Modèles courants
 
-| Identifiant d'agent (exemple) | Rôle typique |
+Le tableau liste des identifiants fréquents ; l’exécutable et les drapeaux restent **votre** `config.yaml` — le contrat d’AgentFlow est de lancer `command` avec des `args` optionnels et de faire transiter les flux via le chemin de rédaction habituel.
+
+| Identifiant d’agent (exemple) | Rôle typique |
 | --- | --- |
 | `kiro` | Rédaction de spec (`agentflow spec`) |
 | `cursor` | Implémentation (`dev`, agent par défaut de `work`) |
 | `codex` / `claude` | Revue ou raisonnement lourd |
-| `ollama` | Enrichissement local, classification, pré-revue bon marché |
-
-Les commandes exactes sont **vos** entrées `config.yaml` — AgentFlow ne lance que `command` + `args`.
+| `ollama` | Enrichissement local, classification, pré-revue économique |
 
 ## Contrats
 
-- Pas d'interpolation shell — argv uniquement
-- Délais via `agents.<id>.timeout`
-- Dry-run évite l'exécution réelle
+- Pas d’interpolation shell — uniquement `argv`
+- Délais d’attente via `agents.<id>.timeout`
+- Le dry-run évite l’exécution réelle
 - Les journaux passent par la rédaction (`application/internal/redact`)
 
 ## Choisir les agents par étape
+
+Changez l’identifiant d’agent par sous-commande lorsqu’une tâche doit s’appuyer sur une autre chaîne d’outils que vos défauts.
 
 ```bash
 agentflow spec feat --agent kiro
@@ -34,7 +36,7 @@ agentflow dev feat --agent cursor
 agentflow review feat --agent codex
 ```
 
-## Voir aussi
+## Pour aller plus loin
 
 - [Configuration des agents](/docs/fr/configuration/agents)
 - [Ollama](/docs/fr/agents/ollama)

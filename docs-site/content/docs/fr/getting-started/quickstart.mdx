@@ -5,9 +5,13 @@ description: Parcourir AgentFlow de bout en bout en moins de dix minutes avec la
 
 # Démarrage rapide
 
-Ce parcours utilise **`--dry-run`** pour explorer l'orchestration sans invoquer d'agents externes ni de shells de validation.
+Ce guide fait le tour d’AgentFlow en moins de dix minutes en s’appuyant sur **`--dry-run`**. Vous verrez comment une intention se résout en plan et en estimation de coût sans invoquer d’agents externes ni shells de validation — pratique pour explorer l’orchestration en conditions réelles sur la structure d’un dépôt.
+
+Lorsque le flux vous convient, retirez `--dry-run` seulement après avoir configuré agents et commandes de validation.
 
 ## 1. Compiler et initialiser
+
+Partez d’un binaire compilé et d’un arbre de projet propre :
 
 ```bash
 make build
@@ -17,18 +21,22 @@ agentflow init
 agentflow doctor
 ```
 
-## 2. Dry-run d'un workflow en langage naturel
+La commande `doctor` met en évidence les trous de configuration (agents manquants, réglages MCP, fichiers de budget) avant que vous ne dépensiez des jetons sur une exécution complète.
+
+## 2. Dry-run d’un workflow en langage naturel
+
+`work` en langage naturel est le point d’entrée le plus haut niveau. Les commandes ci-dessous montrent la planification et l’estimation sans effet de bord :
 
 ```bash
 agentflow work "develop my-feature" --dry-run --plan-only
 agentflow work "develop my-feature" --dry-run --estimate-only
 ```
 
-`--plan-only` résout l'intention et affiche le plan d'exécution. `--estimate-only` exécute le pipeline V3 jusqu'à l'estimation coût/contexte sans exécution agent.
+`--plan-only` résout l’intention et affiche le plan d’exécution. `--estimate-only` enchaîne le pipeline V3 jusqu’à l’estimation du coût et du contexte **sans** appeler les CLI d’agents externes.
 
 ## 3. Inspecter les commandes du pipeline
 
-Avec un dossier de spec Kiro existant (par ex. `.kiro/specs/my-feature/`) :
+Si vous maintenez déjà un dossier de spec Kiro (par exemple `.kiro/specs/my-feature/`), vous pouvez exercer chaque étape du pipeline isolément :
 
 ```bash
 agentflow plan my-feature --dry-run
@@ -39,31 +47,35 @@ agentflow review my-feature --dry-run
 agentflow status --dry-run
 ```
 
-## 4. Rapports
+En dry-run, l’orchestration et la journalisation tournent en local ; aucun processus externe n’est lancé.
 
-Après un `work` en dry-run qui crée les métadonnées d'exécution :
+## 4. Lire les rapports d’exécution
+
+Après un `work` en dry-run qui a créé des métadonnées d’exécution, inspectez les artefacts :
 
 ```bash
 agentflow status --dry-run
 agentflow report <run-id> --dry-run
 ```
 
-Les rapports sont écrits sous `.agentflow/runs/<run-id>/report.md`.
+Les rapports sont écrits sous `.agentflow/runs/<run-id>/report.md`, avec du JSON compagnon pour l’outillage.
 
 ## Exécution réelle
 
-Retirez `--dry-run` uniquement lorsque les agents et les commandes de validation sont configurés et que vous acceptez l'exécution de processus externes :
+Lorsque la configuration est prête et que vous acceptez l’exécution de processus externes, montez en charge de façon délibérée :
 
 ```bash
-agentflow work "develop my-feature" --estimate-only   # garde coût d'abord
+agentflow work "develop my-feature" --estimate-only   # garde-fou économique d’abord
 agentflow work "develop my-feature"                   # confirmation guidée par défaut
 ```
 
+Utilisez `--estimate-only` comme verrou économique avant de payer du temps agent. Le chemin `work` par défaut demande encore confirmation à moins d’opter pour les drapeaux non interactifs documentés dans la référence CLI.
+
 <Callout type="warning">
-Le dry-run simule l'orchestration ; il ne garantit pas la qualité de sortie des agents. Exécutez toujours la validation du projet (`go test`, linters, revue humaine) sur les changements réels.
+Le dry-run simule l’orchestration ; il ne prouve pas la qualité des sorties des agents. Exécutez toujours la validation projet (`go test`, linters, revue humaine) sur les changements réels.
 </Callout>
 
-## Voir aussi
+## Pour aller plus loin
 
 - [Premier workflow](/docs/fr/getting-started/first-workflow)
-- [Référence CLI](/docs/cli/generated)
+- [Référence CLI](/docs/fr/cli/generated)

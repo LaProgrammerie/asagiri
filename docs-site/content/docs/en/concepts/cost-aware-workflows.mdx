@@ -7,14 +7,18 @@ description: Estimate tokens and cost before execution; enforce budgets and rout
 
 ## Problem
 
-Agent runs can burn tokens unpredictably. Teams need **forecasts**, **budgets**, and **routing** that prefer cheaper paths when quality allows.
+Agent runs can consume tokens in ways that are hard to predict from a plain task description. Teams still need **forecasts** before execution, **budget ceilings** that fail closed, and **routing** that prefers cheaper execution paths when the task does not justify a heavy model.
 
 ## AgentFlow approach
 
-1. **Heuristic token counting** — chars-per-token ratios by content kind (`token_estimation` in config)
+AgentFlow addresses that with four concrete mechanisms that stay under your config:
+
+1. **Heuristic token counting** — character counts classified by content kind, divided by `token_estimation` ratios (`token_estimation` in config)
 2. **Pricing sheet** — manual `pricing.models` entries for cloud models (no hardcoded vendor prices in code)
-3. **Budgets** — per-run, per-task, daily caps with optional confirmation thresholds
-4. **Routing** — `routing.strategies` map step classes to local vs cloud-fast vs cloud-heavy agents
+3. **Budgets** — per-run, per-task, and daily caps with optional confirmation thresholds
+4. **Routing** — `routing.strategies` map step classes to local versus cloud-fast versus cloud-heavy agents
+
+Typical CLI entry points:
 
 ```bash
 agentflow estimate billing-v2 --task task-003 --dry-run
@@ -36,7 +40,7 @@ Estimates are **approximate**. Provider billing uses real tokenizers; AgentFlow 
 
 ## Configuration
 
-See [Budgets](/docs/configuration/budgets), [Routing](/docs/configuration/routing), and [Token estimation](/docs/cost-performance/token-estimation).
+Wire budgets, routing rules, and estimator knobs through the dedicated pages: [Budgets](/docs/configuration/budgets), [Routing](/docs/configuration/routing), and [Token estimation](/docs/cost-performance/token-estimation).
 
 ## Related
 

@@ -1,31 +1,33 @@
 ---
-title: Descripción general de agentes
-description: Agentes de codificación externos invocados por AgentFlow como subprocess.
+title: Resumen de agentes
+description: Agentes de codificación externos invocados por AgentFlow como subprocesos.
 ---
 
-# Descripción general de agentes
+# Resumen de agentes
 
-AgentFlow no incrusta modelos. **Orquesta** herramientas CLI configuradas bajo `agents:` y las selecciona mediante enrutamiento, valores por defecto de `work` o banderas por comando.
+AgentFlow es una capa de orquestación: no incluye pesos integrados ni acceso propietario a modelos. Usted declara **CLIs externas** bajo `agents:`; el enrutamiento, los valores por defecto de `work` o los indicadores por comando deciden qué binario se ejecuta en cada paso.
 
-## Patrones admitidos
+## Patrones habituales
 
-| Id de agente (ejemplo) | Rol típico |
+La siguiente tabla enumera identificadores frecuentes; el ejecutable y los indicadores son siempre **los de su** `config.yaml`. El contrato de AgentFlow consiste en lanzar `command` con `args` opcionales y reenviar flujos por la ruta habitual de redacción.
+
+| ID de agente (ejemplo) | Rol típico |
 | --- | --- |
-| `kiro` | Autoría de spec (`agentflow spec`) |
+| `kiro` | Redacción de especificaciones (`agentflow spec`) |
 | `cursor` | Implementación (`dev`, agente por defecto de `work`) |
-| `codex` / `claude` | Revisión o razonamiento profundo |
+| `codex` / `claude` | Revisión o razonamiento exigente |
 | `ollama` | Enriquecimiento local, clasificación, pre-revisión económica |
-
-Los comandos exactos son **sus** entradas `config.yaml` — AgentFlow solo lanza `command` + `args`.
 
 ## Contratos
 
-- Sin interpolación shell — solo argv
+- Sin interpolación por *shell*: solo `argv`
 - Tiempos de espera desde `agents.<id>.timeout`
-- Dry-run omite ejecución real
+- El *dry-run* omite la ejecución real
 - Los registros pasan por redacción (`application/internal/redact`)
 
 ## Elegir agentes por paso
+
+Cambie el ID de agente por subcomando cuando una tarea deba usar otra cadena de herramientas distinta de la predeterminada.
 
 ```bash
 agentflow spec feat --agent kiro

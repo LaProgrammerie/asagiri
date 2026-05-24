@@ -22,7 +22,8 @@ Phase de **consolidation** après livraison V3 : cohérence architecture, sécur
 
 ## Documentation publique
 
-- **Spec site :** [`spec-doc.md`](../../../spec-doc.md)
+- **Passe éditoriale (courante) :** [`spec-doc-v2.md`](../../../spec-doc-v2.md) — ton, prose, i18n (en/fr/de/es), sans changement fonctionnel
+- **Spec site (structure) :** [`spec-doc.md`](../../../spec-doc.md)
 - **Implémentation :** `docs-site/` (Fumadocs, i18n, static export → **Cloudflare Pages** via Wrangler CI)
 - **Déploiement :** [`spec-deploy-doc.md`](../../../spec-deploy-doc.md) — secrets `CLOUDFLARE_*` ; `docs-check.yml` pour forks sans deploy
 - **Génération CLI :** `agentflow docs generate-cli`

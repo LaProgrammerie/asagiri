@@ -5,7 +5,9 @@ description: Map agent ids to CLI commands and timeouts in config.yaml.
 
 # Agents configuration
 
-AgentFlow invokes external CLIs as **subprocesses without a shell** (`application/internal/agent/exec`). Each key under `agents:` is a logical id referenced by flags (`--agent`, `work.default_agent`, routing).
+AgentFlow does not talk to agent APIs directly. It starts each agent as a **subprocess without a shell** (`application/internal/agent/exec`), passing a plain `argv` built from your config. Every key under `agents:` is a logical id you reference from flags (`--agent`), from `work.default_agent`, and from routing rules.
+
+The block below is a realistic shape: several ids point at different executables, with optional `args`, models, timeouts, and an Ollama-style HTTP endpoint where that agent type expects it.
 
 ## Example
 
@@ -33,6 +35,8 @@ agents:
 
 ## Fields
 
+The table is a quick map from config field to how the exec layer uses it. Nothing here is implicit: if you omit `timeout`, defaults elsewhere apply; Ollama-specific keys only matter for an agent that uses that protocol.
+
 | Field | Used by |
 | --- | --- |
 | `command` | Executable name on `PATH` |
@@ -44,6 +48,8 @@ agents:
 
 ## Defaults in `work`
 
+The `work` block chooses which logical ids run when a command does not override them. Adjust these when your default implementation, reviewer, or enricher should change repo-wide.
+
 ```yaml
 work:
   default_agent: cursor
@@ -51,11 +57,11 @@ work:
   default_enricher: ollama
 ```
 
-CLI overrides: `agentflow dev feat --agent cursor`, `agentflow review feat --agent codex`.
+You can still override per invocation, for example `agentflow dev feat --agent cursor` or `agentflow review feat --agent codex`.
 
 ## Dry-run
 
-With `--dry-run`, exec layer skips real subprocesses — useful for CI and docs rehearsal.
+With `--dry-run`, the exec layer does not spawn real subprocesses. That is useful in CI when you only want to validate wiring, and for rehearsing docs or scripts that would otherwise wait on long-running agents.
 
 ## Related
 

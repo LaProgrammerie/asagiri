@@ -5,9 +5,11 @@ description: Lokale Modelle für Enrichment, Routing und Intent-Fallback ausfüh
 
 # Ollama
 
-AgentFlow nutzt Ollama für **lokale** Schritte: Enrichment, Intent-Resolver-Fallback (`intent.resolver.use_ollama_fallback`) und kostenbewusstes Routing zu `work.default_enricher`.
+Ollama versorgt die **lokalen** Anteile von AgentFlow: Anreicherungsschritte, den Intent-Resolver, wenn `intent.resolver.use_ollama_fallback` aktiv ist, und kostenbewusstes Routing Richtung `work.default_enricher`. Es gibt keine separate Produktintegration im üblichen Sinne — Sie setzen HTTP-Endpunkt und Modell-Tags unter `agents.ollama` und spiegeln dieselben Kennungen in passenden `models`-Einträgen wider.
 
 ## Konfiguration
+
+Weisen Sie `endpoint` auf Ihren Daemon, tragen Sie die Chat- und Embedding-Tags ein, die Sie bereits mit `ollama pull` geholt haben, und ordnen Sie dieselbe Modellkennung einem `models`-Profil mit `provider: ollama` und den `usage`-Klassen zu, die lokal abgedeckt werden sollen.
 
 ```yaml
 agents:
@@ -27,6 +29,8 @@ models:
 
 ## Voraussetzungen
 
+Daemon starten, referenzierte Modelle ziehen, anschließend mit `doctor` prüfen, dass Konfiguration und Umgebung zusammenpassen.
+
 ```bash
 ollama serve
 ollama pull qwen2.5-coder:14b
@@ -35,17 +39,19 @@ agentflow doctor
 
 ## Nutzung
 
+`enrich` spricht Ollama an, wenn Sie `--agent ollama` setzen. `work --prefer-local` hält alle dafür qualifizierten Schritte auf dem lokalen Profil, das Ihr Routing beschreibt.
+
 ```bash
 agentflow enrich billing-v2 --agent ollama
 agentflow work "refactor utils" --prefer-local
 ```
 
-## Embeddings / RAG
+## Embeddings und RAG
 
-`embedding_model` ist für zukünftige RAG-Features konfiguriert. Der aktuelle Indexer (`agentflow index`) speichert **Text-Chunks** in SQLite — keine Vektor-Embeddings.
+Das Feld `embedding_model` ist für spätere Abrufpfade reserviert. Der heutige Befehl `agentflow index` legt **Text-Chunks** in SQLite ab — eine vektorbasierte Ähnlichkeitssuche ist in einer Standard-Build nicht zu erwarten.
 
 <Callout type="experimental">
-Vektor-Embeddings und semantische RAG-Retrieval stehen auf der Roadmap (siehe `ROADMAP.md` im Repo-Root). Embedding-basierte Suche in v1 nicht erwarten.
+Vektor-Embeddings und semantisches RAG stehen auf der Roadmap (siehe `ROADMAP.md` im Repository-Root). In Version 1 keine embedding-gestützte Suche erwarten.
 </Callout>
 
 ## Siehe auch

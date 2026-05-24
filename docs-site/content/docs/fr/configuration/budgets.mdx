@@ -1,11 +1,13 @@
 ---
 title: Budgets
-description: Plafonds de coût et de jetons estimés par exécution, par tâche et par jour.
+description: Plafonds de coût et de jetons estimés par run, par tâche et par jour.
 ---
 
 # Budgets
 
-Implémenté dans `application/internal/cost/budget.go` et appliqué dans le pipeline V3 avant exécution agent.
+Les budgets offrent des plafonds prévisibles sur la dépense et le volume de jetons estimés avant que les agents ne tournent. Ils sont implémentés dans `application/internal/cost/budget.go` et appliqués dans le pipeline V3 avant l'exécution des agents, afin qu'un run puisse s'arrêter ou demander confirmation au lieu de dépasser ce que vous jugez acceptable.
+
+Le bloc YAML ci-dessous est la forme complète : devise par défaut, plafonds par run et par tâche, plafond journalier agrégé, et drapeaux de politique qui contrôlent blocage versus dépassement explicite.
 
 ## Schéma
 
@@ -29,19 +31,21 @@ budgets:
 
 ## Interaction CLI
 
-| Drapeau | Comportement |
+Ces flags interagissent avec les mêmes chiffres et politiques : resserrer un run, sortir après estimation seule, ou contourner un blocage quand la politique le permet. `--yes` est la sortie après `BudgetPendingConfirmError` une fois l'estimation relue.
+
+| Flag | Comportement |
 | --- | --- |
-| `--budget <EUR>` | Plafond pour cette invocation |
-| `--estimate-only` | Arrêt après estimation ; aucune dépense |
+| `--budget <EUR>` | Plafond de run pour cette invocation |
+| `--estimate-only` | S'arrête après estimation ; pas de dépense |
 | `--allow-over-budget` | Contourne le blocage si la politique l'autorise |
 | `--yes` | Accepte la confirmation après `BudgetPendingConfirmError` |
 
 ## Limites
 
-Les estimations utilisent des jetons heuristiques × votre grille `pricing`. La facturation réelle fournisseur peut différer.
+Les estimations multiplient des comptages heuristiques de jetons par les taux de votre feuille `pricing`. Les factures fournisseur peuvent diverger, surtout quand les vendeurs changent de paliers ou facturent des facteurs qu'AgentFlow ne modélise pas.
 
 <Callout type="cost">
-Configurez `pricing.models` avec des tarifs à jour. Des prix à zéro rendent l'affichage des coûts trompeur mais n'désactivent pas les plafonds de jetons.
+Configurez `pricing.models` avec des tarifs à jour. Des prix à zéro rendent les affichages de coût trompeurs sans désactiver les plafonds de jetons.
 </Callout>
 
 ## Voir aussi

@@ -1,32 +1,38 @@
 ---
 title: MCP-Sicherheit
-description: Bedrohungsmodell und Härtung für den lokalen MCP-Server.
+description: Bedrohungsmodell und Absicherung des lokalen MCP-Servers.
 ---
 
 # MCP-Sicherheit
 
+Behandeln Sie den MCP-Server wie jeden anderen lokalen Automatisierungs-Endpunkt: Er läuft unter Ihrer Nutzeridentität, mit Zugriff auf Ihr Checkout und auf die Werkzeuge, die AgentFlow eingebunden hat.
+
 ## Bedrohungsmodell
 
-Der MCP-Server läuft als **Ihr Benutzer** mit Repo-Zugriff. Jeder Client am stdio kann Tools aufrufen, bis deaktiviert.
+Der Prozess läuft als **Ihr Benutzerkonto** mit vollem Zugriff auf das Repository. Jeder Client derselben stdio-Verbindung kann registrierte Tools aufrufen, bis MCP abgeschaltet wird oder die Verbindung endet — das Protokoll sieht kein zweites, separates Passwort vor.
 
-## Defaults (sicher)
+## Standard (restriktiv)
+
+Standardmäßig bleibt MCP aus; Antwortgrößen und Laufzeiten sind begrenzt; Investigation-Werkzeuge lesen übliche Secret-Pfade über `secret_path_denylist` nicht ohne Weiteres mit. Das reduziert versehentliche Datenabflüsse — es ist **keine** Sandbox-Garantie.
 
 - `mcp.enabled: false`
-- Ausgabe- und Timeout-Caps
-- `secret_path_denylist` blockiert Lesen gängiger Secret-Pfade in Investigation-Tools
+- Begrenzungen für Ausgabe und Timeout
+- `secret_path_denylist` schützt vor trivialen Secret-Lesezugriffen in Investigation-Tools
 
 ## Empfehlungen
 
-1. MCP nur auf vertrauenswürdigen Maschinen aktivieren
-2. stdio nicht an geteilte Terminals oder Remote-Sessions ohne Auth exponieren
-3. `secret_path_denylist` mit Ihrem Repo abstimmen (`.env`, Keys, Credentials)
-4. Mit `policies.allow_network: false` koppeln, wenn Agents offline bleiben sollen — MCP selbst ist lokal
+MCP nur auf Rechnern nutzen, die Sie kontrollieren, und nur mit Editor-Erweiterungen, denen Sie ohnehin vertrauen. stdio nicht unkontrolliert über gemeinsame Terminal-Sitzungen oder unsichere Remote-Shells weiterreichen. `secret_path_denylist` erweitern, wenn Ihr Repo Schlüssel außerhalb der Standardbeispiele enthält. `policies.allow_network: false` hält Agent-Läufe ohne ausdrückliche Netzwerkfreigabe zurück — MCP selbst bleibt lokal; kombinierte Policies verkleinern die möglichen Folgen, wenn nach einem Tool-Aufruf wieder Agent-Code läuft.
+
+1. MCP nur auf vertrauenswürdigen Hosts aktivieren
+2. stdio nicht in gemeinsamen oder unsicheren Sessions exponieren
+3. `secret_path_denylist` an das eigene Repository anpassen
+4. Bei Offline-Anforderungen mit `policies.allow_network: false` kombinieren
 
 <Callout type="security">
-MCP sandboxt Tool-Implementierungen nicht. Behandeln Sie verbundene Editoren als voll vertrauenswürdig.
+MCP isoliert Tool-Implementierungen nicht. Verbunden Editoren wie voll vertrauenswürdig behandeln.
 </Callout>
 
-## Siehe auch
+## Verwandtes
 
-- [Sicherheitsüberblick](/docs/de/security)
-- [MCP-Überblick](/docs/de/mcp/overview)
+- [Sicherheitsübersicht](/docs/de/security)
+- [MCP-Übersicht](/docs/de/mcp/overview)

@@ -5,9 +5,11 @@ description: Ejecutar modelos locales para enriquecimiento, enrutamiento y respa
 
 # Ollama
 
-AgentFlow usa Ollama para pasos **locales**: enriquecimiento, respaldo del resolvedor de intención (`intent.resolver.use_ollama_fallback`) y enrutamiento consciente del coste hacia `work.default_enricher`.
+Ollama respalda los pasos **locales** en AgentFlow: pases de enriquecimiento, el resolvedor de intención cuando `intent.resolver.use_ollama_fallback` está activo y el enrutamiento consciente del coste orientado a `work.default_enricher`. No es una integración de producto aparte: es el extremo HTTP y las etiquetas de modelo que define bajo `agents.ollama`, más las entradas correspondientes en `models`.
 
-## Configurar
+## Configuración
+
+Apunte `endpoint` a su daemon, nombre las etiquetas de *chat* y de incrustación que haya descargado, y refleje el ID del modelo en un perfil `models` con `provider: ollama` y las clases `usage` que espere usar en local.
 
 ```yaml
 agents:
@@ -27,6 +29,8 @@ models:
 
 ## Requisitos previos
 
+Arranque el daemon, descargue los pesos referenciados y deje que `doctor` confirme que el árbol y la configuración coinciden.
+
 ```bash
 ollama serve
 ollama pull qwen2.5-coder:14b
@@ -35,17 +39,19 @@ agentflow doctor
 
 ## Uso
 
+`enrich` llama a Ollama directamente cuando pasa `--agent ollama`; `work --prefer-local` mantiene en el perfil local los pasos elegibles que describa su enrutamiento.
+
 ```bash
 agentflow enrich billing-v2 --agent ollama
 agentflow work "refactor utils" --prefer-local
 ```
 
-## Embeddings / RAG
+## Incrustaciones / RAG
 
-`embedding_model` está configurado para futuras funciones RAG. El indexador actual (`agentflow index`) almacena **fragmentos de texto** en SQLite — no embeddings vectoriales.
+`embedding_model` está reservado para el trabajo de recuperación que el proyecto aún no ha completado. Hoy, `agentflow index` persiste **fragmentos de texto** en SQLite: no debe esperar búsqueda por similitud vectorial en una compilación estándar.
 
 <Callout type="experimental">
-Los embeddings vectoriales y la recuperación semántica RAG están en la hoja de ruta (véase `ROADMAP.md` en la raíz del repo). No espere búsqueda basada en embeddings en v1.
+Las incrustaciones vectoriales y la recuperación semántica RAG figuran en la hoja de ruta (véase `ROADMAP.md` en la raíz del repositorio). No espere búsqueda basada en incrustaciones en la v1.
 </Callout>
 
 ## Ver también

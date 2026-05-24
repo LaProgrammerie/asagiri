@@ -5,20 +5,27 @@ description: Deterministic orchestration, validation before trust, and honest li
 
 # Philosophy
 
-## Problem
+## The engineering problem
 
-AI coding agents are powerful but non-deterministic. Teams need **repeatable** workflows: known steps, isolated branches, external validation, cost visibility, and audit trails — not opaque “autonomous” runs.
+AI coding agents are powerful, but their outputs are not deterministic. Teams still need **repeatable** workflows: known steps, isolated branches, external validation, visible cost, and audit trails—not opaque runs where nobody can explain what happened or why.
 
-## AgentFlow approach
+AgentFlow exists to make orchestration explicit. You configure the pipeline, the validation commands, and the economic guardrails; the tool coordinates execution and records what ran.
 
-AgentFlow orchestrates **spec → plan → implement → verify → review → report** with:
+## How AgentFlow approaches it
 
-1. **Explicit state** — SQLite-backed runs/tasks and a documented state machine
-2. **Local-first investigation** — grep, filesystem scan, and context packing before cloud calls
-3. **Cost awareness** — heuristic token estimates and budgets before execution
-4. **Git worktree isolation** — one task, one branch, one tree
-5. **Validation by your commands** — `go test`, linters, etc., not agent self-assessment
-6. **Reproducible reports** — markdown + JSON under `.agentflow/runs/`
+The default mental model is **spec → plan → implement → verify → review → report**. Each phase has a defined place in the state machine and in the reports under `.agentflow/runs/`.
+
+**Explicit state** means runs and tasks are backed by SQLite with a documented state machine. You can inspect status, resume, and correlate reports with run IDs instead of guessing from chat history.
+
+**Local-first investigation** runs grep, filesystem scans, and context packing on your machine before cloud calls. The goal is smaller, more relevant prompts—not shipping entire repositories to a model because it is convenient.
+
+**Cost awareness** applies heuristic token estimates and configurable budgets **before** execution. Estimates are approximate, but they are far better than discovering spend only after a long agent session.
+
+**Git worktree isolation** keeps one task on one branch and one working tree. Parallel work stays separated from your main checkout.
+
+**Validation by your commands** means `go test`, linters, and scripts you trust—not the agent claiming success. AgentFlow schedules those checks; it does not replace your test suite.
+
+**Reproducible reports** capture markdown and JSON artifacts so operators and reviewers can audit a run days later.
 
 ## What we do not claim
 
@@ -26,7 +33,7 @@ AgentFlow orchestrates **spec → plan → implement → verify → review → r
 AgentFlow does not guarantee correctness, security, or production readiness. It coordinates tools; humans and your test suite remain the authority.
 </Callout>
 
-## Trade-offs
+## Trade-offs worth understanding
 
 | Gain | Cost |
 | --- | --- |
@@ -35,13 +42,17 @@ AgentFlow does not guarantee correctness, security, or production readiness. It 
 | Worktree safety | Extra disk and git complexity |
 | Pluggable agents | You must install and configure each CLI |
 
+These trade-offs are intentional. AgentFlow favors **control and auditability** over the illusion of fully autonomous coding.
+
 ## Configuration levers
 
-- `work.auto_verify`, `work.auto_review` — automation vs manual gates
-- `policies.require_clean_git` — block dirty trees
-- `budgets` — economic guardrails
+Once you accept that model, a few knobs matter most:
 
-## Related
+- `work.auto_verify`, `work.auto_review` — balance automation against manual gates
+- `policies.require_clean_git` — block dirty trees when policy demands it
+- `budgets` — economic guardrails before expensive steps run
+
+## Related reading
 
 - [Local-first](/docs/concepts/local-first)
 - [Cost-aware workflows](/docs/concepts/cost-aware-workflows)

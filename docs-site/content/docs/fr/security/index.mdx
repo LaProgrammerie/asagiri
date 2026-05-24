@@ -5,36 +5,40 @@ description: Secrets, périmètre, MCP, agents et données envoyées aux fournis
 
 # Sécurité
 
-AgentFlow orchestre des outils puissants. La sécurité est une **responsabilité partagée** : votre config, vos agents et votre processus de revue comptent autant que la CLI.
+AgentFlow enchaîne compilateurs, serveurs MCP, agents en sous-processus et modèles cloud optionnels ; chaque couche amplifie les erreurs d’hygiène déjà présentes dans le dépôt. Attendez-vous à une **responsabilité partagée** : la CLI impose des garde-corps mécaniques, mais choix configurés trop privilégiés et routines de revue après coup restent de votre équipe.
 
-## Synthèse par domaine
+## Synthèse par axe
 
-| Domaine | Comportement |
+| Axe | Comportement |
 | --- | --- |
-| **Système de fichiers** | Opère sur le dépôt + worktrees ; l'investigation respecte les listes de refus |
-| **Secrets** | `token_env` pour Notion ; `secret_path_denylist` ; rédaction des journaux |
-| **Agents subprocess** | Pas de shell ; exec argv uniquement avec délais |
-| **Réseau** | `policies.allow_network: false` par défaut ; les agents peuvent néanmoins appeler le réseau |
-| **MCP** | Désactivé par défaut ; plafonds d'octets de sortie et délais de commande |
-| **Modèles cloud** | Les données quittent la machine lorsque les agents cloud s'exécutent — vous contrôlez les commandes |
+| **Système de fichiers** | Opère repo + worktrees ; investigation respecte listes bloquées |
+| **Secrets** | `token_env` Notion ; `secret_path_denylist` ; anonymisation journaux |
+| **Agents externes** | Pas de shell ; `execve` avec argv uniquement et timeouts réseau |
+| **Réseau** | `policies.allow_network: false` par défaut mais agents peuvent téléphoner hors |
+| **MCP** | Désactivé par défaut ; taille/timeouts bornés |
+| **Modèles cloud** | Données quittent la machine lorsqu’un agent cloud s’active — vos commandes choisissent |
 
-## Périmètre filesystem
+## Étendue disque
+
+La surface explorée :
 
 - Worktrees sous `.agentflow/worktrees/`
-- État et exécutions sous `.agentflow/`
-- Investigation : ignore des globs sensibles et chemins refusés (`.env`, clés)
+- État/exécutions sous `.agentflow/`
+- Investigation évite globs sensibles et chemoins listés (`.env`, clés)
+
+Pour autant fichiers ignorés — secrets présents uniquement localement — restent atteignables si un opérateur force des chemins, d’où profiles agents moind-privilège toujours recommandés.
 
 ## Journaux sensibles
 
-`application/internal/redact` masque les motifs de jetons courants dans les sorties. Ne vous fiez pas seulement à la rédaction — évitez d'injecter des secrets dans les prompts agent.
+`application/internal/redact` masque certains motifs de jeton communs dans la sortie. Ne reposez pas uniquement là-dessus : évitez d’injecter secrets dans vos prompts agents.
 
 ## Agents externes
 
-Les CLI configurés (`cursor-agent`, `codex`, etc.) s'exécurent avec les permissions de votre utilisateur. Traitez-les comme un outil CI avec accès au dépôt.
+CLIs configurés (`cursor-agent`, `codex`, …) gardent vos droits utilisateur. Traitez-les comme n’importe quel automate avec accès checkout.
 
-## Signaler un problème
+## Signaler problèmes
 
-Voir le [`SECURITY.md`](https://github.com/LaProgrammerie/hyper-fast-builder/blob/main/SECURITY.md) du dépôt pour le processus de divulgation.
+Consultez **[SECURITY.md](https://github.com/LaProgrammerie/hyper-fast-builder/blob/main/SECURITY.md)** lorsque vous observez escalade de privilèges orchestrations.
 
 ## Voir aussi
 

@@ -5,13 +5,15 @@ description: Spec in Kiro, implement with Cursor, validate with project commands
 
 # Kiro → Cursor → Verify
 
-Handoff workflow from Kiro specs to Cursor implementation with AgentFlow gates (`spec-doc` §11.2).
+This handoff aligns **`spec-doc` §11.2** with AgentFlow gates: authoring stays in **Kiro** (`.kiro/specs/<feature>/`), implementation happens wherever **Cursor** (or **`cursor-agent`**) excels, and the CLI enforces deterministic **`verify`**/**`review`** steps so automation cannot silently diverge.
 
 ## When to use
 
 You keep requirements and tasks in **Kiro** (`.kiro/specs/<feature>/`) but want **Cursor** (or `cursor-agent`) for implementation, with mandatory verify/review steps.
 
 ## Pipeline
+
+The sequence below is illustrative; downstream reporting still consumes persisted run identifiers.
 
 ```mermaid
 flowchart LR

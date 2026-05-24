@@ -1,43 +1,45 @@
 ---
 title: Seguridad
-description: Secretos, alcance, MCP, agentes y datos enviados a proveedores.
+description: Secretos, alcance, MCP, agentes y datos hacia proveedores.
 ---
 
 # Seguridad
 
-AgentFlow orquesta herramientas potentes. La seguridad es **responsabilidad compartida**: su configuración, agentes y proceso de revisión importan tanto como la CLI.
+AgentFlow ensambla compiladores, MCP, agent subprocess y opcionalmente modelos en la nube : **cada capa amplifica lo que ya faltaba de higiene**. Espere **responsabilidad compartida**: la CLI impone scaffold y candados opcionales, pero decisiones de privilegio alto y prácticas de revisión siguen siendo decisión humana firme del equipo.
 
-## Resumen por área
+## Matriz rápida
 
 | Área | Comportamiento |
 | --- | --- |
-| **Sistema de archivos** | Opera sobre el repo + worktrees; la investigación respeta listas de denegación |
-| **Secretos** | `token_env` para Notion; `secret_path_denylist`; redacción de registros |
-| **Subprocess de agentes** | sin shell; solo argv con tiempos de espera |
-| **Red** | `policies.allow_network: false` por defecto; los agentes aún pueden usar red |
-| **MCP** | desactivado por defecto; límites de bytes de salida y tiempo de comando |
-| **Modelos en la nube** | Los datos salen de la máquina cuando corren agentes en la nube — usted controla qué comandos se ejecutan |
+| **Sistema ficheros** | Opera repo más worktrees; investigación contempla exclusiones configuradas |
+| **Secretos** | `token_env` Notions ; listas secreto ; redacción registros conocidos |
+| **Subagent** | Exec argv sólo timeouts evita shell chaining |
+| **Red** | `policies.allow_network: false` default — agentes igual podrían requerir tráficos si herramienta lo permite |
+| **MCP** | Fuera hasta activar tamaño tiempo acotados |
+| **Cloud** | Información migra cuando invoca comandos externos cloud que lo implican |
 
-## Alcance del sistema de archivos
+## Alcance
 
-- Worktrees bajo `.agentflow/worktrees/`
-- Estado y ejecuciones bajo `.agentflow/`
-- La investigación omite globs sensibles y rutas bloqueadas (`.env`, claves)
+- Árboles trabajo bajo `.agentflow/worktrees/`
+- Persistencia corrida dentro `.agentflow/`
+- Investigación evita rutas marcadas tipo `.env` llaves PEM
 
-## Registros sensibles
+Secrets sólo locales aún expuestos al malrouting — combine perfiles menos privilegio + revisiones conscientes antes merge.
 
-`application/internal/redact` enmascara patrones habituales de tokens. No confíe solo en la redacción — no inyecte secretos en prompts del agente.
+## Registros
+
+`application/internal/redact` atenúa patrones conocidos pero no garantiza ausencia fugas conscientes cuando promps ingieren secret texto.
 
 ## Agentes externos
 
-Las CLIs configuradas (`cursor-agent`, `codex`, etc.) corren con los permisos de su usuario. Trátelas como cualquier herramienta de CI con acceso al repo.
+CLIs ejecutan permisos usuario—trátelos con misma vigilancia automatismo CI tiene credenciales.
 
-## Reportar problemas
+## Reportar incidentes responsable
 
-Vea [`SECURITY.md`](https://github.com/LaProgrammerie/hyper-fast-builder/blob/main/SECURITY.md) del repositorio para el proceso de divulgación.
+[`SECURITY.md`](https://github.com/LaProgrammerie/hyper-fast-builder/blob/main/SECURITY.md) oficial disclosure path.
 
-## Ver también
+## Relacionado
 
 - [Límites](/docs/es/security/limits)
 - [Seguridad MCP](/docs/es/mcp/security)
-- [Configuración de Notion](/docs/es/configuration/notion)
+- [Configuración Notion](/docs/es/configuration/notion)

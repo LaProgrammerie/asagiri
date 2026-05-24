@@ -5,35 +5,41 @@ description: Was AgentFlow nicht garantiert und bekannte Produktgrenzen.
 
 # Grenzen
 
-Explizite Vertrauensgrenzen (`spec-doc` §17.1).
+AgentFlow hilft, disziplinierte Automatisierung aufzubauen; es erbt aber dieselben sensible Stellen wie jeder Orchestrator über großen Sprachmodellen. Die folgenden Abschnitte formulieren die **Vertrauensgrenzen**, die auch **`spec-doc` §17.1** festhält — klare Verneinungen neben dem, worauf Sie sich realistisch verlassen können.
 
-## AgentFlow garantiert nicht
+## Was AgentFlow nicht leistet
 
-- **Korrektheit** des erzeugten Codes
-- **Ersatz Ihrer Testsuite** — Validierung führt Ihre konfigurierten Befehle aus; Fehler sind zu beheben
-- **Ersatz menschlicher Review** für Sicherheit, Compliance oder Architektur
-- **Vollständigen Schutz vor Prompt-Injection** — bösartige Specs oder Notion-Inhalte können Agents lenken
-- **anbieterexakte Token-Abrechnung**
-- **Produktions-SLA** — OSS-Orchestrierungs-CLI
+- **Korrektheit** generierten Codes garantieren
+- **Ihre Testsuite ersetzen** — Validierung führt nur die von Ihnen konfigurierten Befehle aus; Sie beheben weiterhin Fehler
+- **Menschliche Review** für Sicherheit, Compliance oder Architektur ablösen
+- **Jede Prompt-Injection verhindern** — bösartige Specs oder Notion-Inhalte können Agenten beeinflussen
+- **Abrechnungen so genau wie die Tokenizer der Anbieter** vorhersagen
+- **Betriebs-SLAs** über eine OSS-Orchestrierungs-CLI hinaus versprechen
 
-## Was es tut
+Ehrliche Grenzen helfen Teams, manuelle Prüfungen dort zu platzieren, wo deterministische Werkzeuge an ihre Grenzen stoßen.
 
-- erzwingt eine **Zustandsmaschine** für Pipeline-Schritte
-- **isoliert** Aufgaben in Git-Worktrees
-- **schätzt** Kosten/Token vor Läufen
-- **blockiert** einige Policy-Verletzungen (dirty git, Secret-Dateinamen, Budget-Caps)
-- **protokolliert** Läufe für Audit (`report`, SQLite)
+## Was es dennoch tut
 
-## Experimentelle Fähigkeiten
+- Eine **Zustandsmaschine** für Pipeline-Schritte durchsetzen
+- Aufgaben per **Git-Worktrees** isolieren
+- **Kosten und Tokens vor Läufen schätzen**
+- **Einige Policy-Verletzungen blockieren** (unsauberes Git, gefährliche Secret-Dateinamen, Budgetüberschreitungen)
+- **Läufe dokumentieren** (`report`, SQLite)
 
-Separat in der Doku gekennzeichnet — vollständige MCP-Oberfläche, Notion-Sync, Auto-Kontextkompression, Non-Dry-Run-Auto-Resume und vektorielles RAG.
+Diese Punkte unterstützen **Workflow-Hygiene**; sie bedeuten nicht, dass jeder Patch nach grünen lokalen Tests produktionssicher ist.
+
+## Experimentelle Bereiche
+
+Separat in der Dokumentation gekennzeichnet — etwa die volle MCP-Oberfläche, Notion-Sync, automatische Feinjustierung der Kontextkompression, vollautomatisches Resume ohne `--dry-run` und vektorisches RAG.
+
+Funktionen mit diesem Kennzeichen können sich schneller ändern; sie gehören erst dann fest in Produktions-Runbooks, wenn Ihr Team Regressionen und Heuristiken bewusst akzeptiert.
 
 <Callout type="warning">
-`verify` bestanden heißt: konfigurierte Befehle exit 0 — nicht dass die Änderung sicher ausgeliefert werden kann.
+Ein erfolgreiches `verify` bedeutet: Die konfigurierten Befehle sind mit Exit 0 beendet — nicht automatisch, dass die Änderung risikofrei ausgeliefert werden kann.
 </Callout>
 
-## Siehe auch
+## Verwandtes
 
 - [Philosophie](/docs/de/concepts/philosophy)
-- [Sicherheitsüberblick](/docs/de/security)
+- [Sicherheitsübersicht](/docs/de/security)
 - [Roadmap](/docs/de/roadmap)

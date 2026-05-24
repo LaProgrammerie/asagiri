@@ -1,42 +1,44 @@
 ---
 title: Sicherheit
-description: Secrets, Umfang, MCP, Agents und an Anbieter gesendete Daten.
+description: Geheimnisse, Reichweite, MCP, Agents und Datenübertragung an Anbieter.
 ---
 
 # Sicherheit
 
-AgentFlow orchestriert mächtige Werkzeuge. Sicherheit ist **geteilte Verantwortung**: Ihre Konfiguration, Agents und Review-Prozess sind genauso wichtig wie die CLI.
+AgentFlow verknüpft Compiler, MCP-Server, Subprozess-Agenten und optional cloud-gehostete Modelle. **Jede Schicht verstärkt das, was ohnehin in Ihrer Repository-Hygiene steckt.** Es gilt **gemeinsame Verantwortung**: Das CLI kann Grundrichtlinien erzwingen, aber sensible Konfiguration und nachgelagerte Review-Prozesse bleiben bei Ihrem Team.
 
-## Kurzüberblick
+## Überblick
 
 | Bereich | Verhalten |
 | --- | --- |
-| **Dateisystem** | Arbeitet auf Repo + Worktrees; Investigation respektiert Denylisten |
-| **Secrets** | `token_env` für Notion; `secret_path_denylist`; Log-Redaction |
-| **Subprocess-Agents** | keine Shell; nur argv mit Timeouts |
-| **Netzwerk** | `policies.allow_network: false` standardmäßig; Agents können trotzdem Netzwerk nutzen |
-| **MCP** | standardmäßig aus; Output-Bytes- und Befehlszeitlimits |
-| **Cloud-Modelle** | Daten verlassen die Maschine bei Cloud-Agents — Sie steuern, welche Befehle laufen |
+| **Dateisystem** | Arbeit auf Repository plus Worktrees; Investigation achtet Denylisten |
+| **Geheimnisse** | z. B. `token_env` für Notion, `secret_path_denylist`, Reduktion bekannter Muster in Logs |
+| **Subprozess-Agenten** | Keine Shell; nur explizites `argv` mit Timeouts |
+| **Netzwerk** | `policies.allow_network` ist standardmäßig `false`; Agents können dennoch netzwerkaktives Tooling ausführen, wenn Ihre Konfiguration das erlaubt |
+| **MCP** | Standard aus; Begrenzung von Ausgabegröße und Laufzeit |
+| **Cloud-Modelle** | Daten verlassen den Rechner, sobald Cloud-Agenten laufen — Sie entscheiden, welche Befehle und Konfigurationen das ermöglichen |
 
-## Dateisystem-Umfang
+## Reichweite auf der Platte
 
 - Worktrees unter `.agentflow/worktrees/`
-- Status und Läufe unter `.agentflow/`
-- Investigation überspringt sensible Globs und geblockte Pfade (`.env`, Keys)
+- Status und Artefakte unter `.agentflow/`
+- Investigation lässt konfigurierte sensible Glob-Muster und Denylist-Pfade wie `.env` oder Schlüssel aus
 
-## Sensible Logs
+Selbst nicht eingecheckte, aber lokal vorhandene Geheimnisse können durch falsche Anweisungen oder zu großzügige Agentenprofile gefährdet werden — minimale Agent-Rechte und klare Policies bleiben wichtig.
 
-`application/internal/redact` maskiert typische Token-Muster. Verlassen Sie sich nicht allein auf Redaction — keine Secrets in Agent-Prompts.
+## Sensitive Logs
 
-## Externe Agents
+`application/internal/redact` maskiert gängige Token-Muster in Ausgaben. Darauf allein soll man sich nicht verlassen — keine Secrets absichtlich über Prompts einspeisen.
 
-Konfigurierte CLIs (`cursor-agent`, `codex`, usw.) laufen mit Ihren Benutzerrechten. Behandeln Sie sie wie CI-Tools mit Repo-Zugriff.
+## Externe Agent-Befehle
 
-## Probleme melden
+Konfigurierte CLIs (`cursor-agent`, `codex`, …) laufen mit Ihren Nutzerrechten. Behandeln Sie sie wie jedes andere Tool mit vollständigem Repository-Zugriff.
 
-Siehe [`SECURITY.md`](https://github.com/LaProgrammerie/hyper-fast-builder/blob/main/SECURITY.md) im Repository zum Disclosure-Prozess.
+## Melden von Problemen
 
-## Siehe auch
+Bei Hinweisen auf Rechteausweitung oder andere sicherheitsrelevante Schwächen siehe [`SECURITY.md`](https://github.com/LaProgrammerie/hyper-fast-builder/blob/main/SECURITY.md).
+
+## Verwandtes
 
 - [Grenzen](/docs/de/security/limits)
 - [MCP-Sicherheit](/docs/de/mcp/security)

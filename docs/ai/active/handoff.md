@@ -1,11 +1,13 @@
 # Handoff — execution
 
 > **Prescriptive contract** for Cursor / Copilot / implementation.  
-> **Tranche `spec-doc` : documentation publique** + consolidation (`2026-05-17`).
+> **Tranche `spec-doc-v2` : passe éditoriale documentation** (en/fr/de/es) + consolidation (`2026-05-17`).
 
 ## Immediate objective
 
-Site docs public Fumadocs (`docs-site/`), référence CLI générée, déploiement **Cloudflare Pages** (Wrangler via GitHub Actions) — en parallèle de la consolidation OSS (`spec-postv123`).
+**Passe éditoriale `spec-doc-v2`** : réécriture prose (en/fr/de/es) de `docs-site/content/docs/**` hors `cli/generated/**` — ton ingénierie, WHY+HOW, ~70 % prose ; fond technique inchangé. Build `pnpm build` obligatoire. Pas de commit automatique.
+
+Parallèle / hérité : site Fumadocs, CLI générée, Cloudflare Pages (`spec-postv123`, `spec-doc`).
 
 ## Allowed scope (spec-postv123)
 
@@ -36,6 +38,14 @@ Site docs public Fumadocs (`docs-site/`), référence CLI générée, déploieme
 - [x] MVP pages EN + CLI ref générée (`docs generate-cli`)
 - [x] `TestCLICommandsDocumented` (docgen)
 - [x] **Tranche doc-content** : pages MVP `docs-site/content/docs/*` sans placeholder ; pages config/mcp/reference ; `problems.md` ; regen CLI
+
+## Definition of Done — spec-doc-v2 (éditorial)
+
+- [x] ~144 MDX (en/fr/de/es) réécrits hors `cli/generated/**`
+- [x] Pages prioritaires : index, getting-started, concepts, architecture, cost-performance, workflows, reliability, security, `cli/index.mdx`
+- [x] Cohérence narrative entre langues ; aucune feature inventée
+- [x] `cli/generated/*.mdx` non modifiés manuellement (stubs fr/de/es inchangés)
+- [x] `cd docs-site && pnpm typecheck && pnpm lint && pnpm build` + `out/` présent
 
 ## Hors scope
 

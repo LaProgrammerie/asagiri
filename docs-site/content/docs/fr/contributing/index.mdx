@@ -1,36 +1,36 @@
 ---
-title: Contribution
-description: Contribuer à AgentFlow et garder la doc alignée sur la CLI.
+title: Contribuer
+description: Comment contribuer à AgentFlow et garder la doc synchronisée avec la CLI.
 ---
 
-# Contribution
+# Contribuer
 
-Guide complet à la racine du dépôt : **[CONTRIBUTING.md](https://github.com/LaProgrammerie/hyper-fast-builder/blob/main/CONTRIBUTING.md)**.
+La check-list vivante, les attentes de relecture et les politiques du dépôt se trouvent dans **[CONTRIBUTING.md](https://github.com/LaProgrammerie/hyper-fast-builder/blob/main/CONTRIBUTING.md)** à la racine du repo — commencez par là pour tout ce qui dépasse cette courte carte.
 
-## Checklist rapide
+## Check-list rapide
+
+Avant d’ouvrir une PR, chargez le contexte projet, calibrez la portée sur le handoff actif et les specs produit, montrez que l’arbre Go construit encore et passe les tests, régénérez la référence CLI lorsque les commandes bougent, lancez le build du site docs pour les edits MDX, et gardez chaque PR ciblée sans fuite de secrets.
 
 1. Lire `AGENTS.md` et `docs/ai/context-map.md`
 2. Aligner les fonctionnalités sur `docs/ai/active/handoff.md` et les specs produit (`spec-postv123.md`, etc.)
 3. `make build && go test -race ./...`
-4. Mettre à jour la doc CLI lorsque les commandes changent :
+4. Mettre à jour la doc CLI quand les commandes changent :
 
 ```bash
 go run ./application/cmd/agentflow docs generate-cli \
   --output docs-site/content/docs/en/cli/generated
 ```
 
-5. `cd docs-site && npm run build` pour les changements MDX
+5. `cd docs-site && npm run build` pour les modifications MDX
 6. Une PR par sujet cohérent ; pas de secrets dans les commits
 
 ## Documentation
 
-- Site public : `docs-site/content/docs/` (Fumadocs, plusieurs langues)
-- Canon projet : `docs/ai/`
-- Dérive doc/code : [`problems.md`](https://github.com/LaProgrammerie/hyper-fast-builder/blob/main/problems.md) à la racine
+La prose publique cible `docs-site/content/docs/` (le site anglais utilise Fumadocs). Le canon interne et le steering restent sous `docs/ai/`. Lorsque le code et les docs divergent, [`problems.md`](https://github.com/LaProgrammerie/hyper-fast-builder/blob/main/problems.md) à la racine recense la dérive connue.
 
-## Décisions d'architecture
+## Décisions d’architecture
 
-Consigner les compromis durables dans `docs/ai/05-decisions.md` et `docs/decisions/`.
+Quand vous modifiez un arbitrage durable, consignez-le là où les contributeurs futurs iront chercher : `docs/ai/05-decisions.md` plus entrées structurées dans `docs/decisions/` si votre équipe suit ce découpage.
 
 ## Voir aussi
 

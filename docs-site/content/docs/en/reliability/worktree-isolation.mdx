@@ -5,9 +5,11 @@ description: One git worktree per task under .agentflow/worktrees.
 
 # Worktree isolation
 
-Implementation: `application/internal/worktree` — created during `dev` in `workflow.Service.DevFeature`.
+Implementation lives in **`application/internal/worktree`**, spun up whenever **`workflow.Service.DevFeature`** provisions an isolated sandbox for **`dev`**.
 
 ## Behavior
+
+Isolation stays predictable step by step:
 
 1. For each task, AgentFlow creates a worktree under `worktrees.base_path`
 2. Branch name uses `worktrees.branch_prefix` + feature/task id
@@ -23,6 +25,8 @@ worktrees:
 
 ## Diagram
 
+Concurrent tasks therefore fan out horizontally from the canonical repository checkout without sharing dirty working-tree state unintentionally:
+
 ```mermaid
 flowchart TB
   R[Repo root] --> W1[worktree task-001]
@@ -33,11 +37,11 @@ flowchart TB
 
 ## Dry-run
 
-With `--dry-run`, worktree creation is skipped or simulated — integration tests rely on this for CI-safe runs.
+With `--dry-run`, worktree creation is skipped or simulated — integration tests rely on this for CI-safe runs, especially when shared pipelines must never materialize ephemeral branches unnecessarily.
 
 ## Policies
 
-`policies.max_files_changed_per_task` limits blast radius; combine with human review before merge.
+Combine **`policies.max_files_changed_per_task`** with human scrutiny before merges; the knob caps blast radius, not intellectual oversight.
 
 ## Related
 

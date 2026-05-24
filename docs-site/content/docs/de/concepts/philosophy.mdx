@@ -1,48 +1,57 @@
 ---
 title: Philosophie
-description: Deterministische Orchestrierung, Validierung vor Vertrauen, klare Grenzen.
+description: Deterministische Orchestrierung, Validierung vor Vertrauen, ehrliche Grenzen.
 ---
 
 # Philosophie
 
-## Problem
+## Das Engineering-Problem
 
-Coding-Agenten sind leistungsfähig, aber nicht deterministisch. Teams brauchen **wiederholbare** Workflows: bekannte Schritte, isolierte Branches, externe Validierung, Kostentransparenz und Audit-Trails — keine undurchsichtigen „autonomen“ Läufen.
+KI-Coding-Agenten sind leistungsfähig; ihre Ausgaben sind probabilistisch und nicht garantiert wiederholbar. Teams brauchen dennoch **nachvollziehbare** Abläufe: klare Schritte, isolierte Branches, externe Validierung, sichtbare Kosten und prüfbare Spuren — statt Läufen, bei denen nachträglich kaum erklärbar ist, was geschah und warum.
 
-## AgentFlow-Ansatz
+AgentFlow macht Orchestrierung **explizit**: Sie beschreiben Pipeline, Validierungsbefehle und wirtschaftliche Leitplanken; das Werkzeug koordiniert die Ausführung und dokumentiert sie.
 
-AgentFlow orchestriert **spec → plan → implementieren → verifizieren → review → report** mit:
+## Wie AgentFlow das angeht
 
-1. **Explizitem Zustand** — SQLite-gestützte Läufe/Aufgaben und dokumentierte Zustandsmaschine
-2. **Lokal zuerst** — grep, Dateiscan und Kontext-Packing vor Cloud-Aufrufen
-3. **Kostenbewusstsein** — heuristische Token-Schätzungen und Budgets vor Ausführung
-4. **Git-Worktree-Isolation** — eine Aufgabe, ein Branch, ein Tree
-5. **Validierung durch Ihre Befehle** — `go test`, Linter usw., keine Selbsteinschätzung des Agenten
-6. **Reproduzierbare Reports** — Markdown + JSON unter `.agentflow/runs/`
+Die Leitmentalität ist **Spec → Plan → Implement → Verify → Review → Report**. Jede Phase hat einen festen Platz in der State Machine und in den Reports unter `.agentflow/runs/`.
+
+**Expliziter Zustand:** Läufe und Tasks werden in SQLite mit dokumentierten Übergängen geführt. Status abfragen, fortsetzen und Reports über Run-IDs zuordnen — ohne Chat-Verlauf zu rekonstruieren.
+
+**Local-first-Untersuchung:** Grep, Verzeichnisdurchläufe und das Packen von Kontext passieren **lokal**, bevor teure Cloud-Aufrufe starten. Ziel sind kleinere, relevantere Prompts — nicht der Komfort, halbe Repositories an ein externes Modell zu schicken.
+
+**Kostenbewusstsein:** Heuristiken zu Tokenzahl und Budgets greifen **vor** der Ausführung. Die Zahlen sind Näherungen, aber Sie sehen Risiken früh — statt die Rechnung erst nach langem Agent-Einsatz zu entdecken.
+
+**Git-Worktree-Isolation:** Jede Aufgabe auf eigenem Branch und eigenem Arbeitsbaum. Parallel laufende Themen kollidieren seltener im gemeinsamen Checkout.
+
+**Validierung durch Ihre Befehle:** `go test`, Linter und Skripte, denen Sie vertrauen — nicht die Selbsteinschätzung des Modells. AgentFlow plant diese Prüfungen; sie ersetzen Ihre Testsuite nicht.
+
+**Reproduzierbare Reports:** Markdown und JSON-Artefakte, damit Betrieb und Review einen Lauf auch Tage später nachvollziehen können.
 
 ## Was wir nicht behaupten
 
 <Callout type="warning">
-AgentFlow garantiert keine Korrektheit, Sicherheit oder Produktionsreife. Es koordiniert Werkzeuge; Menschen und Ihre Testsuite bleiben die Autorität.
+AgentFlow garantiert weder Korrektheit noch Sicherheit noch Produktionsreife eines Patches. Es verbindet Werkzeuge; Menschen und Ihre Testsuite bleiben die Instanz für die Bewertung der Änderung.
 </Callout>
 
-## Kompromisse
+## Bewusste Kompromisse
 
-| Gewinn | Kosten |
+| Gewinn | Preis |
 | --- | --- |
-| Vorhersagbare Pipeline-Schritte | Weniger „Ein-Klick-Magie“ als Ad-hoc-Agent-Chats |
-| Kostenschätzungen im Voraus | Schätzungen sind näherungsweise (Zeichen/Token-Heuristiken) |
-| Worktree-Sicherheit | Mehr Platten- und Git-Komplexität |
-| Steckbare Agents | Sie müssen jede CLI installieren und konfigurieren |
+| Vorhersagbare Pipeline-Schritte | Weniger „Ein-Klick-Zauber“ als unstrukturierte Agent-Chats |
+| Kostenschätzung vor der Arbeit | Zahlen sind Näherungen (Zeichen-/Token-Heuristiken) |
+| Schutz durch Worktrees | Mehr Speicher und etwas mehr Git-Verwaltung |
+| Auswechselbare Agents | Jedes CLI muss installiert, gewartet und policykonform sein |
 
-## Konfiguration
+AgentFlow setzt auf **Steuerbarkeit und Prüfbarkeit** statt auf die Illusion vollständig autonomer Codierung.
 
-- `work.auto_verify`, `work.auto_review` — Automatisierung vs. manuelle Gates
-- `policies.require_clean_git` — schmutzige Trees blockieren
-- `budgets` — wirtschaftliche Schranken
+## Wichtige Konfigurationshebel
 
-## Siehe auch
+- `work.auto_verify`, `work.auto_review` — Automatisierung versus manuelle Gates
+- `policies.require_clean_git` — Harter Stopp bei „schmutzigem“ Arbeitsbaum, wenn die Policy es verlangt
+- `budgets` — wirtschaftliche Obergrenzen vor kostspieligen Schritten
 
-- [Lokal zuerst](/docs/de/concepts/local-first)
+## Weiterlesen
+
+- [Local-first-Konzepte](/docs/de/concepts/local-first)
 - [Kostenbewusste Workflows](/docs/de/concepts/cost-aware-workflows)
 - [Grenzen](/docs/de/security/limits)

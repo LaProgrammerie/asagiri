@@ -1,16 +1,18 @@
 ---
-title: Flujo de CI
-description: Usar AgentFlow en CI con dry-run, validación y comprobaciones de documentación.
+title: Flujo CI
+description: Usar AgentFlow en CI con dry-run, validación y chequeos de documentación.
 ---
 
-# Flujo de CI
+# Flujo CI
 
-AgentFlow en CI debe permanecer **no interactivo**, **compatible con dry-run** y sin secretos en los registros.
+La integración continua debe ejercitar AgentFlow **sin prompts interactivos** — preferible modo **dry-run** cuando ese matiz coincide con su intención — y sin volcar secretos al log público CI.
 
-## Patrón recomendado
+## Patrón sugerido
+
+Un carril típico compila CLI, inicializa proyecto, ejecuta `doctor`, luego pasa **`work` dry-run + plan-only** para mantener rápido y determinístico.
 
 ```yaml
-# extracto — adapte a su CI
+# extracto — adapte plataforma
 - run: go build -o bin/agentflow ./application/cmd/agentflow
 - run: bin/agentflow init
   working-directory: ${{ github.workspace }}
@@ -19,19 +21,21 @@ AgentFlow en CI debe permanecer **no interactivo**, **compatible con dry-run** y
 - run: go test -race ./...
 ```
 
-## Variables de entorno
+## Variables entorno útiles
+
+Preferir variables frente repetir switches individuales:
 
 | Variable | Efecto |
 | --- | --- |
-| `AGENTFLOW_DRY_RUN=1` | igual que `--dry-run` global |
-| `AGENTFLOW_YES=1` | auto-confirma avisos (con precaución en CI) |
-| `NOTION_TOKEN` | solo necesario para trabajos de sync Notion |
+| `AGENTFLOW_DRY_RUN=1` | Equivalente `--dry-run` global |
+| `AGENTFLOW_YES=1` | Auto confirma prompts (solo consciente CI) |
+| `NOTION_TOKEN` | Obligatorio rutas sincronización Notion |
 
-Vea [Variables de entorno](/docs/es/reference/environment-variables).
+Véase [Variables de entorno](/docs/es/reference/environment-variables).
 
-## CI de documentación
+## Docs CI
 
-Este repositorio construye el sitio público en cada push:
+Validación también abarca compilación site publicado + regenerate CLI inglés coincide código:
 
 ```bash
 cd docs-site && npm ci && npm run build
@@ -39,16 +43,18 @@ go run ./application/cmd/agentflow docs generate-cli --output docs-site/content/
 go test ./application/internal/cli/docgen/...
 ```
 
-Archivo de workflow: `.github/workflows/docs.yml`.
+Definiciones `.github/workflows/docs.yml`.
 
-## Qué no hacer en CI
+## Qué omitir conscientemente CI
 
-- No ejecutar `dev`/`review` reales sin agentes fijados y secretos
-- No hacer commit de `.agentflow/config.yaml` con tokens
-- No tratar `--estimate-only` como sustituto de `go test`
+Ci es ensayo—not production automation unattended unless pinning agents scopes secrets audited:
 
-## Ver también
+- no correr review/dev real sin pines
+- nunca configuración con tokens versionada
+- no sustituir toda seguridad sólo métricas estimación tokens
+
+## Relacionado
 
 - [Contribuir](/docs/es/contributing)
 - [Seguridad](/docs/es/security)
-- [CLI: verify](/docs/cli/generated/verify)
+- [CLI: verify](/docs/es/cli/generated/verify)

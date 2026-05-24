@@ -5,9 +5,11 @@ description: Go modules under application/internal and the execution pipeline.
 
 # Architecture overview
 
-AgentFlow is a Go CLI (`application/cmd/agentflow`) with domain logic in `application/internal/` and shared types in `application/pkg/agentflow`.
+AgentFlow ships as a Go CLI (`application/cmd/agentflow`) with most behavior in `application/internal/` and shared contracts in `application/pkg/agentflow`. This split keeps the binary thin while isolating parsing, planning, investigation, costing, and storage behind explicit packages you can reason about from the filesystem layout alone.
 
 ## Execution pipeline
+
+The end-to-end path starts at the CLI, resolves intent, runs the V3 pipeline (investigation, context optimization, cost and budgets, routing), then executes the workflow stages—plan, enrich, and dev—inside a worktree before validation, optional review, and reporting.
 
 ```mermaid
 flowchart TD
@@ -49,15 +51,11 @@ flowchart TD
 
 ## State storage
 
-- **SQLite** at `state.path` (default `.agentflow/state.sqlite`)
-- Run artefacts: `.agentflow/runs/<run-id>/`
+Runs and tasks persist in **SQLite** at `state.path` (default `.agentflow/state.sqlite`). Artefacts for each run land under `.agentflow/runs/<run-id>/`, which keeps prompts, logs, and intermediate outputs addressable without rereading the database.
 
 ## Extension points
 
-- New agents: config only
-- New validation commands: `validation.commands`
-- Custom routing strategies: `routing.strategies`
-- MCP tools when `mcp.enabled: true`
+You can introduce new agents through config alone; wire new quality gates via `validation.commands`; add routing strategies under `routing.strategies`; and expose optional MCP tools when `mcp.enabled: true`. Those hooks are intentional seams: most teams extend AgentFlow without forking the Go entrypoint.
 
 ## Related
 

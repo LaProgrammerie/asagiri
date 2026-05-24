@@ -1,17 +1,19 @@
 ---
 title: Kiro → Cursor → Verify
-description: Spec en Kiro, implementación con Cursor, validación con comandos del proyecto.
+description: Especificación en Kiro, implementar con Cursor y validar con comandos propios.
 ---
 
 # Kiro → Cursor → Verify
 
-Flujo de entrega desde specs Kiro hasta implementación en Cursor con barreras AgentFlow (`spec-doc` §11.2).
+Este recorrido enlaza **`spec-doc` §11.2** con las compuertas AgentFlow — la escritura sigue **Kiro** (`.kiro/specs/<feature>/`), donde **Cursor** (o **`cursor-agent`**) mejor brilla ejecuta desarrollo CLI obliga **`verify`** / **`review`** deterministas así automatización jamás cambia inadvertidamente.
 
-## Cuándo usarlo
+## Cuándo aplicarlo
 
-Mantiene requisitos y tareas en **Kiro** (`.kiro/specs/<feature>/`) pero quiere **Cursor** (o `cursor-agent`) para implementar, con pasos obligatorios de verify/review.
+Specs y tasks en **Kiro** pero implementación con **Cursor** exigiendo revisión después verificación automatizada obligatorias.
 
 ## Pipeline
+
+Ejemplo conceptual aún report downstream consume IDs persistidas.
 
 ```mermaid
 flowchart LR
@@ -23,9 +25,7 @@ flowchart LR
   R --> REP[report]
 ```
 
-## Comandos
-
-Sustituya `billing-v2` por el id de su feature:
+## Comandos sustituye feature id
 
 ```bash
 agentflow spec billing-v2 --agent kiro
@@ -37,15 +37,15 @@ agentflow review billing-v2 --agent codex
 agentflow report <run-id>
 ```
 
-Use `--dry-run` en cualquier paso durante el ensayo:
+Ensayo usando `--dry-run` :
 
 ```bash
 agentflow dev billing-v2 --agent cursor --dry-run
 ```
 
-## Valores por defecto de configuración
+## Valores ejemplo config
 
-Desde `.agentflow/config.yaml.example`:
+Snippet `.agentflow/config.yaml.example` :
 
 ```yaml
 work:
@@ -56,26 +56,26 @@ work:
   auto_review: false
 ```
 
-Configure `work.auto_review: true` solo si desea revisión tras cada verify exitoso.
+Toggle `auto_review` true sólo cuando desee revisiones cada verify exitoso.
 
-## Atajo por intención
+## Atajo intentación
 
 ```bash
 agentflow work "develop billing-v2" --stop-after verify
 ```
 
-La resolución de intención elige la feature; el pipeline V3 aplica presupuestos y optimización de contexto.
+Resolver intenciones elige función pipeline versión tres aplica presupuesto y reducción contextual.
 
-## Modos de fallo
+## Diagnósticos
 
-| Síntoma | Corrección |
+| Hallazgo | Acción correctiva |
 | --- | --- |
-| `kiro` no está en el PATH | Defina `agents.kiro.command` o instale la CLI de Kiro |
-| Falla verify | Corrija tests localmente; use `agentflow verify billing-v2 --force` solo si la máquina de estados lo permite |
-| Git sucio bloqueado | Commit/stash o ajuste `policies.require_clean_git` |
+| `kiro` ausente PATH | Ajuste comando agente instalación herramienta |
+| Verify fallidos | Correcciones código entonces fuerza comando cuando máquina estados permite |
+| git sucio veto | stash commit política laxar |
 
-## Ver también
+## Relacionado
 
-- [CLI: spec](/docs/cli/generated/spec)
-- [CLI: dev](/docs/cli/generated/dev)
-- [Descripción general de arquitectura](/docs/es/architecture/overview)
+- [CLI spec](/docs/es/cli/generated/spec)
+- [CLI dev](/docs/es/cli/generated/dev)
+- [Arquitectura general](/docs/es/architecture/overview)

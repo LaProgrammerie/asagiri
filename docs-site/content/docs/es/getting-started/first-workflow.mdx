@@ -1,83 +1,86 @@
 ---
-title: Primer flujo de trabajo
-description: Flujo AgentFlow completo desde la inicialización hasta el informe con comandos CLI reales.
+title: Primer workflow
+description: Recorrido completo AgentFlow desde init hasta el informe con comandos CLI reales.
 ---
 
-# Primer flujo de trabajo
+# Primer workflow
 
-Flujo de extremo a extremo alineado con `spec-doc` §11.1: inicializar, verificar, estimar, ejecutar, consultar estado, abrir el informe.
+Esta página sigue el mismo contrato extremo a extremo que `spec-doc` §11.1 : inicializar el repo, validar entorno, estimar gasto antes de gastar, ejecutar el pipeline con intención explícita, inspeccionar estado y abrir el informe. El objetivo es una secuencia pegable en la terminal sin pasos ocultos entre `init` y `report`.
 
-## Requisitos previos
+## Prerrequisitos
 
-- AgentFlow compilado y en el `PATH`
-- Repositorio Git con al menos una spec bajo `.kiro/specs/<feature>/` o `.agentflow/specs/`
-- `.agentflow/config.yaml` con comandos de agente que existan en el equipo
+AgentFlow compilado y en `PATH`, un git cuyas specs viven en `.kiro/specs/<feature>/` o `.agentflow/specs/`, y un `.agentflow/config.yaml` donde las órdenes agente existen en su máquina. Sin estos tres elementos los pasos posteriores fracasan por causas evidentes — binario ausente, spec ausente o subproceso que no arranca.
 
 ## Pasos
 
 ### 1. Inicializar y verificar
+
+Parta convencido del árbol y la cadena de herramientas que AgentFlow empleará:
 
 ```bash
 agentflow init
 agentflow doctor
 ```
 
+`doctor` hace de compuerta: arregle lo que reporte antes de estimar u operar.
+
 ### 2. Estimar antes de gastar
+
+Ejecute `work` solo en modo estimación para que aparezcan proyección de tokens y coste antes de invocar agentes:
 
 ```bash
 agentflow work "develop billing-v2" --estimate-only
 ```
 
-Revise estimaciones de tokens/coste y avisos de presupuesto. Use `--budget 0.50` o la sección `budgets` de la config. Pase `--allow-over-budget` solo si la configuración lo permite.
+Lea estimaciones y avisos de presupuesto. Limite gasto con `--budget 0.50` o con el bloque `budgets`. Use `--allow-over-budget` solo donde la configuración lo permita expresamente — de lo contrario se salta el blindaje que configuró.
 
 ### 3. Ensayo solo plan
+
+Confirme resolución de intención y selección de tareas sin lanzar agentes:
 
 ```bash
 agentflow work "develop billing-v2" --plan-only
 ```
 
-Confirma la resolución de intención y la selección de tareas sin ejecución.
+Útil para validar enrutado y planificación antes de que `dev` entre al worktree.
 
-### 4. Ejecutar la corrida
+### 4. Ejecutar el run
+
+Cuando la ejecución real sea aceptable:
 
 ```bash
 agentflow work "develop billing-v2"
 ```
 
-Con `intent.default_mode: guided` y `work.require_plan_confirmation: true`, AgentFlow pide confirmación antes de ejecutar salvo que pase `--yes`.
-
-Etapas típicas del pipeline: resolver intención → plan/enriquecer contexto → dev en worktree → verify → revisión opcional → informe.
+Con `intent.default_mode: guided` y `work.require_plan_confirmation: true`, AgentFlow pregunta salvo `--yes`. Las etapas habituales: resolver intención, planificar/enriquecer, desarrollar en worktree, verificar, opcionalmente revisar, informar.
 
 ### 5. Estado e informe
+
+Tras ejecutar — o cuando busque una id — liste runs y abra el informe deseado:
 
 ```bash
 agentflow status
 agentflow report <run-id>
 ```
 
-Sustituya `<run-id>` por el ID de `status` (formato del tipo `run-2026-05-17-…`).
+Sustituya `<run-id>` por el valor de `status` (tipo `run-2026-05-17-…`).
 
 ## Qué debería ver
 
-- Estado SQLite en `.agentflow/state.sqlite`
-- Artefactos por ejecución en `.agentflow/runs/<run-id>/`
-- Git worktree en `.agentflow/worktrees/` para tareas de desarrollo activas
-- Salida de los comandos definidos en `validation.commands` (p. ej. `go test ./...`)
+Ejecuciones exitosas dejan **estado SQLite** en `.agentflow/state.sqlite`, **artefactos por run** bajo `.agentflow/runs/<run-id>/` y — para trabajo de desarrollo activo — **un git worktree** bajo `.agentflow/worktrees/`. Salida de validación proviene de lo definido en `validation.commands` (por ejemplo `go test ./...`). Así puede inspeccionar sin repetir agentes.
 
-## Reanudación y recuperación
+## Reanudar y recuperación
 
 ```bash
 agentflow resume <run-id>
 ```
 
-Sin `--dry-run`, **`resume` solo imprime el nombre del siguiente paso** — no vuelve a invocar agentes automáticamente. Use `continue` o vuelva a ejecutar el comando sugerido (`plan`, `enrich`, `dev`, …). El encadenamiento automático solo existe con **`agentflow resume <run-id> --execute` y `--dry-run` global**.
+Sin `--dry-run`, **`resume` solo imprime el siguiente paso**; no relanza agentes automáticamente. Use `continue` o vuelva a ejecutar lo sugerido (`plan`, `enrich`, `dev`, …). El encadenado automático existe sólo como **`agentflow resume <run-id> --execute` más `--dry-run` global**.
 
 <Callout type="experimental">
-La reanudación automática completa fuera de dry-run no está implementada. Prefiera `agentflow continue` para continuar basado en intención.
+Reanudación automática fuera del dry-run completo no existe. Prefiera `agentflow continue` para continuar por intención.
 </Callout>
 
-## Flujos relacionados
+## Workflows relacionados
 
-- [Kiro → Cursor → Verify](/docs/es/workflows/kiro-to-cursor)
-- [Flujo consciente del coste](/docs/es/workflows/cost-aware-workflow)
-- [Recuperación ante fallos](/docs/es/workflows/failure-recovery)
+Para flujo multi herramienta y manejo de fallos vea [Kiro → Cursor → Verify](/docs/es/workflows/kiro-to-cursor), [Workflow sensible al coste](/docs/es/workflows/cost-aware-workflow) y [Recuperación ante fallos](/docs/es/workflows/failure-recovery).

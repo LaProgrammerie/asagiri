@@ -5,19 +5,21 @@ description: Instalar AgentFlow y preparar un repositorio para flujos de IA orqu
 
 # Instalación
 
-AgentFlow es una CLI en Go que orquesta especificaciones, investigación local, git worktrees, agentes externos y comandos de validación. Instale el binario, inicialice el repositorio y verifique el entorno.
+AgentFlow es una CLI en Go que une specs, investigación local, worktrees de Git, agentes de código externos y comandos de validación. La ruta de instalación es deliberada : obtiene un binario único, lo orienta al repositorio y la herramienta gestiona el ciclo de vida de ejecuciones, worktrees y estado en disco. Esta página cubre cómo construir o colocar el binario, inicializar `.agentflow/` en el proyecto y comprobar que Git, configuración y comandos agente están alineados antes de lanzar `work`.
 
 ## Requisitos
 
 | Requisito | Notas |
 | --- | --- |
-| **Go 1.25+** | Compilar desde código o usar un binario publicado |
+| **Go 1.25+** | Build desde código o binario liberado |
 | **Git** | Necesario para worktrees, estado y diffs |
-| **Agentes configurados** | Al menos los comandos referenciados en `.agentflow/config.yaml` (`cursor-agent`, `kiro`, `ollama`, etc.) |
+| **Agentes configurados** | Como mínimo los comandos referenciados en `.agentflow/config.yaml` (`cursor-agent`, `kiro`, `ollama`, etc.) |
 
-Opcional: **Ollama** para enriquecimiento/enrutamiento local, token de **Notion** para sincronización (`NOTION_TOKEN`).
+Opcional : **Ollama** para enriquecimiento o enrutado local y token **Notion** para sincronización (`NOTION_TOKEN`).
 
-## Instalación desde código
+## Instalación desde fuentes
+
+Clone el repositorio, compile con el `Makefile` del proyecto y use el binario bajo `bin/` :
 
 ```bash
 git clone https://github.com/LaProgrammerie/hyper-fast-builder.git
@@ -26,43 +28,44 @@ make build
 # binario: ./bin/agentflow
 ```
 
-Añada `bin/` al `PATH`, o copie `bin/agentflow` a un directorio del `PATH`.
+Añada `bin/` al `PATH` o copie `bin/agentflow` a cualquier directorio ya incluido en `PATH`.
 
 ## Inicializar un repositorio
 
-Desde la raíz del proyecto:
+Desde la raíz del proyecto ejecute `agentflow init`. Orquesta la superficie local de AgentFlow para que los comandos posteriores compartan un mismo fichero de configuración y SQLite.
 
 ```bash
 agentflow init
 ```
 
-Crea entre otros:
+Crea :
 
-- `.agentflow/` — configuración, estado SQLite, ejecuciones, worktrees
-- `.agentflow/config.yaml` — copiado de `config.yaml.example` si falta
-- `.agentflow/state.sqlite` — seguimiento de ejecuciones y tareas
+- `.agentflow/` — config, estado SQLite, runs, worktrees
+- `.agentflow/config.yaml` — copia de `config.yaml.example` cuando falta
+- `.agentflow/state.sqlite` — contabilidad de runs y tareas
 
-Asegúrese de que `.agentflow/state.sqlite` y `.agentflow/worktrees/` estén en `.gitignore` (`init` muestra un recordatorio).
+Incorpore `.agentflow/state.sqlite` y `.agentflow/worktrees/` a `.gitignore`. `init` recuerda que esas rutas no deben versionarse.
 
-## Verificar la instalación
+## Verificar el entorno
+
+Ejecute `agentflow doctor` tras instalar o si algo huele mal cableado. Doctor ejercita git, comprueba que la config existe, que los comandos agente resuelven en `PATH`, y muestra configuraciones típicamente rotas antes de malgastar tiempo en `work`.
 
 ```bash
 agentflow doctor
 ```
 
-`doctor` comprueba git, la configuración, los comandos de agente en el `PATH` y errores habituales. Corrija lo indicado antes de ejecutar `work`.
+Corrija lo reportado antes de usar `work`.
 
 ## Configuración
 
-Copie y edite el ejemplo si necesita agentes o presupuestos personalizados:
+Copie y edite el ejemplo cuando necesite agentes, presupuestos o enrutado propios :
 
 ```bash
 cp .agentflow/config.yaml.example .agentflow/config.yaml
 ```
 
-Vea el [Archivo de configuración](/docs/es/configuration/config-file) para cada bloque YAML.
+Para cada bloque YAML y valor por defecto consulte [Archivo de configuración](/docs/es/configuration/config-file).
 
-## Siguientes pasos
+## Próximos pasos
 
-- [Inicio rápido](/docs/es/getting-started/quickstart)
-- [Primer flujo de trabajo](/docs/es/getting-started/first-workflow)
+Continúe con [Inicio rápido](/docs/es/getting-started/quickstart) y después recorra un ciclo extremo a extremo en [Primer workflow](/docs/es/getting-started/first-workflow).

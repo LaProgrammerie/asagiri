@@ -1,21 +1,23 @@
 ---
-title: Architekturüberblick
+title: Architektur-Übersicht
 description: Go-Module unter application/internal und Ausführungs-Pipeline.
 ---
 
-# Architekturüberblick
+# Architektur-Übersicht
 
-AgentFlow ist eine Go-CLI (`application/cmd/agentflow`) mit Domänenlogik in `application/internal/` und gemeinsamen Typen in `application/pkg/agentflow`.
+AgentFlow ist eine Go-CLI (`application/cmd/agentflow`). Das meiste Verhalten liegt in `application/internal/`, gemeinsame Verträge in `application/pkg/agentflow`. Diese Aufteilung hält das Binary überschaubar und bündelt Parsing, Planung, Untersuchung, Kosten und Persistenz in Packages, deren Rolle Sie allein aus der Ordnerstruktur ableiten können.
 
 ## Ausführungs-Pipeline
 
+Der End-to-End-Pfad startet an der CLI, löst Intent auf und durchläuft die V3-Pipeline (Untersuchung, Kontextoptimierung, Kosten und Budgets, Routing). Anschließend laufen die Workflow-Stufen — plan, enrich, dev — in einem Worktree, gefolgt von Validierung, optionalem Review und Report.
+
 ```mermaid
 flowchart TD
-  A[Nutzerintention / CLI] --> B[Intent-Resolver + Planner]
+  A[User intent / CLI] --> B[intent resolver + planner]
   B --> C[pipeline V3]
   C --> D[investigation]
   D --> E[contextopt]
-  E --> F[Kostenschätzung + Budgets]
+  E --> F[cost estimate + budgets]
   F --> G[routing]
   G --> H[workflow: plan enrich dev]
   H --> I[worktree + agent exec]
@@ -25,42 +27,38 @@ flowchart TD
 
 ## Interne Module
 
-| Paket | Rolle |
+| Package | Rolle |
 | --- | --- |
 | `cli` | Cobra-Befehle, Docgen, App-Kontext |
 | `config` | YAML-Laden, Defaults, Pfadauflösung |
 | `intent` | NL `work`/`continue`, Hybrid-Resolver, Executor |
-| `workflow` | Zustandsmaschine, plan/dev/verify/review, Worktrees |
+| `workflow` | State Machine, plan/dev/verify/review, Worktrees |
 | `worktree` | Git-Worktree-Lebenszyklus |
 | `agent` / `agent/exec` | Subprocess-Verträge |
 | `source` / `source/notion` | Spec-Ingestion |
 | `contextopt` | Kontext sammeln/reduzieren/packen |
-| `investigation` | Lokales grep/Scan |
-| `cost` | Token, Pricing, Budgets |
+| `investigation` | Lokales grep/scan |
+| `cost` | Tokens, Pricing, Budgets |
 | `routing` | Schrittklasse → Agent/Modell |
-| `mcp` | stdio-MCP-Tools (optional) |
-| `store/sqlite` | Läufe, Aufgaben, Metriken |
-| `report` | Lauf-Reports |
-| `tui` | rich/plain/json-UI |
-| `rag` | Chunk-Index (SQLite, nicht vektoriel) |
+| `mcp` | Stdio-MCP-Tools (optional) |
+| `store/sqlite` | Runs, Tasks, Metriken |
+| `report` | Run-Reports |
+| `tui` | Rich/plain/json-UI |
+| `rag` | Chunk-Index (SQLite, nicht-vektoriell) |
 | `bootstrap` | `init`, `doctor` |
-| `redact` | Log-Secret-Masking |
-| `validation` | externer Befehls-Runner |
+| `redact` | Secret-Masking in Logs |
+| `validation` | Externer Befehls-Runner |
 
-## Zustandsspeicherung
+## Zustandsspeicher
 
-- **SQLite** bei `state.path` (Standard `.agentflow/state.sqlite`)
-- Lauf-Artefakte: `.agentflow/runs/<run-id>/`
+Runs und Tasks werden in **SQLite** unter `state.path` persistiert (Standard `.agentflow/state.sqlite`). Artefakte pro Run liegen unter `.agentflow/runs/<run-id>/`, sodass Prompts, Logs und Zwischenergebnisse ohne erneutes Auslesen der Datenbank auffindbar bleiben.
 
 ## Erweiterungspunkte
 
-- neue Agents: nur Config
-- neue Validierungsbefehle: `validation.commands`
-- eigene Routing-Strategien: `routing.strategies`
-- MCP-Tools bei `mcp.enabled: true`
+Sie können neue Agenten über die Konfiguration einbinden, Qualitätsgates über `validation.commands` verdrahten, Routing-Strategien unter `routing.strategies` ergänzen und — wenn `mcp.enabled: true` — optionale MCP-Tools bereitstellen. Das sind bewusste Nahtstellen: Die meisten Teams erweitern AgentFlow, ohne den Go-Einstieg zu forken.
 
 ## Siehe auch
 
-- [Konfiguration](/docs/de/configuration/config-file)
+- [Konfigurationsdatei](/docs/de/configuration/config-file)
 - [Zuverlässigkeit: Worktrees](/docs/de/reliability/worktree-isolation)
-- [MCP-Überblick](/docs/de/mcp/overview)
+- [MCP-Übersicht](/docs/de/mcp/overview)

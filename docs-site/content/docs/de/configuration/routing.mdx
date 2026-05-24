@@ -1,13 +1,15 @@
 ---
 title: Routing
-description: Kostenbewusstes Routing von Schrittklassen zu lokalen oder Cloud-Agents.
+description: Kostenbewusstes Routing von Step-Klassen zu lokalen oder Cloud-Agents.
 ---
 
 # Routing
 
-`application/internal/routing/router.go` wählt Agent/Modell aus der Config anhand von Schrittklassen-Strings (z. B. `summarize`, `implementation`, `pre_review`).
+`application/internal/routing/router.go` ordnet jedem Schritt einen Agent und ein Modell über **Schrittklassen** wie `summarize`, `implementation` oder `pre_review` zu. Der Router liest `routing` aus `config.yaml`. Es gibt keine „Telefonate“ zu Anbietern, um Modelle zu „finden“ — **`models` und `agents` in Ihrer YAML sind maßgeblich.**
 
 ## Konfiguration
+
+Strategien bündeln Präferenzen: welche Klassen lokal bleiben, welche ein schnelles Cloud-Profil rechtfertigen, welche ein schwereres Profil, und wie viele Fehlversuche einen Fallback auslösen.
 
 ```yaml
 routing:
@@ -23,32 +25,36 @@ routing:
 
 ## Entscheidungsfluss
 
+Das Diagramm entspricht der Reihenfolge im Code: lokale Präferenz zuerst, dann Cloud-Sperren, dann schwere gegenüber schnellen Cloud-Buckets, mit Fallbacks, wenn keine Liste exakt passt.
+
 ```mermaid
 flowchart TD
-  A[Schrittklasse] --> B{In prefer_local_for?}
-  B -->|ja| C[default_enricher / ollama]
-  B -->|nein| D{no_cloud ohne allow_cloud?}
-  D -->|ja| C
-  D -->|nein| E{In use_cloud_heavy_for?}
-  E -->|ja| F[claude-Profil]
-  E -->|nein| G{In use_cloud_fast_for?}
-  G -->|ja| H[default_agent / cursor]
-  G -->|nein| H
+  A[Step class] --> B{In prefer_local_for?}
+  B -->|yes| C[default_enricher / ollama]
+  B -->|no| D{no_cloud without allow_cloud?}
+  D -->|yes| C
+  D -->|no| E{In use_cloud_heavy_for?}
+  E -->|yes| F[claude profile]
+  E -->|no| G{In use_cloud_fast_for?}
+  G -->|yes| H[default_agent / cursor]
+  G -->|no| H
 ```
 
 ## CLI-Overrides
 
+Dieselbe Entscheidungslogik ohne YAML zu ändern: lokal erzwingen, wo die Strategie es erlaubt; Cloud nur mit ausdrücklicher Erlaubnis.
+
 | Flag | Wirkung |
 | --- | --- |
-| `--prefer-local` | Erzwingt lokalen Pfad, wenn Strategie passt |
-| `--no-cloud` | Blockiert Cloud außer mit `--allow-cloud` |
-| `--allow-cloud` | Explizite Cloud-Erlaubnis |
+| `--prefer-local` | Erzwingt den lokalen Pfad, wenn die Strategie passt |
+| `--no-cloud` | Blockiert Cloud, außer zusammen mit `--allow-cloud` |
+| `--allow-cloud` | Explizite Erlaubnis für Cloud-Routing |
 
 <Callout type="experimental">
-Cloud-Routing-Qualität hängt vollständig von Ihren `models`- und `agents`-Einträgen ab — AgentFlow ruft keine Vendor-APIs zur automatischen Modellwahl auf.
+Die Qualität des Cloud-Routings hängt vollständig von Ihren Einträgen in `models` und `agents` ab — AgentFlow wählt keine Modelle automatisch per Vendor-API.
 </Callout>
 
-## Siehe auch
+## Verwandtes
 
 - [Kostenbewusste Konzepte](/docs/de/concepts/cost-aware-workflows)
 - [Modelle in der Konfigurationsdatei](/docs/de/configuration/config-file#models)

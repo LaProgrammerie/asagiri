@@ -5,7 +5,9 @@ description: Référence de commandes auto-générée à partir des définitions
 
 # Référence CLI générée
 
-Ces pages sont **générées** à partir des définitions Cobra actives. Ne les modifiez pas à la main — elles seront écrasées.
+Les pages de cette section ne prennent forme que via **`docs generate-cli`**. Traitez les retouches Markdown comme éphémères : l’avertissement ci-dessous reste vrai, car une régénération Cobra écrase les ajouts manuels.
+
+Ces pages sont **générées** à partir des définitions Cobra actives. Ne les modifiez pas à la main — les changements seront écrasés.
 
 ## Régénérer
 
@@ -20,13 +22,10 @@ Ou avec un binaire compilé :
 ./bin/agentflow docs generate-cli --output docs-site/content/docs/en/cli/generated
 ```
 
-## Langues
+## Parcourir les commandes
 
-- **Référence complète (anglais)** : [CLI généré — anglais](/docs/cli/generated) — toutes les commandes, tous les drapeaux.
-- Cette section **française** propose des pages résumé pour les commandes principales uniquement ; le détail des options reste dans la version anglaise générée.
-
-Parcourir les résumés : ouvrez la section **CLI → généré** dans la barre latérale ou commencez par [l'index généré (EN)](/docs/cli/generated/index).
+Ouvrez la section **CLI → généré** dans la barre latérale, ou commencez par [l’index généré](/docs/cli/generated/index). La section française propose des pages résumé pour un sous-ensemble de commandes ; le détail complet des drapeaux reste sur l’arborescence anglaise générée (`/docs/cli/generated`).
 
 ## Guides rédigés
 
-Pour les workflows et concepts : [Vue d'ensemble CLI](/docs/fr/cli), [Premier workflow](/docs/fr/getting-started/first-workflow) et [Workflows](/docs/fr/workflows/kiro-to-cursor).
+Pour les workflows et les concepts : [Vue d’ensemble CLI](/docs/fr/cli), [Premier workflow](/docs/fr/getting-started/first-workflow) et [Workflows](/docs/fr/workflows/kiro-to-cursor).

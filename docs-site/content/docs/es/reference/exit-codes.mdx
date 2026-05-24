@@ -1,37 +1,41 @@
 ---
 title: Códigos de salida
-description: Comportamiento de salida de la CLI en éxito y fallo.
+description: Comportamiento de salida CLI en éxito o fracaso.
 ---
 
 # Códigos de salida
 
-AgentFlow sigue las convenciones habituales de Go/Cobra:
+AgentFlow replica semánticas Go/Cobra para que pipelines bifurquen `$?` sin envolturas ad hoc.
 
-| Código | Significado |
+| Código | Sentido |
 | --- | --- |
-| **0** | Comando completado sin error |
-| **1** | Error general (`RunE` devolvió error — configuración, git, workflow, bloqueo de presupuesto, fallo de agente) |
-| **2** | Error de uso de Cobra (bandera desconocida, aridad incorrecta) — típico en invocaciones mal formadas |
+| **0** | Comando finalizado sin error |
+| **1** | Error genérico (error del `RunE` — configuración, git, workflow, presupuesto, agente) |
+| **2** | Error de uso Cobra (flag desconocido, aridad equivocada) |
 
 ## Ejemplos
 
+Ejemplifica fallos sintácticos (salida **2**), rutas bien (doctor o estimate-only cuando sale bien) versus fallos operacionales presupuesto/verify como **1** con texto en stderr.
+
 ```bash
-agentflow work                    # salida 2 — falta argumento de instrucción obligatorio
-agentflow doctor                  # salida 0 si pasan todas las comprobaciones
-agentflow work "x" --estimate-only # salida 0 si la estimación tiene éxito
+agentflow work                    # exit 2 — falta instrucción requerida
+agentflow doctor                  # exit 0 si todo chequea bien
+agentflow work "x" --estimate-only # exit 0 si la estimación alcanza
 ```
 
-Los bloqueos de presupuesto y fallos de validación aparecen como **salida 1** con mensaje en stderr.
+Bloqueos por presupuesto y validaciones suelen producir **exit 1**.
 
 ## Scripts
+
+Úselo junto `||`; recuerde `--dry-run` si solo necesita revisar wiring sin fallar porque falta binario agente.
 
 ```bash
 agentflow verify my-feature || echo "verify failed"
 ```
 
-Use `--dry-run` en CI para evitar salidas no nulas por agentes ausentes cuando solo prueba la orquestación.
+`--dry-run` puede evitar código distinto de cero en CI cuando sólo ejercitan el esqueleto orquestador.
 
-## Ver también
+## Relacionado
 
-- [Descripción general de la CLI](/docs/es/cli)
+- [Vista CLI](/docs/es/cli)
 - [Recuperación ante fallos](/docs/es/workflows/failure-recovery)

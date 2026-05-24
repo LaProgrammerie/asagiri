@@ -1,34 +1,38 @@
 ---
 title: Flujos local-first
-description: Investigar y reducir contexto en local antes de llamar a modelos en la nube.
+description: Investigar y acotar el contexto en local antes de llamar a modelos cloud.
 ---
 
 # Flujos local-first
 
 ## Problema
 
-Enviar repositorios enteros a modelos en la nube es lento, costoso y riesgoso. La mayoría de preguntas de ingeniería se puede acotar con **herramientas locales**: búsqueda, recorrido de archivos, símbolos y empaquetado de contexto estructurado.
+Empujar un repositorio entero por un modelo cloud es lento, caro y a menudo filtra más código del que la tarea requiere. Muchas preguntas de ingeniería se reducen al buscar en el árbol, listar archivos candidatos y aplicar empaquetado estructurado — trabajo que pertenece a tu máquina con herramientas ordinarias, no en un prompt remoto.
 
-## Enfoque de AgentFlow
+## Enfoque AgentFlow
 
-Antes de pasos de agente costosos, AgentFlow puede:
+AgentFlow trata **la investigación local y la reducción de contexto** como preludio de primera clase. Antes de los pasos caros, AgentFlow puede acotar lo que sale del repo:
 
 1. **`agentflow investigate <feature>`** — grep acotado, archivos candidatos, avisos de archivos grandes, tests relacionados
-2. **`agentflow context <feature> --optimize`** — recopilar, puntuar y comprimir contexto en un paquete
-3. **Enrutamiento** — preferir Ollama/perfiles locales para summarize, classify, `pre_review`, `context_selection` (véase `routing.strategies.cost_aware`)
+2. **`agentflow context <feature> --optimize`** — recoger, puntuar y comprimir contexto en un pack
+3. **Enrutamiento** — preferir Ollama o perfiles locales para `summarize`, `classify`, `pre_review` y `context_selection` cuando `routing.strategies.cost_aware` está activo
+
+El flujo es lineal en la práctica: la intención del usuario alimenta la investigación, la investigación un pack de contexto, el enrutamiento elige local o cloud, y ambos caminos convergen en validación.
 
 ```mermaid
 flowchart LR
-  A[Intención del usuario] --> B[Investigate]
-  B --> C[Paquete de contexto]
-  C --> D{Ruta}
-  D -->|paso local| E[Ollama / agente local]
-  D -->|paso nube| F[Cursor / Codex / Claude]
-  E --> G[Validación]
+  A[User intent] --> B[Investigate]
+  B --> C[Context pack]
+  C --> D{Route}
+  D -->|local step| E[Ollama / local agent]
+  D -->|cloud step| F[Cursor / Codex / Claude]
+  E --> G[Validation]
   F --> G
 ```
 
 ## Ejemplo
+
+La secuencia siguiente ejecuta investigación y optimización de contexto para una feature, luego previsualiza un `work` con preferencia local y estimate-only:
 
 ```bash
 agentflow investigate billing-v2 --task task-003
@@ -40,11 +44,13 @@ agentflow work "develop billing-v2" --prefer-local --estimate-only
 
 | Mejora | No resuelve |
 | --- | --- |
-| Latencia y coste en triage | Comprensión semántica de un gran modelo en la nube |
-| Registros de investigación repetibles | Ranking de relevancia perfecto (puntuación heurística) |
-| Pasos sin conexión posibles con Ollama | Cumplimiento air-gap sin su propia revisión |
+| Latencia y coste del triaje | Comprensión semántica igual a un modelo cloud grande |
+| Logs de investigación reproducibles | Ranking de relevancia perfecto (puntuación heurística) |
+| Pasos offline con Ollama | Cumplimiento air-gapped sin tu propia revisión |
 
 ## Configuración
+
+El fragmento activa enrutamiento cost_aware y fija límites compartidos de investigación. Aplican aunque `mcp.enabled` sea false: viven bajo `mcp.investigation` como config compartida para herramientas locales.
 
 ```yaml
 routing:
@@ -59,9 +65,7 @@ mcp:
     max_grep_output_bytes: 262144
 ```
 
-Los límites de investigación aplican incluso con `mcp.enabled: false` — configuración compartida bajo `mcp.investigation`.
-
-## Ver también
+## Relacionado
 
 - [Investigación local](/docs/es/cost-performance/local-investigation)
 - [Optimización de contexto](/docs/es/cost-performance/context-optimization)

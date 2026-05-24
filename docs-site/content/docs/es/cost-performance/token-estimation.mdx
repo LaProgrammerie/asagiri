@@ -1,17 +1,15 @@
 ---
 title: Estimación de tokens
-description: Recuentos heurísticos de tokens y precios para pantallas de coste previas a la ejecución.
+description: Recuentos heurísticos de tokens y tarifación para vistas de coste previas al run.
 ---
 
 # Estimación de tokens
 
-Fuentes: `application/internal/cost/token_counter.go` y `estimator.go`.
+La implementación vive en `application/internal/cost/token_counter.go` y `estimator.go`. El estimador permite mostrar órdenes de magnitud de **tokens y coste** antes de invocar agentes — útil para confrontar los presupuestos y registrar con qué trabajo implicaba grosso modo un plan, sin pretender ser la API de facturación de un proveedor alojado.
 
-## Funcionamiento
+## Cómo funciona
 
-1. Medir longitudes de caracteres en archivos o blobs de texto
-2. Clasificar el tipo de contenido por extensión (`code`, `markdown`, `json`, `default`)
-3. Dividir por `token_estimation.*_chars_per_token` y redondear hacia arriba
+El flujo es determinista : medir caracteres por ficheros o trozos de texto, clasificar cada porción por extensión en tipo de contenido (`code`, `markdown`, `json`, `default`), dividir por los valores `token_estimation.*_chars_per_token` configurados y redondear hacia arriba.
 
 ```yaml
 token_estimation:
@@ -23,10 +21,10 @@ token_estimation:
 
 ## Visualización del coste
 
-Tokens estimados × tarifas `pricing.models.<model-id>` → EUR estimado (o `budgets.default_currency`).
+Los tokens estimados se multiplican por las tarifas `pricing.models.<model-id>` para obtener un EUR aproximado — o cualquier moneda declarada por `budgets.default_currency`. Esa multiplicación es matemática YAML transparente de su lado, no una tabla oculta en el binario.
 
 <Callout type="cost">
-**No es exacto por proveedor.** OpenAI, Anthropic y Google facturan con sus propios tokenizers. Trate los números como umbrales de orden de magnitud.
+**No exacto al tokenizer del proveedor.** OpenAI, Anthropic y Google facturan con tokenizadores propios. Use los números como parachoques de magnitud.
 </Callout>
 
 ## Comandos
@@ -37,11 +35,11 @@ agentflow work "develop billing-v2" --estimate-only
 agentflow cost billing-v2
 ```
 
-## Pruebas golden
+## Tests golden
 
-La forma del estimador está cubierta por pruebas golden en `application/internal/cost/`. Actualice goldens con `UPDATE_GOLDEN=1` solo cuando cambie algoritmos intencionalmente.
+La forma del estimador está fijada con tests golden en `application/internal/cost/`. Actualice goldens solo con `UPDATE_GOLDEN=1` cuando altere conscientemente los algoritmos — si no podría enmascarar regresiones en dimensionado de prompts o cómputo de costes.
 
-## Ver también
+## Relacionado
 
-- [Presupuestos](/docs/es/configuration/budgets)
+- [Budgets](/docs/es/configuration/budgets)
 - [Optimización de contexto](/docs/es/cost-performance/context-optimization)

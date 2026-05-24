@@ -1,68 +1,71 @@
 ---
 title: Installation
-description: AgentFlow installieren und ein Repository für orchestrierte KI-Workflows vorbereiten.
+description: AgentFlow installieren und ein Repository für orchestierte KI-Workflows vorbereiten.
 ---
 
 # Installation
 
-AgentFlow ist eine Go-CLI, die Spezifikationen, lokale Voruntersuchung, Git-Worktrees, externe Coding-Agenten und Validierungsbefehle orchestriert. Binär installieren, Repository initialisieren, dann Umgebung prüfen.
+AgentFlow ist eine Go-CLI, die Specs, lokale Investigation, Git-Worktrees, externe Coding-Agenten und Validierungsbefehle verbindet. Der Installationsweg ist bewusst schlank: eine Binärdatei, ein Repository als Arbeitskontext — das Tool führt Laufzyklen, Worktrees und Persistenz auf der Platte. Diese Seite behandelt Build oder Platzierung der Binärdatei, Initialisierung von `.agentflow/` und den Check von Git, Konfiguration und Agent-Befehlen vor dem ersten `work`.
 
-## Voraussetzungen
+## Anforderungen
 
-| Voraussetzung | Hinweise |
+| Anforderung | Hinweise |
 | --- | --- |
-| **Go 1.25+** | Aus Quellen bauen oder Release-Binär verwenden |
-| **Git** | Für Worktrees, Status und Diffs erforderlich |
-| **Konfigurierte Agents** | Mindestens die in `.agentflow/config.yaml` referenzierten Befehle (`cursor-agent`, `kiro`, `ollama`, usw.) |
+| **Go 1.25+** | Bau aus Quelle oder Release-Binary |
+| **Git** | Erforderlich für Worktrees, Status und Diffs |
+| **Konfigurierte Agents** | Mindestens die in `.agentflow/config.yaml` genannten Befehle (`cursor-agent`, `kiro`, `ollama`, …) |
 
-Optional: **Ollama** für lokales Enrichment/Routing, **Notion**-Token für Sync (`NOTION_TOKEN`).
+Optional: **Ollama** für lokales Routing oder Enrichment; **Notion**-Token für Sync (`NOTION_TOKEN`).
 
-## Installation aus Quellen
+## Installation aus dem Quellcode
+
+Repository klonen, mit dem Projekt-Makefile bauen, die Binärdatei unter `bin/` verwenden:
 
 ```bash
 git clone https://github.com/LaProgrammerie/hyper-fast-builder.git
 cd hyper-fast-builder
 make build
-# Binär: ./bin/agentflow
+# Binärdatei: ./bin/agentflow
 ```
 
-`bin/` zum `PATH` hinzufügen oder `bin/agentflow` in ein Verzeichnis im `PATH` kopieren.
+`bin/` zum `PATH` hinzufügen oder `bin/agentflow` an einen Ort kopieren, der bereits auf `PATH` liegt.
 
 ## Repository initialisieren
 
-Im Projektroot:
+Vom Projektroot `agentflow init` ausführen. Der Befehl legt die lokale AgentFlow-Oberfläche an, damit später alle Kommandos dieselbe Konfiguration und dieselbe SQLite-Datenbank nutzen.
 
 ```bash
 agentflow init
 ```
 
-Erzeugt u. a.:
+Es entstehen unter anderem:
 
-- `.agentflow/` — Konfiguration, SQLite-Status, Läufe, Worktrees
-- `.agentflow/config.yaml` — kopiert von `config.yaml.example`, falls fehlend
-- `.agentflow/state.sqlite` — Lauf- und Aufgabenbuchhaltung
+- `.agentflow/` — Konfiguration, SQLite, Runs, Worktrees
+- `.agentflow/config.yaml` — aus `config.yaml.example`, falls noch nicht vorhanden
+- `.agentflow/state.sqlite` — Buchführung für Läufe und Tasks
 
-Stellen Sie sicher, dass `.agentflow/state.sqlite` und `.agentflow/worktrees/` in `.gitignore` stehen (`init` erinnert daran).
+Tragen Sie `.agentflow/state.sqlite` und `.agentflow/worktrees/` in `.gitignore` ein. `init` erinnert daran — diese Artefakte gehören nicht ins Versionsarchiv.
 
 ## Einrichtung prüfen
+
+Nach der Installation oder wenn etwas nicht passt: `agentflow doctor`. Der Befehl prüft Git, die Existenz der Konfiguration, ob Agent-Befehle auf `PATH` auflösbar sind, und häufige Fehlkonfigurationen — bevor Sie Zeit in einen fehlschlagenden `work`-Lauf investieren.
 
 ```bash
 agentflow doctor
 ```
 
-`doctor` prüft Git, Konfigurationsdatei, Agent-Befehle im `PATH` und typische Fehlkonfigurationen. Beheben Sie Meldungen vor `work`.
+Gemeldete Punkte beheben, bevor Sie `work` ausführen.
 
 ## Konfiguration
 
-Bei Bedarf Beispiel kopieren und anpassen:
+Bei Bedarf die Beispieldatei kopieren und anpassen:
 
 ```bash
 cp .agentflow/config.yaml.example .agentflow/config.yaml
 ```
 
-Siehe [Konfigurationsdatei](/docs/de/configuration/config-file) für alle YAML-Blöcke.
+Alle Blöcke und Defaults: [Konfigurationsdatei](/docs/de/configuration/config-file).
 
 ## Nächste Schritte
 
-- [Schnellstart](/docs/de/getting-started/quickstart)
-- [Erster Workflow](/docs/de/getting-started/first-workflow)
+Weiter mit [Schnellstart](/docs/de/getting-started/quickstart), dann ein durchgängiger Ablauf unter [Erster Workflow](/docs/de/getting-started/first-workflow).

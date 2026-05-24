@@ -1,47 +1,53 @@
 ---
-title: Descripción general de la CLI
+title: Resumen de la CLI
 description: Grupos de comandos AgentFlow y referencia generada por comando.
 ---
 
-# Descripción general de la CLI
+# Resumen de la CLI
 
-Binario de entrada: **`agentflow`** (`application/cmd/agentflow`).
+El binario **`agentflow`** (`application/cmd/agentflow`) es la única superficie de entrada para inicializar proyectos, trocear el pipeline spec-driven en verbos discretos, inspeccionar artefactos de coste y tareas operativas. El tráfico diario suele ir por **`work`**, donde intenciones en lenguaje natural mapean pipelines enteros, o por pasos nombrados (**`plan`**, **`dev`**, **`verify`**, etc.) cuando `.kiro/specs/<feature>/` ya ancla tu plan. Los agrupamientos resumen la intención; los flags autoritativos vienen de Cobra vía la **[referencia CLI generada](/docs/es/cli/generated)** — regenera ese árbol cuando cambie el cableado CLI.
 
-## Banderas globales
+## Comportamiento global
 
-| Bandera | Descripción |
+Los flags de simulación aplican de forma coherente a subcomandos anidados:
+
+| Flag | Descripción |
 | --- | --- |
 | `--dry-run` | Simula sin agentes externos ni shells de validación |
-| (persistente) | Heredada por todos los subcomandos |
+| (persistente) | Heredado por todos los subcomandos |
 
-Entorno: `AGENTFLOW_DRY_RUN=1`, `AGENTFLOW_YES=1` — véase [Variables de entorno](/docs/es/reference/environment-variables).
+Variables de entorno como `AGENTFLOW_DRY_RUN=1` y `AGENTFLOW_YES=1` reflejan flags habituales; ver [Variables de entorno](/docs/es/reference/environment-variables) para la lista completa.
 
-## Grupos de comandos
+## Grupos de comandos de un vistazo
 
-| Grupo | Comandos |
-| --- | --- |
-| **Arranque** | `init`, `doctor`, `version` |
-| **Pipeline** | `spec`, `plan`, `enrich`, `dev`, `verify`, `review`, `pr` |
-| **Intención** | `work`, `continue`, `next`, `inbox` |
-| **Fuentes** | `sync`, `index` |
-| **Coste / contexto** | `estimate`, `investigate`, `context`, `cost`, `cost-report`, `cost-models` |
-| **Inspect** | `inspect` (diff, symbol, tests) |
-| **Ops** | `status`, `resume`, `report`, `clean` |
-| **MCP** | `mcp`, `mcp-serve` |
-| **Meta** | `docs`, `help` |
+| Grupo | Comandos | Uso típico |
+| --- | --- | --- |
+| **Bootstrap** | `init`, `doctor`, `version` | Configuración inicial y comprobaciones de salud |
+| **Pipeline** | `spec`, `plan`, `enrich`, `dev`, `verify`, `review`, `pr` | Pasos spec-driven en `.kiro/specs/<feature>/` |
+| **Intent** | `work`, `continue`, `next`, `inbox` | Flujos en lenguaje natural y reanudación |
+| **Sources** | `sync`, `index` | Fuentes externas (p. ej. Notion) e indexación |
+| **Coste / contexto** | `estimate`, `investigate`, `context`, `cost`, `cost-report`, `cost-models` | Estimación, investigación, packs de contexto |
+| **Inspect** | `inspect` (diff, symbol, tests) | Investigación local dirigida |
+| **Ops** | `status`, `resume`, `report`, `clean` | Ciclo de vida de runs y artefactos |
+| **MCP** | `mcp`, `mcp-serve` | Integración MCP si está activada |
+| **Meta** | `docs`, `help` | Generación de docs y ayuda integrada |
 
-## Referencia generada
+Trata el agrupamiento como ayuda de navegación — no como mandato sobre cuántos comandos van en scripts frente al shell interactivo.
 
-Las páginas por comando (banderas sincronizadas con Cobra) están bajo **[CLI generado](/docs/es/cli/generated)** (resúmenes traducidos; referencia completa en inglés en `/docs/cli/generated`).
+## Referencia generada por comando
 
-Regenerar tras cambios en la CLI:
+Las páginas por comando con flags están en **[CLI generated](/docs/es/cli/generated)**. Tras cambiar comandos Cobra, regenera:
 
 ```bash
 go run ./application/cmd/agentflow docs generate-cli \
   --output docs-site/content/docs/en/cli/generated
 ```
 
-## Empezar
+Haz commit del MDX generado con el cambio CLI para mantener la doc pública al día.
+
+## Primeros comandos a probar
+
+Prueba con seguridad antes de añadir agentes:
 
 ```bash
 agentflow init
@@ -49,4 +55,4 @@ agentflow doctor
 agentflow work "my feature" --dry-run --plan-only
 ```
 
-Vea [Inicio rápido](/docs/es/getting-started/quickstart) y [Primer flujo de trabajo](/docs/es/getting-started/first-workflow).
+Después sigue el [Inicio rápido](/docs/es/getting-started/quickstart) para un dry-run seguro, luego el [Primer flujo](/docs/es/getting-started/first-workflow) cuando agentes y comandos de validación estén configurados.

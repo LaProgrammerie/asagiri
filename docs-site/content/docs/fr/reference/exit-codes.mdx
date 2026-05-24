@@ -1,37 +1,41 @@
 ---
 title: Codes de sortie
-description: Comportement de sortie de la CLI en succès et en échec.
+description: Valeurs renvoyées par la CLI en succès ou échec.
 ---
 
 # Codes de sortie
 
-AgentFlow suit les conventions Go/Cobra habituelles :
+AgentFlow suit les usages Go/Cobra : scripts et pipelines peuvent bifurquer sur `$?` sans adaptations.
 
 | Code | Signification |
 | --- | --- |
 | **0** | Commande terminée sans erreur |
-| **1** | Erreur générale (`RunE` a renvoyé une erreur — config, git, workflow, blocage budget, échec agent) |
-| **2** | Erreur d'usage Cobra (drapeau inconnu, mauvaise arité) — typique des invocations mal formées |
+| **1** | Erreur générale (`RunE` a renvoyé une erreur — config, git, workflow, budget, agent) |
+| **2** | Erreur d’usage Cobra (flag inconnu, arité incorrecte) — typiques des lignes incorrectes |
 
 ## Exemples
 
+Les extraits montrent la différence entre soucis de syntaxe (sortie **2**), bonnes voies (**0** lorsque tout passe pendant `doctor` ou une estimation seule qui réussit), et problèmes d’exploration budgétaire ou validations qui montent comme **1** avec message sur stderr.
+
 ```bash
-agentflow work                    # sortie 2 — argument d'instruction obligatoire manquant
-agentflow doctor                  # sortie 0 si tous les contrôles passent
-agentflow work "x" --estimate-only # sortie 0 si l'estimation réussit
+agentflow work                    # exit 2 — argument instruction manquant
+agentflow doctor                  # exit 0 quand tous contrôles passent
+agentflow work "x" --estimate-only # exit 0 quand l’estimation fonctionne
 ```
 
-Les blocages budget et les échecs de validation apparaissent en **sortie 1** avec message sur stderr.
+Les blocages budgétaires et validations échouées remontent en **exit 1** avec stderr.
 
 ## Scripts
+
+Combiner avec `||` dans vos scripts et rappeler `--dry-run` si vous vérifiez seulement le câblage CI sans faire échouer l’étape lorsqu’un agent n’est pas installé.
 
 ```bash
 agentflow verify my-feature || echo "verify failed"
 ```
 
-Utilisez `--dry-run` en CI pour éviter les sorties non nulles dues à des agents absents lorsque vous testez uniquement l'orchestration.
+`--dry-run` en CI diminue codes non-zero dus uniquement aux binaires agent absents alors que vous ne testez que l’écorchage.
 
 ## Voir aussi
 
-- [Vue d'ensemble CLI](/docs/fr/cli)
+- [Synthèse CLI](/docs/fr/cli)
 - [Récupération après échec](/docs/fr/workflows/failure-recovery)

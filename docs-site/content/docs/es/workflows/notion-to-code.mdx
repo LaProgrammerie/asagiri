@@ -1,19 +1,23 @@
 ---
-title: Notion → spec local → work
-description: Sincronizar páginas de Notion con specs locales; ejecutar solo desde instantáneas.
+title: Notion → espec local → work
+description: Sincroniza páginas Notion como specs locales; ejecuta sólo snapshots.
 ---
 
-# Notion → spec local → work
+# Notion → espec local → work
 
 ## Principio
 
-**Notion nunca es la fuente de verdad de ejecución.** AgentFlow trabaja siempre desde una **instantánea local** bajo `.agentflow/specs/` (o rutas en `sources.local.paths`). La sincronización trae contenido remoto; `work` lee archivos locales y el estado SQLite.
+**Notion jamás sirve ejecución en vivo.** AgentFlow opera siempre snapshots **filesystem** ubicados `.agentflow/specs/` (también alternativamente paths `sources.local`). Sync trae contenido remoto trabajo consume árboles disco + registros SQLite.
+
+Producto/design sigue usando Notions mientras ingeniería repite corrida estable snapshot inmutable aislando caos medio vuelos donde editor cambia schemas.
 
 <Callout type="experimental">
-La sincronización con Notion requiere configuración y un token API válido. Trate la sincronización como experimental hasta validar el mapeo de su espacio.
+Sinc Notion necesita configuración token API vigente marcado experimental hasta validar mappings espacio trabajo.
 </Callout>
 
-## Configurar Notion
+## Configuración
+
+YAML igual que schema oficial activa connector nombra variable secreta identificador BD import pref `.agentflow/specs`.
 
 ```yaml
 sources:
@@ -24,7 +28,7 @@ sources:
     import_path: .agentflow/specs
 ```
 
-Exporte el token:
+Export secreto PAT shell:
 
 ```bash
 export NOTION_TOKEN="ntn_..."
@@ -32,40 +36,43 @@ export NOTION_TOKEN="ntn_..."
 
 ## Sincronizar
 
+Individual URL via `sync notion` mientras tanto **`sync all`** recorrer fuentes opcionales habilitadas.
+
 ```bash
 agentflow sync notion --page "https://www.notion.so/..."
-# o listar y sincronizar todas las fuentes activadas:
 agentflow sync all
 ```
 
-Vista previa en dry-run:
+Previsualización:
 
 ```bash
 agentflow --dry-run sync notion --page "https://www.notion.so/..."
 ```
 
-El modo interactivo puede pedir confirmación antes de sobrescribir una spec local modificada.
+Interactivo puede advertir ante sobrescritura archivo local tocado tras sync previo divergente manual.
 
-## Trabajar desde la instantánea local
+## Trabajar post snapshot
+
+Lista + pipeline consultan mismo árbol descargado:
 
 ```bash
 agentflow inbox --source notion
 agentflow work "develop billing-v2" --source notion
 ```
 
-## Compromisos
+## Compensaciones
 
-| Ventaja | Riesgo |
+| Beneficio | Riesgo |
 | --- | --- |
-| Origen amigable para PM en Notion | Exposición del token si se hace commit |
-| Ejecución offline tras la sincronización | Deriva de esquema si cambian propiedades en Notion |
+| Gestión contenido stakeholder Notion cómodo | Fuga token repos si commit descuidados |
+| Modo offline post sync | Derivación cambios props Notion ruptura parsers |
 
 <Callout type="security">
-Nunca haga commit de `NOTION_TOKEN`. Use `token_env` y secretos en CI. Los registros redactan patrones habituales de secretos.
+Nunca VERSIONAR `NOTION_TOKEN` sólo usar `token_env` secretos pipelines logs masking reducen ruidos no garantizan seguridad total.
 </Callout>
 
-## Ver también
+## Relacionado
 
-- [Configuración de Notion](/docs/es/configuration/notion)
-- [CLI: sync](/docs/cli/generated/sync)
-- [CLI: inbox](/docs/cli/generated/inbox)
+- [Documentación configuración Notion](/docs/es/configuration/notion)
+- [CLI sync](/docs/es/cli/generated/sync)
+- [CLI inbox](/docs/es/cli/generated/inbox)

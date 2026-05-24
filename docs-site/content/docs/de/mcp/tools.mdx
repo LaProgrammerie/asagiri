@@ -1,43 +1,47 @@
 ---
 title: MCP-Tools
-description: Tools, die bei mcp.enabled true exponiert werden.
+description: "Werkzeuge des MCP-Servers, sobald mcp.enabled in der Konfiguration aktiv ist."
 ---
 
 # MCP-Tools
 
-Wenn `mcp.enabled: true`, registriert `mcp-serve` Tools auf Basis der Pakete investigation und contextopt. Tool-Namen und Schemas werden zur Laufzeit von `tools/list` geliefert.
+Wenn in der Konfiguration **`mcp.enabled`** gesetzt ist, registriert `mcp-serve` Werkzeuge, die auf dieselben Investigation- und Kontextpfade wie die CLI zurückgreifen. Konkrete Tool-Namen und JSON-Schemas werden hier nicht fest eingefroren — nach jedem Upgrade von AgentFlow sollten Clients **`tools/list`** aufrufen, um die aktuelle Oberfläche zu sehen.
 
 ## Typische Fähigkeiten
 
+Die folgende Tabelle beschreibt Rollen, keine garantierte Tool-Liste: Investigation hält Repository-Zugriffe begrenzt wie bei CLI `investigate`; Kontext-Helfer bauen oder fassen Kontextpakete zusammen; Kostenhilfen nutzen dieselben Token-Heuristiken wie die CLI, damit Clients die Größenordnung einer Nutzlast vorab sehen können.
+
 | Bereich | Zweck |
 | --- | --- |
-| Investigation | begrenztes grep / Repo-Scan konsistent mit CLI `investigate` |
-| Kontext | Kontext-Packs bauen oder zusammenfassen |
-| Kosten | approximative Token/Kosten für eine Nutzlast |
+| Investigation | Begrenztes Grep und Repo-Scanning analog zu CLI `investigate` |
+| Context | Kontextpakete erzeugen oder zusammenfassen |
+| Cost | Ungefähre Tokenzahl und Kosten einer Nutzlast |
 
-Exakte Tool-IDs können sich zwischen Releases ändern — nach Upgrade immer `tools/list` aufrufen.
+Exakte Tool-IDs können zwischen Releases wechseln — **`tools/list` nach jedem Upgrade ausführen.**
 
-## Grenzen
+## Begrenzungen
 
-Aus der Konfiguration:
+Die Konfiguration entspricht den gleichen Leitplanken wie die CLI: globale `max_output_bytes` und `command_timeout_seconds` sowie gemeinsame Caps unter `investigation.*`, die auch für Investigation außerhalb von MCP gelten.
 
-- `max_output_bytes` — Cap für RPC-Nutzlastgröße
-- `command_timeout_seconds` — Ausführung pro Tool
-- `investigation.*` — grep/Scan-Caps (geteilt mit Non-MCP-Investigation)
+- `max_output_bytes` — Obergrenze für die Größe von RPC-Nutzlasten
+- `command_timeout_seconds` — Zeitlimit pro Tool-Ausführung
+- `investigation.*` — gemeinsame Grenzen für Grep und Dateiscan mit allen nicht-MCP-Pfaden
 
-## Beispiel-Client-Flow
+## Beispiel: Client-Ablauf
+
+Server starten, MCP-Client per stdio anbinden, dann wie vom JSON-RPC-Protokoll erwartet `tools/list` senden.
 
 ```bash
 agentflow mcp-serve
-# Editor-MCP-Client verbindet stdio und sendet:
+# Editor-MCP-Client verbindet sich über stdio und sendet z. B.:
 # {"jsonrpc":"2.0","id":1,"method":"tools/list"}
 ```
 
 <Callout type="experimental">
-Tool-Oberfläche ist minimal und in Entwicklung. Nicht dokumentierte Tools in Produktionsautomatisierung nicht ohne AgentFlow-Version-Pinning verwenden.
+Die Tool-Oberfläche bleibt bewusst klein und kann sich ändern — keine nicht dokumentierte Automation in Produktion ohne feste AgentFlow-Version pflegen.
 </Callout>
 
-## Siehe auch
+## Verwandtes
 
-- [Lokale Untersuchung](/docs/de/cost-performance/local-investigation)
+- [Lokale Investigation](/docs/de/cost-performance/local-investigation)
 - [MCP-Sicherheit](/docs/de/mcp/security)

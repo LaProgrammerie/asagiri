@@ -1,17 +1,15 @@
 ---
 title: Token-Schätzung
-description: Heuristische Token-Zählung und Preisberechnung für Kostenanzeigen vor dem Lauf.
+description: Heuristische Tokenzahlen und Preise für Kostenvorschau vor dem Lauf.
 ---
 
 # Token-Schätzung
 
-Quellen: `application/internal/cost/token_counter.go` und `estimator.go`.
+Implementierung in `application/internal/cost/token_counter.go` und `estimator.go`. Der Estimator soll **Größenordnungen** für Tokens und Kosten zeigen, bevor Subprozess-Agenten starten — nützlich für Vergleich mit Budgets und für Logs darüber, was ein Plan grob implizierte, ohne eine Billing-API des Anbieters nachzuahmen.
 
-## Funktionsweise
+## Ablauf
 
-1. Zeichenlängen für Dateien oder Textblobs messen
-2. Inhaltstyp per Extension klassifizieren (`code`, `markdown`, `json`, `default`)
-3. Durch `token_estimation.*_chars_per_token` teilen und aufrunden
+Deterministisch: Zeichenanzahl für Dateien oder Textblöcke messen, jedes Fragment nach Erweiterung einer Inhaltsart zuordnen (`code`, `markdown`, `json`, `default`), durch die konfigurierten `token_estimation.*_chars_per_token` teilen und aufrunden.
 
 ```yaml
 token_estimation:
@@ -23,10 +21,10 @@ token_estimation:
 
 ## Kostenanzeige
 
-Geschätzte Token × `pricing.models.<model-id>`-Tarife → geschätzte EUR (oder `budgets.default_currency`).
+Geschätzte Tokens werden mit den Sätzen aus `pricing.models.<model-id>` multipliziert und ergeben einen geschätzten Betrag in der Währung von `budgets.default_currency` (oder der dort gesetzten Vorgabe). Das ist transparente Rechnung auf Basis Ihrer YAML — keine versteckte Ratentabelle im Binary.
 
 <Callout type="cost">
-**Nicht anbieterexakt.** OpenAI, Anthropic und Google nutzen eigene Tokenizer. Zahlen als Größenordnungs-Schwellen behandeln.
+**Nicht tokenizer-exakt.** OpenAI, Anthropic und Google nutzen eigene Tokenizer. Die Zahlen sind Leitplanken in der Größenordnung.
 </Callout>
 
 ## Befehle
@@ -37,11 +35,11 @@ agentflow work "develop billing-v2" --estimate-only
 agentflow cost billing-v2
 ```
 
-## Golden Tests
+## Golden-Tests
 
-Estimator-Form wird durch Golden Tests in `application/internal/cost/` abgedeckt. Goldens nur mit `UPDATE_GOLDEN=1` aktualisieren, wenn Algorithmen bewusst geändert werden.
+Die Form des Estimators ist durch Golden-Tests unter `application/internal/cost/` abgesichert. Goldens nur mit `UPDATE_GOLDEN=1` aktualisieren, wenn sich Algorithmen **bewusst** ändern — sonst könnten Regressionen bei Prompt-Umfang oder Kostenberechnung unbemerkt bleiben.
 
-## Siehe auch
+## Verwandtes
 
 - [Budgets](/docs/de/configuration/budgets)
-- [Kontext-Optimierung](/docs/de/cost-performance/context-optimization)
+- [Kontextoptimierung](/docs/de/cost-performance/context-optimization)

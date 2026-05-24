@@ -1,39 +1,37 @@
 ---
 title: Hoja de ruta
-description: Funciones entregadas, trabajo de consolidación y siguientes prioridades.
+description: Funciones entregadas, consolidación y siguiente priorización.
 ---
 
 # Hoja de ruta
 
-Hoja de ruta canónica: **[ROADMAP.md](https://github.com/LaProgrammerie/hyper-fast-builder/blob/main/ROADMAP.md)** en la raíz del repositorio.
+El orden oficial vive **[ROADMAP.md](https://github.com/LaProgrammerie/hyper-fast-builder/blob/main/ROADMAP.md)** junto al código; esta página lo presenta cómodamente desde el docs site.
 
 ## Entregado (V1 → V3)
 
-- Primitivas CLI: `init`, `spec`, `plan`, `dev`, `verify`, `review`, worktrees, SQLite
-- Capa de intención: `work`, `continue`, `next`, sync Notion
-- Coste/rendimiento: `estimate`, `investigate`, `context`, `cost`, MCP, TUI, métricas
+Incluye flujos CLI nucleares (`init`, `spec`, `plan`, `dev`, `verify`, `review` con worktrees y SQLite), superficie intention en NL (`work`, `continue`, `next`), sync Notion más la capa de costes/observabilidad (`estimate`, `investigate`, `context`, `cost`), MCP, TUI, métricas.
 
-## En curso (consolidación)
+## En progreso (consolidación)
 
-- Auditorías de arquitectura/seguridad/rendimiento bajo `docs/consolidation/`
-- Sitio de documentación pública (este sitio) + referencia CLI generada
-- Preparación OSS: Apache 2.0, CONTRIBUTING, ejemplos
+Hoy en día : auditorías bajo `docs/consolidation/`, publicación del docs site visible con refs CLI regeneradas, preparación OSS (Apache 2.0, `CONTRIBUTING`, ejemplos curados).
 
-## Prioridades siguientes
+## Próximo priorizado
 
-| Prioridad | Elemento |
+Tabla basto — la secuencia final sigue `docs/consolidation/TODO-prioritized.md`.
+
+| Prioridad | Ítem |
 | --- | --- |
-| P0 | Cobertura `workflow` / `intent/executor` > 50 % |
-| P0 | Tokenizers exactos por proveedor |
-| P1 | Caché persistente del paquete de contexto entre ejecuciones |
-| P1 | CI completa en GitHub Actions (test, lint, release) |
-| P2 | TUI interactiva bubbletea |
-| P2 | Embeddings vectoriales RAG |
+| P0 | Cobertura `workflow` / `intent/executor` > 50% |
+| P0 | Tokenizers exactísimos proveedor |
+| P1 | Caché persistente de packs context entre runs |
+| P1 | GitHub Actions CI pleno (test, lint, release) |
+| P2 | TUI bubbletea interactivo |
+| P2 | RAG embebido vector |
 | P3 | Multi-repo / estado remoto |
 
-Detalle: `docs/consolidation/TODO-prioritized.md`.
+Detalle complementario `docs/consolidation/TODO-prioritized.md`.
 
-## Ver también
+## Relacionado
 
 - [Contribuir](/docs/es/contributing)
 - [Límites](/docs/es/security/limits)

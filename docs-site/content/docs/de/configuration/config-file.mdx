@@ -1,15 +1,17 @@
 ---
 title: Konfigurationsdatei
-description: Vollständige Referenz zu Blöcken und Defaults von .agentflow/config.yaml.
+description: Vollständige Referenz zu Blöcken und Standardwerten in .agentflow/config.yaml.
 ---
 
 # Konfigurationsdatei
 
-Pfad: **`.agentflow/config.yaml`** (von `agentflow init` aus `config.yaml.example` erstellt). Alle Pfade sind relativ zum Repository-Root, sofern nicht absolut.
+Die kanonische Datei ist **`.agentflow/config.yaml`**, angelegt durch `agentflow init` aus `config.yaml.example`. Relative Pfade löst AgentFlow von der Repository-Wurzel aus. Das generierte JSON-Schema zur maschinellen Validierung liegt auf der Docs-Site unter `/schemas/config.schema.json`.
 
-JSON Schema (generiert): `/schemas/config.schema.json` auf der Docs-Site.
+Die folgenden Abschnitte folgen dem Aufbau der Datei: Jeder Block steuert einen Teilbereich — Intent, Standardwerte für `work`, Quellen, Persistenz, Agents, Validierung, Modelle, Kosten, Routing, UI, MCP und Repository-Richtlinien.
 
 ## `project`
+
+Projektname und Standardbranch für worktree-orientierte Abläufe.
 
 ```yaml
 project:
@@ -17,11 +19,9 @@ project:
   default_branch: main
 ```
 
-Anzeigename des Repos und Standard-Branch für Worktree-Operationen.
-
 ## `intent`
 
-Natural-Language-Auflösung für `work` / `continue` (`application/internal/intent`).
+Konfiguration für die Auflösung natürlicher Sprache bei `work` und `continue` (`application/internal/intent`): Resolver an oder aus, Modus, Verhalten bei niedriger Konfidenz und optionaler Ollama-Fallback.
 
 ```yaml
 intent:
@@ -35,7 +35,7 @@ intent:
 
 ## `work`
 
-Defaults für Orchestrierung und Agentenauswahl.
+Repo-weite Defaults für die Orchestrierung: welche Agents welche Rollen haben, wo die Pipeline stoppt, Schalter für Verifikation und Review, Task-Limits und ob eine Planbestätigung verlangt wird.
 
 ```yaml
 work:
@@ -51,9 +51,11 @@ work:
 
 ## `sources`
 
+Lokale Quellen durchsuchen feste Pfade nach Specs und aktivem Handoff; Notion ist optional und importiert Snapshots in den Baum.
+
 | Block | Zweck |
 | --- | --- |
-| `sources.local` | Scan von `.agentflow/specs`, `.kiro/specs`, `docs/ai/active` |
+| `sources.local` | z. B. `.agentflow/specs`, `.kiro/specs`, `docs/ai/active` |
 | `sources.notion` | Optional Notion → lokal (siehe [Notion](/docs/de/configuration/notion)) |
 
 ```yaml
@@ -73,6 +75,8 @@ sources:
 
 ## `specs`, `state`, `worktrees`
 
+Pfade für Kiro-artige Specs, SQLite-State und Worktree-Layout. `cleanup_policy` steuert das Aufräumen unter `worktrees.base_path`.
+
 ```yaml
 specs:
   kiro_path: .kiro/specs
@@ -91,9 +95,11 @@ worktrees:
 
 ## `agents`
 
-Logische Agent-IDs auf Subprocess-Befehle abbilden. Siehe [Agents-Konfiguration](/docs/de/configuration/agents).
+Logische Agent-IDs auf Unterprozess-Kommandos abbilden: [Agenten-Konfiguration](/docs/de/configuration/agents).
 
 ## `validation`
+
+`validation.commands` listet Prüfungen (Tests, Linter, eigene Skripte). Bei Go-Repos liefert der Bootstrap oft Defaults, wenn `go.mod` vorhanden ist.
 
 ```yaml
 validation:
@@ -103,11 +109,9 @@ validation:
       required: true
 ```
 
-Go-Repos erhalten Defaults aus dem Bootstrap, wenn `go.mod` existiert.
-
 ## `models`
 
-Logische Profile für Routing und Kosten (`specv3`). Keys sind beliebige IDs:
+Logische Profile für Routing und Kosten (`specv3`). Schlüssel sind frei wählbare IDs; jeder Eintrag verbindet Provider, Cost-Klasse, Modellnamen und erlaubte Nutzungsklassen.
 
 ```yaml
 models:
@@ -122,11 +126,11 @@ models:
 
 ## `budgets`
 
-Siehe [Budgets](/docs/de/configuration/budgets).
+Obergrenzen pro Run, Task und Tag: [Budgets](/docs/de/configuration/budgets).
 
 ## `pricing`
 
-Manuelle Preisliste — **keine hart codierten Cloud-Preise im Code**.
+Grenzkosten für Cloud und lokal kommen aus **Ihrem** YAML — **keine** fest eingebauten Cloud-Preise im Code. Ein aktuelles `updated_at` zeigt, wann Zahlen zuletzt mit einer Preisliste abgeglichen wurden.
 
 ```yaml
 pricing:
@@ -141,7 +145,7 @@ pricing:
 
 ## `token_estimation`
 
-Zeichen-pro-Token-Heuristiken (`application/internal/cost/token_counter.go`):
+Token-Zahlen fürs Budget nutzen Heuristiken zu Zeichen pro Token (`application/internal/cost/token_counter.go`). Feinanpassung rückt Schätzungen näher an Ihre Mischung aus Code und Prosa.
 
 ```yaml
 token_estimation:
@@ -152,16 +156,16 @@ token_estimation:
 ```
 
 <Callout type="cost">
-Diese Verhältnisse approximieren Token — es sind keine Anbieter-Tokenizer.
+Diese Verhältnisse nähern sich Tokens an — sie sind keine Provider-Tokenizer.
 </Callout>
 
 ## `routing`
 
-Siehe [Routing](/docs/de/configuration/routing).
+Schrittklassen zu lokalen oder Cloud-Agents: [Routing](/docs/de/configuration/routing).
 
 ## `ui`
 
-Terminal-UX (`application/internal/tui`):
+Terminal-Verhalten (`application/internal/tui`): Darstellungsmodus, Live-Logs, Fortschrittsbalken, kompakte Ausgabe.
 
 ```yaml
 ui:
@@ -173,7 +177,7 @@ ui:
 
 ## `mcp`
 
-Lokaler MCP-stdio-Server (`mcp.enabled` muss `true` sein, um Tools zu servieren):
+Wenn `mcp.enabled` `true` ist, kann AgentFlow einen lokalen stdio-MCP-Server mit Tool-Timeouts, Ausgabelimits, Investigation-Caps und Pfaden betreiben, die Investigation nicht lesen darf.
 
 ```yaml
 mcp:
@@ -190,6 +194,8 @@ mcp:
 
 ## `policies`
 
+Repo-weite Leitplanken: sauberes Git, Secret-Dateimuster, Limits geänderter Dateien, Netzwerk und Labels, die vor bestimmten Änderungsklassen eine menschliche Freigabe erzwingen.
+
 ```yaml
 policies:
   require_clean_git: true
@@ -202,10 +208,10 @@ policies:
     - dependency_upgrade
 ```
 
-## Änderungen validieren
+## Änderungen prüfen
+
+Nach YAML-Änderungen schnell mit `agentflow doctor` prüfen, bevor `work` echte Agents startet.
 
 ```bash
 agentflow doctor
 ```
-
-Nach YAML-Bearbeitung `doctor` vor `work` ausführen.

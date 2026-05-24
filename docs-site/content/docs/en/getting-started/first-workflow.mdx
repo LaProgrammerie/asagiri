@@ -5,64 +5,69 @@ description: Complete AgentFlow flow from init through report with real CLI comm
 
 # First workflow
 
-End-to-end flow aligned with `spec-doc` §11.1: initialize, verify, estimate, execute, inspect status, open the report.
+This page follows the same end-to-end contract as `spec-doc` §11.1: initialize the repo, verify the environment, estimate cost before spend, run the pipeline with an explicit intent, inspect status, and open the report. The goal is a reproducible sequence you can paste into a terminal, with no hidden steps between `init` and `report`.
 
 ## Prerequisites
 
-- AgentFlow built and on `PATH`
-- Git repository with at least one spec under `.kiro/specs/<feature>/` or `.agentflow/specs/`
-- `.agentflow/config.yaml` with agent commands that exist on your machine
+You need AgentFlow built and on `PATH`, a git repository whose specs live under `.kiro/specs/<feature>/` or `.agentflow/specs/`, and a `.agentflow/config.yaml` whose agent commands actually exist on your machine. Without those three, later steps will fail for obvious reasons—missing binary, missing spec, or a subprocess that cannot start.
 
 ## Steps
 
 ### 1. Initialize and verify
+
+Start from a clean understanding of the filesystem and toolchain AgentFlow will use:
 
 ```bash
 agentflow init
 agentflow doctor
 ```
 
+`doctor` is the gate: fix reported issues before estimating or executing.
+
 ### 2. Estimate before spending
+
+Run `work` in estimate-only mode so token and cost projections appear before any agent invocation:
 
 ```bash
 agentflow work "develop billing-v2" --estimate-only
 ```
 
-Review token/cost estimates and budget prompts. Use `--budget 0.50` or config `budgets` to cap spend. Pass `--allow-over-budget` only when config allows overrides.
+Read the token and cost estimates and any budget prompts. Cap spend with `--budget 0.50` or the `budgets` block in config. Use `--allow-over-budget` only when your config explicitly allows overrides—otherwise you are bypassing the guardrails you configured.
 
 ### 3. Plan-only rehearsal
+
+Confirm intent resolution and task selection without executing agents:
 
 ```bash
 agentflow work "develop billing-v2" --plan-only
 ```
 
-Confirms intent resolution and task selection without execution.
+This step is useful when you want to validate routing and planning before any `dev` work touches a worktree.
 
 ### 4. Execute the run
+
+When you are ready for real execution:
 
 ```bash
 agentflow work "develop billing-v2"
 ```
 
-With `intent.default_mode: guided` and `work.require_plan_confirmation: true`, AgentFlow asks before executing unless you pass `--yes`.
-
-Pipeline stages (typical): resolve intent → plan/enrich context → dev in worktree → verify → optional review → report.
+With `intent.default_mode: guided` and `work.require_plan_confirmation: true`, AgentFlow prompts before executing unless you pass `--yes`. The pipeline stages you typically see are: resolve intent, plan and enrich context, develop inside a worktree, verify, optional review, then report.
 
 ### 5. Status and report
+
+After execution (or if you need to find an ID), list runs and open the report for the run you care about:
 
 ```bash
 agentflow status
 agentflow report <run-id>
 ```
 
-Replace `<run-id>` with the ID from `status` (format like `run-2026-05-17-…`).
+Replace `<run-id>` with the identifier from `status` (format like `run-2026-05-17-…`).
 
 ## What you should see
 
-- SQLite state under `.agentflow/state.sqlite`
-- Per-run artefacts under `.agentflow/runs/<run-id>/`
-- Git worktree under `.agentflow/worktrees/` for active dev tasks
-- Validation output from commands in `validation.commands` (e.g. `go test ./...`)
+Successful runs leave **SQLite state** at `.agentflow/state.sqlite`, **per-run artefacts** under `.agentflow/runs/<run-id>/`, and—for active development tasks—a **git worktree** under `.agentflow/worktrees/`. Validation output comes from the commands you defined in `validation.commands` (for example `go test ./...`). Together those artefacts make the run inspectable after the fact without re-running agents.
 
 ## Resume and recovery
 
@@ -70,7 +75,7 @@ Replace `<run-id>` with the ID from `status` (format like `run-2026-05-17-…`).
 agentflow resume <run-id>
 ```
 
-Without `--dry-run`, **`resume` prints the next step name only** — it does not automatically re-invoke agents. Use `continue` or re-run the suggested command (`plan`, `enrich`, `dev`, …). Automatic step chaining exists only as **`agentflow resume <run-id> --execute` with global `--dry-run`**.
+Without `--dry-run`, **`resume` prints the next step name only**; it does not automatically re-invoke agents. Use `continue` or re-run the suggested command (`plan`, `enrich`, `dev`, …). Automatic step chaining exists only as **`agentflow resume <run-id> --execute` with global `--dry-run`**.
 
 <Callout type="experimental">
 Full non-dry-run auto-resume is not implemented. Prefer `agentflow continue` for intent-based continuation.
@@ -78,6 +83,4 @@ Full non-dry-run auto-resume is not implemented. Prefer `agentflow continue` for
 
 ## Related workflows
 
-- [Kiro → Cursor → Verify](/docs/workflows/kiro-to-cursor)
-- [Cost-aware workflow](/docs/workflows/cost-aware-workflow)
-- [Failure recovery](/docs/workflows/failure-recovery)
+For multi-tool flows and failure handling, see [Kiro → Cursor → Verify](/docs/workflows/kiro-to-cursor), [Cost-aware workflow](/docs/workflows/cost-aware-workflow), and [Failure recovery](/docs/workflows/failure-recovery).

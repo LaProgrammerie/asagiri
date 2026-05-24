@@ -1,11 +1,13 @@
 ---
 title: Budgets
-description: Geschätzte Kosten- und Token-Obergrenzen pro Lauf, Aufgabe und Tag.
+description: Geschätzte Kosten- und Token-Obergrenzen pro Run, Task und Tag.
 ---
 
 # Budgets
 
-Implementiert in `application/internal/cost/budget.go` und im V3-Pipeline vor Agentenausführung erzwungen.
+Budgets setzen vorhersagbare Obergrenzen für geschätzte Ausgaben und Token-Volumen, **bevor** Agenten laufen. Implementierung in `application/internal/cost/budget.go`; in der V3-Pipeline werden sie vor der Agentenausführung angewendet. Ein Lauf kann so abbrechen oder um Bestätigung bitten, statt unbemerkt über Ihre Grenzen zu steigen.
+
+Der YAML-Block unten zeigt die vollständige Form: Standardwährung, Caps pro Run und Task, tägliches Aggregat und Richtlinien zum Blockieren versus ausdrücklichem Override.
 
 ## Schema
 
@@ -27,21 +29,23 @@ budgets:
     override_flag: "--allow-over-budget"
 ```
 
-## CLI-Interaktion
+## Interaktion mit der CLI
+
+Dieselben Zahlen und Policies erreichen Sie über Flags: einen Lauf begrenzen, nach der Schätzung stoppen oder — wenn die Policy es erlaubt — einen Block umgehen. `--yes` ist der Ausweg nach `BudgetPendingConfirmError`, wenn die Schätzung geprüft wurde und Sie dennoch fortfahren möchten.
 
 | Flag | Verhalten |
 | --- | --- |
-| `--budget <EUR>` | Lauf-Level-Cap für diesen Aufruf |
-| `--estimate-only` | Stop nach Schätzung; keine Ausgaben |
-| `--allow-over-budget` | Umgehung der Sperre, wenn Policy es erlaubt |
-| `--yes` | Bestätigung nach `BudgetPendingConfirmError` akzeptieren |
+| `--budget <EUR>` | Run-spezifische Obergrenze für diesen Aufruf |
+| `--estimate-only` | Stoppt nach der Schätzung; keine bezahlte Ausführung |
+| `--allow-over-budget` | Umgeht den Block, wenn die Policy das erlaubt |
+| `--yes` | Bestätigt nach `BudgetPendingConfirmError` |
 
 ## Grenzen
 
-Schätzungen nutzen heuristische Token × Ihr `pricing`-Sheet. Reale Anbieterrechnungen können abweichen.
+Schätzungen multiplizieren heuristische Tokenzahlen mit den Raten aus `pricing`. Rechnungen der Anbieter können abweichen — etwa bei Tarifwechseln oder bei Abrechnungsfaktoren, die AgentFlow nicht modelliert.
 
 <Callout type="cost">
-`pricing.models` mit aktuellen Tarifen pflegen. Nullpreise verzerren Kostenanzeigen, deaktivieren aber keine Token-Caps.
+`pricing.models` mit aktuellen Raten pflegen. Nullpreise verzerren die Kostendarstellung, deaktivieren aber keine Token-Obergrenzen.
 </Callout>
 
 ## Siehe auch

@@ -1,19 +1,23 @@
 ---
 title: Variables de entorno
-description: Variables de entorno leídas por AgentFlow en tiempo de ejecución.
+description: Variables de entorno que AgentFlow respeta en ejecución.
 ---
 
 # Variables de entorno
 
+AgentFlow lee un conjunto corto explícito; sirve para que CI, shells y wrappers activen comportamiento sin reescribir configs.
+
 | Variable | Efecto |
 | --- | --- |
-| `AGENTFLOW_DRY_RUN` | Si vale `1`, equivalente al `--dry-run` global (también fijado por la capa exec) |
-| `AGENTFLOW_YES` | Si vale `1`, confirma automáticamente avisos interactivos (`requireConfirm`) |
-| `NOTION_TOKEN` | Token API de Notion por defecto cuando `sources.notion.token_env` es `NOTION_TOKEN` |
-| `NOTION_TEST_PAGE_ID` | solo pruebas de integración (`source/notion/integration_test.go`) |
-| `UPDATE_GOLDEN` | Si vale `1`, actualiza archivos golden del paquete `cost` |
+| `AGENTFLOW_DRY_RUN` | Con `1`, equivale a `--dry-run` global (capa exec puede fijarlo) |
+| `AGENTFLOW_YES` | Con `1`, confirma automáticamente prompts (`requireConfirm`) |
+| `NOTION_TOKEN` | Token por defecto si `sources.notion.token_env` es `NOTION_TOKEN` |
+| `NOTION_TEST_PAGE_ID` | Solo pruebas de integración (`source/notion/integration_test.go`) |
+| `UPDATE_GOLDEN` | Con `1`, refresca archivos golden del paquete `cost` |
 
-## Token de Notion personalizado
+## Token Notion renombrado
+
+Si cambia nombre de secreto mantenga sincronizado `token_env` para que sync + API coincidan en la fuente.
 
 ```yaml
 sources:
@@ -25,16 +29,18 @@ sources:
 export MY_NOTION_SECRET="..."
 ```
 
-## Uso en CI
+## Uso CI
+
+`AGENTFLOW_DRY_RUN=1` habitual para ensayos orquestación sin binarios verdaderamente invocados. `AGENTFLOW_YES=1` resérvelo a jobs donde confirmaciones no debieran frenar después de chequear conscientemente límites de presupuesto.
 
 ```yaml
 env:
   AGENTFLOW_DRY_RUN: "1"
 ```
 
-Evite `AGENTFLOW_YES=1` salvo que la canalización deba omitir confirmaciones de presupuesto intencionalmente.
+Evite `AGENTFLOW_YES=1` salvo esa necesidad.
 
-## Ver también
+## Relacionado
 
-- [Configuración de Notion](/docs/es/configuration/notion)
-- [Flujo de CI](/docs/es/workflows/ci-workflow)
+- [Configuración Notion](/docs/es/configuration/notion)
+- [Flujo CI](/docs/es/workflows/ci-workflow)
