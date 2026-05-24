@@ -6,12 +6,13 @@ Complements `AGENTS.md`: **where things live**, **who consumes what**, and **how
 
 | Topic | Where it lives |
 |-------|----------------|
-| **AgentFlow consolidation (OSS / fiabilisation)** | `spec-postv123.md`, `docs/consolidation/` |
-| **Public documentation site** | `spec-doc.md`, `spec-deploy-doc.md`, `docs-site/` (Fumadocs → **Cloudflare Pages**) ; contenu `content/docs/{en,fr,de,es}/` — **en** défaut/fallback, référence CLI générée uniquement sous `en/cli/generated/` ; CI `.github/workflows/docs-cloudflare-pages.yml` |
+| **Asagiri rebrand (spec-rename)** | `spec-rename.md`, `docs/ai/active/handoff.md`, ADR-016, `docs/migration/github-rename-asagiri.md` |
+| **Consolidation OSS / fiabilisation** | `spec-postv123.md`, `docs/consolidation/` |
+| **Public documentation site** | `spec-doc.md`, `spec-deploy-doc.md`, `docs-site/` (Fumadocs → **Cloudflare Pages**, projet **`asagiri-docs`**) ; contenu `content/docs/{en,fr,de,es}/` — **en** défaut/fallback, référence CLI générée sous `en/cli/generated/` ; CI `.github/workflows/docs-cloudflare-pages.yml` |
 | **Doc / code / spec drift tracker** | `problems.md` (repo root) |
-| **AgentFlow spec courante (cost/perf)** | `specv3.md` (repo root) |
-| **AgentFlow intent layer** | `specv2.md` (repo root) |
-| **AgentFlow V1 spec (historique)** | `spec.md` (repo root) |
+| **Asagiri cost/perf (V3)** | `specv3.md` (repo root) |
+| **Intent layer** | `specv2.md` (repo root) |
+| **V1 spec (historique, noms AgentFlow)** | `spec.md` (repo root) |
 | Short cross-tool index | `AGENTS.md` (root) |
 | Stack locale (Go, Docker, Makefile) | `docs/ai/02-architecture.md`, `docs/ai/03-standards.md`, `Makefile` |
 | Decisions / architecture / standards (detail) | `docs/ai/*.md` |
@@ -25,6 +26,7 @@ Complements `AGENTS.md`: **where things live**, **who consumes what**, and **how
 | This repo as **upstream template** for forks | `.cursor/rules/template-is-upstream.mdc`, `.kiro/steering/35-template-downstream.md` |
 | Template drift sync hooks/rules for downstream repos | `.cursor/hooks.json`, `.cursor/hooks/template-sync-*.sh`, `.cursor/rules/template-generic-sync.mdc`, `.kiro/steering/35-template-generic-sync.md` |
 | GitHub bridge | `.github/copilot-instructions.md` |
+| Phase 2 repo + module Go path | `docs/migration/github-rename-asagiri.md` |
 
 ## Recommended reading order
 

@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/telemetry"
+	"github.com/LaProgrammerie/asagiri/application/internal/telemetry"
 )
 
 // StoreHistory adapts telemetry.MetricsStore to HistoryReader.

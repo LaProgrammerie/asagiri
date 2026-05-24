@@ -1,11 +1,11 @@
 ---
 title: Installation
-description: Installer AgentFlow et préparer un dépôt pour des workflows IA orchestrés.
+description: Installer Asagiri et préparer un dépôt pour des workflows IA orchestrés.
 ---
 
 # Installation
 
-AgentFlow est une CLI Go qui relie specs, investigation locale, worktrees Git, agents de codage externes et commandes de validation. La voie d’installation est réfléchie : vous obtenez un binaire unique, le pointez sur un dépôt, et l’outil gère le cycle de vie des runs, worktrees et état sur disque. Cette page couvre la compilation ou le placement du binaire, l’initialisation `.agentflow/` dans un projet, et la confirmation que Git, la config et les commandes agents s’alignent avant un `work`.
+Asagiri est une CLI Go qui relie specs, investigation locale, worktrees Git, agents de codage externes et commandes de validation. La voie d’installation est réfléchie : vous obtenez un binaire unique, le pointez sur un dépôt, et l’outil gère le cycle de vie des runs, worktrees et état sur disque. Cette page couvre la compilation ou le placement du binaire, l’initialisation `.asagiri/` dans un projet, et la confirmation que Git, la config et les commandes agents s’alignent avant un `work`.
 
 ## Prérequis
 
@@ -13,7 +13,7 @@ AgentFlow est une CLI Go qui relie specs, investigation locale, worktrees Git, a
 | --- | --- |
 | **Go 1.25+** | Build depuis les sources ou binaire livré |
 | **Git** | Requis pour worktrees, états et diffs |
-| **Agents configurés** | Au minimum les commandes citées dans `.agentflow/config.yaml` (`cursor-agent`, `kiro`, `ollama`, etc.) |
+| **Agents configurés** | Au minimum les commandes citées dans `.asagiri/config.yaml` (`cursor-agent`, `kiro`, `ollama`, etc.) |
 
 Optionnel : **Ollama** pour enrichissement local ou routage, et jeton **Notion** pour la synchro (`NOTION_TOKEN`).
 
@@ -21,24 +21,24 @@ Optionnel : **Ollama** pour enrichissement local ou routage, et jeton **Notion**
 
 ```bash
 brew tap LaProgrammerie/tap
-brew install agentflow
-agentflow version
+brew install asa
+asa version
 ```
 
 La formule est publiée dans [LaProgrammerie/homebrew-tap](https://github.com/LaProgrammerie/homebrew-tap) à chaque tag de release.
 
 ## Installation manuelle (binaire publié)
 
-Téléchargez archives et sommes depuis [GitHub Releases](https://github.com/LaProgrammerie/hyper-fast-builder/releases). Noms d’archives type GoReleaser : `agentflow_Darwin_arm64.tar.gz`, `agentflow_Linux_x86_64.tar.gz`, `agentflow_Windows_arm64.zip`, etc.
+Téléchargez archives et sommes depuis [GitHub Releases](https://github.com/LaProgrammerie/asagiri/releases). Noms d’archives type GoReleaser : `asa_Darwin_arm64.tar.gz`, `asa_Linux_x86_64.tar.gz`, `asa_Windows_arm64.zip`, etc.
 
 ```bash
 VERSION=v0.1.0
-curl -LO "https://github.com/LaProgrammerie/hyper-fast-builder/releases/download/${VERSION}/checksums.txt"
-curl -LO "https://github.com/LaProgrammerie/hyper-fast-builder/releases/download/${VERSION}/agentflow_Darwin_arm64.tar.gz"
+curl -LO "https://github.com/LaProgrammerie/asagiri/releases/download/${VERSION}/checksums.txt"
+curl -LO "https://github.com/LaProgrammerie/asagiri/releases/download/${VERSION}/asa_Darwin_arm64.tar.gz"
 sha256sum -c checksums.txt
-tar -xzf agentflow_Darwin_arm64.tar.gz
-sudo install -m 755 agentflow /usr/local/bin/agentflow
-agentflow version
+tar -xzf asa_Darwin_arm64.tar.gz
+sudo install -m 755 asa /usr/local/bin/asa
+asa version
 ```
 
 Adaptez `VERSION`, le nom d’archive et le chemin d’installation à votre OS et CPU.
@@ -48,36 +48,36 @@ Adaptez `VERSION`, le nom d’archive et le chemin d’installation à votre OS 
 Clonez le dépôt, compilez avec le `Makefile` du projet et utilisez le binaire sous `bin/` :
 
 ```bash
-git clone https://github.com/LaProgrammerie/hyper-fast-builder.git
-cd hyper-fast-builder
+git clone https://github.com/LaProgrammerie/asagiri.git
+cd asagiri
 make build
-./bin/agentflow version
+./bin/asa version
 ```
 
-Ajoutez `bin/` au `PATH`, ou copiez `bin/agentflow` dans tout répertoire déjà présent dans `PATH`.
+Ajoutez `bin/` au `PATH`, ou copiez `bin/asa` dans tout répertoire déjà présent dans `PATH`.
 
 ## Initialiser un dépôt
 
-Depuis la racine de votre projet, lancez `agentflow init`. La commande génère la surface locale AgentFlow pour que les commandes suivantes partagent un fichier de configuration et une base SQLite.
+Depuis la racine de votre projet, lancez `asa init`. La commande génère la surface locale Asagiri pour que les commandes suivantes partagent un fichier de configuration et une base SQLite.
 
 ```bash
-agentflow init
+asa init
 ```
 
 Crée :
 
-- `.agentflow/` — config, état SQLite, runs, worktrees
-- `.agentflow/config.yaml` — copie de `config.yaml.example` lorsqu’il manque
-- `.agentflow/state.sqlite` — suivi runs et tâches
+- `.asagiri/` — config, état SQLite, runs, worktrees
+- `.asagiri/config.yaml` — copie de `config.yaml.example` lorsqu’il manque
+- `.asagiri/state.sqlite` — suivi runs et tâches
 
-Listez `.agentflow/state.sqlite` et `.agentflow/worktrees/` dans `.gitignore`. `init` rappelle qu’ils ne doivent pas être versionnés.
+Listez `.asagiri/state.sqlite` et `.asagiri/worktrees/` dans `.gitignore`. `init` rappelle qu’ils ne doivent pas être versionnés.
 
 ## Vérifier l’installation
 
-Après toute voie d’installation (Homebrew, binaire release ou `make build`), exécutez `agentflow doctor`. Doctor vérifie Git, la présence de la config, la résolution des commandes agents sur `PATH`, et signale les pièges fréquents avant de passer du temps sur un `work` bloqué.
+Après toute voie d’installation (Homebrew, binaire release ou `make build`), exécutez `asa doctor`. Doctor vérifie Git, la présence de la config, la résolution des commandes agents sur `PATH`, et signale les pièges fréquents avant de passer du temps sur un `work` bloqué.
 
 ```bash
-agentflow doctor
+asa doctor
 ```
 
 Corrigez ce qu’il signale avant d’utiliser `work`.
@@ -87,7 +87,7 @@ Corrigez ce qu’il signale avant d’utiliser `work`.
 Copiez l’exemple et éditez-le pour agents, budgets ou routage personnalisés :
 
 ```bash
-cp .agentflow/config.yaml.example .agentflow/config.yaml
+cp .asagiri/config.yaml.example .asagiri/config.yaml
 ```
 
 Pour chaque bloc YAML et défaut par défaut, voir [Fichier de configuration](/docs/fr/configuration/config-file).

@@ -1,19 +1,23 @@
 ---
 title: Environment variables
-description: Environment variables read by AgentFlow at runtime.
+description: Environment variables read by Asagiri at runtime.
 ---
 
 # Environment variables
 
-AgentFlow reads a small, explicit set of environment variables. They exist so CI, shells, and wrappers can flip global behavior without rewriting configs.
+Asagiri reads a small, explicit set of environment variables. They exist so CI, shells, and wrappers can flip global behavior without rewriting configs.
 
 | Variable | Effect |
 | --- | --- |
-| `AGENTFLOW_DRY_RUN` | When `1`, same as global `--dry-run` (also set by exec layer) |
-| `AGENTFLOW_YES` | When `1`, auto-confirms interactive prompts (`requireConfirm`) |
+| `ASA_DRY_RUN` | When `1`, same as global `--dry-run` (also set by exec layer) |
+| `ASA_YES` | When `1`, auto-confirms interactive prompts (`requireConfirm`) |
 | `NOTION_TOKEN` | Default Notion API token when `sources.notion.token_env` is `NOTION_TOKEN` |
 | `NOTION_TEST_PAGE_ID` | Integration tests only (`source/notion/integration_test.go`) |
 | `UPDATE_GOLDEN` | When `1`, refresh golden test files in `cost` package |
+
+## Legacy `AGENTFLOW_*` variables
+
+`AGENTFLOW_DRY_RUN` and `AGENTFLOW_YES` still work but are **deprecated**; Asagiri prints a stderr warning and reads `ASA_DRY_RUN` / `ASA_YES` when set. Prefer the `ASA_*` names in new scripts and CI configs.
 
 ## Custom Notion token env
 
@@ -31,14 +35,14 @@ export MY_NOTION_SECRET="..."
 
 ## CI usage
 
-`AGENTFLOW_DRY_RUN=1` is the usual way to exercise orchestration in pipelines without spawning configured binaries. Reserve `AGENTFLOW_YES=1` for jobs that must auto-accept prompts **after** you are certain budget confirmations should not block the job.
+`ASA_DRY_RUN=1` is the usual way to exercise orchestration in pipelines without spawning configured binaries. Reserve `ASA_YES=1` for jobs that must auto-accept prompts **after** you are certain budget confirmations should not block the job.
 
 ```yaml
 env:
-  AGENTFLOW_DRY_RUN: "1"
+  ASA_DRY_RUN: "1"
 ```
 
-Avoid `AGENTFLOW_YES=1` unless the pipeline must bypass budget confirmations intentionally.
+Avoid `ASA_YES=1` unless the pipeline must bypass budget confirmations intentionally.
 
 ## Related
 

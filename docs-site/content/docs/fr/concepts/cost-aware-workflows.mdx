@@ -9,9 +9,9 @@ description: Estimer jetons et coût avant exécution ; appliquer budgets et rou
 
 Les runs agent peuvent consommer des jetons de façon difficile à prévoir à partir d'une simple description de tâche. Les équipes ont tout de même besoin de **prévisions** avant exécution, de **plafonds budgétaires** qui échouent fermés, et d'un **routage** qui préfère les chemins d'exécution moins chers quand la tâche ne justifie pas un modèle lourd.
 
-## Approche AgentFlow
+## Approche Asagiri
 
-AgentFlow y répond avec quatre mécanismes concrets sous votre config :
+Asagiri y répond avec quatre mécanismes concrets sous votre config :
 
 1. **Comptage heuristique de jetons** — comptage de caractères par type de contenu, divisé par les ratios `token_estimation` (`token_estimation` dans la config)
 2. **Grille tarifaire** — entrées manuelles `pricing.models` pour les modèles cloud (pas de prix fournisseur codés en dur)
@@ -21,13 +21,13 @@ AgentFlow y répond avec quatre mécanismes concrets sous votre config :
 Points d'entrée CLI typiques :
 
 ```bash
-agentflow estimate billing-v2 --task task-003 --dry-run
-agentflow work "develop billing-v2" --estimate-only
-agentflow work "develop billing-v2" --budget 0.50 --allow-over-budget
+asa estimate billing-v2 --task task-003 --dry-run
+asa work "develop billing-v2" --estimate-only
+asa work "develop billing-v2" --budget 0.50 --allow-over-budget
 ```
 
 <Callout type="cost">
-Les estimations sont **approximatives**. La facturation fournisseur utilise de vrais tokenizers ; AgentFlow ne fournit pas encore de compteurs exacts fournisseur.
+Les estimations sont **approximatives**. La facturation fournisseur utilise de vrais tokenizers ; Asagiri ne fournit pas encore de compteurs exacts fournisseur.
 </Callout>
 
 ## Compromis

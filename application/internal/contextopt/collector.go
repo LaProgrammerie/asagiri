@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/config"
+	"github.com/LaProgrammerie/asagiri/application/internal/config"
 )
 
 type CollectOpts struct {
@@ -31,7 +31,7 @@ func Collect(repoRoot, feature string, cfg *config.Config, opts CollectOpts) ([]
 	if feature != "" {
 		paths = append(paths,
 			filepath.Join(".kiro", "specs", feature),
-			filepath.Join(".agentflow", "specs", feature),
+			filepath.Join(".asagiri", "specs", feature),
 		)
 	}
 	for _, p := range cfg.Sources.Local.Paths {
@@ -144,7 +144,7 @@ func skipDir(rel string) bool {
 	parts := strings.Split(filepath.ToSlash(rel), "/")
 	for _, p := range parts {
 		switch p {
-		case "node_modules", "vendor", ".git", "dist", "build", ".agentflow", "terminals":
+		case "node_modules", "vendor", ".git", "dist", "build", ".asagiri", "terminals":
 			return true
 		}
 	}

@@ -5,10 +5,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/config"
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/contextopt"
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/investigation"
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/intent"
+	"github.com/LaProgrammerie/asagiri/application/internal/config"
+	"github.com/LaProgrammerie/asagiri/application/internal/contextopt"
+	"github.com/LaProgrammerie/asagiri/application/internal/investigation"
+	"github.com/LaProgrammerie/asagiri/application/internal/intent"
 )
 
 func TestBuildEstimateLocalAgent(t *testing.T) {

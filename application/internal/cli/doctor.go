@@ -3,7 +3,7 @@ package cli
 import (
 	"os"
 
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/bootstrap"
+	"github.com/LaProgrammerie/asagiri/application/internal/bootstrap"
 	"github.com/spf13/cobra"
 )
 

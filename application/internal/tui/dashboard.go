@@ -7,7 +7,7 @@ import (
 
 // RenderDashboard prints a compact multi-line status block.
 func RenderDashboard(out io.Writer, feature, task, budget string, inputTok, outTok int, cost string) {
-	fmt.Fprintf(out, "AgentFlow Work\n")
+	fmt.Fprintf(out, "Asagiri Work\n")
 	fmt.Fprintf(out, "══════════════\n")
 	fmt.Fprintf(out, "Feature  %s\n", feature)
 	fmt.Fprintf(out, "Task     %s\n", task)

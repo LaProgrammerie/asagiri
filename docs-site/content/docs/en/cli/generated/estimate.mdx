@@ -1,20 +1,20 @@
 ---
-title: Estimate · AgentFlow CLI
+title: Estimate · Asagiri CLI
 description: Estimer tokens/coût/temps sans exécuter
 ---
 
-CLI path: **`agentflow estimate`**
+CLI path: **`asa estimate`**
 
 ## When to use
 
-Orchestration commands coordinate higher-order AgentFlow workloads such as ingestion, syncing, backlog triage, investigative passes, hydrated context payloads, coarse estimates, and workspace-specific automation.
+Orchestration commands coordinate higher-order Asagiri workloads such as ingestion, syncing, backlog triage, investigative passes, hydrated context payloads, coarse estimates, and workspace-specific automation.
 
 > Original CLI synopsis: Estimer tokens/coût/temps sans exécuter
 
 ## Usage
 
 ```bash
-agentflow estimate [flags]
+asa estimate [flags]
 ```
 
 ## Options
@@ -28,7 +28,7 @@ agentflow estimate [flags]
 ## Examples
 
 ```bash
-agentflow estimate
+asa estimate
 ```
 
 > Wire richer samples through **cobra.Command.Example** when the happy path warrants copy/paste-friendly automation beyond this scaffold.
@@ -40,7 +40,7 @@ agentflow estimate
 ## Failure modes
 
 - Cobra rejects unknown flags or arity mismatches before any repository side effects occur.
-- AgentFlow cannot resolve scaffolding when the command is invoked outside an initialised checkout.
+- Asagiri cannot resolve scaffolding when the command is invoked outside an initialised checkout.
 - Downstream automation may fail whenever credentials, network endpoints, or cached prerequisites drift from expectations.
 
 ## Related commands

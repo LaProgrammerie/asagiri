@@ -7,7 +7,7 @@ description: Notion-Seiten in lokale Spec-Snapshots synchronisieren; Ausführung
 
 ## Grundsatz
 
-**Notion ist nie die alleinige Laufzeitwahrheit.** AgentFlow arbeitet immer von einem **lokalen Snapshot** unter `.agentflow/specs/` (oder den Pfaden in `sources.local.paths`). Sync holt Inhalt aus der Cloud; `work` liest lokale Dateien und SQLite-Zustand.
+**Notion ist nie die alleinige Laufzeitwahrheit.** Asagiri arbeitet immer von einem **lokalen Snapshot** unter `.asagiri/specs/` (oder den Pfaden in `sources.local.paths`). Sync holt Inhalt aus der Cloud; `work` liest lokale Dateien und SQLite-Zustand.
 
 Produkt- und Designrollen können in Notion schreiben; Engineering wiederholt Läufe aus **Dateisystem-Snapshots**. So bleibt das Verhalten nachvollziehbar, wenn sich Workspace-Schemas oder Datenbankstrukturen ändern.
 
@@ -17,7 +17,7 @@ Notion-Sync verlangt Konfiguration und ein gültiges API-Token. Behandeln Sie Sy
 
 ## Notion konfigurieren
 
-YAML spiegelt das Schema: Connector aktivieren, Umgebungsvariable für das PAT festlegen, Datenbank-ID der Specs setzen, Importpfad typischerweise `.agentflow/specs` (anders wo dokumentiert).
+YAML spiegelt das Schema: Connector aktivieren, Umgebungsvariable für das PAT festlegen, Datenbank-ID der Specs setzen, Importpfad typischerweise `.asagiri/specs` (anders wo dokumentiert).
 
 ```yaml
 sources:
@@ -25,7 +25,7 @@ sources:
     enabled: true
     token_env: NOTION_TOKEN
     specs_database_id: "<your-database-id>"
-    import_path: .agentflow/specs
+    import_path: .asagiri/specs
 ```
 
 Token setzen:
@@ -39,14 +39,14 @@ export NOTION_TOKEN="ntn_..."
 Einzelne Seite per URL oder alle aktivierten Quellen:
 
 ```bash
-agentflow sync notion --page "https://www.notion.so/..."
-agentflow sync all
+asa sync notion --page "https://www.notion.so/..."
+asa sync all
 ```
 
 Vorschau ohne Seiteneffekte:
 
 ```bash
-agentflow --dry-run sync notion --page "https://www.notion.so/..."
+asa --dry-run sync notion --page "https://www.notion.so/..."
 ```
 
 Im interaktiven Modus kann vor dem Überschreiben einer lokal geänderten Spec nachgefragt werden.
@@ -56,8 +56,8 @@ Im interaktiven Modus kann vor dem Überschreiben einer lokal geänderten Spec n
 Listing und Ausführung lesen denselben synchronisierten Baum:
 
 ```bash
-agentflow inbox --source notion
-agentflow work "develop billing-v2" --source notion
+asa inbox --source notion
+asa work "develop billing-v2" --source notion
 ```
 
 ## Abwägungen

@@ -1,9 +1,9 @@
 ---
-title: Docs · AgentFlow CLI
-description: Documentation tooling for AgentFlow artefacts
+title: Docs · Asagiri CLI
+description: Documentation tooling for Asagiri artefacts
 ---
 
-CLI path: **`agentflow docs`**
+CLI path: **`asa docs`**
 
 ## When to use
 
@@ -11,12 +11,12 @@ Use **docs** commands when refreshing machine-generated reference material—for
 
 **generate-cli** is safe to run repeatedly; outputs are regenerated wholesale under the **--output** directory.
 
-> Original CLI synopsis: Documentation tooling for AgentFlow artefacts
+> Original CLI synopsis: Documentation tooling for Asagiri artefacts
 
 ## Usage
 
 ```bash
-agentflow docs [flags]
+asa docs [flags]
 ```
 
 ## Options
@@ -28,7 +28,7 @@ agentflow docs [flags]
 ## Examples
 
 ```bash
-agentflow docs
+asa docs
 ```
 
 > Wire richer samples through **cobra.Command.Example** when the happy path warrants copy/paste-friendly automation beyond this scaffold.
@@ -40,7 +40,7 @@ agentflow docs
 ## Failure modes
 
 - Cobra rejects unknown flags or arity mismatches before any repository side effects occur.
-- AgentFlow cannot resolve scaffolding when the command is invoked outside an initialised checkout.
+- Asagiri cannot resolve scaffolding when the command is invoked outside an initialised checkout.
 - Filesystem ACLs can deny writes under **--output**, leaving partial artefacts if interrupted mid-write.
 
 ## Related commands

@@ -6,13 +6,13 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/LaProgrammerie/hyper-fast-builder/application/pkg/agentflow"
+	"github.com/LaProgrammerie/asagiri/application/pkg/asagiri"
 )
 
-const OutputFormatV1 = "agentflow-v1"
+const OutputFormatV1 = "asagiri-v1"
 
 // BuildContext constructs a spec §9.1 context from task fields.
-func BuildContext(runID string, task *agentflow.Task, contextFiles []string) agentflow.AgentContext {
+func BuildContext(runID string, task *asagiri.Task, contextFiles []string) asagiri.AgentContext {
 	allowed := task.Scope.AllowedPaths
 	if len(allowed) == 0 {
 		allowed = []string{"application/**"}
@@ -21,7 +21,7 @@ func BuildContext(runID string, task *agentflow.Task, contextFiles []string) age
 	if len(valCmds) == 0 {
 		valCmds = []string{"go test ./..."}
 	}
-	return agentflow.AgentContext{
+	return asagiri.AgentContext{
 		RunID:              runID,
 		TaskID:             task.ID,
 		Objective:          task.Title,
@@ -35,29 +35,29 @@ func BuildContext(runID string, task *agentflow.Task, contextFiles []string) age
 }
 
 // DryRunResult returns a fixture result for dry-run mode.
-func DryRunResult(summary string) agentflow.AgentResult {
-	return agentflow.AgentResult{
+func DryRunResult(summary string) asagiri.AgentResult {
+	return asagiri.AgentResult{
 		Status:              "completed",
 		Summary:             summary,
 		ChangedFiles:        []string{},
-		CommandsRun:         []agentflow.CommandRun{},
+		CommandsRun:         []asagiri.CommandRun{},
 		Risks:               []string{},
 		RequiresHumanReview: true,
 	}
 }
 
 // ParseResult attempts to parse agent stdout as AgentResult JSON.
-func ParseResult(stdout string) (agentflow.AgentResult, bool) {
+func ParseResult(stdout string) (asagiri.AgentResult, bool) {
 	stdout = trimJSON(stdout)
 	if stdout == "" {
-		return agentflow.AgentResult{}, false
+		return asagiri.AgentResult{}, false
 	}
-	var res agentflow.AgentResult
+	var res asagiri.AgentResult
 	if err := json.Unmarshal([]byte(stdout), &res); err != nil {
-		return agentflow.AgentResult{}, false
+		return asagiri.AgentResult{}, false
 	}
 	if res.Status == "" {
-		return agentflow.AgentResult{}, false
+		return asagiri.AgentResult{}, false
 	}
 	return res, true
 }
@@ -80,9 +80,9 @@ func trimSpace(s string) string {
 	return s
 }
 
-// WriteLogs persists context.json and result.json under .agentflow/logs/<task-id>/.
-func WriteLogs(repoRoot, taskID string, ctx agentflow.AgentContext, res agentflow.AgentResult) error {
-	logDir := filepath.Join(repoRoot, ".agentflow", "logs", taskID)
+// WriteLogs persists context.json and result.json under .asagiri/logs/<task-id>/.
+func WriteLogs(repoRoot, taskID string, ctx asagiri.AgentContext, res asagiri.AgentResult) error {
+	logDir := filepath.Join(repoRoot, ".asagiri", "logs", taskID)
 	if err := os.MkdirAll(logDir, 0o755); err != nil {
 		return fmt.Errorf("create log dir: %w", err)
 	}

@@ -1,9 +1,9 @@
 ---
-title: Docs Generate-cli · AgentFlow CLI
+title: Docs Generate-cli · Asagiri CLI
 description: The generator walks every command except the root binary and writes one deterministic MDX file per reachable node.
 ---
 
-CLI path: **`agentflow docs generate-cli`**
+CLI path: **`asa docs generate-cli`**
 
 ## When to use
 
@@ -16,7 +16,7 @@ Use **docs** commands when refreshing machine-generated reference material—for
 ## Usage
 
 ```bash
-agentflow docs generate-cli [flags]
+asa docs generate-cli [flags]
 ```
 
 ## Options
@@ -29,7 +29,7 @@ agentflow docs generate-cli [flags]
 ## Examples
 
 ```bash
-agentflow docs generate-cli
+asa docs generate-cli
 ```
 
 > Wire richer samples through **cobra.Command.Example** when the happy path warrants copy/paste-friendly automation beyond this scaffold.
@@ -43,7 +43,7 @@ agentflow docs generate-cli
 ## Failure modes
 
 - Cobra rejects unknown flags or arity mismatches before any repository side effects occur.
-- AgentFlow cannot resolve scaffolding when the command is invoked outside an initialised checkout.
+- Asagiri cannot resolve scaffolding when the command is invoked outside an initialised checkout.
 - Filesystem ACLs can deny writes under **--output**, leaving partial artefacts if interrupted mid-write.
 
 ## Related commands

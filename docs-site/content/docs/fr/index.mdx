@@ -1,31 +1,31 @@
 ---
-title: AgentFlow
+title: Asagiri
 description: Orchestration déterministe des workflows de développement assisté par IA.
 ---
 
-# AgentFlow
+# Asagiri
 
 Orchestration déterministe des workflows de développement assisté par IA.
 
-AgentFlow transforme les spécifications en exécutions de développement auditables et conscientes des coûts. Le pipeline combine investigation locale, git worktrees, agents de code externes, les commandes de validation que vous définissez et des rapports reproductibles : chaque exécution laisse une trace exploitable plutôt qu’un fil de discussion opaque.
+Asagiri transforme les spécifications en exécutions de développement auditables et conscientes des coûts. Le pipeline combine investigation locale, git worktrees, agents de code externes, les commandes de validation que vous définissez et des rapports reproductibles : chaque exécution laisse une trace exploitable plutôt qu’un fil de discussion opaque.
 
 ```bash
-agentflow work "develop billing-v2"
+asa work "develop billing-v2"
 ```
 
 ## Idées centrales
 
-**L’investigation locale d’abord** précède les appels aux modèles cloud. AgentFlow parcourt le dépôt avec un grep borné et une traversée contrôlée du système de fichiers, puis resserre le contexte pour éviter d’envoyer l’arbre entier vers des API distantes par défaut.
+**L’investigation locale d’abord** précède les appels aux modèles cloud. Asagiri parcourt le dépôt avec un grep borné et une traversée contrôlée du système de fichiers, puis resserre le contexte pour éviter d’envoyer l’arbre entier vers des API distantes par défaut.
 
 **L’estimation des coûts et des jetons** donne une vision de la dépense attendue avant l’exécution. Des compteurs heuristiques et des grilles tarifaires configurables fournissent des garde-fous d’ordre de grandeur ; les budgets peuvent bloquer ou exiger une confirmation avant le lancement des agents.
 
-**L’isolation par git worktree** place chaque tâche sur sa branche et son arbre de travail sous `.agentflow/worktrees/`, ce qui limite les collisions lorsque plusieurs évolutions avancent en parallèle.
+**L’isolation par git worktree** place chaque tâche sur sa branche et son arbre de travail sous `.asagiri/worktrees/`, ce qui limite les collisions lorsque plusieurs évolutions avancent en parallèle.
 
 **Le routage des agents** associe les classes d’étapes du pipeline au profil que vous avez configuré — Ollama local pour le triage, CLI cloud pour l’implémentation lourde — selon la stratégie et les politiques définies en YAML.
 
-**La validation avant confiance** signifie qu’AgentFlow exécute vos commandes (`go test`, linters, scripts personnalisés), et non l’auto-évaluation de l’agent, avant de considérer une étape comme terminée.
+**La validation avant confiance** signifie qu’Asagiri exécute vos commandes (`go test`, linters, scripts personnalisés), et non l’auto-évaluation de l’agent, avant de considérer une étape comme terminée.
 
-**Les rapports reproductibles** écrivent du Markdown et du JSON sous `.agentflow/runs/<run-id>/` afin d’auditer ce qui a tourné, ce que cela a coûté et ce qu’a rapporté la validation.
+**Les rapports reproductibles** écrivent du Markdown et du JSON sous `.asagiri/runs/<run-id>/` afin d’auditer ce qui a tourné, ce que cela a coûté et ce qu’a rapporté la validation.
 
 ## Démarrage
 
@@ -36,5 +36,5 @@ Pour onboarder un dépôt, enchaînez ces pages dans l’ordre :
 3. [Premier workflow](/docs/fr/getting-started/first-workflow)
 
 <Callout type="warning">
-AgentFlow ne prouve pas la correction. La validation et la revue humaine restent obligatoires pour les changements critiques.
+Asagiri ne prouve pas la correction. La validation et la revue humaine restent obligatoires pour les changements critiques.
 </Callout>

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/rag"
+	"github.com/LaProgrammerie/asagiri/application/internal/rag"
 	"github.com/spf13/cobra"
 )
 

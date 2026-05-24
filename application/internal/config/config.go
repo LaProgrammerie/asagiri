@@ -5,19 +5,25 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 
 	"gopkg.in/yaml.v3"
 )
 
 const (
-	DefaultConfigRel     = ".agentflow/config.yaml"
-	DefaultExampleRel    = ".agentflow/config.yaml.example"
-	DefaultStateBackend  = "sqlite"
-	DefaultStatePath     = ".agentflow/state.sqlite"
-	DefaultWorktreesPath = ".agentflow/worktrees"
+	DefaultConfigRel      = ".asagiri/config.yaml"
+	DefaultExampleRel     = ".asagiri/config.yaml.example"
+	LegacyConfigRel       = ".agentflow/config.yaml"
+	LegacyExampleRel      = ".agentflow/config.yaml.example"
+	DefaultStateBackend   = "sqlite"
+	DefaultStatePath      = ".asagiri/state.sqlite"
+	DefaultWorktreesPath  = ".asagiri/worktrees"
+	DefaultBranchPrefix   = "asagiri"
 )
 
-// Config mirrors .agentflow/config.yaml.
+var legacyConfigWarned sync.Map
+
+// Config mirrors .asagiri/config.yaml.
 type Config struct {
 	Project    Project              `yaml:"project"`
 	Specs      Specs                `yaml:"specs"`
@@ -298,7 +304,7 @@ func (c *Config) applyDefaults(repoDirName string) {
 		c.Worktrees.BasePath = DefaultWorktreesPath
 	}
 	if c.Worktrees.BranchPrefix == "" {
-		c.Worktrees.BranchPrefix = "agentflow"
+		c.Worktrees.BranchPrefix = DefaultBranchPrefix
 	}
 	if c.Worktrees.CleanupPolicy == "" {
 		c.Worktrees.CleanupPolicy = "keep_failed"
@@ -434,7 +440,7 @@ func (c *Config) applyIntentDefaults() {
 	}
 	if len(c.Sources.Local.Paths) == 0 {
 		c.Sources.Local.Paths = []string{
-			".agentflow/specs",
+			".asagiri/specs",
 			".kiro/specs",
 			"docs/ai/active",
 		}
@@ -443,7 +449,7 @@ func (c *Config) applyIntentDefaults() {
 		c.Sources.Notion.TokenEnv = "NOTION_TOKEN"
 	}
 	if c.Sources.Notion.ImportPath == "" {
-		c.Sources.Notion.ImportPath = ".agentflow/specs"
+		c.Sources.Notion.ImportPath = ".asagiri/specs"
 	}
 	if c.Sources.Notion.StatusProperty == "" {
 		c.Sources.Notion.StatusProperty = "Status"
@@ -573,14 +579,43 @@ func (c *Config) StateDBPath(repoRoot string) string {
 	return c.Resolve(repoRoot, c.State.Path)
 }
 
-// ConfigPath returns the default config path under repoRoot.
-func ConfigPath(repoRoot string) string {
-	return filepath.Join(repoRoot, DefaultConfigRel)
+func warnLegacyConfigDir(dir string) {
+	if _, loaded := legacyConfigWarned.LoadOrStore(dir, true); loaded {
+		return
+	}
+	fmt.Fprintf(os.Stderr, "warning: %s is deprecated; migrate to .asagiri/\n", dir)
 }
 
-// ExamplePath returns the example config path under repoRoot.
+// ResolveConfigPath picks .asagiri/config.yaml, or legacy .agentflow/config.yaml with a warning.
+func ResolveConfigPath(repoRoot string) string {
+	canon := filepath.Join(repoRoot, DefaultConfigRel)
+	if _, err := os.Stat(canon); err == nil {
+		return canon
+	}
+	legacy := filepath.Join(repoRoot, LegacyConfigRel)
+	if _, err := os.Stat(legacy); err == nil {
+		warnLegacyConfigDir(".agentflow")
+		return legacy
+	}
+	return canon
+}
+
+// ConfigPath returns the resolved config path under repoRoot.
+func ConfigPath(repoRoot string) string {
+	return ResolveConfigPath(repoRoot)
+}
+
+// ExamplePath returns the example config path under repoRoot (.asagiri preferred).
 func ExamplePath(repoRoot string) string {
-	return filepath.Join(repoRoot, DefaultExampleRel)
+	canon := filepath.Join(repoRoot, DefaultExampleRel)
+	if _, err := os.Stat(canon); err == nil {
+		return canon
+	}
+	legacy := filepath.Join(repoRoot, LegacyExampleRel)
+	if _, err := os.Stat(legacy); err == nil {
+		return legacy
+	}
+	return canon
 }
 
 // NewTestConfig returns a config with applyDefaults + applyV3Defaults (for unit tests).

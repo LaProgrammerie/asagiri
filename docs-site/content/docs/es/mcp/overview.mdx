@@ -5,7 +5,7 @@ description: Servidor MCP stdio opcional que expone herramientas de investigaci�
 
 # Resumen MCP
 
-Para puentes de editor que hablan MCP **stdio JSON-RPC**, AgentFlow puede exponer un servidor pequeño implementado en `application/internal/mcp`. Es deliberadamente reducido: listar herramientas, invocarlas con límites y devolver resultados estructurados — no una plataforma remota completa para agentes.
+Para puentes de editor que hablan MCP **stdio JSON-RPC**, Asagiri puede exponer un servidor pequeño implementado en `application/internal/mcp`. Es deliberadamente reducido: listar herramientas, invocarlas con límites y devolver resultados estructurados — no una plataforma remota completa para agentes.
 
 <Callout type="experimental">
 MCP viene desactivado por defecto. Actívelo solo tras revisar alcances en entornos confiables.
@@ -24,20 +24,20 @@ mcp:
 
 ## Servicio
 
-`agentflow mcp-serve` ejecuta el transporte stdio; los clientes envían JSON separado por saltos de línea y esperan `initialize`, `tools/list` y `tools/call` como JSON-RPC.
+`asa mcp-serve` ejecuta el transporte stdio; los clientes envían JSON separado por saltos de línea y esperan `initialize`, `tools/list` y `tools/call` como JSON-RPC.
 
 ```bash
-agentflow mcp-serve
+asa mcp-serve
 ```
 
 Soporta `initialize`, `tools/list`, `tools/call` (JSON delimitado por nuevas líneas).
 
 ## Wrapper CLI
 
-`agentflow mcp` es la ayuda que agrupa subcomandos MCP para inspección local — júntelo con las referencias generadas cuando necesite flags exactos.
+`asa mcp` es la ayuda que agrupa subcomandos MCP para inspección local — júntelo con las referencias generadas cuando necesite flags exactos.
 
 ```bash
-agentflow mcp
+asa mcp
 ```
 
 Inspeccione comandos MCP — véase referencia generada [mcp](/docs/es/cli/generated/mcp) y [mcp-serve](/docs/es/cli/generated/mcp-serve).

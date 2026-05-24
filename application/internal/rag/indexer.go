@@ -12,7 +12,7 @@ import (
 )
 
 // DefaultIndexDir is the local RAG index root (spec §10.3).
-const DefaultIndexDir = ".agentflow/index"
+const DefaultIndexDir = ".asagiri/index"
 
 // IndexOptions configures what to index.
 type IndexOptions struct {
@@ -29,7 +29,7 @@ type IndexResult struct {
 	DBPath  string
 }
 
-var defaultExclude = []string{".git", "vendor", "node_modules", ".agentflow/index"}
+var defaultExclude = []string{".git", "vendor", "node_modules", ".asagiri/index"}
 
 // Index walks sources and stores chunks in chunks.sqlite.
 func Index(opts IndexOptions) (IndexResult, error) {
@@ -174,7 +174,7 @@ func DefaultIndexPaths() []string {
 func OpenDB(repoRoot string) (*sql.DB, error) {
 	dbPath := filepath.Join(repoRoot, DefaultIndexDir, "chunks.sqlite")
 	if _, err := os.Stat(dbPath); err != nil {
-		return nil, fmt.Errorf("index absent — lancez agentflow index: %w", err)
+		return nil, fmt.Errorf("index absent — lancez asa index: %w", err)
 	}
 	return sql.Open("sqlite", dbPath)
 }

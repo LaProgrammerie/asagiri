@@ -11,7 +11,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-// WriteLocalSpec writes a synced document to .agentflow/specs/<feature>/.
+// WriteLocalSpec writes a synced document to .asagiri/specs/<feature>/.
 func WriteLocalSpec(repoRoot, importRel string, feature string, doc SourceDocument, opts SyncOptions) (SyncResult, error) {
 	dest := LocalSpecPath{Root: importRel, Feature: feature}
 	return writeLocalSpec(repoRoot, dest, doc, opts)

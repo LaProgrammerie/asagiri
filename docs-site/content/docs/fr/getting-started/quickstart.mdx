@@ -1,11 +1,11 @@
 ---
 title: Démarrage rapide
-description: Parcourir AgentFlow de bout en bout en moins de dix minutes avec la sécurité du dry-run.
+description: Parcourir Asagiri de bout en bout en moins de dix minutes avec la sécurité du dry-run.
 ---
 
 # Démarrage rapide
 
-Ce guide fait le tour d’AgentFlow en moins de dix minutes en s’appuyant sur **`--dry-run`**. Vous verrez comment une intention se résout en plan et en estimation de coût sans invoquer d’agents externes ni shells de validation — pratique pour explorer l’orchestration en conditions réelles sur la structure d’un dépôt.
+Ce guide fait le tour d’Asagiri en moins de dix minutes en s’appuyant sur **`--dry-run`**. Vous verrez comment une intention se résout en plan et en estimation de coût sans invoquer d’agents externes ni shells de validation — pratique pour explorer l’orchestration en conditions réelles sur la structure d’un dépôt.
 
 Lorsque le flux vous convient, retirez `--dry-run` seulement après avoir configuré agents et commandes de validation.
 
@@ -17,8 +17,8 @@ Partez d’un binaire compilé et d’un arbre de projet propre :
 make build
 export PATH="$PWD/bin:$PATH"
 cd your-repo
-agentflow init
-agentflow doctor
+asa init
+asa doctor
 ```
 
 La commande `doctor` met en évidence les trous de configuration (agents manquants, réglages MCP, fichiers de budget) avant que vous ne dépensiez des jetons sur une exécution complète.
@@ -28,8 +28,8 @@ La commande `doctor` met en évidence les trous de configuration (agents manquan
 `work` en langage naturel est le point d’entrée le plus haut niveau. Les commandes ci-dessous montrent la planification et l’estimation sans effet de bord :
 
 ```bash
-agentflow work "develop my-feature" --dry-run --plan-only
-agentflow work "develop my-feature" --dry-run --estimate-only
+asa work "develop my-feature" --dry-run --plan-only
+asa work "develop my-feature" --dry-run --estimate-only
 ```
 
 `--plan-only` résout l’intention et affiche le plan d’exécution. `--estimate-only` enchaîne le pipeline V3 jusqu’à l’estimation du coût et du contexte **sans** appeler les CLI d’agents externes.
@@ -39,12 +39,12 @@ agentflow work "develop my-feature" --dry-run --estimate-only
 Si vous maintenez déjà un dossier de spec Kiro (par exemple `.kiro/specs/my-feature/`), vous pouvez exercer chaque étape du pipeline isolément :
 
 ```bash
-agentflow plan my-feature --dry-run
-agentflow enrich my-feature --dry-run
-agentflow dev my-feature --dry-run
-agentflow verify my-feature --dry-run
-agentflow review my-feature --dry-run
-agentflow status --dry-run
+asa plan my-feature --dry-run
+asa enrich my-feature --dry-run
+asa dev my-feature --dry-run
+asa verify my-feature --dry-run
+asa review my-feature --dry-run
+asa status --dry-run
 ```
 
 En dry-run, l’orchestration et la journalisation tournent en local ; aucun processus externe n’est lancé.
@@ -54,19 +54,19 @@ En dry-run, l’orchestration et la journalisation tournent en local ; aucun pro
 Après un `work` en dry-run qui a créé des métadonnées d’exécution, inspectez les artefacts :
 
 ```bash
-agentflow status --dry-run
-agentflow report <run-id> --dry-run
+asa status --dry-run
+asa report <run-id> --dry-run
 ```
 
-Les rapports sont écrits sous `.agentflow/runs/<run-id>/report.md`, avec du JSON compagnon pour l’outillage.
+Les rapports sont écrits sous `.asagiri/runs/<run-id>/report.md`, avec du JSON compagnon pour l’outillage.
 
 ## Exécution réelle
 
 Lorsque la configuration est prête et que vous acceptez l’exécution de processus externes, montez en charge de façon délibérée :
 
 ```bash
-agentflow work "develop my-feature" --estimate-only   # garde-fou économique d’abord
-agentflow work "develop my-feature"                   # confirmation guidée par défaut
+asa work "develop my-feature" --estimate-only   # garde-fou économique d’abord
+asa work "develop my-feature"                   # confirmation guidée par défaut
 ```
 
 Utilisez `--estimate-only` comme verrou économique avant de payer du temps agent. Le chemin `work` par défaut demande encore confirmation à moins d’opter pour les drapeaux non interactifs documentés dans la référence CLI.

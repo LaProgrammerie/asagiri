@@ -1,20 +1,20 @@
 ---
-title: Work · AgentFlow CLI
+title: Work · Asagiri CLI
 description: Exécuter une intention en langage naturel
 ---
 
-CLI path: **`agentflow work`**
+CLI path: **`asa work`**
 
 ## When to use
 
-Orchestration commands coordinate higher-order AgentFlow workloads such as ingestion, syncing, backlog triage, investigative passes, hydrated context payloads, coarse estimates, and workspace-specific automation.
+Orchestration commands coordinate higher-order Asagiri workloads such as ingestion, syncing, backlog triage, investigative passes, hydrated context payloads, coarse estimates, and workspace-specific automation.
 
 > Original CLI synopsis: Exécuter une intention en langage naturel
 
 ## Usage
 
 ```bash
-agentflow work [flags]
+asa work [flags]
 ```
 
 ## Options
@@ -45,7 +45,7 @@ agentflow work [flags]
 ## Examples
 
 ```bash
-agentflow work
+asa work
 ```
 
 > Wire richer samples through **cobra.Command.Example** when the happy path warrants copy/paste-friendly automation beyond this scaffold.
@@ -57,7 +57,7 @@ agentflow work
 ## Failure modes
 
 - Cobra rejects unknown flags or arity mismatches before any repository side effects occur.
-- AgentFlow cannot resolve scaffolding when the command is invoked outside an initialised checkout.
+- Asagiri cannot resolve scaffolding when the command is invoked outside an initialised checkout.
 - Downstream automation may fail whenever credentials, network endpoints, or cached prerequisites drift from expectations.
 
 ## Related commands

@@ -1,6 +1,6 @@
 version: 2
 
-project_name: agentflow
+project_name: asa
 
 before:
   hooks:
@@ -8,9 +8,9 @@ before:
     - go test ./...
 
 builds:
-  - id: agentflow
-    main: ./application/cmd/agentflow
-    binary: agentflow
+  - id: asa
+    main: ./application/cmd/asa
+    binary: asa
     env:
       - CGO_ENABLED=0
     goos:
@@ -22,14 +22,14 @@ builds:
       - arm64
     ldflags:
       - -s -w
-      - -X github.com/LaProgrammerie/hyper-fast-builder/application/internal/version.Version={{.Version}}
-      - -X github.com/LaProgrammerie/hyper-fast-builder/application/internal/version.Commit={{.Commit}}
-      - -X github.com/LaProgrammerie/hyper-fast-builder/application/internal/version.Date={{.Date}}
+      - -X github.com/LaProgrammerie/asagiri/application/internal/version.Version={{.Version}}
+      - -X github.com/LaProgrammerie/asagiri/application/internal/version.Commit={{.Commit}}
+      - -X github.com/LaProgrammerie/asagiri/application/internal/version.Date={{.Date}}
 
 archives:
   - id: default
     ids:
-      - agentflow
+      - asa
     format_overrides:
       - goos: windows
         formats:
@@ -55,21 +55,21 @@ changelog:
 release:
   github:
     owner: LaProgrammerie
-    name: hyper-fast-builder
+    name: asagiri
   draft: false
   prerelease: auto
 
 brews:
-  - name: agentflow
+  - name: asa
     repository:
       owner: LaProgrammerie
       name: homebrew-tap
       token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
     directory: Formula
-    homepage: "https://github.com/LaProgrammerie/hyper-fast-builder"
+    homepage: "https://github.com/LaProgrammerie/asagiri"
     description: "Deterministic orchestration for AI coding workflows"
     license: "Apache-2.0"
     test: |
-      system "#{bin}/agentflow", "version"
+      system "#{bin}/asa", "version"
     install: |
-      bin.install "agentflow"
+      bin.install "asa"

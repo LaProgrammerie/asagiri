@@ -5,7 +5,7 @@ description: Spec in Kiro, implement with Cursor, validate with project commands
 
 # Kiro → Cursor → Verify
 
-This handoff aligns **`spec-doc` §11.2** with AgentFlow gates: authoring stays in **Kiro** (`.kiro/specs/<feature>/`), implementation happens wherever **Cursor** (or **`cursor-agent`**) excels, and the CLI enforces deterministic **`verify`**/**`review`** steps so automation cannot silently diverge.
+This handoff aligns **`spec-doc` §11.2** with Asagiri gates: authoring stays in **Kiro** (`.kiro/specs/<feature>/`), implementation happens wherever **Cursor** (or **`cursor-agent`**) excels, and the CLI enforces deterministic **`verify`**/**`review`** steps so automation cannot silently diverge.
 
 ## When to use
 
@@ -30,24 +30,24 @@ flowchart LR
 Replace `billing-v2` with your feature id:
 
 ```bash
-agentflow spec billing-v2 --agent kiro
-agentflow plan billing-v2
-agentflow enrich billing-v2 --agent ollama
-agentflow dev billing-v2 --agent cursor
-agentflow verify billing-v2
-agentflow review billing-v2 --agent codex
-agentflow report <run-id>
+asa spec billing-v2 --agent kiro
+asa plan billing-v2
+asa enrich billing-v2 --agent ollama
+asa dev billing-v2 --agent cursor
+asa verify billing-v2
+asa review billing-v2 --agent codex
+asa report <run-id>
 ```
 
 Use `--dry-run` on any step while rehearsing:
 
 ```bash
-agentflow dev billing-v2 --agent cursor --dry-run
+asa dev billing-v2 --agent cursor --dry-run
 ```
 
 ## Configuration defaults
 
-From `.agentflow/config.yaml.example`:
+From `.asagiri/config.yaml.example`:
 
 ```yaml
 work:
@@ -63,7 +63,7 @@ Set `work.auto_review: true` only when you want review after every successful ve
 ## Intent shortcut
 
 ```bash
-agentflow work "develop billing-v2" --stop-after verify
+asa work "develop billing-v2" --stop-after verify
 ```
 
 Intent resolution picks the feature; V3 pipeline applies budgets and context optimization.
@@ -73,7 +73,7 @@ Intent resolution picks the feature; V3 pipeline applies budgets and context opt
 | Symptom | Fix |
 | --- | --- |
 | `kiro` not on PATH | Set `agents.kiro.command` or install Kiro CLI |
-| Verify fails | Fix tests locally; use `agentflow verify billing-v2 --force` only when state machine allows |
+| Verify fails | Fix tests locally; use `asa verify billing-v2 --force` only when state machine allows |
 | Dirty git blocked | Commit/stash or adjust `policies.require_clean_git` |
 
 ## Related

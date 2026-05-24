@@ -13,7 +13,7 @@ func TestLoadValid(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	cfgPath := filepath.Join(repo, ".agentflow", "config.yaml")
+	cfgPath := filepath.Join(repo, ".asagiri", "config.yaml")
 	if err := os.MkdirAll(filepath.Dir(cfgPath), 0o755); err != nil {
 		t.Fatal(err)
 	}
@@ -22,7 +22,7 @@ project:
   name: test-proj
 state:
   backend: sqlite
-  path: .agentflow/state.sqlite
+  path: .asagiri/state.sqlite
 `), 0o644); err != nil {
 		t.Fatal(err)
 	}
@@ -95,13 +95,13 @@ func TestLoadPoliciesAndValidation(t *testing.T) {
 	if err := os.WriteFile(filepath.Join(repo, "go.mod"), []byte("module x\n\ngo 1.25\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	cfgPath := filepath.Join(repo, ".agentflow", "config.yaml")
+	cfgPath := filepath.Join(repo, ".asagiri", "config.yaml")
 	if err := os.WriteFile(cfgPath, []byte(`
 project:
   name: test
 state:
   backend: sqlite
-  path: .agentflow/state.sqlite
+  path: .asagiri/state.sqlite
 validation:
   commands:
     - name: tests
@@ -127,7 +127,7 @@ policies:
 
 func requireDirs(t *testing.T, repo string) {
 	t.Helper()
-	if err := os.MkdirAll(filepath.Join(repo, ".agentflow"), 0o755); err != nil {
+	if err := os.MkdirAll(filepath.Join(repo, ".asagiri"), 0o755); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -135,7 +135,7 @@ func requireDirs(t *testing.T, repo string) {
 func TestValidateUnsupportedBackend(t *testing.T) {
 	dir := t.TempDir()
 	cfg := &Config{
-		State: State{Backend: "postgres", Path: ".agentflow/state.sqlite"},
+		State: State{Backend: "postgres", Path: ".asagiri/state.sqlite"},
 	}
 	cfg.applyDefaults("x")
 	if err := cfg.Validate(dir); err == nil {

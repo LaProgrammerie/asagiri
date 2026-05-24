@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/config"
-	"github.com/LaProgrammerie/hyper-fast-builder/application/pkg/agentflow"
+	"github.com/LaProgrammerie/asagiri/application/internal/config"
+	"github.com/LaProgrammerie/asagiri/application/pkg/asagiri"
 )
 
 // HighLevelPlanner builds primitive step plans (specv2 §6).
@@ -160,18 +160,18 @@ func EvaluateCondition(cond string, intent ResolvedIntent, fs FeatureState, opts
 	case "no_tasks":
 		return !fs.HasTasks
 	case "task_not_enriched":
-		return fs.NextTaskStatus == agentflow.StatusPending || fs.NextTaskStatus == agentflow.StatusPlanned
+		return fs.NextTaskStatus == asagiri.StatusPending || fs.NextTaskStatus == asagiri.StatusPlanned
 	case "task_pending_or_enriched":
 		switch fs.NextTaskStatus {
-		case agentflow.StatusPending, agentflow.StatusPlanned, agentflow.StatusEnriched, "":
+		case asagiri.StatusPending, asagiri.StatusPlanned, asagiri.StatusEnriched, "":
 			return true
 		default:
-			return fs.NextTaskStatus == agentflow.StatusEnriched
+			return fs.NextTaskStatus == asagiri.StatusEnriched
 		}
 	case "implementation_done":
-		return fs.NextTaskStatus == agentflow.StatusImplemented || fs.NextTaskStatus == agentflow.StatusRunning
+		return fs.NextTaskStatus == asagiri.StatusImplemented || fs.NextTaskStatus == asagiri.StatusRunning
 	case "verification_failed":
-		return fs.NextTaskStatus == agentflow.StatusVerifyFailed
+		return fs.NextTaskStatus == asagiri.StatusVerifyFailed
 	case "review_enabled":
 		return !opts.NoReview
 	case "requires_human_approval":
@@ -181,7 +181,7 @@ func EvaluateCondition(cond string, intent ResolvedIntent, fs FeatureState, opts
 	}
 }
 
-// RecommendNext computes next primitive for `agentflow next`.
+// RecommendNext computes next primitive for `asa next`.
 func RecommendNext(snap StateSnapshot, feature string) (NextRecommendation, error) {
 	fs := featureState(snap, feature)
 	if feature == "" {
@@ -193,33 +193,33 @@ func RecommendNext(snap StateSnapshot, feature string) (NextRecommendation, erro
 	}
 	taskID := fs.NextTaskID
 	switch fs.NextTaskStatus {
-	case agentflow.StatusImplemented, agentflow.StatusRunning:
-		cmd := fmt.Sprintf("agentflow verify %s --task %s", feature, taskID)
+	case asagiri.StatusImplemented, asagiri.StatusRunning:
+		cmd := fmt.Sprintf("asa verify %s --task %s", feature, taskID)
 		return NextRecommendation{
 			Feature: feature, TaskID: taskID, Action: "verify",
 			Reason: "implementation completed but validation missing", Primitive: cmd,
 		}, nil
-	case agentflow.StatusVerified:
-		cmd := fmt.Sprintf("agentflow review %s --task %s --agent codex", feature, taskID)
+	case asagiri.StatusVerified:
+		cmd := fmt.Sprintf("asa review %s --task %s --agent codex", feature, taskID)
 		return NextRecommendation{
 			Feature: feature, TaskID: taskID, Action: "review",
 			Reason: "verified but review missing", Primitive: cmd,
 		}, nil
-	case agentflow.StatusEnriched, agentflow.StatusPending, agentflow.StatusPlanned, "":
-		cmd := fmt.Sprintf("agentflow dev %s --task %s --agent cursor", feature, taskID)
+	case asagiri.StatusEnriched, asagiri.StatusPending, asagiri.StatusPlanned, "":
+		cmd := fmt.Sprintf("asa dev %s --task %s --agent cursor", feature, taskID)
 		if taskID == "" {
-			cmd = fmt.Sprintf("agentflow plan %s", feature)
+			cmd = fmt.Sprintf("asa plan %s", feature)
 			return NextRecommendation{Feature: feature, Action: "plan", Reason: "no tasks planned", Primitive: cmd}, nil
 		}
 		return NextRecommendation{
 			Feature: feature, TaskID: taskID, Action: "dev",
 			Reason: "task ready for implementation", Primitive: cmd,
 		}, nil
-	case agentflow.StatusVerifyFailed:
-		cmd := fmt.Sprintf("agentflow verify %s --task %s --force", feature, taskID)
+	case asagiri.StatusVerifyFailed:
+		cmd := fmt.Sprintf("asa verify %s --task %s --force", feature, taskID)
 		return NextRecommendation{Feature: feature, TaskID: taskID, Action: "verify", Reason: "verification failed", Primitive: cmd}, nil
 	default:
-		cmd := fmt.Sprintf("agentflow status")
+		cmd := fmt.Sprintf("asa status")
 		return NextRecommendation{Feature: feature, Action: "status", Reason: "inspect current state", Primitive: cmd}, nil
 	}
 }

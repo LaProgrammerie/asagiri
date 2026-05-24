@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/intent"
+	"github.com/LaProgrammerie/asagiri/application/internal/intent"
 	"github.com/spf13/cobra"
 )
 
@@ -40,7 +40,7 @@ func newContinueCmd(dryRun *bool) *cobra.Command {
 				}
 			}
 			if feature == "" {
-				fmt.Fprintln(cmd.OutOrStdout(), "Aucune feature à reprendre. Utilisez: agentflow inbox")
+				fmt.Fprintln(cmd.OutOrStdout(), "Aucune feature à reprendre. Utilisez: asa inbox")
 				return nil
 			}
 

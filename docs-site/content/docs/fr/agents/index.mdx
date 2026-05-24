@@ -1,19 +1,19 @@
 ---
 title: Vue d'ensemble des agents
-description: Agents de code externes invoqués par AgentFlow en subprocess.
+description: Agents de code externes invoqués par Asagiri en subprocess.
 ---
 
 # Vue d'ensemble des agents
 
-AgentFlow est une couche d’orchestration : il n’embarque ni poids de modèles ni accès propriétaire. Vous déclarez des **CLI externes** sous `agents:` ; le routage, les valeurs par défaut de `work` ou les drapeaux par commande déterminent quel binaire s’exécute pour une étape donnée.
+Asagiri est une couche d’orchestration : il n’embarque ni poids de modèles ni accès propriétaire. Vous déclarez des **CLI externes** sous `agents:` ; le routage, les valeurs par défaut de `work` ou les drapeaux par commande déterminent quel binaire s’exécute pour une étape donnée.
 
 ## Modèles courants
 
-Le tableau liste des identifiants fréquents ; l’exécutable et les drapeaux restent **votre** `config.yaml` — le contrat d’AgentFlow est de lancer `command` avec des `args` optionnels et de faire transiter les flux via le chemin de rédaction habituel.
+Le tableau liste des identifiants fréquents ; l’exécutable et les drapeaux restent **votre** `config.yaml` — le contrat d’Asagiri est de lancer `command` avec des `args` optionnels et de faire transiter les flux via le chemin de rédaction habituel.
 
 | Identifiant d’agent (exemple) | Rôle typique |
 | --- | --- |
-| `kiro` | Rédaction de spec (`agentflow spec`) |
+| `kiro` | Rédaction de spec (`asa spec`) |
 | `cursor` | Implémentation (`dev`, agent par défaut de `work`) |
 | `codex` / `claude` | Revue ou raisonnement lourd |
 | `ollama` | Enrichissement local, classification, pré-revue économique |
@@ -30,10 +30,10 @@ Le tableau liste des identifiants fréquents ; l’exécutable et les drapeaux r
 Changez l’identifiant d’agent par sous-commande lorsqu’une tâche doit s’appuyer sur une autre chaîne d’outils que vos défauts.
 
 ```bash
-agentflow spec feat --agent kiro
-agentflow enrich feat --agent ollama
-agentflow dev feat --agent cursor
-agentflow review feat --agent codex
+asa spec feat --agent kiro
+asa enrich feat --agent ollama
+asa dev feat --agent cursor
+asa review feat --agent codex
 ```
 
 ## Pour aller plus loin

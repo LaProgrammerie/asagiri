@@ -1,4 +1,4 @@
-module github.com/LaProgrammerie/hyper-fast-builder
+module github.com/LaProgrammerie/asagiri
 
 go 1.25.0
 

@@ -3,8 +3,8 @@ package cli
 import (
 	"fmt"
 
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/contextopt"
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/investigation"
+	"github.com/LaProgrammerie/asagiri/application/internal/contextopt"
+	"github.com/LaProgrammerie/asagiri/application/internal/investigation"
 	"github.com/spf13/cobra"
 )
 

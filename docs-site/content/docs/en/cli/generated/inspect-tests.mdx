@@ -1,9 +1,9 @@
 ---
-title: Inspect Tests · AgentFlow CLI
+title: Inspect Tests · Asagiri CLI
 description: Tests liés à un chemin
 ---
 
-CLI path: **`agentflow inspect tests`**
+CLI path: **`asa inspect tests`**
 
 ## When to use
 
@@ -14,7 +14,7 @@ Use **inspect** when you need fast, offline answers about symbols, neighbouring 
 ## Usage
 
 ```bash
-agentflow inspect tests [flags]
+asa inspect tests [flags]
 ```
 
 ## Options
@@ -26,7 +26,7 @@ agentflow inspect tests [flags]
 ## Examples
 
 ```bash
-agentflow inspect tests
+asa inspect tests
 ```
 
 > Wire richer samples through **cobra.Command.Example** when the happy path warrants copy/paste-friendly automation beyond this scaffold.
@@ -38,7 +38,7 @@ agentflow inspect tests
 ## Failure modes
 
 - Cobra rejects unknown flags or arity mismatches before any repository side effects occur.
-- AgentFlow cannot resolve scaffolding when the command is invoked outside an initialised checkout.
+- Asagiri cannot resolve scaffolding when the command is invoked outside an initialised checkout.
 - Git probing fails when binaries are missing or repositories are shallow or incomplete.
 - Symbol lookups can legitimately return empty output whenever indexes lag behind edits.
 

@@ -4,7 +4,7 @@ import (
 	"math"
 	"strings"
 
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/config"
+	"github.com/LaProgrammerie/asagiri/application/internal/config"
 )
 
 // ContentKind selects chars-per-token ratio (specv3 §5.3).

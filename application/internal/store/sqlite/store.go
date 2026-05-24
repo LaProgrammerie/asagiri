@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/LaProgrammerie/hyper-fast-builder/application/pkg/agentflow"
+	"github.com/LaProgrammerie/asagiri/application/pkg/asagiri"
 	_ "modernc.org/sqlite"
 )
 
@@ -27,7 +27,7 @@ const (
 	StatusDone     = "done"
 )
 
-// Store wraps a SQLite connection for AgentFlow state.
+// Store wraps a SQLite connection for Asagiri state.
 type Store struct {
 	db *sql.DB
 }
@@ -196,13 +196,13 @@ func normalizeRunStatus(status string) string {
 
 func normalizeStatus(status string) string {
 	if status == "" {
-		return agentflow.StatusPending
+		return asagiri.StatusPending
 	}
 	switch status {
 	case StatusDone:
-		return agentflow.StatusImplemented
+		return asagiri.StatusImplemented
 	case StatusFailed:
-		return agentflow.StatusFailed
+		return asagiri.StatusFailed
 	default:
 		return status
 	}

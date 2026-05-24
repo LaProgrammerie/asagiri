@@ -5,8 +5,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/config"
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/store/sqlite"
+	"github.com/LaProgrammerie/asagiri/application/internal/config"
+	"github.com/LaProgrammerie/asagiri/application/internal/store/sqlite"
 	"github.com/stretchr/testify/require"
 )
 
@@ -23,10 +23,10 @@ func TestPlanFeatureCreatesRunAndTasks(t *testing.T) {
 			ActiveSpecPath: "docs/ai/active/current-spec.md",
 			HandoffPath:    "docs/ai/active/handoff.md",
 		},
-		State: config.State{Backend: "sqlite", Path: ".agentflow/state.sqlite"},
+		State: config.State{Backend: "sqlite", Path: ".asagiri/state.sqlite"},
 		Worktrees: config.Worktrees{
-			BasePath:      ".agentflow/worktrees",
-			BranchPrefix:  "agentflow",
+			BasePath:      ".asagiri/worktrees",
+			BranchPrefix:  "asa",
 			CleanupPolicy: "keep_failed",
 		},
 		Agents: map[string]config.Agent{
@@ -34,7 +34,7 @@ func TestPlanFeatureCreatesRunAndTasks(t *testing.T) {
 		},
 	}
 
-	dbPath := filepath.Join(repo, ".agentflow", "state.sqlite")
+	dbPath := filepath.Join(repo, ".asagiri", "state.sqlite")
 	store, err := sqlite.Open(dbPath)
 	require.NoError(t, err)
 	t.Cleanup(func() { _ = store.Close() })

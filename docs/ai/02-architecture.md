@@ -2,9 +2,9 @@
 
 ## Vue d’ensemble
 
-- **Produit :** AgentFlow — CLI Cobra (`application/cmd/agentflow`).
-- **Langage :** Go — module unique (`go.mod` à la racine), code sous `application/internal/`.
-- **État local :** répertoire `.agentflow/` dans chaque dépôt Git cible (voir `spec.md` §2.2).
+- **Produit :** Asagiri — CLI Cobra (`application/cmd/asa`), commande **`asa`**.
+- **Langage :** Go — module `github.com/LaProgrammerie/asagiri` (dépôt GitHub inchangé en phase 1 — ADR-016), code sous `application/internal/`.
+- **État local :** répertoire **`.asagiri/`** dans chaque dépôt Git cible.
 - **Runtime local :** Docker Compose sous `infrastructure/docker/` (dev Go + deps) ; optionnel pour le CLI pur.
 - **Orchestration dev :** `Makefile` (`make build`, `make test`, `make dev`).
 
@@ -12,13 +12,14 @@
 
 ```
 application/
-  cmd/agentflow/main.go
+  cmd/asa/main.go
   internal/
     cli/                 # Cobra : primitives V1 + work/continue/next/inbox/sync
     intent/              # resolver, planner, executor (specv2)
     source/              # LocalSource, Notion (specv2 §7–8)
     config/              # config.yaml typée (+ intent, work, sources)
     bootstrap/           # init, doctor, GitRoot
+    env/                 # ASA_* + fallback AGENTFLOW_* (compat)
     agent/               # interface Agent
     agent/exec/          # subprocess agents (sans shell)
     worktree/            # git worktree par tâche
@@ -28,7 +29,7 @@ application/
     report/              # report.md + report.json
     store/sqlite/        # SQLite modernc, migrations embed
     version/
-.agentflow/              # créé par agentflow init
+.asagiri/                # créé par asa init
   config.yaml
   state.sqlite           # gitignored
   runs/ tasks/ logs/ worktrees/
@@ -41,6 +42,7 @@ application/
 | `internal/config` | Struct YAML ; `Load` + validation chemins relatifs |
 | `internal/store/sqlite` | DB, migrations v1–v2, CRUD `runs` / `tasks` |
 | `internal/bootstrap` | `Init`, `Doctor` |
+| `internal/env` | Variables `ASA_*` ; compat `AGENTFLOW_*` |
 | `internal/agent` + `agent/exec` | Interface agents ; exécution `exec.Command` (pas de shell) |
 | `internal/worktree` | Création / suppression worktrees Git |
 | `internal/workflow` | `PlanFeature`, `DevFeature`, `VerifyFeature`, etc. |
@@ -49,7 +51,8 @@ application/
 | `internal/report` | Rapports de run |
 | `internal/cli` | Surface utilisateur + `--dry-run` global |
 | `internal/intent` | Résolution d’intention, plan haut niveau, exécution via `workflow` |
-| `internal/source` | Abstraction sources ; sync vers `.agentflow/specs/<feature>/` |
+| `internal/source` | Abstraction sources ; sync vers `.asagiri/specs/<feature>/` |
+| `pkg/asagiri` | Types partagés (ex-`pkg/agentflow`) |
 
 ## Flux intention (specv2)
 
@@ -65,22 +68,23 @@ Sources externes (Notion) : **sync obligatoire** avant exécution — jamais de 
 spec/plan → enrich → dev (worktree + agent) → verify → review → report / pr
 ```
 
-État persistant : `runs.steps_json`, tâches `tasks.payload_json` + fichiers `.agentflow/tasks/<feature>/*.json`.
+État persistant : `runs.steps_json`, tâches `tasks.payload_json` + fichiers `.asagiri/tasks/<feature>/*.json`.
 
 ## Contrat Makefile
 
 | Cible | Action |
 |-------|--------|
-| `make build` | `bin/agentflow` |
+| `make build` | `bin/asa` |
 | `make test` | `go test ./...` |
 | `make lint` | `golangci-lint run` (toolchain Go ≥ `go.mod`) |
 | `make dev` | stack Docker dev |
+| `make release-snapshot` | GoReleaser snapshot (artefacts `asa_*`) |
 
-## Équivalence spec §11.1 ↔ dépôt (ADR-001)
+## Équivalence spec §11.1 ↔ dépôt (ADR-001, chemins ADR-016)
 
-| Spec `agentflow/` | Réel |
-|-------------------|------|
-| `cmd/agentflow/` | `application/cmd/agentflow/` |
+| Spec historique `agentflow/` | Réel (Asagiri) |
+|------------------------------|----------------|
+| `cmd/agentflow/` | `application/cmd/asa/` |
 | `internal/cli/` | `application/internal/cli/` |
 | `internal/workflow/` (+ `state_machine.go`) | `application/internal/workflow/` |
 | `internal/agents/` | `application/internal/agent/` + `agent/exec/` |
@@ -97,9 +101,15 @@ spec/plan → enrich → dev (worktree + agent) → verify → review → report
 | `internal/pipeline/` | `RunV3Pipeline` (séquence work V3) |
 | `internal/routing/` | Routing cost-aware local/cloud |
 | `internal/mcp/` | Serveur MCP stdio |
-| `pkg/agentflow/types` | `application/pkg/agentflow/` |
+| `pkg/agentflow/types` | `application/pkg/asagiri/` |
 
 Interfaces §11.2 : `WorkflowEngine`, `TaskStore`, `WorktreeManager`, `Validator` déclarées dans `internal/workflow/interfaces.go` ; implémentations = `Service`, `sqlite.Store`, `worktree.Manager`, `validation.Runner`.
+
+## Distribution & docs (ADR-015, ADR-016)
+
+- Releases GitHub : repo **`LaProgrammerie/asagiri`**, binaire **`asa`**, archives `asa_{OS}_{ARCH}`.
+- Homebrew : `brew install LaProgrammerie/tap/asa`.
+- Docs publiques : `docs-site/` → Cloudflare Pages projet **`asagiri-docs`** ; `basePath` legacy **`/asagiri`** si `GITHUB_PAGES=true`.
 
 ## Limites connues
 

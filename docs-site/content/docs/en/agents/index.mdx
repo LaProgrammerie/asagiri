@@ -1,19 +1,19 @@
 ---
 title: Agents overview
-description: External coding agents invoked by AgentFlow as subprocesses.
+description: External coding agents invoked by Asagiri as subprocesses.
 ---
 
 # Agents overview
 
-AgentFlow is an orchestration layer: it does not ship embedded weights or proprietary model access. You declare **external CLIs** under `agents:`; routing, `work` defaults, or per-command flags decide which binary runs for a given step.
+Asagiri is an orchestration layer: it does not ship embedded weights or proprietary model access. You declare **external CLIs** under `agents:`; routing, `work` defaults, or per-command flags decide which binary runs for a given step.
 
 ## Supported patterns
 
-The table lists common ids teams adopt; the executable and flags are always **your** `config.yaml` — AgentFlow’s contract is to spawn `command` with optional `args` and forward streams through the usual redaction path.
+The table lists common ids teams adopt; the executable and flags are always **your** `config.yaml` — Asagiri’s contract is to spawn `command` with optional `args` and forward streams through the usual redaction path.
 
 | Agent id (example) | Typical role |
 | --- | --- |
-| `kiro` | Spec authoring (`agentflow spec`) |
+| `kiro` | Spec authoring (`asa spec`) |
 | `cursor` | Implementation (`dev`, default `work` agent) |
 | `codex` / `claude` | Review or heavy reasoning |
 | `ollama` | Local enrich, classify, cheap pre-review |
@@ -30,10 +30,10 @@ The table lists common ids teams adopt; the executable and flags are always **yo
 Swap agent id per subcommand when a task should use a different toolchain than your defaults.
 
 ```bash
-agentflow spec feat --agent kiro
-agentflow enrich feat --agent ollama
-agentflow dev feat --agent cursor
-agentflow review feat --agent codex
+asa spec feat --agent kiro
+asa enrich feat --agent ollama
+asa dev feat --agent cursor
+asa review feat --agent codex
 ```
 
 ## Related

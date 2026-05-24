@@ -1,6 +1,6 @@
 ---
 title: Erster Workflow
-description: Vollständiger AgentFlow-Ablauf von init bis report mit realen CLI-Befehlen.
+description: Vollständiger Asagiri-Ablauf von init bis report mit realen CLI-Befehlen.
 ---
 
 # Erster Workflow
@@ -9,7 +9,7 @@ Diese Seite folgt dem End-to-End-Vertrag wie in `spec-doc` §11.1 beschrieben: R
 
 ## Voraussetzungen
 
-AgentFlow gebaut und auf `PATH`; ein Git-Repository mit Specs unter `.kiro/specs/<feature>/` oder `.agentflow/specs/`; eine `.agentflow/config.yaml`, deren Agent-Befehle auf Ihrer Maschine existieren. Ohne diese drei Grundlagen scheitern spätere Schritte aus nachvollziehbaren Gründen — fehlende Binärdatei, fehlende Spec oder ein nicht startbarer Subprozess.
+Asagiri gebaut und auf `PATH`; ein Git-Repository mit Specs unter `.kiro/specs/<feature>/` oder `.asagiri/specs/`; eine `.asagiri/config.yaml`, deren Agent-Befehle auf Ihrer Maschine existieren. Ohne diese drei Grundlagen scheitern spätere Schritte aus nachvollziehbaren Gründen — fehlende Binärdatei, fehlende Spec oder ein nicht startbarer Subprozess.
 
 ## Schritte
 
@@ -18,8 +18,8 @@ AgentFlow gebaut und auf `PATH`; ein Git-Repository mit Specs unter `.kiro/specs
 Klares Bild von Dateisystem und Toolchain:
 
 ```bash
-agentflow init
-agentflow doctor
+asa init
+asa doctor
 ```
 
 `doctor` ist das Gateway: Alle Hinweise beheben, bevor geschätzt oder ausgeführt wird.
@@ -29,7 +29,7 @@ agentflow doctor
 `work` nur zur Schätzung ausführen, damit Token- und Kostenprojektion vor Agent-Aufrufen sichtbar wird:
 
 ```bash
-agentflow work "develop billing-v2" --estimate-only
+asa work "develop billing-v2" --estimate-only
 ```
 
 Schätzungen und Budget-Rückfragen lesen. Ausgaben mit `--budget 0.50` oder über den Block `budgets` begrenzen. `--allow-over-budget` nur nutzen, wenn Overrides in der Policy ausdrücklich erlaubt sind — sonst unterlaufen Sie die eigenen Leitplanken.
@@ -39,7 +39,7 @@ Schätzungen und Budget-Rückfragen lesen. Ausgaben mit `--budget 0.50` oder üb
 Intent-Auflösung und Task-Auswahl prüfen, ohne Agenten auszuführen:
 
 ```bash
-agentflow work "develop billing-v2" --plan-only
+asa work "develop billing-v2" --plan-only
 ```
 
 Nützlich, wenn Routing oder Plan erst sicher sein sollen, bevor `dev` einen Worktree berührt.
@@ -49,36 +49,36 @@ Nützlich, wenn Routing oder Plan erst sicher sein sollen, bevor `dev` einen Wor
 Wenn echte Ausführung gewünscht ist:
 
 ```bash
-agentflow work "develop billing-v2"
+asa work "develop billing-v2"
 ```
 
-Mit `intent.default_mode: guided` und `work.require_plan_confirmation: true` fragt AgentFlow vor der Ausführung nach — außer Sie setzen `--yes`. Typische Phasen: Intent auflosen, planen und Kontext anreichern, im Worktree entwickeln, verifizieren, optional reviewen, reporten.
+Mit `intent.default_mode: guided` und `work.require_plan_confirmation: true` fragt Asagiri vor der Ausführung nach — außer Sie setzen `--yes`. Typische Phasen: Intent auflosen, planen und Kontext anreichern, im Worktree entwickeln, verifizieren, optional reviewen, reporten.
 
 ### 5. Status und Report
 
 Nach dem Lauf oder zur Suche nach einer ID:
 
 ```bash
-agentflow status
-agentflow report <run-id>
+asa status
+asa report <run-id>
 ```
 
 `<run-id>` aus der `status`-Ausgabe verwenden (Format etwa `run-2026-05-17-…`).
 
 ## Erwartbare Artefakte
 
-Erfolgreiche Runs hinterlassen **SQLite-State** unter `.agentflow/state.sqlite`, **Artefakte pro Lauf** unter `.agentflow/runs/<run-id>/` und bei aktiver Entwicklungsaufgabe einen **Git-Worktree** unter `.agentflow/worktrees/`. Validierungsausgaben stammen aus `validation.commands` (z. B. `go test ./...`). Zusammen ermöglichen sie Nachvollziehbarkeit ohne erneuten Agent-Einsatz.
+Erfolgreiche Runs hinterlassen **SQLite-State** unter `.asagiri/state.sqlite`, **Artefakte pro Lauf** unter `.asagiri/runs/<run-id>/` und bei aktiver Entwicklungsaufgabe einen **Git-Worktree** unter `.asagiri/worktrees/`. Validierungsausgaben stammen aus `validation.commands` (z. B. `go test ./...`). Zusammen ermöglichen sie Nachvollziehbarkeit ohne erneuten Agent-Einsatz.
 
 ## Fortsetzen und Wiederaufnahme
 
 ```bash
-agentflow resume <run-id>
+asa resume <run-id>
 ```
 
-Ohne `--dry-run` gibt **`resume` nur den nächsten Schritt aus**; Agenten werden nicht automatisch erneut gestartet. Nutzen Sie `continue` oder führen Sie den ausgegebenen Schritt manuell erneut aus (`plan`, `enrich`, `dev`, …). Automatisches Verketten von Schritten existiert nur als **`agentflow resume <run-id> --execute` zusammen mit globalem `--dry-run`**.
+Ohne `--dry-run` gibt **`resume` nur den nächsten Schritt aus**; Agenten werden nicht automatisch erneut gestartet. Nutzen Sie `continue` oder führen Sie den ausgegebenen Schritt manuell erneut aus (`plan`, `enrich`, `dev`, …). Automatisches Verketten von Schritten existiert nur als **`asa resume <run-id> --execute` zusammen mit globalem `--dry-run`**.
 
 <Callout type="experimental">
-Vollautomatisches Resume ohne Dry-Run ist nicht implementiert. Für intent-basierte Fortsetzung eher `agentflow continue` verwenden.
+Vollautomatisches Resume ohne Dry-Run ist nicht implementiert. Für intent-basierte Fortsetzung eher `asa continue` verwenden.
 </Callout>
 
 ## Verwandte Workflows

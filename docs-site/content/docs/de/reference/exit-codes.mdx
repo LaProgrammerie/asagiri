@@ -5,7 +5,7 @@ description: CLI-Exit-Verhalten bei Erfolg oder Fehler.
 
 # Exit-Codes
 
-AgentFlow folgt üblichen Go-/Cobra-Konventionen, damit Shell-Skripte und CI an `$?` ohne eigene Wrapper erkennen können, ob ein Befehl erfolgreich war.
+Asagiri folgt üblichen Go-/Cobra-Konventionen, damit Shell-Skripte und CI an `$?` ohne eigene Wrapper erkennen können, ob ein Befehl erfolgreich war.
 
 | Code | Bedeutung |
 | --- | --- |
@@ -18,9 +18,9 @@ AgentFlow folgt üblichen Go-/Cobra-Konventionen, damit Shell-Skripte und CI an 
 Die folgenden Zeilen illustrieren den Unterschied zwischen Syntaxfehlern (**Exit 2**), erfolgreichen Pfaden (**Exit 0** bei `doctor` oder erfolgreicher Nur-Schätzung) und operativen Fehlern (**Exit 1** bei Budget oder Validierung, mit Kontext auf stderr).
 
 ```bash
-agentflow work                    # Exit 2 — Pflichtargument für die Anweisung fehlt
-agentflow doctor                  # Exit 0, wenn alle Prüfungen bestehen
-agentflow work "x" --estimate-only # Exit 0, wenn die Schätzung erfolgreich ist
+asa work                    # Exit 2 — Pflichtargument für die Anweisung fehlt
+asa doctor                  # Exit 0, wenn alle Prüfungen bestehen
+asa work "x" --estimate-only # Exit 0, wenn die Schätzung erfolgreich ist
 ```
 
 Budgets und Validierung melden sich typischerweise mit **Exit 1** und einer Meldung auf stderr.
@@ -30,7 +30,7 @@ Budgets und Validierung melden sich typischerweise mit **Exit 1** und einer Meld
 Mit `||` in Shell-Skripten kombinieren; `--dry-run` nutzen, wenn nur die Verdrahtung getestet werden soll und fehlende Agent-Binärdateien keinen Fehler auslösen sollen.
 
 ```bash
-agentflow verify my-feature || echo "verify failed"
+asa verify my-feature || echo "verify failed"
 ```
 
 In CI hilft `--dry-run`, wenn nur das Orchestrierungsgerüst geprüft wird und nicht die echte Agentenausführung.

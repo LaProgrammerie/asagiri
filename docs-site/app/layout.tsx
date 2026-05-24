@@ -8,10 +8,10 @@ const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: {
-    default: 'AgentFlow',
-    template: '%s | AgentFlow',
+    default: 'Asagiri',
+    template: '%s | Asagiri',
   },
-  description: 'Documentation for AgentFlow.',
+  description: 'Documentation for Asagiri.',
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

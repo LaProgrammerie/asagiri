@@ -1,9 +1,9 @@
 ---
-title: Spec · AgentFlow CLI
+title: Spec · Asagiri CLI
 description: Lire ou produire une spec via un agent
 ---
 
-CLI path: **`agentflow spec`**
+CLI path: **`asa spec`**
 
 ## When to use
 
@@ -14,7 +14,7 @@ Workflow commands advance tracked features across spec → plan → implementati
 ## Usage
 
 ```bash
-agentflow spec [flags]
+asa spec [flags]
 ```
 
 ## Options
@@ -27,7 +27,7 @@ agentflow spec [flags]
 ## Examples
 
 ```bash
-agentflow spec
+asa spec
 ```
 
 > Wire richer samples through **cobra.Command.Example** when the happy path warrants copy/paste-friendly automation beyond this scaffold.
@@ -40,7 +40,7 @@ agentflow spec
 ## Failure modes
 
 - Cobra rejects unknown flags or arity mismatches before any repository side effects occur.
-- AgentFlow cannot resolve scaffolding when the command is invoked outside an initialised checkout.
+- Asagiri cannot resolve scaffolding when the command is invoked outside an initialised checkout.
 - Delegated subprocesses (**git**, MCP hosts, editor agents, etc.) can exit non-zero and bubble errors verbatim.
 
 ## Related commands

@@ -3,8 +3,8 @@ package workflow
 import (
 	"context"
 
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/store/sqlite"
-	"github.com/LaProgrammerie/hyper-fast-builder/application/pkg/agentflow"
+	"github.com/LaProgrammerie/asagiri/application/internal/store/sqlite"
+	"github.com/LaProgrammerie/asagiri/application/pkg/asagiri"
 )
 
 // WorkflowRequest groups inputs for a full workflow run (spec §11.2).
@@ -68,4 +68,4 @@ type Validator interface {
 }
 
 // Ensure canonical task type is referenced for doc alignment.
-var _ = agentflow.Task{}
+var _ = asagiri.Task{}

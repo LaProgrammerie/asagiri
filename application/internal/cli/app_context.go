@@ -2,13 +2,12 @@ package cli
 
 import (
 	"fmt"
-	"os"
-	"strings"
 
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/bootstrap"
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/config"
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/store/sqlite"
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/workflow"
+	"github.com/LaProgrammerie/asagiri/application/internal/bootstrap"
+	"github.com/LaProgrammerie/asagiri/application/internal/env"
+	"github.com/LaProgrammerie/asagiri/application/internal/config"
+	"github.com/LaProgrammerie/asagiri/application/internal/store/sqlite"
+	"github.com/LaProgrammerie/asagiri/application/internal/workflow"
 )
 
 type appContext struct {
@@ -36,7 +35,7 @@ func loadContext(startDir string, dryRunFlag bool) (*appContext, error) {
 		_ = store.Close()
 		return nil, fmt.Errorf("migrations SQLite: %w", err)
 	}
-	dryRun := dryRunFlag || strings.TrimSpace(os.Getenv("AGENTFLOW_DRY_RUN")) == "1"
+	dryRun := dryRunFlag || env.DryRunEnabled()
 	return &appContext{
 		RepoRoot: repoRoot,
 		Config:   cfg,

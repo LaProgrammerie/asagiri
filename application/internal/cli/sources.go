@@ -3,8 +3,8 @@ package cli
 import (
 	"fmt"
 
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/source"
-	srcnotion "github.com/LaProgrammerie/hyper-fast-builder/application/internal/source/notion"
+	"github.com/LaProgrammerie/asagiri/application/internal/source"
+	srcnotion "github.com/LaProgrammerie/asagiri/application/internal/source/notion"
 )
 
 type sourceRegistry struct {

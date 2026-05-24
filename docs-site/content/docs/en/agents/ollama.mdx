@@ -5,7 +5,7 @@ description: Run local models for enrichment, routing, and intent fallback.
 
 # Ollama
 
-Ollama backs **local** steps in AgentFlow: enrichment passes, the intent resolver when `intent.resolver.use_ollama_fallback` is on, and cost-aware routing that targets `work.default_enricher`. It is not a separate product integration — it is the HTTP endpoint and model tags you wire under `agents.ollama` plus matching `models` entries.
+Ollama backs **local** steps in Asagiri: enrichment passes, the intent resolver when `intent.resolver.use_ollama_fallback` is on, and cost-aware routing that targets `work.default_enricher`. It is not a separate product integration — it is the HTTP endpoint and model tags you wire under `agents.ollama` plus matching `models` entries.
 
 ## Configure
 
@@ -34,7 +34,7 @@ Start the daemon, pull the weights you referenced, then let `doctor` confirm the
 ```bash
 ollama serve
 ollama pull qwen2.5-coder:14b
-agentflow doctor
+asa doctor
 ```
 
 ## Usage
@@ -42,13 +42,13 @@ agentflow doctor
 `enrich` calls Ollama directly when you pass `--agent ollama`; `work --prefer-local` keeps eligible steps on the local profile your routing describes.
 
 ```bash
-agentflow enrich billing-v2 --agent ollama
-agentflow work "refactor utils" --prefer-local
+asa enrich billing-v2 --agent ollama
+asa work "refactor utils" --prefer-local
 ```
 
 ## Embeddings / RAG
 
-`embedding_model` is reserved for retrieval work the project has not fully shipped yet. Today’s `agentflow index` persists **text chunks** in SQLite — vector similarity search is not something you should expect from a stock build.
+`embedding_model` is reserved for retrieval work the project has not fully shipped yet. Today’s `asa index` persists **text chunks** in SQLite — vector similarity search is not something you should expect from a stock build.
 
 <Callout type="experimental">
 Vector embeddings and semantic RAG retrieval are roadmap items (see root `ROADMAP.md`). Do not expect embedding-based search in v1.

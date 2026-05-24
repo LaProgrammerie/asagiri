@@ -5,7 +5,7 @@ description: Associer les identifiants d'agents aux commandes CLI et timeouts da
 
 # Configuration des agents
 
-AgentFlow n'appelle pas les API d'agents directement. Il démarre chaque agent en **subprocess sans shell** (`application/internal/agent/exec`), avec un `argv` construit depuis votre config. Chaque clé sous `agents:` est un identifiant logique que vous référencez via les flags (`--agent`), `work.default_agent` et les règles de routage.
+Asagiri n'appelle pas les API d'agents directement. Il démarre chaque agent en **subprocess sans shell** (`application/internal/agent/exec`), avec un `argv` construit depuis votre config. Chaque clé sous `agents:` est un identifiant logique que vous référencez via les flags (`--agent`), `work.default_agent` et les règles de routage.
 
 Le bloc ci-dessous est une forme réaliste : plusieurs identifiants pointent vers des exécutables différents, avec `args`, modèles, timeouts optionnels, et un endpoint HTTP de style Ollama quand ce type d'agent l'attend.
 
@@ -57,7 +57,7 @@ work:
   default_enricher: ollama
 ```
 
-Vous pouvez toujours surcharger par invocation, par exemple `agentflow dev feat --agent cursor` ou `agentflow review feat --agent codex`.
+Vous pouvez toujours surcharger par invocation, par exemple `asa dev feat --agent cursor` ou `asa review feat --agent codex`.
 
 ## Dry-run
 

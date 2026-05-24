@@ -7,13 +7,13 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/config"
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/contextopt"
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/cost"
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/investigation"
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/intent"
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/store/sqlite"
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/telemetry"
+	"github.com/LaProgrammerie/asagiri/application/internal/config"
+	"github.com/LaProgrammerie/asagiri/application/internal/contextopt"
+	"github.com/LaProgrammerie/asagiri/application/internal/cost"
+	"github.com/LaProgrammerie/asagiri/application/internal/investigation"
+	"github.com/LaProgrammerie/asagiri/application/internal/intent"
+	"github.com/LaProgrammerie/asagiri/application/internal/store/sqlite"
+	"github.com/LaProgrammerie/asagiri/application/internal/telemetry"
 )
 
 // V3Options controls cost-aware preprocessing and execution gates (specv3 §12).

@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/LaProgrammerie/hyper-fast-builder/application/pkg/agentflow"
+	"github.com/LaProgrammerie/asagiri/application/pkg/asagiri"
 	"github.com/stretchr/testify/require"
 )
 
@@ -91,12 +91,12 @@ func TestRunAndTaskCRUD(t *testing.T) {
 		PayloadJSON: `{"title":"Task 1"}`,
 	}
 	require.NoError(t, store.CreateTask(task))
-	require.NoError(t, store.UpdateTask(&Task{ID: task.ID, Status: StatusDone, WorktreePath: ".agentflow/worktrees/x"}))
+	require.NoError(t, store.UpdateTask(&Task{ID: task.ID, Status: StatusDone, WorktreePath: ".asagiri/worktrees/x"}))
 
 	gotTask, err := store.GetTask(task.ID)
 	require.NoError(t, err)
-	require.Equal(t, agentflow.StatusImplemented, gotTask.Status)
-	require.Equal(t, ".agentflow/worktrees/x", gotTask.WorktreePath)
+	require.Equal(t, asagiri.StatusImplemented, gotTask.Status)
+	require.Equal(t, ".asagiri/worktrees/x", gotTask.WorktreePath)
 
 	runs, err := store.ListRuns(10)
 	require.NoError(t, err)

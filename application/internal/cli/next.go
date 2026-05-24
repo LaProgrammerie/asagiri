@@ -4,7 +4,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/intent"
+	"github.com/LaProgrammerie/asagiri/application/internal/intent"
 	"github.com/spf13/cobra"
 )
 
@@ -41,7 +41,7 @@ func newNextCmd(dryRun *bool) *cobra.Command {
 			if !execute {
 				return nil
 			}
-			parts := strings.Fields(strings.TrimPrefix(rec.Primitive, "agentflow "))
+			parts := strings.Fields(strings.TrimPrefix(rec.Primitive, "asa "))
 			if len(parts) == 0 {
 				return nil
 			}

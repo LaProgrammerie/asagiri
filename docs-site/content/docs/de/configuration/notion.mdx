@@ -9,7 +9,7 @@ Die Integration liegt in `application/internal/source/notion`. Entscheidend ist 
 
 ## Konfiguration
 
-Property-Namen müssen zu Ihrem Workspace-Schema passen; AgentFlow errät keine Notion-Layouts.
+Property-Namen müssen zu Ihrem Workspace-Schema passen; Asagiri errät keine Notion-Layouts.
 
 ```yaml
 sources:
@@ -22,7 +22,7 @@ sources:
     status_property: Status
     title_property: Name
     updated_time_property: Last edited time
-    import_path: .agentflow/specs
+    import_path: .asagiri/specs
 ```
 
 Das API-Token wird aus der Umgebungsvariable gelesen, die `token_env` benennt (üblicherweise `NOTION_TOKEN`).
@@ -33,14 +33,14 @@ Token setzen, `sync` auf eine Seiten-URL oder einen vollständigen Sync ausweite
 
 ```bash
 export NOTION_TOKEN="..."
-agentflow sync notion --page "https://notion.so/..."
-agentflow sync all
-agentflow inbox --source notion
+asa sync notion --page "https://notion.so/..."
+asa sync all
+asa inbox --source notion
 ```
 
 ## Sicherheit und Probebetrieb
 
-Notion bleibt **deaktiviert**, bis `enabled: true` gesetzt ist. Mit `agentflow --dry-run sync notion --page …` lässt sich der Pfad ohne unbeabsichtigte Seiteneffekte üben. Existiert bereits eine lokale Spec und stdin ist ein Terminal, erscheinen Rückfragen vor dem Überschreiben — stilles Vernichten lokaler Arbeit ist nicht vorgesehen.
+Notion bleibt **deaktiviert**, bis `enabled: true` gesetzt ist. Mit `asa --dry-run sync notion --page …` lässt sich der Pfad ohne unbeabsichtigte Seiteneffekte üben. Existiert bereits eine lokale Spec und stdin ist ein Terminal, erscheinen Rückfragen vor dem Überschreiben — stilles Vernichten lokaler Arbeit ist nicht vorgesehen.
 
 <Callout type="experimental">
 Notion-Schemas unterscheiden sich je Workspace. Property-Namen (`status_property` und andere) validieren, bevor Sie auf Sync in Produktion setzen.

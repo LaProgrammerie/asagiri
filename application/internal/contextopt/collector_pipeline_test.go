@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/config"
+	"github.com/LaProgrammerie/asagiri/application/internal/config"
 )
 
 func TestCollectForPipelineUsesCandidatesOnly(t *testing.T) {

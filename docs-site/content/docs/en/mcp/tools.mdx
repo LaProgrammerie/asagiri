@@ -32,13 +32,13 @@ Configuration mirrors CLI safety rails: global `max_output_bytes` and `command_t
 Start the server, attach your MCP client over stdio, then issue a `tools/list` request exactly as JSON-RPC expects.
 
 ```bash
-agentflow mcp-serve
+asa mcp-serve
 # Editor MCP client connects via stdio, sends:
 # {"jsonrpc":"2.0","id":1,"method":"tools/list"}
 ```
 
 <Callout type="experimental">
-Tool surface is minimal and evolving. Do not depend on undocumented tools in production automation without pinning AgentFlow version.
+Tool surface is minimal and evolving. Do not depend on undocumented tools in production automation without pinning Asagiri version.
 </Callout>
 
 ## Related

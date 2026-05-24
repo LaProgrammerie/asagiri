@@ -5,15 +5,15 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/config"
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/store/sqlite"
+	"github.com/LaProgrammerie/asagiri/application/internal/config"
+	"github.com/LaProgrammerie/asagiri/application/internal/store/sqlite"
 	"github.com/stretchr/testify/require"
 )
 
 func TestStatusEmptyStore(t *testing.T) {
 	repo := t.TempDir()
 	cfg := config.NewTestConfig(filepath.Base(repo))
-	dbPath := filepath.Join(repo, ".agentflow", "state.sqlite")
+	dbPath := filepath.Join(repo, ".asagiri", "state.sqlite")
 	require.NoError(t, os.MkdirAll(filepath.Dir(dbPath), 0o755))
 	store, err := sqlite.Open(dbPath)
 	require.NoError(t, err)

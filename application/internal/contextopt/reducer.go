@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/config"
+	"github.com/LaProgrammerie/asagiri/application/internal/config"
 )
 
 // ReduceOpts configures trimming of large files.

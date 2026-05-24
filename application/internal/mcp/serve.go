@@ -4,7 +4,7 @@ import (
 	"context"
 	"os"
 
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/config"
+	"github.com/LaProgrammerie/asagiri/application/internal/config"
 )
 
 // ServeStdio runs the MCP server on stdin/stdout.

@@ -9,9 +9,9 @@ description: Estimar tokens y coste antes de ejecutar; aplicar presupuestos y en
 
 Las ejecuciones de agentes pueden consumir tokens de formas difíciles de prever desde una descripción simple de tarea. Los equipos siguen necesitando **previsiones** antes de ejecutar, **techos presupuestarios** que fallen en cerrado, y **enrutamiento** que prefiera rutas de ejecución más baratas cuando la tarea no justifica un modelo pesado.
 
-## Enfoque AgentFlow
+## Enfoque Asagiri
 
-AgentFlow lo aborda con cuatro mecanismos concretos bajo tu config:
+Asagiri lo aborda con cuatro mecanismos concretos bajo tu config:
 
 1. **Conteo heurístico de tokens** — conteo de caracteres por tipo de contenido, dividido por ratios `token_estimation` (`token_estimation` en config)
 2. **Hoja de precios** — entradas manuales `pricing.models` para modelos cloud (sin precios de proveedor hardcodeados)
@@ -21,13 +21,13 @@ AgentFlow lo aborda con cuatro mecanismos concretos bajo tu config:
 Puntos de entrada CLI típicos:
 
 ```bash
-agentflow estimate billing-v2 --task task-003 --dry-run
-agentflow work "develop billing-v2" --estimate-only
-agentflow work "develop billing-v2" --budget 0.50 --allow-over-budget
+asa estimate billing-v2 --task task-003 --dry-run
+asa work "develop billing-v2" --estimate-only
+asa work "develop billing-v2" --budget 0.50 --allow-over-budget
 ```
 
 <Callout type="cost">
-Las estimaciones son **aproximadas**. La facturación del proveedor usa tokenizers reales; AgentFlow aún no incluye contadores exactos del proveedor.
+Las estimaciones son **aproximadas**. La facturación del proveedor usa tokenizers reales; Asagiri aún no incluye contadores exactos del proveedor.
 </Callout>
 
 ## Compromisos

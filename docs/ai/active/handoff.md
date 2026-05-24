@@ -1,49 +1,54 @@
 # Handoff — execution
 
 > **Prescriptive contract** for Cursor / Copilot / implementation.  
-> **Tranche `spec-release` : distribution release & Homebrew** (`2026-05-17`).
+> **Tranche `spec-rename` : rebranding AgentFlow → Asagiri / `asa`** (`2026-05-20`).
 
 ## Immediate objective
 
-**Tranche `spec-release`** : chaîne GoReleaser + GitHub Actions + Homebrew tap + docs d’installation. Pas de tag/push/commit automatique par l’agent.
+**Tranche `spec-rename` + module** : Asagiri / `asa`, module `github.com/LaProgrammerie/asagiri`, URLs `LaProgrammerie/asagiri`. **Action humaine restante** : renommer le dépôt GitHub (`hyper-fast-builder` → `asagiri`) — [`docs/migration/github-rename-asagiri.md`](../../migration/github-rename-asagiri.md). Pas de tag/push/commit automatique par l’agent.
 
-## Allowed scope (spec-release)
+## Allowed scope (spec-rename)
 
-- `application/internal/version/`
-- `application/internal/cli/root.go`, `root_test.go`
-- `.goreleaser.yaml`
-- `.github/workflows/release.yml`, `.github/workflows/release-check.yml`
-- `Makefile` (RELEASE_LDFLAGS, `release-snapshot`, `release-check`)
-- `docs/release-process.md`, `docs/homebrew/`
-- `README.md`
-- `docs-site/content/docs/{en,fr,de,es}/getting-started/installation.mdx`
-- `docs/ai/active/handoff.md`, `current-spec.md`, `05-decisions.md` (ADR-015)
-- `.gitignore` (`dist/`)
+- `application/cmd/asa/`, `application/pkg/asagiri/`
+- `application/internal/**` (CLI, version, bootstrap, config, env/compat, workflow, MCP, TUI, docgen, tests)
+- `.asagiri/config.yaml`, `.asagiri/config.yaml.example`
+- `Makefile`, `.goreleaser.yaml`, `.gitignore`
+- `.github/workflows/` (CI, release, docs Cloudflare)
+- `docs/homebrew/asa.rb.example` (et suppression `agentflow.rb.example` si présent)
+- `docs-site/` (branding, installation MDX toutes langues, `basePath` legacy)
+- `README.md`, `docs/release-process.md`, `scripts/benchmark-workflow.sh`
+- `examples/` (commandes et env `ASA_*`)
+- `docs/ai/active/handoff.md`, `current-spec.md`, `05-decisions.md` (ADR-016)
+- `docs/ai/00-overview.md`, `01-product.md`, `02-architecture.md`, `03-standards.md`, `context-map.md`
+- `docs/migration/github-rename-asagiri.md`
 
-## Definition of Done — spec-release
+## Definition of Done — spec-rename
 
-- [x] `application/internal/version` : `Version`, `Commit`, `Date` (defaults `dev` / `unknown` / `unknown`)
-- [x] `agentflow version` : `AgentFlow vX`, `commit:`, `built:`
-- [x] Tests CLI + package version
-- [x] `.goreleaser.yaml` v2 : builds multi-OS/arch, archives LICENSE+README, Windows zip, checksums, changelog filters, brews → `LaProgrammerie/homebrew-tap`, release `hyper-fast-builder`
-- [x] `release.yml` (tags `v*`, tests, goreleaser-action, tokens documentés)
-- [x] `release-check.yml` (PR paths, `goreleaser check`)
-- [x] Makefile : `RELEASE_LDFLAGS`, `release-snapshot`, `release-check` ; `build` préservé
-- [x] `docs/release-process.md`, `docs/homebrew/agentflow.rb.example`
-- [x] README + installation MDX (4 langues) synchronisés
-- [ ] Première release réelle `v0.1.0` sur GitHub (action humaine)
-- [ ] `brew install LaProgrammerie/tap/agentflow` validé post-release
+- [x] Produit public **Asagiri** (README, help CLI, TUI, logs utilisateur, docs-site titres)
+- [x] Commande et binaire **`asa`** (Cobra root, Makefile `bin/asa`, completions, golden/integration tests)
+- [x] `asa version` affiche identité Asagiri (pas AgentFlow)
+- [x] Config locale **`.asagiri/`** ; exemple versionné ; init/doctor pointent ce chemin ; fallback `.agentflow/` corrigé
+- [x] Variables **`ASA_*`** documentées ; fallback `AGENTFLOW_*` via `internal/env/compat` avec warning stderr
+- [x] GoReleaser : archives `asa_{OS}_{ARCH}` ; brews → formule **`asa`** sur `LaProgrammerie/homebrew-tap`
+- [x] Workflows release/CI : noms d’artefacts et jobs cohérents `asa`
+- [x] Docs-site : exemples `asa` ; i18n en/fr/de/es sans `agentflow` résiduel critique (`AGENTFLOW_*` legacy documenté)
+- [x] Cloudflare : `CLOUDFLARE_PAGES_PROJECT` = **`asagiri-docs`** (doc + secrets) ; `basePath` legacy **`/asagiri`** si `GITHUB_PAGES=true`
+- [x] Recherche globale : zéro occurrence critique `AgentFlow` / `agentflow` hors specs historiques, ADR, migration, fixtures test
 - [x] `go test ./...`, `go vet ./...`, `goreleaser check`, `make release-snapshot` (local)
+- [x] `asa doctor` OK sur ce dépôt (`asa init` non rejoué — config `.asagiri/` présente)
+- [x] Runbook phase 2 rédigé : [`docs/migration/github-rename-asagiri.md`](../../migration/github-rename-asagiri.md)
+- [ ] `docs-site` : `pnpm build` / `lint` non exécutés ici (`pnpm` absent du PATH ; `typecheck` OK via sous-agent)
 
 ## Hors scope
 
-- Packages Debian/RPM, Scoop, Winget, Docker image
-- cosign / SBOM / notarization macOS
-- Renommage module Go
-- Commit / push / tag par l’agent
+- Renommage dépôt GitHub sur github.com (humain, voir runbook migration)
+- Refactor produit, nouvelles features, changement comportement workflow
+- Mise à jour exhaustive des specs racine historiques (`spec.md`, `specv2.md`, …) sauf si bloquant pour DoD public
+- Commit / push / tag / release réelle par l’agent
 
 ## References
 
-- [`spec-release.md`](../../../spec-release.md)
-- ADR-015 dans [`05-decisions.md`](../05-decisions.md)
-- Hérité : `spec-postv123`, `spec-doc-v2`, `spec-deploy-doc`
+- [`spec-rename.md`](../../../spec-rename.md)
+- ADR-016 dans [`05-decisions.md`](../05-decisions.md)
+- Phase 2 repo/module : [`docs/migration/github-rename-asagiri.md`](../../migration/github-rename-asagiri.md)
+- Hérité livré : `spec-release` (ADR-015), `spec-deploy-doc`, `spec-doc-v2`

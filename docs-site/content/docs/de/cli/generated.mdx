@@ -5,21 +5,21 @@ description: Aus Cobra automatisch erzeugte Befehlsreferenz.
 
 # Generierte CLI-Referenz
 
-Die Seiten in diesem Bereich entstehen nur über **`agentflow docs generate-cli`**. Manuelle Korrekturen wären kurzlebig: Der nächste Docgen-Lauf überschreibt sie.
+Die Seiten in diesem Bereich entstehen nur über **`asa docs generate-cli`**. Manuelle Korrekturen wären kurzlebig: Der nächste Docgen-Lauf überschreibt sie.
 
 **Generierte Inhalte nicht von Hand pflegen** — Änderungen gehören in den Go-Code oder die Docgen-Pipeline.
 
 ## Neu erzeugen
 
 ```bash
-go run ./application/cmd/agentflow docs generate-cli \
+go run ./application/cmd/asa docs generate-cli \
   --output docs-site/content/docs/en/cli/generated
 ```
 
 Mit bereits gebauter Binärdatei:
 
 ```bash
-./bin/agentflow docs generate-cli --output docs-site/content/docs/en/cli/generated
+./bin/asa docs generate-cli --output docs-site/content/docs/en/cli/generated
 ```
 
 ## Navigation

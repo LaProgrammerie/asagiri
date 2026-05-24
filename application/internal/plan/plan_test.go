@@ -3,7 +3,7 @@ package plan
 import (
 	"testing"
 
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/spec"
+	"github.com/LaProgrammerie/asagiri/application/internal/spec"
 	"github.com/stretchr/testify/require"
 )
 

@@ -5,7 +5,7 @@ description: Módulos Go bajo application/internal y pipeline de ejecución.
 
 # Resumen de arquitectura
 
-AgentFlow es una CLI Go (`application/cmd/agentflow`) con la mayor parte del comportamiento en `application/internal/` y contratos compartidos en `application/pkg/agentflow`. Esta división mantiene el binario fino mientras aísla parsing, planificación, investigación, coste y almacenamiento tras paquetes explícitos que puedes razonar solo con el layout del árbol.
+Asagiri es una CLI Go (`application/cmd/asa`) con la mayor parte del comportamiento en `application/internal/` y contratos compartidos en `application/pkg/asa`. Esta división mantiene el binario fino mientras aísla parsing, planificación, investigación, coste y almacenamiento tras paquetes explícitos que puedes razonar solo con el layout del árbol.
 
 ## Pipeline de ejecución
 
@@ -51,11 +51,11 @@ flowchart TD
 
 ## Almacenamiento de estado
 
-Runs y tareas persisten en **SQLite** en `state.path` (por defecto `.agentflow/state.sqlite`). Los artefactos de cada run van bajo `.agentflow/runs/<run-id>/`, manteniendo prompts, logs y salidas intermedias localizables sin releer la base.
+Runs y tareas persisten en **SQLite** en `state.path` (por defecto `.asagiri/state.sqlite`). Los artefactos de cada run van bajo `.asagiri/runs/<run-id>/`, manteniendo prompts, logs y salidas intermedias localizables sin releer la base.
 
 ## Puntos de extensión
 
-Nuevos agentes solo con config; quality gates vía `validation.commands`; estrategias de enrutamiento bajo `routing.strategies`; herramientas MCP opcionales con `mcp.enabled: true`. Costuras intencionales: la mayoría de equipos extienden AgentFlow sin bifurcar el entrypoint Go.
+Nuevos agentes solo con config; quality gates vía `validation.commands`; estrategias de enrutamiento bajo `routing.strategies`; herramientas MCP opcionales con `mcp.enabled: true`. Costuras intencionales: la mayoría de equipos extienden Asagiri sin bifurcar el entrypoint Go.
 
 ## Relacionado
 

@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/config"
+	"github.com/LaProgrammerie/asagiri/application/internal/config"
 )
 
 func TestServerToolReadFile(t *testing.T) {
@@ -20,7 +20,7 @@ func TestServerToolReadFile(t *testing.T) {
 	}
 	cfg := config.NewTestConfig("t")
 	var in bytes.Buffer
-	in.WriteString(`{"jsonrpc":"2.0","id":7,"method":"tools/call","params":{"name":"agentflow.read_file_safe","arguments":{"path":"a.go"}}}` + "\n")
+	in.WriteString(`{"jsonrpc":"2.0","id":7,"method":"tools/call","params":{"name":"asagiri.read_file_safe","arguments":{"path":"a.go"}}}` + "\n")
 	var out bytes.Buffer
 	s := &Server{RepoRoot: dir, Config: cfg, In: &in, Out: &out}
 	if err := s.Serve(context.Background()); err != nil {

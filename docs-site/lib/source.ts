@@ -2,7 +2,7 @@ import { docs } from 'collections/server';
 import { loader, type InferPageType } from 'fumadocs-core/source';
 import { i18n } from '@/lib/i18n';
 
-const basePath = process.env.GITHUB_PAGES === 'true' ? '/hyper-fast-builder' : '';
+const basePath = process.env.GITHUB_PAGES === 'true' ? '/asagiri' : '';
 const docsBaseUrl = basePath === '' ? '/docs' : `${basePath}/docs`;
 
 function docsUrl(slugs: string[], locale?: string): string {

@@ -5,7 +5,7 @@ description: Bounded grep and filesystem scans before cloud agent calls.
 
 # Local investigation
 
-Before AgentFlow forwards repository context to a cloud agent, it **investigates the project locally**. The implementation lives in `application/internal/investigation` and feeds both `agentflow investigate` and the V3 pipeline prelude. The engineering goal is narrow but important: **shrink prompt size and surface the files that matter** using bounded, repeatable tools—grep, filesystem scans, heuristics—instead of asking a model to ingest the whole tree.
+Before Asagiri forwards repository context to a cloud agent, it **investigates the project locally**. The implementation lives in `application/internal/investigation` and feeds both `asa investigate` and the V3 pipeline prelude. The engineering goal is narrow but important: **shrink prompt size and surface the files that matter** using bounded, repeatable tools—grep, filesystem scans, heuristics—instead of asking a model to ingest the whole tree.
 
 ## What happens on your machine
 
@@ -18,11 +18,11 @@ Those artefacts flow into context packing and cost estimation. They are inputs, 
 Use these commands to run or debug investigation outside a full `work` pipeline:
 
 ```bash
-agentflow investigate billing-v2
-agentflow investigate billing-v2 --task task-003
-agentflow inspect diff
-agentflow inspect symbol Handler
-agentflow inspect tests billing-v2
+asa investigate billing-v2
+asa investigate billing-v2 --task task-003
+asa inspect diff
+asa inspect symbol Handler
+asa inspect tests billing-v2
 ```
 
 The `inspect` subcommands wrap targeted helpers when you already know whether you care about a diff, a symbol, or test associations.

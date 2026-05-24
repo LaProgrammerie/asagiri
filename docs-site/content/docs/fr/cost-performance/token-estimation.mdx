@@ -5,7 +5,7 @@ description: Comptages heuristiques de jetons et tarification pour l’affichage
 
 # Estimation de jetons
 
-L’implémentation se trouve dans `application/internal/cost/token_counter.go` et `estimator.go`. L’estimateur sert pour qu’AgentFlow affiche des ordres de grandeur de **tokens et de coût** avant de lancer des agents — utile pour comparer aux budgets et journaliser grossièrement ce qu’un plan présageait, sans prétendre être l’API de facturation d’un hébergeur.
+L’implémentation se trouve dans `application/internal/cost/token_counter.go` et `estimator.go`. L’estimateur sert pour qu’Asagiri affiche des ordres de grandeur de **tokens et de coût** avant de lancer des agents — utile pour comparer aux budgets et journaliser grossièrement ce qu’un plan présageait, sans prétendre être l’API de facturation d’un hébergeur.
 
 ## Fonctionnement
 
@@ -30,9 +30,9 @@ Les jetons estimés sont multipliés par les taux `pricing.models.<model-id>` po
 ## Commandes
 
 ```bash
-agentflow estimate billing-v2 --task task-003
-agentflow work "develop billing-v2" --estimate-only
-agentflow cost billing-v2
+asa estimate billing-v2 --task task-003
+asa work "develop billing-v2" --estimate-only
+asa cost billing-v2
 ```
 
 ## Tests golden

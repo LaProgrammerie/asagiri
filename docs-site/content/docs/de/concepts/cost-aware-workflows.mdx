@@ -9,7 +9,7 @@ description: Token und Kosten vor der Ausführung schätzen; Budgets und Routing
 
 Agentenläufe können Tokens verbrauchen, ohne dass sich der Umfang aus einer kurzen Aufgabenbeschreibung vorher ablesen lässt. Teams brauchen dennoch **Vorhersagen** vor dem ersten Aufruf, **Deckel** gegen Budgetüberläufe, die zuverlässig greifen, und **Routing**, das dort günstigere Ausführungswege wählt, wo die Aufgabenart keine teure Großbaustelle erfordert.
 
-## AgentFlows Ansatz
+## Asagiris Ansatz
 
 Vier Mechanismen — allesamt über die Konfiguration steuerbar:
 
@@ -21,13 +21,13 @@ Vier Mechanismen — allesamt über die Konfiguration steuerbar:
 Typische CLI-Einstiege:
 
 ```bash
-agentflow estimate billing-v2 --task task-003 --dry-run
-agentflow work "develop billing-v2" --estimate-only
-agentflow work "develop billing-v2" --budget 0.50 --allow-over-budget
+asa estimate billing-v2 --task task-003 --dry-run
+asa work "develop billing-v2" --estimate-only
+asa work "develop billing-v2" --budget 0.50 --allow-over-budget
 ```
 
 <Callout type="cost">
-Schätzungen sind **ungefähre Größenordnungen**. Anbieter nutzen eigene Tokenizer; AgentFlow ersetzt deren Abrechnung nicht Byte für Byte.
+Schätzungen sind **ungefähre Größenordnungen**. Anbieter nutzen eigene Tokenizer; Asagiri ersetzt deren Abrechnung nicht Byte für Byte.
 </Callout>
 
 ## Abwägungen

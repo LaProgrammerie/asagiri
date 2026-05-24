@@ -1,6 +1,6 @@
 import Link from 'next/link';
 
-const basePath = process.env.GITHUB_PAGES === 'true' ? '/hyper-fast-builder' : '';
+const basePath = process.env.GITHUB_PAGES === 'true' ? '/asagiri' : '';
 
 const locales = [
   { code: 'en', label: 'English', href: `${basePath}/docs/` },
@@ -13,7 +13,7 @@ export default function HomePage() {
   return (
     <main className="mx-auto flex min-h-screen max-w-lg flex-col justify-center gap-8 px-6 py-16">
       <div>
-        <h1 className="text-3xl font-semibold tracking-tight">AgentFlow</h1>
+        <h1 className="text-3xl font-semibold tracking-tight">Asagiri</h1>
         <p className="mt-2 text-fd-muted-foreground">
           Deterministic orchestration for AI coding workflows.
         </p>

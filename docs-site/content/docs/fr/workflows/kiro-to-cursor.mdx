@@ -5,7 +5,7 @@ description: Spec dans Kiro, implémenter avec Cursor, valider avec commandes pr
 
 # Kiro → Cursor → Verify
 
-Ce passage à l’échelle aligne **`spec-doc` §11.2** avec portes AgentFlow — la rédaction reste sous **Kiro** (`.kiro/specs/<feature>/`), Cursor / `cursor-agent` portent l’implémentation où il excelle ; la CLI impose des étapes **verify**/**review** déterministes empêchant dérive muette.
+Ce passage à l’échelle aligne **`spec-doc` §11.2** avec portes Asagiri — la rédaction reste sous **Kiro** (`.kiro/specs/<feature>/`), Cursor / `cursor-agent` portent l’implémentation où il excelle ; la CLI impose des étapes **verify**/**review** déterministes empêchant dérive muette.
 
 ## Quand vous y recourez
 
@@ -30,19 +30,19 @@ flowchart LR
 Remplacez `billing-v2` par votre feature :
 
 ```bash
-agentflow spec billing-v2 --agent kiro
-agentflow plan billing-v2
-agentflow enrich billing-v2 --agent ollama
-agentflow dev billing-v2 --agent cursor
-agentflow verify billing-v2
-agentflow review billing-v2 --agent codex
-agentflow report <run-id>
+asa spec billing-v2 --agent kiro
+asa plan billing-v2
+asa enrich billing-v2 --agent ollama
+asa dev billing-v2 --agent cursor
+asa verify billing-v2
+asa review billing-v2 --agent codex
+asa report <run-id>
 ```
 
 Répète possible avec `--dry-run` durant mise en plateau :
 
 ```bash
-agentflow dev billing-v2 --agent cursor --dry-run
+asa dev billing-v2 --agent cursor --dry-run
 ```
 
 ## Defaults configuration
@@ -63,7 +63,7 @@ Activer auto review seulement quand désirez revues systématiques à chaque ver
 ## Raccourci intention
 
 ```bash
-agentflow work "develop billing-v2" --stop-after verify
+asa work "develop billing-v2" --stop-after verify
 ```
 
 Résolveur intentions choisi feature flux V3 impose budgets/context.

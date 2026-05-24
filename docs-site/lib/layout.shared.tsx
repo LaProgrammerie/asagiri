@@ -4,7 +4,7 @@ import type { Locale } from '@/lib/i18n';
 import { defineI18nUI } from 'fumadocs-ui/i18n';
 import type { BaseLayoutProps } from 'fumadocs-ui/layouts/shared';
 
-const basePath = process.env.GITHUB_PAGES === 'true' ? '/hyper-fast-builder' : '';
+const basePath = process.env.GITHUB_PAGES === 'true' ? '/asagiri' : '';
 
 export const i18nUI = defineI18nUI(i18n, {
   translations: {
@@ -32,7 +32,7 @@ export function baseOptions(locale: Locale): BaseLayoutProps {
   return {
     i18n: true,
     nav: {
-      title: 'AgentFlow',
+      title: 'Asagiri',
       url: docsHome,
     },
   };

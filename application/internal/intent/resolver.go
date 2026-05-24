@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/config"
+	"github.com/LaProgrammerie/asagiri/application/internal/config"
 )
 
 // IntentResolver resolves free-text instructions (specv2 §5).

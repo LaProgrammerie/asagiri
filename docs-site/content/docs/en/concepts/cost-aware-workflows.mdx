@@ -9,9 +9,9 @@ description: Estimate tokens and cost before execution; enforce budgets and rout
 
 Agent runs can consume tokens in ways that are hard to predict from a plain task description. Teams still need **forecasts** before execution, **budget ceilings** that fail closed, and **routing** that prefers cheaper execution paths when the task does not justify a heavy model.
 
-## AgentFlow approach
+## Asagiri approach
 
-AgentFlow addresses that with four concrete mechanisms that stay under your config:
+Asagiri addresses that with four concrete mechanisms that stay under your config:
 
 1. **Heuristic token counting** — character counts classified by content kind, divided by `token_estimation` ratios (`token_estimation` in config)
 2. **Pricing sheet** — manual `pricing.models` entries for cloud models (no hardcoded vendor prices in code)
@@ -21,13 +21,13 @@ AgentFlow addresses that with four concrete mechanisms that stay under your conf
 Typical CLI entry points:
 
 ```bash
-agentflow estimate billing-v2 --task task-003 --dry-run
-agentflow work "develop billing-v2" --estimate-only
-agentflow work "develop billing-v2" --budget 0.50 --allow-over-budget
+asa estimate billing-v2 --task task-003 --dry-run
+asa work "develop billing-v2" --estimate-only
+asa work "develop billing-v2" --budget 0.50 --allow-over-budget
 ```
 
 <Callout type="cost">
-Estimates are **approximate**. Provider billing uses real tokenizers; AgentFlow does not yet ship provider-exact counters.
+Estimates are **approximate**. Provider billing uses real tokenizers; Asagiri does not yet ship provider-exact counters.
 </Callout>
 
 ## Trade-offs

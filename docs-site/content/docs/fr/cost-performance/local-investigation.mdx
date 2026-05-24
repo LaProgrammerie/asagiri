@@ -5,7 +5,7 @@ description: Grep et parcours filesystem bornés avant les appels agents cloud.
 
 # Investigation locale
 
-Avant qu’AgentFlow ne transmette du contexte de dépôt à un agent cloud, il **investigue le projet localement**. L’implémentation se trouve dans `application/internal/investigation` et alimente à la fois `agentflow investigate` et le prélude du pipeline V3. L’objectif d’ingénierie est étroit mais important : **réduire la taille des prompts et mettre en avant les fichiers qui comptent** au moyen d’outils bornés et reproductifs — grep, parcours du système de fichiers, heuristiques — plutôt que de demander à un modèle d’ingérer tout l’arbre.
+Avant qu’Asagiri ne transmette du contexte de dépôt à un agent cloud, il **investigue le projet localement**. L’implémentation se trouve dans `application/internal/investigation` et alimente à la fois `asa investigate` et le prélude du pipeline V3. L’objectif d’ingénierie est étroit mais important : **réduire la taille des prompts et mettre en avant les fichiers qui comptent** au moyen d’outils bornés et reproductifs — grep, parcours du système de fichiers, heuristiques — plutôt que de demander à un modèle d’ingérer tout l’arbre.
 
 ## Ce qui se passe sur votre machine
 
@@ -18,11 +18,11 @@ Ces artefacts alimentent l’empaquetage du contexte et l’estimation des coût
 Utilisez ces commandes pour exécuter ou déboguer l’investigation en dehors d’un pipeline `work` complet :
 
 ```bash
-agentflow investigate billing-v2
-agentflow investigate billing-v2 --task task-003
-agentflow inspect diff
-agentflow inspect symbol Handler
-agentflow inspect tests billing-v2
+asa investigate billing-v2
+asa investigate billing-v2 --task task-003
+asa inspect diff
+asa inspect symbol Handler
+asa inspect tests billing-v2
 ```
 
 Les sous-commandes `inspect` encapsulent des aides ciblées lorsque vous savez déjà si un diff, un symbole ou des associations de tests vous intéressent.

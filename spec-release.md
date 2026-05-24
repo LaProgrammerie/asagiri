@@ -81,13 +81,13 @@ La version doit être injectée au build via -ldflags.
 
 Exemple existant :
 
-go build -ldflags "-X github.com/LaProgrammerie/hyper-fast-builder/application/internal/version.Version=dev" \
+go build -ldflags "-X github.com/LaProgrammerie/asagiri/application/internal/version.Version=dev" \
   -o bin/agentflow ./application/cmd/agentflow
 
 À généraliser :
 
 go build \
-  -ldflags "-s -w -X github.com/LaProgrammerie/hyper-fast-builder/application/internal/version.Version=${VERSION}" \
+  -ldflags "-s -w -X github.com/LaProgrammerie/asagiri/application/internal/version.Version=${VERSION}" \
   -o dist/agentflow ./application/cmd/agentflow
 
 Le package application/internal/version doit exposer au minimum :
@@ -204,9 +204,9 @@ builds:
       - arm64
     ldflags:
       - -s -w
-      - -X github.com/LaProgrammerie/hyper-fast-builder/application/internal/version.Version={{.Version}}
-      - -X github.com/LaProgrammerie/hyper-fast-builder/application/internal/version.Commit={{.Commit}}
-      - -X github.com/LaProgrammerie/hyper-fast-builder/application/internal/version.Date={{.Date}}
+      - -X github.com/LaProgrammerie/asagiri/application/internal/version.Version={{.Version}}
+      - -X github.com/LaProgrammerie/asagiri/application/internal/version.Commit={{.Commit}}
+      - -X github.com/LaProgrammerie/asagiri/application/internal/version.Date={{.Date}}
 archives:
   - id: default
     builds:
@@ -236,7 +236,7 @@ release:
   draft: false
   prerelease: auto
 
-Adapter le module path si le repo final n’est plus github.com/LaProgrammerie/hyper-fast-builder.
+Adapter le module path si le repo final n’est plus github.com/LaProgrammerie/asagiri.
 
 ⸻
 

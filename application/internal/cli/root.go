@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/version"
+	"github.com/LaProgrammerie/asagiri/application/internal/version"
 	"github.com/spf13/cobra"
 )
 
-// Execute runs the agentflow CLI.
+// Execute runs the asa CLI.
 func Execute() error {
 	return RootCommand().Execute()
 }
@@ -23,8 +23,8 @@ func newRootCmd() *cobra.Command {
 	var dryRun bool
 
 	root := &cobra.Command{
-		Use:     "agentflow",
-		Short:   "Orchestrateur CLI local pour workflows de développement agentique",
+		Use:     "asa",
+		Short:   "Asagiri — orchestration locale pour workflows agentiques",
 		Long:    rootLong,
 		Example: rootExample,
 	}

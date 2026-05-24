@@ -9,9 +9,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/config"
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/store/sqlite"
-	"github.com/LaProgrammerie/hyper-fast-builder/application/pkg/agentflow"
+	"github.com/LaProgrammerie/asagiri/application/internal/config"
+	"github.com/LaProgrammerie/asagiri/application/internal/store/sqlite"
+	"github.com/LaProgrammerie/asagiri/application/pkg/asagiri"
 	"gopkg.in/yaml.v3"
 )
 
@@ -44,12 +44,12 @@ func BuildSnapshot(repoRoot string, cfg *config.Config, store *sqlite.Store) (St
 		}
 		scanFeatureDirs(repoRoot, cfg.Specs.KiroPath, addFeature)
 	} else {
-		scanFeatureDirs(repoRoot, ".agentflow/specs", addFeature)
+		scanFeatureDirs(repoRoot, ".asagiri/specs", addFeature)
 		scanFeatureDirs(repoRoot, ".kiro/specs", addFeature)
 	}
 
 	for name, fs := range features {
-		tasksDir := filepath.Join(repoRoot, ".agentflow", "tasks", name)
+		tasksDir := filepath.Join(repoRoot, ".asagiri", "tasks", name)
 		entries, _ := os.ReadDir(tasksDir)
 		for _, e := range entries {
 			if e.IsDir() || (!strings.HasSuffix(e.Name(), ".yaml") && !strings.HasSuffix(e.Name(), ".json")) {
@@ -58,7 +58,7 @@ func BuildSnapshot(repoRoot string, cfg *config.Config, store *sqlite.Store) (St
 			fs.HasTasks = true
 			fs.TaskCount++
 		}
-		specDir := filepath.Join(repoRoot, ".agentflow", "specs", name)
+		specDir := filepath.Join(repoRoot, ".asagiri", "specs", name)
 		if meta := readMetadataStatus(specDir); meta != "" {
 			fs.Status = meta
 		}
@@ -122,18 +122,18 @@ func mergeTasksIntoFeature(features map[string]*FeatureState, feature string, ta
 
 func nextFromSQLiteTasks(tasks []sqlite.Task) (string, string) {
 	priority := []string{
-		agentflow.StatusRunning,
-		agentflow.StatusImplemented,
-		agentflow.StatusVerifyFailed,
-		agentflow.StatusVerified,
-		agentflow.StatusReviewFailed,
-		agentflow.StatusEnriched,
-		agentflow.StatusPending,
-		agentflow.StatusPlanned,
+		asagiri.StatusRunning,
+		asagiri.StatusImplemented,
+		asagiri.StatusVerifyFailed,
+		asagiri.StatusVerified,
+		asagiri.StatusReviewFailed,
+		asagiri.StatusEnriched,
+		asagiri.StatusPending,
+		asagiri.StatusPlanned,
 	}
 	for _, want := range priority {
 		for _, t := range tasks {
-			if t.Status == want || (want == agentflow.StatusImplemented && t.Status == sqlite.StatusDone) {
+			if t.Status == want || (want == asagiri.StatusImplemented && t.Status == sqlite.StatusDone) {
 				return t.ID, t.Status
 			}
 		}
@@ -145,7 +145,7 @@ func nextFromSQLiteTasks(tasks []sqlite.Task) (string, string) {
 }
 
 func pickNextTask(repoRoot, feature string) (string, string) {
-	dir := filepath.Join(repoRoot, ".agentflow", "tasks", feature)
+	dir := filepath.Join(repoRoot, ".asagiri", "tasks", feature)
 	entries, err := os.ReadDir(dir)
 	if err != nil {
 		return "", ""
@@ -163,17 +163,17 @@ func pickNextTask(repoRoot, feature string) (string, string) {
 		if err != nil {
 			continue
 		}
-		var t agentflow.Task
+		var t asagiri.Task
 		if err := yaml.Unmarshal(data, &t); err != nil {
 			continue
 		}
 		tasks = append(tasks, pair{t.ID, t.Status})
 	}
 	priority := []string{
-		agentflow.StatusImplemented,
-		agentflow.StatusEnriched,
-		agentflow.StatusPending,
-		agentflow.StatusPlanned,
+		asagiri.StatusImplemented,
+		asagiri.StatusEnriched,
+		asagiri.StatusPending,
+		asagiri.StatusPlanned,
 	}
 	for _, want := range priority {
 		for _, p := range tasks {

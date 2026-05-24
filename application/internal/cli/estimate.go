@@ -4,9 +4,9 @@ import (
 	"context"
 	"errors"
 
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/cost"
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/intent"
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/pipeline"
+	"github.com/LaProgrammerie/asagiri/application/internal/cost"
+	"github.com/LaProgrammerie/asagiri/application/internal/intent"
+	"github.com/LaProgrammerie/asagiri/application/internal/pipeline"
 	"github.com/spf13/cobra"
 )
 

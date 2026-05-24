@@ -1,17 +1,17 @@
 ---
 title: Configuration file
-description: Complete reference for .agentflow/config.yaml blocks and defaults.
+description: Complete reference for .asagiri/config.yaml blocks and defaults.
 ---
 
 # Configuration file
 
-The canonical file is **`.agentflow/config.yaml`**, created by `agentflow init` from `config.yaml.example`. Unless a path is absolute, AgentFlow resolves it from the repository root. For machine-readable validation, the generated JSON Schema lives at `/schemas/config.schema.json` on the docs site.
+The canonical file is **`.asagiri/config.yaml`**, created by `asa init` from `config.yaml.example`. Unless a path is absolute, Asagiri resolves it from the repository root. For machine-readable validation, the generated JSON Schema lives at `/schemas/config.schema.json` on the docs site.
 
 The sections that follow mirror the file layout: each block controls a slice of behavior (intent, work defaults, sources, persistence, agents, validation, models, cost, routing, UI, MCP, and repo policies).
 
 ## `project`
 
-`project` carries a human-facing name and the default branch AgentFlow uses for worktree-oriented flows.
+`project` carries a human-facing name and the default branch Asagiri uses for worktree-oriented flows.
 
 ```yaml
 project:
@@ -55,7 +55,7 @@ Local sources scan fixed paths for specs and active handoff material; Notion is 
 
 | Block | Purpose |
 | --- | --- |
-| `sources.local` | Scan `.agentflow/specs`, `.kiro/specs`, `docs/ai/active` |
+| `sources.local` | Scan `.asagiri/specs`, `.kiro/specs`, `docs/ai/active` |
 | `sources.notion` | Optional Notion → local import (see [Notion](/docs/configuration/notion)) |
 
 ```yaml
@@ -63,14 +63,14 @@ sources:
   local:
     enabled: true
     paths:
-      - .agentflow/specs
+      - .asagiri/specs
       - .kiro/specs
       - docs/ai/active
   notion:
     enabled: false
     token_env: NOTION_TOKEN
     specs_database_id: ""
-    import_path: .agentflow/specs
+    import_path: .asagiri/specs
 ```
 
 ## `specs`, `state`, `worktrees`
@@ -85,11 +85,11 @@ specs:
 
 state:
   backend: sqlite
-  path: .agentflow/state.sqlite
+  path: .asagiri/state.sqlite
 
 worktrees:
-  base_path: .agentflow/worktrees
-  branch_prefix: agentflow
+  base_path: .asagiri/worktrees
+  branch_prefix: asa
   cleanup_policy: keep_failed
 ```
 
@@ -177,7 +177,7 @@ ui:
 
 ## `mcp`
 
-When `mcp.enabled` is `true`, AgentFlow can run a local stdio MCP server with tool timeouts, output limits, investigation caps, and paths that investigation tooling must not read.
+When `mcp.enabled` is `true`, Asagiri can run a local stdio MCP server with tool timeouts, output limits, investigation caps, and paths that investigation tooling must not read.
 
 ```yaml
 mcp:
@@ -210,8 +210,8 @@ policies:
 
 ## Validate changes
 
-After you edit YAML, `agentflow doctor` is the fast sanity check before you run `work` against real agents.
+After you edit YAML, `asa doctor` is the fast sanity check before you run `work` against real agents.
 
 ```bash
-agentflow doctor
+asa doctor
 ```

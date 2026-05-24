@@ -157,7 +157,7 @@ func buildMDX(rel, slug string, cmd *cobra.Command, root *cobra.Command) ([]byte
 		Title       string `yaml:"title"`
 		Description string `yaml:"description"`
 	}{
-		Title:       title + " · AgentFlow CLI",
+		Title:       title + " · Asagiri CLI",
 		Description: desc,
 	}
 	var fmBuf bytes.Buffer
@@ -218,13 +218,13 @@ func englishDescription(rel, slug string, cmd *cobra.Command) string {
 	if s := strings.TrimSpace(cmd.Short); s != "" {
 		return sanitizeDescription(singleLine(removeAnglePlaceholders(s)), slug)
 	}
-	return fmt.Sprintf("AgentFlow CLI reference for %s.", englishPathPhrase(rel))
+	return fmt.Sprintf("Asagiri CLI reference for %s.", englishPathPhrase(rel))
 }
 
 func sanitizeDescription(s, slug string) string {
 	out := strings.TrimSpace(s)
 	if out == "" {
-		return fmt.Sprintf("AgentFlow CLI reference for `%s`.", slug)
+		return fmt.Sprintf("Asagiri CLI reference for `%s`.", slug)
 	}
 	if len([]rune(out)) > 220 {
 		rs := []rune(out)
@@ -341,11 +341,11 @@ Use **inspect** when you need fast, offline answers about symbols, neighbouring 
 `)
 	case "cost":
 		block = strings.TrimSpace(`
-Use **cost** when reconciling SQLite-backed telemetry with pricing tables declared in **.agentflow/config.yaml** or when slicing spend over a bounded recency window.
+Use **cost** when reconciling SQLite-backed telemetry with pricing tables declared in **.asagiri/config.yaml** or when slicing spend over a bounded recency window.
 `)
 	case "mcp":
 		block = strings.TrimSpace(`
-Use **mcp serve** whenever an IDE expects a bundled Model Context Protocol stdio shim that mirrors **.agentflow** configuration.
+Use **mcp serve** whenever an IDE expects a bundled Model Context Protocol stdio shim that mirrors **.asagiri** configuration.
 `)
 	case "workflow":
 		block = strings.TrimSpace(`
@@ -353,7 +353,7 @@ Workflow commands advance tracked features across spec → plan → implementati
 `)
 	case "bootstrap":
 		block = strings.TrimSpace(`
-Bootstrap commands scaffold or reconcile the AgentFlow working tree so subsequent workflow nodes can reliably resolve configuration and repository metadata.
+Bootstrap commands scaffold or reconcile the Asagiri working tree so subsequent workflow nodes can reliably resolve configuration and repository metadata.
 `)
 	case "runops":
 		block = strings.TrimSpace(`
@@ -365,7 +365,7 @@ Indexing keeps embedded search artefacts aligned whenever significant repository
 `)
 	default:
 		block = strings.TrimSpace(`
-Orchestration commands coordinate higher-order AgentFlow workloads such as ingestion, syncing, backlog triage, investigative passes, hydrated context payloads, coarse estimates, and workspace-specific automation.
+Orchestration commands coordinate higher-order Asagiri workloads such as ingestion, syncing, backlog triage, investigative passes, hydrated context payloads, coarse estimates, and workspace-specific automation.
 `)
 	}
 	if short := strings.TrimSpace(cmd.Short); short != "" {
@@ -547,7 +547,7 @@ func englishInternals(rel string) string {
 `)
 		case "diff":
 			return strings.TrimSpace(`
-- Spawns **git diff --stat** scoped with **git -C** at the AgentFlow-managed repository root, truncating very large summaries locally.
+- Spawns **git diff --stat** scoped with **git -C** at the Asagiri-managed repository root, truncating very large summaries locally.
 `)
 		default:
 			return strings.TrimSpace(`
@@ -580,7 +580,7 @@ func englishInternals(rel string) string {
 		switch firstToken(rel) {
 		case "init":
 			return strings.TrimSpace(`
-- Writes AgentFlow scaffolding (directories plus manifests) that align repositories with onboarding expectations documented for contributors.
+- Writes Asagiri scaffolding (directories plus manifests) that align repositories with onboarding expectations documented for contributors.
 `)
 		case "doctor":
 			return strings.TrimSpace(`
@@ -616,7 +616,7 @@ func englishInternals(rel string) string {
 
 	case "repoindex":
 		return strings.TrimSpace(`
-- Crawls repositories to refresh AgentFlow ingestion indexes referenced by tooling that depends on deterministic filesystem snapshots.
+- Crawls repositories to refresh Asagiri ingestion indexes referenced by tooling that depends on deterministic filesystem snapshots.
 `)
 
 	default:
@@ -649,7 +649,7 @@ func englishFailureModes(rel string) string {
 	}
 	var b strings.Builder
 	write(&b, "Cobra rejects unknown flags or arity mismatches before any repository side effects occur.")
-	write(&b, "AgentFlow cannot resolve scaffolding when the command is invoked outside an initialised checkout.")
+	write(&b, "Asagiri cannot resolve scaffolding when the command is invoked outside an initialised checkout.")
 
 	switch archetype(rel) {
 	case "docs":
@@ -661,7 +661,7 @@ func englishFailureModes(rel string) string {
 		write(&b, "SQLite contention or corrupted telemetry prevent summarisation queries from completing.")
 		write(&b, "Malformed **--since** payloads fail fast before aggregates are queried.")
 	case "mcp":
-		write(&b, "Disabled MCP integrations stop early with guidance drawn from **.agentflow** configuration diagnostics.")
+		write(&b, "Disabled MCP integrations stop early with guidance drawn from **.asagiri** configuration diagnostics.")
 	case "version":
 		write(&b, "Version strings may read as placeholders when distribution pipelines omit linkage metadata—a rare tooling misconfiguration.")
 	case "workflow", "runops", "repoindex":

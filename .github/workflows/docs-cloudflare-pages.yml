@@ -40,7 +40,7 @@ jobs:
 
       - name: Generate CLI reference
         working-directory: ${{ github.workspace }}
-        run: go run ./application/cmd/agentflow docs generate-cli --output docs-site/content/docs/en/cli/generated
+        run: go run ./application/cmd/asa docs generate-cli --output docs-site/content/docs/en/cli/generated
 
       - name: Enable Corepack
         run: corepack enable

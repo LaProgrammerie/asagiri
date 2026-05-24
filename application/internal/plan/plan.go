@@ -6,8 +6,8 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/spec"
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/store/sqlite"
+	"github.com/LaProgrammerie/asagiri/application/internal/spec"
+	"github.com/LaProgrammerie/asagiri/application/internal/store/sqlite"
 )
 
 var (

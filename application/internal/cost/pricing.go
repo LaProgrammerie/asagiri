@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"math"
 
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/config"
+	"github.com/LaProgrammerie/asagiri/application/internal/config"
 )
 
 // CostFromPricing computes spend from configured per-1M token prices only (specv3 §6).

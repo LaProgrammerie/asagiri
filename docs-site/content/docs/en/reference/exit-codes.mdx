@@ -5,7 +5,7 @@ description: CLI exit behavior on success and failure.
 
 # Exit codes
 
-AgentFlow follows idiomatic Go/Cobra exit semantics so shell scripts and CI gates can branch on `$?` without custom wrappers.
+Asagiri follows idiomatic Go/Cobra exit semantics so shell scripts and CI gates can branch on `$?` without custom wrappers.
 
 | Code | Meaning |
 | --- | --- |
@@ -18,9 +18,9 @@ AgentFlow follows idiomatic Go/Cobra exit semantics so shell scripts and CI gate
 The samples illustrate the distinction between usage failures (exit **2**), happy paths (exit **0** on `doctor` or a successful estimate-only run), and operational failures (budget or validation errors surface as exit **1** with stderr context).
 
 ```bash
-agentflow work                    # exit 2 — missing required instruction arg
-agentflow doctor                  # exit 0 when all checks pass
-agentflow work "x" --estimate-only # exit 0 when estimate succeeds
+asa work                    # exit 2 — missing required instruction arg
+asa doctor                  # exit 0 when all checks pass
+asa work "x" --estimate-only # exit 0 when estimate succeeds
 ```
 
 Budget blocks and validation failures surface as **exit 1** with stderr message.
@@ -30,7 +30,7 @@ Budget blocks and validation failures surface as **exit 1** with stderr message.
 Combine with `||` in shell scripts, and remember `--dry-run` when you only want to validate wiring in CI without failing because an agent binary is absent.
 
 ```bash
-agentflow verify my-feature || echo "verify failed"
+asa verify my-feature || echo "verify failed"
 ```
 
 Use `--dry-run` in CI to avoid non-zero exits from missing agents when only testing orchestration scaffolding.

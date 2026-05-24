@@ -5,7 +5,7 @@ description: Map agent ids to CLI commands and timeouts in config.yaml.
 
 # Agents configuration
 
-AgentFlow does not talk to agent APIs directly. It starts each agent as a **subprocess without a shell** (`application/internal/agent/exec`), passing a plain `argv` built from your config. Every key under `agents:` is a logical id you reference from flags (`--agent`), from `work.default_agent`, and from routing rules.
+Asagiri does not talk to agent APIs directly. It starts each agent as a **subprocess without a shell** (`application/internal/agent/exec`), passing a plain `argv` built from your config. Every key under `agents:` is a logical id you reference from flags (`--agent`), from `work.default_agent`, and from routing rules.
 
 The block below is a realistic shape: several ids point at different executables, with optional `args`, models, timeouts, and an Ollama-style HTTP endpoint where that agent type expects it.
 
@@ -57,7 +57,7 @@ work:
   default_enricher: ollama
 ```
 
-You can still override per invocation, for example `agentflow dev feat --agent cursor` or `agentflow review feat --agent codex`.
+You can still override per invocation, for example `asa dev feat --agent cursor` or `asa review feat --agent codex`.
 
 ## Dry-run
 

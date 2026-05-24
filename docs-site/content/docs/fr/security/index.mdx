@@ -5,7 +5,7 @@ description: Secrets, périmètre, MCP, agents et données envoyées aux fournis
 
 # Sécurité
 
-AgentFlow enchaîne compilateurs, serveurs MCP, agents en sous-processus et modèles cloud optionnels ; chaque couche amplifie les erreurs d’hygiène déjà présentes dans le dépôt. Attendez-vous à une **responsabilité partagée** : la CLI impose des garde-corps mécaniques, mais choix configurés trop privilégiés et routines de revue après coup restent de votre équipe.
+Asagiri enchaîne compilateurs, serveurs MCP, agents en sous-processus et modèles cloud optionnels ; chaque couche amplifie les erreurs d’hygiène déjà présentes dans le dépôt. Attendez-vous à une **responsabilité partagée** : la CLI impose des garde-corps mécaniques, mais choix configurés trop privilégiés et routines de revue après coup restent de votre équipe.
 
 ## Synthèse par axe
 
@@ -22,8 +22,8 @@ AgentFlow enchaîne compilateurs, serveurs MCP, agents en sous-processus et mod�
 
 La surface explorée :
 
-- Worktrees sous `.agentflow/worktrees/`
-- État/exécutions sous `.agentflow/`
+- Worktrees sous `.asagiri/worktrees/`
+- État/exécutions sous `.asagiri/`
 - Investigation évite globs sensibles et chemoins listés (`.env`, clés)
 
 Pour autant fichiers ignorés — secrets présents uniquement localement — restent atteignables si un opérateur force des chemins, d’où profiles agents moind-privilège toujours recommandés.
@@ -38,7 +38,7 @@ CLIs configurés (`cursor-agent`, `codex`, …) gardent vos droits utilisateur. 
 
 ## Signaler problèmes
 
-Consultez **[SECURITY.md](https://github.com/LaProgrammerie/hyper-fast-builder/blob/main/SECURITY.md)** lorsque vous observez escalade de privilèges orchestrations.
+Consultez **[SECURITY.md](https://github.com/LaProgrammerie/asagiri/blob/main/SECURITY.md)** lorsque vous observez escalade de privilèges orchestrations.
 
 ## Voir aussi
 

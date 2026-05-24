@@ -7,7 +7,7 @@ description: Sync Notion pages to local specs; execute only from snapshots.
 
 ## Principle
 
-**Notion is never the execution source of truth.** AgentFlow always works from a **local snapshot** under `.agentflow/specs/` (or paths in `sources.local.paths`). Sync pulls remote content; `work` reads local files and SQLite state.
+**Notion is never the execution source of truth.** Asagiri always works from a **local snapshot** under `.asagiri/specs/` (or paths in `sources.local.paths`). Sync pulls remote content; `work` reads local files and SQLite state.
 
 Product and design stakeholders can therefore keep authoring in Notion while engineering replay runs from immutable filesystem snapshots—a split that avoids surprise behaviour when editors rename properties or reorganize databases mid-flight.
 
@@ -17,7 +17,7 @@ Notion sync requires configuration and a valid API token. Treat sync as experime
 
 ## Configure Notion
 
-YAML mirrors the authoritative schema: enable the connector, declare which environment variable exposes the PAT, tie it to your specs database identifier, and point imports at `.agentflow/specs` (overridable elsewhere if your layout differs).
+YAML mirrors the authoritative schema: enable the connector, declare which environment variable exposes the PAT, tie it to your specs database identifier, and point imports at `.asagiri/specs` (overridable elsewhere if your layout differs).
 
 ```yaml
 sources:
@@ -25,7 +25,7 @@ sources:
     enabled: true
     token_env: NOTION_TOKEN
     specs_database_id: "<your-database-id>"
-    import_path: .agentflow/specs
+    import_path: .asagiri/specs
 ```
 
 Export the token:
@@ -39,26 +39,26 @@ export NOTION_TOKEN="ntn_..."
 `sync notion` can target a canonical page URL, while **`sync all`** fans out across every configured source so auxiliary streams stay coherent.
 
 ```bash
-agentflow sync notion --page "https://www.notion.so/..."
+asa sync notion --page "https://www.notion.so/..."
 # or list + sync all enabled sources:
-agentflow sync all
+asa sync all
 ```
 
 Dry-run preview:
 
 ```bash
-agentflow --dry-run sync notion --page "https://www.notion.so/..."
+asa --dry-run sync notion --page "https://www.notion.so/..."
 ```
 
 Interactive mode may prompt before overwriting a modified local spec.
 
 ## Work from local snapshot
 
-Listing plus execution both consult the synced tree under `.agentflow/specs`:
+Listing plus execution both consult the synced tree under `.asagiri/specs`:
 
 ```bash
-agentflow inbox --source notion
-agentflow work "develop billing-v2" --source notion
+asa inbox --source notion
+asa work "develop billing-v2" --source notion
 ```
 
 ## Trade-offs

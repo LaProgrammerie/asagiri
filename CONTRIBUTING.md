@@ -1,6 +1,6 @@
-# Contribuer à AgentFlow
+# Contribuer à Asagiri
 
-Merci de votre intérêt pour AgentFlow (dépôt `hyper-fast-builder`).
+Merci de votre intérêt pour Asagiri (dépôt `Asagiri`).
 
 ## Avant de coder
 
@@ -20,7 +20,7 @@ Tests avec détecteur de courses : `go test -race ./...`
 
 ## Conventions
 
-- Code Go sous `application/internal/` ; point d’entrée `application/cmd/agentflow`.
+- Code Go sous `application/internal/` ; point d’entrée `application/cmd/asa`.
 - Erreurs explicites ; pas de `panic` aux frontières CLI.
 - Agents externes : toujours subprocess sans shell (`exec.Command`).
 - Nouvelle décision d’architecture → entrée dans `docs/ai/05-decisions.md`.
@@ -34,4 +34,4 @@ Tests avec détecteur de courses : `go test -race ./...`
 
 ## Rapports de bugs
 
-Inclure : version (`agentflow --version`), OS, commande exacte, sortie (secrets masqués), config redacted (`.agentflow/config.yaml` sans tokens).
+Inclure : version (`asa --version`), OS, commande exacte, sortie (secrets masqués), config redacted (`.asagiri/config.yaml` sans tokens).

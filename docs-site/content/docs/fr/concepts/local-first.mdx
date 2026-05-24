@@ -9,12 +9,12 @@ description: Investiguer et réduire le contexte en local avant d'appeler les mo
 
 Envoyer tout un dépôt dans un modèle cloud est lent, coûteux, et fait souvent fuiter plus de code que la tâche ne l'exige. Beaucoup de questions d'ingénierie se réduisent une fois que vous avez cherché dans l'arbre, listé les fichiers candidats et appliqué un empilement structuré — travail qui appartient à votre machine avec des outils ordinaires, pas dans un prompt distant.
 
-## Approche AgentFlow
+## Approche Asagiri
 
-AgentFlow traite **l'investigation locale et la réduction de contexte** comme prélude de premier ordre. Avant les étapes coûteuses, AgentFlow peut restreindre ce qui quitte le dépôt :
+Asagiri traite **l'investigation locale et la réduction de contexte** comme prélude de premier ordre. Avant les étapes coûteuses, Asagiri peut restreindre ce qui quitte le dépôt :
 
-1. **`agentflow investigate <feature>`** — grep borné, fichiers candidats, alertes gros fichiers, tests liés
-2. **`agentflow context <feature> --optimize`** — collecter, scorer, compresser le contexte en un pack
+1. **`asa investigate <feature>`** — grep borné, fichiers candidats, alertes gros fichiers, tests liés
+2. **`asa context <feature> --optimize`** — collecter, scorer, compresser le contexte en un pack
 3. **Routage** — préférer Ollama ou profils locaux pour `summarize`, `classify`, `pre_review` et `context_selection` quand `routing.strategies.cost_aware` est actif
 
 Le flux est linéaire en pratique : l'intention utilisateur alimente l'investigation, l'investigation un pack de contexte, le routage choisit local ou cloud, et les deux chemins convergent vers la validation.
@@ -35,9 +35,9 @@ flowchart LR
 La séquence ci-dessous lance investigation et optimisation de contexte pour une feature, puis prévisualise un `work` avec préférence locale et estimate-only :
 
 ```bash
-agentflow investigate billing-v2 --task task-003
-agentflow context billing-v2 --task task-003 --optimize
-agentflow work "develop billing-v2" --prefer-local --estimate-only
+asa investigate billing-v2 --task task-003
+asa context billing-v2 --task task-003 --optimize
+asa work "develop billing-v2" --prefer-local --estimate-only
 ```
 
 ## Compromis

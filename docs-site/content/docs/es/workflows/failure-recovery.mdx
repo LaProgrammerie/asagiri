@@ -5,7 +5,7 @@ description: Recuperación tras verify fallido revisión incompleta o ejecución
 
 # Recuperación ante fallos
 
-AgentFlow persiste estados claros antes deducirlos archivo suelto respetarlos usando overrides documentados permite desatascar sin dañar historia.
+Asagiri persiste estados claros antes deducirlos archivo suelto respetarlos usando overrides documentados permite desatascar sin dañar historia.
 
 ## Máquina estados modelada
 
@@ -36,31 +36,31 @@ Pasos ilegales regresar error salvo comandos especialmente permitido `--force`.
 
 ```bash
 # fix local worktree después:
-agentflow verify billing-v2 --force
+asa verify billing-v2 --force
 ```
 
 ### Review fracasado
 
 ```bash
-agentflow review billing-v2 --agent codex --force
+asa review billing-v2 --agent codex --force
 ```
 
 ### Run interrumpe mid pipeline
 
 ```bash
-agentflow status
-agentflow resume <run-id>          # muestra siguiente plan|dev|review...
-agentflow continue "resume billing-v2"
+asa status
+asa resume <run-id>          # muestra siguiente plan|dev|review...
+asa continue "resume billing-v2"
 ```
 
 <Callout type="experimental">
-`agentflow resume <run-id> --execute` sólo concatena dentro global **`--dry-run`**; fuera ejecute manual siguiente instrucción o `continue`.
+`asa resume <run-id> --execute` sólo concatena dentro global **`--dry-run`**; fuera ejecute manual siguiente instrucción o `continue`.
 </Callout>
 
 ### Worktrees viejas
 
 ```bash
-agentflow clean
+asa clean
 ```
 
 Politica retention `cleanup_policy` determina preservación fallidas.
@@ -68,8 +68,8 @@ Politica retention `cleanup_policy` determina preservación fallidas.
 ## Post mortems
 
 ```bash
-agentflow report <run-id>
-agentflow investigate billing-v2
+asa report <run-id>
+asa investigate billing-v2
 ```
 
 ## Relacionado

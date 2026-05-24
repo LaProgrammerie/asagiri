@@ -5,7 +5,7 @@ description: Geheimnisse, Reichweite, MCP, Agents und Datenübertragung an Anbie
 
 # Sicherheit
 
-AgentFlow verknüpft Compiler, MCP-Server, Subprozess-Agenten und optional cloud-gehostete Modelle. **Jede Schicht verstärkt das, was ohnehin in Ihrer Repository-Hygiene steckt.** Es gilt **gemeinsame Verantwortung**: Das CLI kann Grundrichtlinien erzwingen, aber sensible Konfiguration und nachgelagerte Review-Prozesse bleiben bei Ihrem Team.
+Asagiri verknüpft Compiler, MCP-Server, Subprozess-Agenten und optional cloud-gehostete Modelle. **Jede Schicht verstärkt das, was ohnehin in Ihrer Repository-Hygiene steckt.** Es gilt **gemeinsame Verantwortung**: Das CLI kann Grundrichtlinien erzwingen, aber sensible Konfiguration und nachgelagerte Review-Prozesse bleiben bei Ihrem Team.
 
 ## Überblick
 
@@ -20,8 +20,8 @@ AgentFlow verknüpft Compiler, MCP-Server, Subprozess-Agenten und optional cloud
 
 ## Reichweite auf der Platte
 
-- Worktrees unter `.agentflow/worktrees/`
-- Status und Artefakte unter `.agentflow/`
+- Worktrees unter `.asagiri/worktrees/`
+- Status und Artefakte unter `.asagiri/`
 - Investigation lässt konfigurierte sensible Glob-Muster und Denylist-Pfade wie `.env` oder Schlüssel aus
 
 Selbst nicht eingecheckte, aber lokal vorhandene Geheimnisse können durch falsche Anweisungen oder zu großzügige Agentenprofile gefährdet werden — minimale Agent-Rechte und klare Policies bleiben wichtig.
@@ -36,7 +36,7 @@ Konfigurierte CLIs (`cursor-agent`, `codex`, …) laufen mit Ihren Nutzerrechten
 
 ## Melden von Problemen
 
-Bei Hinweisen auf Rechteausweitung oder andere sicherheitsrelevante Schwächen siehe [`SECURITY.md`](https://github.com/LaProgrammerie/hyper-fast-builder/blob/main/SECURITY.md).
+Bei Hinweisen auf Rechteausweitung oder andere sicherheitsrelevante Schwächen siehe [`SECURITY.md`](https://github.com/LaProgrammerie/asagiri/blob/main/SECURITY.md).
 
 ## Verwandtes
 

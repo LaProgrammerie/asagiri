@@ -5,7 +5,7 @@ description: Begrenztes Grep und Dateisystem-Scans vor Aufrufen von Cloud-Agente
 
 # Lokale Investigation
 
-Bevor AgentFlow Repository-Kontext an einen Cloud-Agent weitergibt, **untersucht das Projekt lokal**. Die Implementierung liegt in `application/internal/investigation`; sie speist `agentflow investigate` und die V3-Pipeline-Vorbereitung. Das Ziel ist überschaubar, aber wichtig: **Prompt-Größe senken und die relevanten Dateien sichtbar machen** — mit begrenzten, wiederholbaren Mitteln (Grep, Verzeichnisdurchlauf, Heuristiken) statt einem Modell den gesamten Baum zu übergeben.
+Bevor Asagiri Repository-Kontext an einen Cloud-Agent weitergibt, **untersucht das Projekt lokal**. Die Implementierung liegt in `application/internal/investigation`; sie speist `asa investigate` und die V3-Pipeline-Vorbereitung. Das Ziel ist überschaubar, aber wichtig: **Prompt-Größe senken und die relevanten Dateien sichtbar machen** — mit begrenzten, wiederholbaren Mitteln (Grep, Verzeichnisdurchlauf, Heuristiken) statt einem Modell den gesamten Baum zu übergeben.
 
 ## Was auf Ihrer Maschine passiert
 
@@ -18,11 +18,11 @@ Diese Artefakte sind Eingaben für Kontext-Pack und Kostenschätzung, keine endg
 Zum Testen oder Debuggen der Investigation außerhalb eines vollen `work`-Laufs:
 
 ```bash
-agentflow investigate billing-v2
-agentflow investigate billing-v2 --task task-003
-agentflow inspect diff
-agentflow inspect symbol Handler
-agentflow inspect tests billing-v2
+asa investigate billing-v2
+asa investigate billing-v2 --task task-003
+asa inspect diff
+asa inspect symbol Handler
+asa inspect tests billing-v2
 ```
 
 Die `inspect`-Unterbefehle sind gezielt hilfreich, wenn bereits klar ist, ob Diff, Symbol oder Tests im Mittelpunkt stehen.

@@ -7,7 +7,7 @@ description: Sincroniza páginas Notion como specs locales; ejecuta sólo snapsh
 
 ## Principio
 
-**Notion jamás sirve ejecución en vivo.** AgentFlow opera siempre snapshots **filesystem** ubicados `.agentflow/specs/` (también alternativamente paths `sources.local`). Sync trae contenido remoto trabajo consume árboles disco + registros SQLite.
+**Notion jamás sirve ejecución en vivo.** Asagiri opera siempre snapshots **filesystem** ubicados `.asagiri/specs/` (también alternativamente paths `sources.local`). Sync trae contenido remoto trabajo consume árboles disco + registros SQLite.
 
 Producto/design sigue usando Notions mientras ingeniería repite corrida estable snapshot inmutable aislando caos medio vuelos donde editor cambia schemas.
 
@@ -17,7 +17,7 @@ Sinc Notion necesita configuración token API vigente marcado experimental hasta
 
 ## Configuración
 
-YAML igual que schema oficial activa connector nombra variable secreta identificador BD import pref `.agentflow/specs`.
+YAML igual que schema oficial activa connector nombra variable secreta identificador BD import pref `.asagiri/specs`.
 
 ```yaml
 sources:
@@ -25,7 +25,7 @@ sources:
     enabled: true
     token_env: NOTION_TOKEN
     specs_database_id: "<your-database-id>"
-    import_path: .agentflow/specs
+    import_path: .asagiri/specs
 ```
 
 Export secreto PAT shell:
@@ -39,14 +39,14 @@ export NOTION_TOKEN="ntn_..."
 Individual URL via `sync notion` mientras tanto **`sync all`** recorrer fuentes opcionales habilitadas.
 
 ```bash
-agentflow sync notion --page "https://www.notion.so/..."
-agentflow sync all
+asa sync notion --page "https://www.notion.so/..."
+asa sync all
 ```
 
 Previsualización:
 
 ```bash
-agentflow --dry-run sync notion --page "https://www.notion.so/..."
+asa --dry-run sync notion --page "https://www.notion.so/..."
 ```
 
 Interactivo puede advertir ante sobrescritura archivo local tocado tras sync previo divergente manual.
@@ -56,8 +56,8 @@ Interactivo puede advertir ante sobrescritura archivo local tocado tras sync pre
 Lista + pipeline consultan mismo árbol descargado:
 
 ```bash
-agentflow inbox --source notion
-agentflow work "develop billing-v2" --source notion
+asa inbox --source notion
+asa work "develop billing-v2" --source notion
 ```
 
 ## Compensaciones

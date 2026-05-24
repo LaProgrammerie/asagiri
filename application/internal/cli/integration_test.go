@@ -30,7 +30,7 @@ func TestCLIIntegrationDryRun(t *testing.T) {
 	runGitCommand(t, repo, "config", "user.email", "test@example.com")
 	runGitCommand(t, repo, "config", "user.name", "Test")
 	writeFile(t, filepath.Join(repo, "go.mod"), "module example.com/test\n\ngo 1.25.0\n")
-	writeFile(t, filepath.Join(repo, ".agentflow", "config.yaml.example"), `project:
+	writeFile(t, filepath.Join(repo, ".asagiri", "config.yaml.example"), `project:
   name: test
   default_branch: main
 specs:
@@ -39,10 +39,10 @@ specs:
   handoff_path: docs/ai/active/handoff.md
 state:
   backend: sqlite
-  path: .agentflow/state.sqlite
+  path: .asagiri/state.sqlite
 worktrees:
-  base_path: .agentflow/worktrees
-  branch_prefix: agentflow
+  base_path: .asagiri/worktrees
+  branch_prefix: asagiri
   cleanup_policy: keep_failed
 agents:
   kiro:
@@ -99,11 +99,11 @@ agents:
 
 	root.SetArgs([]string{"report", runID, "--dry-run"})
 	require.NoError(t, root.Execute(), output.String())
-	require.FileExists(t, filepath.Join(repo, ".agentflow", "runs", runID, "report.md"))
+	require.FileExists(t, filepath.Join(repo, ".asagiri", "runs", runID, "report.md"))
 }
 
 func latestRunID(repo string) (string, error) {
-	dbPath := filepath.Join(repo, ".agentflow", "state.sqlite")
+	dbPath := filepath.Join(repo, ".asagiri", "state.sqlite")
 	store, err := loadContext(repo, true)
 	if err != nil {
 		return "", err

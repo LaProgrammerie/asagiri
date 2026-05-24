@@ -1,11 +1,11 @@
-# Consolidation AgentFlow (spec-postv123)
+# Consolidation Asagiri (spec-postv123, historique AgentFlow)
 
 Index des livrables de la mission consolidation / open source readiness.
 
 | Doc | Sujet |
 |-----|--------|
 | [01-architecture-audit.md](01-architecture-audit.md) | Architecture, drift, décisions |
-| [02-api-stability.md](02-api-stability.md) | CLI, primitives, `pkg/agentflow` |
+| [02-api-stability.md](02-api-stability.md) | CLI, primitives, `pkg/asagiri` |
 | [03-security-reliability-audit.md](03-security-reliability-audit.md) | Sécurité, fiabilité, garde-fous |
 | [04-performance-cost-audit.md](04-performance-cost-audit.md) | Performance, tokens, benchmark |
 | [05-agent-workflows.md](05-agent-workflows.md) | Matrice tests agents |

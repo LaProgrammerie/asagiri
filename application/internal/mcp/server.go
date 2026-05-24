@@ -10,10 +10,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/config"
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/contextopt"
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/cost"
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/investigation"
+	"github.com/LaProgrammerie/asagiri/application/internal/config"
+	"github.com/LaProgrammerie/asagiri/application/internal/contextopt"
+	"github.com/LaProgrammerie/asagiri/application/internal/cost"
+	"github.com/LaProgrammerie/asagiri/application/internal/investigation"
 )
 
 // Server is a minimal stdio MCP JSON-RPC server (specv3 §10) — initialize, tools/list, tools/call only.
@@ -72,7 +72,7 @@ func (s *Server) handle(ctx context.Context, req rpcRequest) rpcResponse {
 		return finish(base, map[string]any{
 			"protocolVersion": "2024-11-05",
 			"capabilities":    map[string]any{"tools": map[string]any{}},
-			"serverInfo":      map[string]any{"name": "agentflow", "version": "v3"},
+			"serverInfo":      map[string]any{"name": "asa", "version": "v3"},
 		})
 	case "tools/list":
 		return finish(base, map[string]any{"tools": toolDefs()})
@@ -112,16 +112,16 @@ func (s *Server) writeErr(id any, code int, msg string) {
 
 func toolDefs() []map[string]any {
 	return []map[string]any{
-		{"name": "agentflow.search", "inputSchema": map[string]any{}},
-		{"name": "agentflow.read_file_safe", "inputSchema": map[string]any{}},
-		{"name": "agentflow.extract_symbols", "inputSchema": map[string]any{}},
-		{"name": "agentflow.find_related_tests", "inputSchema": map[string]any{}},
-		{"name": "agentflow.estimate_tokens", "inputSchema": map[string]any{}},
-		{"name": "agentflow.estimate_cost", "inputSchema": map[string]any{}},
-		{"name": "agentflow.get_task_context", "inputSchema": map[string]any{}},
-		{"name": "agentflow.get_run_status", "inputSchema": map[string]any{}},
-		{"name": "agentflow.get_diff_summary", "inputSchema": map[string]any{}},
-		{"name": "agentflow.run_local_check", "inputSchema": map[string]any{}},
+		{"name": "asagiri.search", "inputSchema": map[string]any{}},
+		{"name": "asagiri.read_file_safe", "inputSchema": map[string]any{}},
+		{"name": "asagiri.extract_symbols", "inputSchema": map[string]any{}},
+		{"name": "asagiri.find_related_tests", "inputSchema": map[string]any{}},
+		{"name": "asagiri.estimate_tokens", "inputSchema": map[string]any{}},
+		{"name": "asagiri.estimate_cost", "inputSchema": map[string]any{}},
+		{"name": "asagiri.get_task_context", "inputSchema": map[string]any{}},
+		{"name": "asagiri.get_run_status", "inputSchema": map[string]any{}},
+		{"name": "asagiri.get_diff_summary", "inputSchema": map[string]any{}},
+		{"name": "asagiri.run_local_check", "inputSchema": map[string]any{}},
 	}
 }
 
@@ -158,7 +158,7 @@ func (s *Server) toolCall(ctx context.Context, base rpcResponse, params json.Raw
 	var text string
 	var err error
 	switch p.Name {
-	case "agentflow.search":
+	case "asagiri.search":
 		q := stringArg(args, "query")
 		if q == "" {
 			err = fmt.Errorf("query requis")
@@ -167,7 +167,7 @@ func (s *Server) toolCall(ctx context.Context, base rpcResponse, params json.Raw
 		hits, e := investigation.Grep(ctx, s.RepoRoot, q, s.Config.MCP.Investigation)
 		err = e
 		text = strings.Join(hits, "\n")
-	case "agentflow.read_file_safe":
+	case "asagiri.read_file_safe":
 		rel := stringArg(args, "path")
 		if err := s.denyPath(rel); err != nil {
 			base.Error = &rpcError{Code: -32003, Message: err.Error()}
@@ -176,7 +176,7 @@ func (s *Server) toolCall(ctx context.Context, base rpcResponse, params json.Raw
 		b, e := investigation.ReadFileSnippet(s.RepoRoot, rel, maxB)
 		err = e
 		text = string(b)
-	case "agentflow.extract_symbols":
+	case "asagiri.extract_symbols":
 		rel := stringArg(args, "path")
 		if err := s.denyPath(rel); err != nil {
 			base.Error = &rpcError{Code: -32003, Message: err.Error()}
@@ -187,11 +187,11 @@ func (s *Server) toolCall(ctx context.Context, base rpcResponse, params json.Raw
 		syms := investigation.ExtractGoSymbols(string(b))
 		enc, _ := json.Marshal(syms)
 		text = string(enc)
-	case "agentflow.find_related_tests":
+	case "asagiri.find_related_tests":
 		var files []string
 		_ = json.Unmarshal(args["files"], &files)
 		text = strings.Join(investigation.RelatedTestPaths(files), "\n")
-	case "agentflow.estimate_tokens":
+	case "asagiri.estimate_tokens":
 		content := stringArg(args, "content")
 		k := cost.ContentDefault
 		if stringArg(args, "kind") == "code" {
@@ -199,14 +199,14 @@ func (s *Server) toolCall(ctx context.Context, base rpcResponse, params json.Raw
 		}
 		tok := cost.EstimateFromText(content, k, s.Config.TokenEst)
 		text = fmt.Sprintf("%d", tok)
-	case "agentflow.estimate_cost":
+	case "asagiri.estimate_cost":
 		model := stringArg(args, "model")
 		inTok := intArg(args, "input_tokens")
 		outTok := intArg(args, "output_tokens")
 		mny, e := cost.CostFromPricing(s.Config, model, inTok, outTok)
 		err = e
 		text = fmt.Sprintf(`{"cents":%d,"currency":%q}`, mny.Cents, mny.Currency)
-	case "agentflow.get_task_context":
+	case "asagiri.get_task_context":
 		feat := stringArg(args, "feature")
 		entries, e := contextopt.Collect(s.RepoRoot, feat, s.Config, contextopt.CollectOpts{MaxFiles: 80})
 		err = e
@@ -215,13 +215,13 @@ func (s *Server) toolCall(ctx context.Context, base rpcResponse, params json.Raw
 			lines = append(lines, e.RelPath)
 		}
 		text = strings.Join(lines, "\n")
-	case "agentflow.get_run_status":
+	case "asagiri.get_run_status":
 		text = "not_persisted_in_mcp_stub"
-	case "agentflow.get_diff_summary":
+	case "asagiri.get_diff_summary":
 		out, e := investigation.RunCommand(ctx, timeout, "git", "-C", s.RepoRoot, "diff", "--stat")
 		err = e
 		text = string(out)
-	case "agentflow.run_local_check":
+	case "asagiri.run_local_check":
 		out, e := investigation.RunCommand(ctx, timeout, "go", "test", "./...")
 		err = e
 		text = string(out)

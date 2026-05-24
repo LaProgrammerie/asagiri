@@ -1,19 +1,23 @@
 ---
 title: Variables d’environnement
-description: Variables que lit AgentFlow à l’exécution.
+description: Variables que lit Asagiri à l’exécution.
 ---
 
 # Variables d’environnement
 
-AgentFlow n’expose qu’un petit ensemble explicite de variables pour que CI, shells et wrappers basculent globalement sans réécrire les configs à chaque tentative.
+Asagiri n’expose qu’un petit ensemble explicite de variables pour que CI, shells et wrappers basculent globalement sans réécrire les configs à chaque tentative.
 
 | Variable | Effet |
 | --- | --- |
-| `AGENTFLOW_DRY_RUN` | Lorsque `1`, équivalent au `--dry-run` global (aussi défini par la couche d’exec) |
-| `AGENTFLOW_YES` | Lorsque `1`, force la confirmation automatique aux invites (`requireConfirm`) |
+| `ASA_DRY_RUN` | Lorsque `1`, équivalent au `--dry-run` global (aussi défini par la couche d’exec) |
+| `ASA_YES` | Lorsque `1`, force la confirmation automatique aux invites (`requireConfirm`) |
 | `NOTION_TOKEN` | Jeton Notion API par défaut lorsque `sources.notion.token_env` vaut `NOTION_TOKEN` |
 | `NOTION_TEST_PAGE_ID` | Tests d’intégration uniquement (`source/notion/integration_test.go`) |
 | `UPDATE_GOLDEN` | Lorsque `1`, rafraîchit fichiers golden du paquet cost |
+
+## Variables legacy `AGENTFLOW_*`
+
+`AGENTFLOW_DRY_RUN` et `AGENTFLOW_YES` restent acceptées mais sont **dépréciées** ; Asagiri émet un avertissement sur stderr et lit `ASA_DRY_RUN` / `ASA_YES` lorsqu’elles sont définies. Préférez les noms `ASA_*` dans les nouveaux scripts et configs CI.
 
 ## Token Notion avec nom personnalisé
 
@@ -31,14 +35,14 @@ export MY_NOTION_SECRET="..."
 
 ## Usage CI
 
-`AGENTFLOW_DRY_RUN=1` permet d’orchestrir les pipelines sans lancer vos binaires réels configurés. Gardez `AGENTFLOW_YES=1` pour les jobs qui doivent accepter **après** une analyse sérieuse où la confirmation budget ne doit pas bloquer.
+`ASA_DRY_RUN=1` permet d’orchestrir les pipelines sans lancer vos binaires réels configurés. Gardez `ASA_YES=1` pour les jobs qui doivent accepter **après** une analyse sérieuse où la confirmation budget ne doit pas bloquer.
 
 ```yaml
 env:
-  AGENTFLOW_DRY_RUN: "1"
+  ASA_DRY_RUN: "1"
 ```
 
-Évitez `AGENTFLOW_YES=1` sauf si le pipeline doit sciemment passer outre les validations interactives sensibles aux budgets.
+Évitez `ASA_YES=1` sauf si le pipeline doit sciemment passer outre les validations interactives sensibles aux budgets.
 
 ## Voir aussi
 

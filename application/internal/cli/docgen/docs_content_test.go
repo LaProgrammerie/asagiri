@@ -12,6 +12,9 @@ func TestPublicDocsNoPlaceholders(t *testing.T) {
 	contentDir := filepath.Join(root, "docs-site", "content", "docs")
 	bad := []string{
 		"placeholder content",
+		"AgentFlow",
+		"agentflow",
+		"hyper-fast-builder",
 		"Hyper Fast Builder",
 		"Coming soon",
 	}

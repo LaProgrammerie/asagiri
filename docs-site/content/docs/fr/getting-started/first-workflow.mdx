@@ -1,6 +1,6 @@
 ---
 title: Premier workflow
-description: Flux AgentFlow bout en bout depuis init jusqu’au rapport avec de vraies commandes CLI.
+description: Flux Asagiri bout en bout depuis init jusqu’au rapport avec de vraies commandes CLI.
 ---
 
 # Premier workflow
@@ -9,17 +9,17 @@ Cette page suit le même contrat end-to-end que `spec-doc` §11.1 : initialiser 
 
 ## Prérequis
 
-AgentFlow compilé et sur `PATH`, un dépôt git dont les specs vivent sous `.kiro/specs/<fonctionnalité>/` ou `.agentflow/specs/`, et un `.agentflow/config.yaml` dont les commandes agents existent réellement sur votre machine. Sans ces trois éléments, les étapes suivantes échouent pour des raisons limpides : binaire absent, spec manquante, ou sous-processus impossible à démarrer.
+Asagiri compilé et sur `PATH`, un dépôt git dont les specs vivent sous `.kiro/specs/<fonctionnalité>/` ou `.asagiri/specs/`, et un `.asagiri/config.yaml` dont les commandes agents existent réellement sur votre machine. Sans ces trois éléments, les étapes suivantes échouent pour des raisons limpides : binaire absent, spec manquante, ou sous-processus impossible à démarrer.
 
 ## Étapes
 
 ### 1. Initialiser et vérifier
 
-Partez d’une vision claire du système de fichiers et de la chaîne d’outils qu’AgentFlow utilisera :
+Partez d’une vision claire du système de fichiers et de la chaîne d’outils qu’Asagiri utilisera :
 
 ```bash
-agentflow init
-agentflow doctor
+asa init
+asa doctor
 ```
 
 `doctor` fait office de portillon : réglez tout ce qu’il signale avant d’estimer ou d’exécuter.
@@ -29,7 +29,7 @@ agentflow doctor
 Lancez `work` en mode estimation seule pour que projections de jetons et de coût apparaissent avant toute invocation d’agent :
 
 ```bash
-agentflow work "develop billing-v2" --estimate-only
+asa work "develop billing-v2" --estimate-only
 ```
 
 Relisez les estimations et toute invitation budgétaire. Bridez avec `--budget 0.50` ou via le bloc `budgets`. N’utilisez `--allow-over-budget` que si vos règles le permettent explicitement — sinon vous court-circuitez les garde-fous que vous avez configurés.
@@ -39,7 +39,7 @@ Relisez les estimations et toute invitation budgétaire. Bridez avec `--budget 0
 Validez la résolution d’intention et la sélection des tâches sans exécuter les agents :
 
 ```bash
-agentflow work "develop billing-v2" --plan-only
+asa work "develop billing-v2" --plan-only
 ```
 
 Utile quand vous voulez sécuriser routage et planification avant tout travail `dev` dans un worktree.
@@ -49,36 +49,36 @@ Utile quand vous voulez sécuriser routage et planification avant tout travail `
 Lorsque l’exécution réelle est prête :
 
 ```bash
-agentflow work "develop billing-v2"
+asa work "develop billing-v2"
 ```
 
-Avec `intent.default_mode: guided` et `work.require_plan_confirmation: true`, AgentFlow demande avant d’aller plus loin sauf `--yes`. Les phases que vous voyez généralement : résolution d’intention, plan et enrichissement, développement dans un worktree, vérification, revue optionnelle puis rapport.
+Avec `intent.default_mode: guided` et `work.require_plan_confirmation: true`, Asagiri demande avant d’aller plus loin sauf `--yes`. Les phases que vous voyez généralement : résolution d’intention, plan et enrichissement, développement dans un worktree, vérification, revue optionnelle puis rapport.
 
 ### 5. Statut et rapport
 
 Après l’exécution — ou pour retrouver un identifiant — listez les runs et ouvrez le rapport désiré :
 
 ```bash
-agentflow status
-agentflow report <run-id>
+asa status
+asa report <run-id>
 ```
 
 Remplacez `<run-id>` par la valeur donnée par `status` (format du type `run-2026-05-17-…`).
 
 ## Ce que vous devez observer
 
-Les runs qui réussissent laissent **l’état SQLite** à `.agentflow/state.sqlite`, des **artefacts par run** sous `.agentflow/runs/<run-id>/`, et — pour une tâche de développement active — un **git worktree** sous `.agentflow/worktrees/`. Les sorties de validation proviennent des commandes que vous avez définies sous `validation.commands` (par exemple `go test ./...`). Ces artefacts rendent une exécution inspectable a posteriori sans relancer les agents.
+Les runs qui réussissent laissent **l’état SQLite** à `.asagiri/state.sqlite`, des **artefacts par run** sous `.asagiri/runs/<run-id>/`, et — pour une tâche de développement active — un **git worktree** sous `.asagiri/worktrees/`. Les sorties de validation proviennent des commandes que vous avez définies sous `validation.commands` (par exemple `go test ./...`). Ces artefacts rendent une exécution inspectable a posteriori sans relancer les agents.
 
 ## Reprendre et récupérer
 
 ```bash
-agentflow resume <run-id>
+asa resume <run-id>
 ```
 
-Sans `--dry-run`, **`resume` imprime uniquement le nom du prochain pas** ; il ne ré-invoque pas automatiquement les agents. Servez-vous de `continue` ou relancez la commande suggérée (`plan`, `enrich`, `dev`, …). Le chaînage automatique existe seulement avec **`agentflow resume <run-id> --execute` et le `--dry-run` global**.
+Sans `--dry-run`, **`resume` imprime uniquement le nom du prochain pas** ; il ne ré-invoque pas automatiquement les agents. Servez-vous de `continue` ou relancez la commande suggérée (`plan`, `enrich`, `dev`, …). Le chaînage automatique existe seulement avec **`asa resume <run-id> --execute` et le `--dry-run` global**.
 
 <Callout type="experimental">
-La reprise auto hors dry-run complète n’est pas implémentée. Préférez `agentflow continue` pour continuer par intention.
+La reprise auto hors dry-run complète n’est pas implémentée. Préférez `asa continue` pour continuer par intention.
 </Callout>
 
 ## Workflows liés

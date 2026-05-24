@@ -3,14 +3,14 @@
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
-BIN="${BIN:-$ROOT/bin/agentflow}"
+BIN="${BIN:-$ROOT/bin/asa}"
 if [[ ! -x "$BIN" ]]; then
   make build
-  BIN="$ROOT/bin/agentflow"
+  BIN="$ROOT/bin/asa"
 fi
-export AGENTFLOW_DRY_RUN=1
+export ASA_DRY_RUN=1
 FEATURE="${FEATURE:-agentflow-test}"
-echo "=== AgentFlow benchmark (dry-run) ==="
+echo "=== Asagiri benchmark (dry-run) ==="
 echo "feature=$FEATURE bin=$BIN"
 start=$(date +%s%N)
 "$BIN" estimate "$FEATURE" 2>&1 | tail -20

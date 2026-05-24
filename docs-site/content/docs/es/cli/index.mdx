@@ -1,11 +1,11 @@
 ---
 title: Resumen de la CLI
-description: Grupos de comandos AgentFlow y referencia generada por comando.
+description: Grupos de comandos Asagiri y referencia generada por comando.
 ---
 
 # Resumen de la CLI
 
-El binario **`agentflow`** (`application/cmd/agentflow`) es la única superficie de entrada para inicializar proyectos, trocear el pipeline spec-driven en verbos discretos, inspeccionar artefactos de coste y tareas operativas. El tráfico diario suele ir por **`work`**, donde intenciones en lenguaje natural mapean pipelines enteros, o por pasos nombrados (**`plan`**, **`dev`**, **`verify`**, etc.) cuando `.kiro/specs/<feature>/` ya ancla tu plan. Los agrupamientos resumen la intención; los flags autoritativos vienen de Cobra vía la **[referencia CLI generada](/docs/es/cli/generated)** — regenera ese árbol cuando cambie el cableado CLI.
+El binario **`asa`** (`application/cmd/asa`) es la única superficie de entrada para inicializar proyectos, trocear el pipeline spec-driven en verbos discretos, inspeccionar artefactos de coste y tareas operativas. El tráfico diario suele ir por **`work`**, donde intenciones en lenguaje natural mapean pipelines enteros, o por pasos nombrados (**`plan`**, **`dev`**, **`verify`**, etc.) cuando `.kiro/specs/<feature>/` ya ancla tu plan. Los agrupamientos resumen la intención; los flags autoritativos vienen de Cobra vía la **[referencia CLI generada](/docs/es/cli/generated)** — regenera ese árbol cuando cambie el cableado CLI.
 
 ## Comportamiento global
 
@@ -16,7 +16,7 @@ Los flags de simulación aplican de forma coherente a subcomandos anidados:
 | `--dry-run` | Simula sin agentes externos ni shells de validación |
 | (persistente) | Heredado por todos los subcomandos |
 
-Variables de entorno como `AGENTFLOW_DRY_RUN=1` y `AGENTFLOW_YES=1` reflejan flags habituales; ver [Variables de entorno](/docs/es/reference/environment-variables) para la lista completa.
+Variables de entorno como `ASA_DRY_RUN=1` y `ASA_YES=1` reflejan flags habituales; ver [Variables de entorno](/docs/es/reference/environment-variables) para la lista completa.
 
 ## Grupos de comandos de un vistazo
 
@@ -39,7 +39,7 @@ Trata el agrupamiento como ayuda de navegación — no como mandato sobre cuánt
 Las páginas por comando con flags están en **[CLI generated](/docs/es/cli/generated)**. Tras cambiar comandos Cobra, regenera:
 
 ```bash
-go run ./application/cmd/agentflow docs generate-cli \
+go run ./application/cmd/asa docs generate-cli \
   --output docs-site/content/docs/en/cli/generated
 ```
 
@@ -50,9 +50,9 @@ Haz commit del MDX generado con el cambio CLI para mantener la doc pública al d
 Prueba con seguridad antes de añadir agentes:
 
 ```bash
-agentflow init
-agentflow doctor
-agentflow work "my feature" --dry-run --plan-only
+asa init
+asa doctor
+asa work "my feature" --dry-run --plan-only
 ```
 
 Después sigue el [Inicio rápido](/docs/es/getting-started/quickstart) para un dry-run seguro, luego el [Primer flujo](/docs/es/getting-started/first-workflow) cuando agentes y comandos de validación estén configurados.

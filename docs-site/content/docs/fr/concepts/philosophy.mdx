@@ -9,11 +9,11 @@ description: Orchestration déterministe, validation avant confiance et limites 
 
 Les agents de codage IA sont puissants, mais leurs sorties ne sont pas déterministes. Les équipes ont toutefois besoin de workflows **répétables** : étapes connues, branches isolées, validation externe, visibilité des coûts et pistes d’audit — pas des exécutions opaques où personne ne peut expliquer ce qui s’est passé ni pourquoi.
 
-AgentFlow existe pour rendre l’orchestration explicite. Vous configurez le pipeline, les commandes de validation et les garde-fous économiques ; l’outil coordonne l’exécution et enregistre ce qui a tourné.
+Asagiri existe pour rendre l’orchestration explicite. Vous configurez le pipeline, les commandes de validation et les garde-fous économiques ; l’outil coordonne l’exécution et enregistre ce qui a tourné.
 
-## Comment AgentFlow s’y prend
+## Comment Asagiri s’y prend
 
-Le modèle mental par défaut est **spec → plan → implémentation → vérification → revue → rapport**. Chaque phase a une place définie dans la machine à états et dans les rapports sous `.agentflow/runs/`.
+Le modèle mental par défaut est **spec → plan → implémentation → vérification → revue → rapport**. Chaque phase a une place définie dans la machine à états et dans les rapports sous `.asagiri/runs/`.
 
 **L’état explicite** signifie que les exécutions et les tâches sont portées par SQLite avec une machine à états documentée. Vous pouvez inspecter le statut, reprendre une exécution et corréler les rapports avec des identifiants d’exécution plutôt que de deviner à partir de l’historique du terminal.
 
@@ -23,14 +23,14 @@ Le modèle mental par défaut est **spec → plan → implémentation → vérif
 
 **L’isolation par git worktree** retient une tâche, une branche et un arbre de travail. Le travail parallèle reste séparé de votre checkout principal.
 
-**La validation par vos commandes** signifie `go test`, les linters et les scripts en lesquels vous avez confiance — pas l’affirmation de l’agent qu’« tout va bien ». AgentFlow planifie ces contrôles ; il ne remplace pas votre suite de tests.
+**La validation par vos commandes** signifie `go test`, les linters et les scripts en lesquels vous avez confiance — pas l’affirmation de l’agent qu’« tout va bien ». Asagiri planifie ces contrôles ; il ne remplace pas votre suite de tests.
 
 **Les rapports reproductibles** capturent des artefacts Markdown et JSON pour que les opérateurs et les relecteurs puissent auditer une exécution des jours plus tard.
 
 ## Ce que nous ne prétendons pas
 
 <Callout type="warning">
-AgentFlow ne garantit ni correction, ni sécurité, ni préparation à la production. Il coordonne des outils ; les humains et votre suite de tests restent l’autorité.
+Asagiri ne garantit ni correction, ni sécurité, ni préparation à la production. Il coordonne des outils ; les humains et votre suite de tests restent l’autorité.
 </Callout>
 
 ## Compromis à comprendre
@@ -42,7 +42,7 @@ AgentFlow ne garantit ni correction, ni sécurité, ni préparation à la produc
 | Sécurité accrue des worktrees | Disque et complexité git supplémentaires |
 | Agents branchables | Vous devez installer et configurer chaque CLI |
 
-Ces compromis sont intentionnels. AgentFlow privilégie le **contrôle et l’auditabilité** à l’illusion d’un codage entièrement autonome.
+Ces compromis sont intentionnels. Asagiri privilégie le **contrôle et l’auditabilité** à l’illusion d’un codage entièrement autonome.
 
 ## Leviers de configuration
 

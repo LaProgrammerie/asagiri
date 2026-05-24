@@ -1,4 +1,4 @@
-# AgentFlow documentation site
+# Asagiri documentation site
 
 Static [Fumadocs](https://fumadocs.dev) + Next.js export (`docs-site/out/`).
 
@@ -6,7 +6,7 @@ Static [Fumadocs](https://fumadocs.dev) + Next.js export (`docs-site/out/`).
 
 ```bash
 # From repository root — regenerate CLI reference (optional if unchanged)
-go run ./application/cmd/agentflow docs generate-cli --output docs-site/content/docs/en/cli/generated
+go run ./application/cmd/asa docs generate-cli --output docs-site/content/docs/en/cli/generated
 
 cd docs-site
 corepack enable
@@ -33,7 +33,7 @@ Configure these **GitHub repository secrets** (Settings → Secrets and variable
 |--------|-------------|
 | `CLOUDFLARE_API_TOKEN` | API token with permission to deploy to Cloudflare Pages |
 | `CLOUDFLARE_ACCOUNT_ID` | Cloudflare account ID |
-| `CLOUDFLARE_PAGES_PROJECT` | Pages project name (not the full URL) |
+| `CLOUDFLARE_PAGES_PROJECT` | Pages project name (not the full URL), e.g. `asagiri-docs` |
 
 Create the Pages project in the Cloudflare dashboard first, then add the secrets. PRs deploy a preview branch; pushes to `main` deploy production (`--branch=main`).
 
@@ -42,4 +42,4 @@ Forks without these secrets still get validation from [`.github/workflows/docs-c
 ## Build notes
 
 - `output: 'export'` — no SSR or API routes.
-- `basePath` `/hyper-fast-builder` applies only when `GITHUB_PAGES=true` (legacy); Cloudflare custom domain builds use site root.
+- `basePath` `/asagiri` applies only when `GITHUB_PAGES=true` (legacy); Cloudflare custom domain builds use site root.

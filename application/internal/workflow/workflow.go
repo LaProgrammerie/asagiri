@@ -10,17 +10,17 @@ import (
 	"strings"
 	"time"
 
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/agent"
-	agentexec "github.com/LaProgrammerie/hyper-fast-builder/application/internal/agent/exec"
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/config"
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/plan"
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/policy"
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/rag"
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/report"
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/spec"
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/store/sqlite"
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/worktree"
-	"github.com/LaProgrammerie/hyper-fast-builder/application/pkg/agentflow"
+	"github.com/LaProgrammerie/asagiri/application/internal/agent"
+	agentexec "github.com/LaProgrammerie/asagiri/application/internal/agent/exec"
+	"github.com/LaProgrammerie/asagiri/application/internal/config"
+	"github.com/LaProgrammerie/asagiri/application/internal/plan"
+	"github.com/LaProgrammerie/asagiri/application/internal/policy"
+	"github.com/LaProgrammerie/asagiri/application/internal/rag"
+	"github.com/LaProgrammerie/asagiri/application/internal/report"
+	"github.com/LaProgrammerie/asagiri/application/internal/spec"
+	"github.com/LaProgrammerie/asagiri/application/internal/store/sqlite"
+	"github.com/LaProgrammerie/asagiri/application/internal/worktree"
+	"github.com/LaProgrammerie/asagiri/application/pkg/asagiri"
 )
 
 // StepState tracks one step execution in run.steps_json.
@@ -165,10 +165,10 @@ func (s *Service) PlanFeature(feature string) (string, []plan.Task, error) {
 		_ = s.updateStep(run, "plan", sqlite.StatusFailed, err.Error())
 		return run.ID, nil, err
 	}
-	canonicalTasks := make([]agentflow.Task, 0, len(tasks))
+	canonicalTasks := make([]asagiri.Task, 0, len(tasks))
 	for _, task := range tasks {
 		canonical := planToCanonical(feature, task)
-		canonical.Status = agentflow.StatusPlanned
+		canonical.Status = asagiri.StatusPlanned
 		canonical.Validation.Commands = s.cfg.ValidationCommandLines()
 		payload, marshalErr := canonicalToPayload(canonical)
 		if marshalErr != nil {
@@ -179,7 +179,7 @@ func (s *Service) PlanFeature(feature string) (string, []plan.Task, error) {
 			ID:          task.ID,
 			RunID:       run.ID,
 			Feature:     feature,
-			Status:      agentflow.StatusPlanned,
+			Status:      asagiri.StatusPlanned,
 			PayloadJSON: payload,
 		}); err != nil {
 			_ = s.updateStep(run, "plan", sqlite.StatusFailed, err.Error())
@@ -231,7 +231,7 @@ func (s *Service) pickTasks(feature, taskID string) ([]sqlite.Task, error) {
 		return nil, err
 	}
 	if len(all) == 0 {
-		return nil, fmt.Errorf("aucune tâche pour la feature %q — lancez agentflow plan %s", feature, feature)
+		return nil, fmt.Errorf("aucune tâche pour la feature %q — lancez asa plan %s", feature, feature)
 	}
 	if taskID == "" {
 		return all, nil
@@ -266,8 +266,8 @@ func (s *Service) EnrichFeature(ctx context.Context, feature, taskID, agentName 
 		return run.ID, err
 	}
 	for _, task := range tasks {
-		if st := normalizeStatus(task.Status); st == agentflow.StatusPending {
-			if err := s.transitionTask(task, agentflow.StatusPlanned, true); err != nil {
+		if st := normalizeStatus(task.Status); st == asagiri.StatusPending {
+			if err := s.transitionTask(task, asagiri.StatusPlanned, true); err != nil {
 				_ = s.updateStep(run, "enrich", sqlite.StatusFailed, err.Error())
 				return run.ID, err
 			}
@@ -275,7 +275,7 @@ func (s *Service) EnrichFeature(ctx context.Context, feature, taskID, agentName 
 				task = *fresh
 			}
 		}
-		if err := s.transitionTask(task, agentflow.StatusEnriched, force); err != nil {
+		if err := s.transitionTask(task, asagiri.StatusEnriched, force); err != nil {
 			_ = s.updateStep(run, "enrich", sqlite.StatusFailed, err.Error())
 			return run.ID, err
 		}
@@ -299,7 +299,7 @@ func (s *Service) EnrichFeature(ctx context.Context, feature, taskID, agentName 
 		if updateErr := s.store.UpdateTask(&sqlite.Task{
 			ID:          task.ID,
 			PayloadJSON: string(body),
-			Status:      agentflow.StatusEnriched,
+			Status:      asagiri.StatusEnriched,
 		}); updateErr != nil {
 			_ = s.updateStep(run, "enrich", sqlite.StatusFailed, updateErr.Error())
 			return run.ID, updateErr
@@ -350,7 +350,7 @@ func defaultEnrichment(repoRoot string, task sqlite.Task, agentName string, res 
 	return out
 }
 
-func (s *Service) contextFilesForTask(feature string, task agentflow.Task) []string {
+func (s *Service) contextFilesForTask(feature string, task asagiri.Task) []string {
 	if s.dryRun {
 		return rag.HeuristicContextFiles(s.repoRoot, feature)
 	}
@@ -387,8 +387,8 @@ func (s *Service) DevFeature(ctx context.Context, feature, taskID, agentName str
 	}
 
 	for _, task := range tasks {
-		if st := normalizeStatus(task.Status); st == agentflow.StatusPlanned || st == agentflow.StatusPending {
-			if err := s.transitionTask(task, agentflow.StatusEnriched, true); err != nil {
+		if st := normalizeStatus(task.Status); st == asagiri.StatusPlanned || st == asagiri.StatusPending {
+			if err := s.transitionTask(task, asagiri.StatusEnriched, true); err != nil {
 				_ = s.updateStep(run, "dev", sqlite.StatusFailed, err.Error())
 				return run.ID, err
 			}
@@ -396,13 +396,13 @@ func (s *Service) DevFeature(ctx context.Context, feature, taskID, agentName str
 				task = *fresh
 			}
 		}
-		if err := s.transitionTask(task, agentflow.StatusRunning, force); err != nil {
+		if err := s.transitionTask(task, asagiri.StatusRunning, force); err != nil {
 			_ = s.updateStep(run, "dev", sqlite.StatusFailed, err.Error())
 			return run.ID, err
 		}
 		worktreePath, _, err := s.worktreeMngr.Create(ctx, feature, task.ID)
 		if err != nil {
-			_ = s.transitionTask(task, agentflow.StatusFailed, true)
+			_ = s.transitionTask(task, asagiri.StatusFailed, true)
 			_ = s.updateStep(run, "dev", sqlite.StatusFailed, err.Error())
 			return run.ID, err
 		}
@@ -425,7 +425,7 @@ func (s *Service) DevFeature(ctx context.Context, feature, taskID, agentName str
 		}
 		_ = agent.WriteLogs(s.repoRoot, task.ID, agentCtx, agentRes)
 		if runErr != nil {
-			_ = s.transitionTask(task, agentflow.StatusFailed, true)
+			_ = s.transitionTask(task, asagiri.StatusFailed, true)
 			_ = s.updateStep(run, "dev", sqlite.StatusFailed, runErr.Error())
 			return run.ID, runErr
 		}
@@ -437,7 +437,7 @@ func (s *Service) DevFeature(ctx context.Context, feature, taskID, agentName str
 		if fresh, getErr := s.store.GetTask(task.ID); getErr == nil {
 			task = *fresh
 		}
-		if err := s.transitionTask(task, agentflow.StatusImplemented, force); err != nil {
+		if err := s.transitionTask(task, asagiri.StatusImplemented, force); err != nil {
 			_ = s.updateStep(run, "dev", sqlite.StatusFailed, err.Error())
 			return run.ID, err
 		}
@@ -450,7 +450,7 @@ func (s *Service) DevFeature(ctx context.Context, feature, taskID, agentName str
 }
 
 func (s *Service) writeTaskLog(taskID, fileName, body string) error {
-	logDir := filepath.Join(s.repoRoot, ".agentflow", "logs", taskID)
+	logDir := filepath.Join(s.repoRoot, ".asagiri", "logs", taskID)
 	if err := os.MkdirAll(logDir, 0o755); err != nil {
 		return fmt.Errorf("create task log dir: %w", err)
 	}
@@ -481,11 +481,11 @@ func (s *Service) VerifyFeature(ctx context.Context, feature, taskID string, for
 			targetDir = task.WorktreePath
 		}
 		if err := s.runVerification(ctx, targetDir, task.PayloadJSON); err != nil {
-			_ = s.transitionTask(task, agentflow.StatusVerifyFailed, true)
+			_ = s.transitionTask(task, asagiri.StatusVerifyFailed, true)
 			_ = s.updateStep(run, "verify", sqlite.StatusFailed, err.Error())
 			return run.ID, err
 		}
-		if err := s.transitionTask(task, agentflow.StatusVerified, force); err != nil {
+		if err := s.transitionTask(task, asagiri.StatusVerified, force); err != nil {
 			_ = s.updateStep(run, "verify", sqlite.StatusFailed, err.Error())
 			return run.ID, err
 		}
@@ -524,11 +524,11 @@ func (s *Service) ReviewFeature(ctx context.Context, feature, taskID, agentName 
 			WorkingDir: s.repoRoot,
 		})
 		if runErr != nil {
-			_ = s.transitionTask(task, agentflow.StatusReviewFailed, true)
+			_ = s.transitionTask(task, asagiri.StatusReviewFailed, true)
 			_ = s.updateStep(run, "review", sqlite.StatusFailed, runErr.Error())
 			return run.ID, runErr
 		}
-		if err := s.transitionTask(task, agentflow.StatusReviewed, force); err != nil {
+		if err := s.transitionTask(task, asagiri.StatusReviewed, force); err != nil {
 			_ = s.updateStep(run, "review", sqlite.StatusFailed, err.Error())
 			return run.ID, err
 		}
@@ -668,7 +668,7 @@ func (s *Service) PreparePR(ctx context.Context, feature string) (string, error)
 		return "", fmt.Errorf("aucune tâche pour la feature %q", feature)
 	}
 
-	baseDir := filepath.Join(s.repoRoot, ".agentflow", "runs", "pr-"+sanitize(feature))
+	baseDir := filepath.Join(s.repoRoot, ".asagiri", "runs", "pr-"+sanitize(feature))
 	if err := os.MkdirAll(baseDir, 0o755); err != nil {
 		return "", err
 	}

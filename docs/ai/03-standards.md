@@ -13,15 +13,15 @@
 ```
 go.mod
 Makefile
-spec.md
-.agentflow/config.yaml.example
-application/cmd/agentflow/
-application/internal/{cli,config,bootstrap,agent,worktree,workflow,validation,policy,rag,spec,plan,report,store/sqlite,version}
-application/pkg/agentflow/
-bin/agentflow
+spec-rename.md
+.asagiri/config.yaml.example
+application/cmd/asa/
+application/internal/{cli,config,bootstrap,env,agent,worktree,workflow,validation,policy,rag,spec,plan,report,store/sqlite,version}
+application/pkg/asagiri/
+bin/asa
 ```
 
-## CLI AgentFlow (V1)
+## CLI Asagiri (`asa`)
 
 | Commande | Statut |
 |----------|--------|
@@ -34,27 +34,28 @@ bin/agentflow
 | `review <feature> [--task id] --agent <name>` | Implémenté |
 | `status`, `resume <run-id>`, `report <run-id>` | Implémenté |
 | `clean [--merged] [--failed]`, `pr <feature>` | Implémenté |
-| `agentflow index` | Index RAG local (§10.3) |
+| `asa index` | Index RAG local (§10.3) |
+| `work`, `continue`, `next`, `estimate`, `inbox`, `sync` | Intent layer (specv2) |
 | `bench`, `search`, `graph`, `export` | Hors scope |
 
 **Flags communs :** `--force` sur `enrich`, `dev`, `verify`, `review`, `resume` ; `resume --execute` (dry-run).
 
-**Dry-run :** `--dry-run` ou `AGENTFLOW_DRY_RUN=1` — simule agents et validations (CI/tests).
+**Dry-run :** `--dry-run` ou **`ASA_DRY_RUN=1`** (fallback déprécié `AGENTFLOW_DRY_RUN=1` avec warning).
 
 **Config (§7) :** `validation.commands`, `policies`, agents (`timeout`, `default_model`, `endpoint`/`model` pour Ollama). Défauts Go injectés si `go.mod` absent de surcharge.
 
-**Tâches (§8) :** statuts canoniques + fichiers `.agentflow/tasks/<feature>/<id>.yaml`.
+**Tâches (§8) :** statuts canoniques + fichiers `.asagiri/tasks/<feature>/<id>.yaml`.
 
-**Logs agent (§9) :** `.agentflow/logs/<task-id>/context.json`, `result.json`.
+**Logs agent (§9) :** `.asagiri/logs/<task-id>/context.json`, `result.json`.
 
 ## Chemins (relatifs à la racine Git)
 
 | Artefact | Défaut |
 |----------|--------|
-| Config | `.agentflow/config.yaml` |
-| État SQLite | `.agentflow/state.sqlite` |
-| Worktrees | `.agentflow/worktrees/` |
-| Runs / tasks / logs | `.agentflow/runs/`, `tasks/`, `logs/` |
+| Config | `.asagiri/config.yaml` |
+| État SQLite | `.asagiri/state.sqlite` |
+| Worktrees | `.asagiri/worktrees/` |
+| Runs / tasks / logs | `.asagiri/runs/`, `tasks/`, `logs/` |
 | Specs Kiro | `.kiro/specs` |
 | Spec active / handoff | `docs/ai/active/current-spec.md`, `handoff.md` |
 
@@ -63,10 +64,11 @@ bin/agentflow
 | Action | Commande |
 |--------|----------|
 | Build CLI | `make build` |
-| Init / doctor | `./bin/agentflow init` puis `doctor` |
+| Init / doctor | `./bin/asa init` puis `doctor` |
 | Tests | `make test` ou `go test -race ./...` |
 | Lint | `make lint` (nécessite golangci-lint + Go ≥ version module) |
 | Dev Docker | `make dev` |
+| Release check | `make release-check` |
 
 ## Tests
 
@@ -78,3 +80,7 @@ bin/agentflow
 
 - Pas de secrets dans le dépôt ; `state.sqlite` et `worktrees/` gitignored.
 - Pas d’injection shell sur les agents ni les validations.
+
+## Branding public
+
+- Produit : **Asagiri** ; CLI : **`asa`** ; pas de `agentflow` / `AgentFlow` dans help, docs-site, README, exemples release (voir `spec-rename.md`).

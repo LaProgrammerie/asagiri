@@ -1,20 +1,20 @@
 ---
-title: Mcp Serve · AgentFlow CLI
+title: Mcp Serve · Asagiri CLI
 description: Démarrer MCP stdio
 ---
 
-CLI path: **`agentflow mcp serve`**
+CLI path: **`asa mcp serve`**
 
 ## When to use
 
-Use **mcp serve** whenever an IDE expects a bundled Model Context Protocol stdio shim that mirrors **.agentflow** configuration.
+Use **mcp serve** whenever an IDE expects a bundled Model Context Protocol stdio shim that mirrors **.asagiri** configuration.
 
 > Original CLI synopsis: Démarrer MCP stdio
 
 ## Usage
 
 ```bash
-agentflow mcp serve [flags]
+asa mcp serve [flags]
 ```
 
 ## Options
@@ -26,7 +26,7 @@ agentflow mcp serve [flags]
 ## Examples
 
 ```bash
-agentflow mcp serve
+asa mcp serve
 ```
 
 > Wire richer samples through **cobra.Command.Example** when the happy path warrants copy/paste-friendly automation beyond this scaffold.
@@ -38,8 +38,8 @@ agentflow mcp serve
 ## Failure modes
 
 - Cobra rejects unknown flags or arity mismatches before any repository side effects occur.
-- AgentFlow cannot resolve scaffolding when the command is invoked outside an initialised checkout.
-- Disabled MCP integrations stop early with guidance drawn from **.agentflow** configuration diagnostics.
+- Asagiri cannot resolve scaffolding when the command is invoked outside an initialised checkout.
+- Disabled MCP integrations stop early with guidance drawn from **.asagiri** configuration diagnostics.
 
 ## Related commands
 

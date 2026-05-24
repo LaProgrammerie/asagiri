@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/config"
-	appvalidate "github.com/LaProgrammerie/hyper-fast-builder/application/internal/validation"
+	"github.com/LaProgrammerie/asagiri/application/internal/config"
+	appvalidate "github.com/LaProgrammerie/asagiri/application/internal/validation"
 )
 
 type taskPayload struct {

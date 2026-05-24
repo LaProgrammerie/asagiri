@@ -4,8 +4,8 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/config"
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/investigation"
+	"github.com/LaProgrammerie/asagiri/application/internal/config"
+	"github.com/LaProgrammerie/asagiri/application/internal/investigation"
 )
 
 // PackInput carries investigation and task hints for ordering.

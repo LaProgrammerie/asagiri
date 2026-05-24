@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/cli/docgen"
+	"github.com/LaProgrammerie/asagiri/application/internal/cli/docgen"
 	"github.com/spf13/cobra"
 )
 
@@ -30,7 +30,7 @@ The generator walks every command except the root binary and writes one determin
 
 	docs := &cobra.Command{
 		Use:   "docs",
-		Short: "Documentation tooling for AgentFlow artefacts",
+		Short: "Documentation tooling for Asagiri artefacts",
 	}
 	docs.AddCommand(gen)
 

@@ -1,7 +1,7 @@
 import { createMDX } from 'fumadocs-mdx/next';
 
 const isGithubPages = process.env.GITHUB_PAGES === 'true';
-const basePath = isGithubPages ? '/hyper-fast-builder' : undefined;
+const basePath = isGithubPages ? '/asagiri' : undefined;
 
 const withMDX = createMDX();
 

@@ -5,7 +5,7 @@ description: Especificación en Kiro, implementar con Cursor y validar con coman
 
 # Kiro → Cursor → Verify
 
-Este recorrido enlaza **`spec-doc` §11.2** con las compuertas AgentFlow — la escritura sigue **Kiro** (`.kiro/specs/<feature>/`), donde **Cursor** (o **`cursor-agent`**) mejor brilla ejecuta desarrollo CLI obliga **`verify`** / **`review`** deterministas así automatización jamás cambia inadvertidamente.
+Este recorrido enlaza **`spec-doc` §11.2** con las compuertas Asagiri — la escritura sigue **Kiro** (`.kiro/specs/<feature>/`), donde **Cursor** (o **`cursor-agent`**) mejor brilla ejecuta desarrollo CLI obliga **`verify`** / **`review`** deterministas así automatización jamás cambia inadvertidamente.
 
 ## Cuándo aplicarlo
 
@@ -28,24 +28,24 @@ flowchart LR
 ## Comandos sustituye feature id
 
 ```bash
-agentflow spec billing-v2 --agent kiro
-agentflow plan billing-v2
-agentflow enrich billing-v2 --agent ollama
-agentflow dev billing-v2 --agent cursor
-agentflow verify billing-v2
-agentflow review billing-v2 --agent codex
-agentflow report <run-id>
+asa spec billing-v2 --agent kiro
+asa plan billing-v2
+asa enrich billing-v2 --agent ollama
+asa dev billing-v2 --agent cursor
+asa verify billing-v2
+asa review billing-v2 --agent codex
+asa report <run-id>
 ```
 
 Ensayo usando `--dry-run` :
 
 ```bash
-agentflow dev billing-v2 --agent cursor --dry-run
+asa dev billing-v2 --agent cursor --dry-run
 ```
 
 ## Valores ejemplo config
 
-Snippet `.agentflow/config.yaml.example` :
+Snippet `.asagiri/config.yaml.example` :
 
 ```yaml
 work:
@@ -61,7 +61,7 @@ Toggle `auto_review` true sólo cuando desee revisiones cada verify exitoso.
 ## Atajo intentación
 
 ```bash
-agentflow work "develop billing-v2" --stop-after verify
+asa work "develop billing-v2" --stop-after verify
 ```
 
 Resolver intenciones elige función pipeline versión tres aplica presupuesto y reducción contextual.

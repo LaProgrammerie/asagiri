@@ -5,7 +5,7 @@ description: Recover from failed verify, review, or interrupted runs.
 
 # Failure recovery
 
-AgentFlow persists explicit task states instead of implying progress from stray files. Recovering cleanly means respecting those transitions—or using documented overrides (`--force`, resume helpers) where the orchestrator allows retries.
+Asagiri persists explicit task states instead of implying progress from stray files. Recovering cleanly means respecting those transitions—or using documented overrides (`--force`, resume helpers) where the orchestrator allows retries.
 
 ## State machine
 
@@ -38,31 +38,31 @@ The recipes below mirror how teams unwind the most frequent stuck states once lo
 
 ```bash
 # fix code in worktree, then:
-agentflow verify billing-v2 --force
+asa verify billing-v2 --force
 ```
 
 ### Review failed
 
 ```bash
-agentflow review billing-v2 --agent codex --force
+asa review billing-v2 --agent codex --force
 ```
 
 ### Interrupted run
 
 ```bash
-agentflow status
-agentflow resume <run-id>          # prints next step: plan|enrich|dev|verify|review
-agentflow continue "resume billing-v2"   # intent-based continuation
+asa status
+asa resume <run-id>          # prints next step: plan|enrich|dev|verify|review
+asa continue "resume billing-v2"   # intent-based continuation
 ```
 
 <Callout type="experimental">
-`agentflow resume <run-id> --execute` chains steps only with global **`--dry-run`**. Non-dry-run resume does not auto-invoke agents — run the printed step manually or use `continue`.
+`asa resume <run-id> --execute` chains steps only with global **`--dry-run`**. Non-dry-run resume does not auto-invoke agents — run the printed step manually or use `continue`.
 </Callout>
 
 ### Clean stale worktrees
 
 ```bash
-agentflow clean
+asa clean
 ```
 
 Removes worktrees according to `worktrees.cleanup_policy` (`keep_failed` keeps failed task trees).
@@ -72,8 +72,8 @@ Removes worktrees according to `worktrees.cleanup_policy` (`keep_failed` keeps f
 When someone needs breadcrumbs after the fact—or you are reconciling timelines with reviewers—persisted run metadata is surfaced through **`report`** and cross-feature **`investigate`** summaries.
 
 ```bash
-agentflow report <run-id>
-agentflow investigate billing-v2
+asa report <run-id>
+asa investigate billing-v2
 ```
 
 ## Related

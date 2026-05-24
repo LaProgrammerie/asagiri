@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/LaProgrammerie/hyper-fast-builder/application/pkg/agentflow"
+	"github.com/LaProgrammerie/asagiri/application/pkg/asagiri"
 )
 
 var (
@@ -14,16 +14,16 @@ var (
 
 // allowedTransitions maps from-status to permitted next statuses (spec §12).
 var allowedTransitions = map[string][]string{
-	agentflow.StatusPending:      {agentflow.StatusPlanned, agentflow.StatusAborted},
-	agentflow.StatusPlanned:      {agentflow.StatusEnriched, agentflow.StatusAborted},
-	agentflow.StatusEnriched:     {agentflow.StatusRunning, agentflow.StatusAborted},
-	agentflow.StatusRunning:      {agentflow.StatusImplemented, agentflow.StatusFailed, agentflow.StatusAborted},
-	agentflow.StatusImplemented:  {agentflow.StatusVerified, agentflow.StatusVerifyFailed, agentflow.StatusAborted},
-	agentflow.StatusVerifyFailed: {agentflow.StatusImplemented, agentflow.StatusAborted},
-	agentflow.StatusVerified:     {agentflow.StatusReviewed, agentflow.StatusReviewFailed, agentflow.StatusAborted},
-	agentflow.StatusReviewFailed: {agentflow.StatusVerified, agentflow.StatusAborted},
-	agentflow.StatusReviewed:     {agentflow.StatusReadyForPR, agentflow.StatusAborted},
-	agentflow.StatusReadyForPR:   {agentflow.StatusMerged, agentflow.StatusAborted},
+	asagiri.StatusPending:      {asagiri.StatusPlanned, asagiri.StatusAborted},
+	asagiri.StatusPlanned:      {asagiri.StatusEnriched, asagiri.StatusAborted},
+	asagiri.StatusEnriched:     {asagiri.StatusRunning, asagiri.StatusAborted},
+	asagiri.StatusRunning:      {asagiri.StatusImplemented, asagiri.StatusFailed, asagiri.StatusAborted},
+	asagiri.StatusImplemented:  {asagiri.StatusVerified, asagiri.StatusVerifyFailed, asagiri.StatusAborted},
+	asagiri.StatusVerifyFailed: {asagiri.StatusImplemented, asagiri.StatusAborted},
+	asagiri.StatusVerified:     {asagiri.StatusReviewed, asagiri.StatusReviewFailed, asagiri.StatusAborted},
+	asagiri.StatusReviewFailed: {asagiri.StatusVerified, asagiri.StatusAborted},
+	asagiri.StatusReviewed:     {asagiri.StatusReadyForPR, asagiri.StatusAborted},
+	asagiri.StatusReadyForPR:   {asagiri.StatusMerged, asagiri.StatusAborted},
 }
 
 // TransitionTask moves a task to toStatus unless already at a terminal success state.
@@ -45,9 +45,9 @@ func TransitionTask(from, to string, force bool) error {
 func normalizeStatus(s string) string {
 	switch s {
 	case "done":
-		return agentflow.StatusImplemented
+		return asagiri.StatusImplemented
 	case "failed":
-		return agentflow.StatusFailed
+		return asagiri.StatusFailed
 	default:
 		return s
 	}
@@ -69,21 +69,21 @@ func canTransition(from, to string) bool {
 // stepRank orders pipeline progress (lower = earlier).
 func stepRank(status string) int {
 	switch normalizeStatus(status) {
-	case agentflow.StatusPending:
+	case asagiri.StatusPending:
 		return 0
-	case agentflow.StatusPlanned:
+	case asagiri.StatusPlanned:
 		return 1
-	case agentflow.StatusEnriched:
+	case asagiri.StatusEnriched:
 		return 2
-	case agentflow.StatusRunning, agentflow.StatusFailed:
+	case asagiri.StatusRunning, asagiri.StatusFailed:
 		return 3
-	case agentflow.StatusImplemented, agentflow.StatusVerifyFailed:
+	case asagiri.StatusImplemented, asagiri.StatusVerifyFailed:
 		return 4
-	case agentflow.StatusVerified, agentflow.StatusReviewFailed:
+	case asagiri.StatusVerified, asagiri.StatusReviewFailed:
 		return 5
-	case agentflow.StatusReviewed:
+	case asagiri.StatusReviewed:
 		return 6
-	case agentflow.StatusReadyForPR, agentflow.StatusMerged:
+	case asagiri.StatusReadyForPR, asagiri.StatusMerged:
 		return 7
 	default:
 		return 0

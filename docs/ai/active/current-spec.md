@@ -1,12 +1,31 @@
-# Current spec — AgentFlow release distribution
+# Current spec — Asagiri rebrand (spec-rename)
+
+**Phase :** `spec-rename` + module path **`github.com/LaProgrammerie/asagiri`**  
+**Date :** 2026-05-20
+
+## Spec active
+
+- **Mission :** [`spec-rename.md`](../../../spec-rename.md)
+- **Décisions :** ADR-016, ADR-017 dans [`05-decisions.md`](../05-decisions.md)
+- **GitHub (humain) :** renommer le dépôt → [`docs/migration/github-rename-asagiri.md`](../../migration/github-rename-asagiri.md)
+
+## Résumé
+
+Identité **Asagiri**, CLI **`asa`**, module et URLs **`LaProgrammerie/asagiri`**. Reste : renommer le dépôt sur GitHub (`hyper-fast-builder` → `asagiri`).
+
+## Handoff actif
+
+[`handoff.md`](handoff.md)
+
+---
+
+# Previous phase — release distribution (spec-release)
 
 **Phase :** `spec-release` (GoReleaser, GitHub Releases, Homebrew)  
 **Date :** 2026-05-17
 
-## Spec active
-
-- **Mission courante :** [`spec-release.md`](../../../spec-release.md)
-- **Décision :** ADR-015 dans [`05-decisions.md`](../05-decisions.md)
+- **Mission :** [`spec-release.md`](../../../spec-release.md)
+- **Décision :** ADR-015 (distribution sur repo `asagiri` ; formule Homebrew migrée vers **`asa`** sous ADR-016)
 
 ---
 
@@ -14,10 +33,6 @@
 
 **Phase :** `spec-postv123` (consolidation, fiabilisation, OSS)  
 **Date :** 2026-05-17
-
-## Résumé
-
-Phase de **consolidation** après livraison V3 : cohérence architecture, sécurité, performance, tests, explainability, documentation OSS. Pas d’extension fonctionnelle majeure.
 
 ## Critères de phase
 
@@ -34,22 +49,15 @@ Phase de **consolidation** après livraison V3 : cohérence architecture, sécur
 
 ## Documentation publique
 
-- **Passe éditoriale (courante) :** [`spec-doc-v2.md`](../../../spec-doc-v2.md) — ton, prose, i18n (en/fr/de/es), sans changement fonctionnel
+- **Passe éditoriale :** [`spec-doc-v2.md`](../../../spec-doc-v2.md)
 - **Spec site (structure) :** [`spec-doc.md`](../../../spec-doc.md)
-- **Implémentation :** `docs-site/` (Fumadocs, i18n, static export → **Cloudflare Pages** via Wrangler CI)
-- **Déploiement :** [`spec-deploy-doc.md`](../../../spec-deploy-doc.md) — secrets `CLOUDFLARE_*` ; `docs-check.yml` pour forks sans deploy
-- **Génération CLI :** `agentflow docs generate-cli`
+- **Implémentation :** `docs-site/` (Fumadocs, i18n, static export → **Cloudflare Pages**)
+- **Déploiement :** [`spec-deploy-doc.md`](../../../spec-deploy-doc.md) — projet Pages **`asagiri-docs`** (ADR-016)
+- **Génération CLI :** `asa docs generate-cli`
 
-## Specs
+## Specs historiques
 
-- **Mission courante :** [`spec-postv123.md`](../../../spec-postv123.md)
-- **V3 cost/perf :** [`specv3.md`](../../../specv3.md)
-- **Intent :** [`specv2.md`](../../../specv2.md)
-- **V1 :** [`spec.md`](../../../spec.md)
-
-## Handoff actif
-
-[`handoff.md`](handoff.md)
+- [`spec-postv123.md`](../../../spec-postv123.md), [`specv3.md`](../../../specv3.md), [`specv2.md`](../../../specv2.md), [`spec.md`](../../../spec.md)
 
 ## Scores consolidation
 

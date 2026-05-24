@@ -1,19 +1,19 @@
 ---
 title: Resumen de agentes
-description: Agentes de codificación externos invocados por AgentFlow como subprocesos.
+description: Agentes de codificación externos invocados por Asagiri como subprocesos.
 ---
 
 # Resumen de agentes
 
-AgentFlow es una capa de orquestación: no incluye pesos integrados ni acceso propietario a modelos. Usted declara **CLIs externas** bajo `agents:`; el enrutamiento, los valores por defecto de `work` o los indicadores por comando deciden qué binario se ejecuta en cada paso.
+Asagiri es una capa de orquestación: no incluye pesos integrados ni acceso propietario a modelos. Usted declara **CLIs externas** bajo `agents:`; el enrutamiento, los valores por defecto de `work` o los indicadores por comando deciden qué binario se ejecuta en cada paso.
 
 ## Patrones habituales
 
-La siguiente tabla enumera identificadores frecuentes; el ejecutable y los indicadores son siempre **los de su** `config.yaml`. El contrato de AgentFlow consiste en lanzar `command` con `args` opcionales y reenviar flujos por la ruta habitual de redacción.
+La siguiente tabla enumera identificadores frecuentes; el ejecutable y los indicadores son siempre **los de su** `config.yaml`. El contrato de Asagiri consiste en lanzar `command` con `args` opcionales y reenviar flujos por la ruta habitual de redacción.
 
 | ID de agente (ejemplo) | Rol típico |
 | --- | --- |
-| `kiro` | Redacción de especificaciones (`agentflow spec`) |
+| `kiro` | Redacción de especificaciones (`asa spec`) |
 | `cursor` | Implementación (`dev`, agente por defecto de `work`) |
 | `codex` / `claude` | Revisión o razonamiento exigente |
 | `ollama` | Enriquecimiento local, clasificación, pre-revisión económica |
@@ -30,10 +30,10 @@ La siguiente tabla enumera identificadores frecuentes; el ejecutable y los indic
 Cambie el ID de agente por subcomando cuando una tarea deba usar otra cadena de herramientas distinta de la predeterminada.
 
 ```bash
-agentflow spec feat --agent kiro
-agentflow enrich feat --agent ollama
-agentflow dev feat --agent cursor
-agentflow review feat --agent codex
+asa spec feat --agent kiro
+asa enrich feat --agent ollama
+asa dev feat --agent cursor
+asa review feat --agent codex
 ```
 
 ## Ver también

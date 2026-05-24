@@ -5,7 +5,7 @@ description: Spezifikation in Kiro, Umsetzung mit Cursor, Verifikation über Pro
 
 # Kiro → Cursor → Verify
 
-Dieser Arbeitsablauf entspricht **`spec-doc` §11.2** mit den AgentFlow-Gates: Anforderungen und Aufgaben bleiben in **Kiro** unter `.kiro/specs/<feature>/`; die Umsetzung nutzt **Cursor** oder **`cursor-agent`** dort, wo diese Tools stark sind; die CLI erzwingt deterministische **`verify`**- und **`review`**-Schritte, damit Automation nicht still nebenläufig abweicht.
+Dieser Arbeitsablauf entspricht **`spec-doc` §11.2** mit den Asagiri-Gates: Anforderungen und Aufgaben bleiben in **Kiro** unter `.kiro/specs/<feature>/`; die Umsetzung nutzt **Cursor** oder **`cursor-agent`** dort, wo diese Tools stark sind; die CLI erzwingt deterministische **`verify`**- und **`review`**-Schritte, damit Automation nicht still nebenläufig abweicht.
 
 ## Wann der Ablauf passt
 
@@ -30,24 +30,24 @@ flowchart LR
 `billing-v2` durch Ihre Feature-ID ersetzen:
 
 ```bash
-agentflow spec billing-v2 --agent kiro
-agentflow plan billing-v2
-agentflow enrich billing-v2 --agent ollama
-agentflow dev billing-v2 --agent cursor
-agentflow verify billing-v2
-agentflow review billing-v2 --agent codex
-agentflow report <run-id>
+asa spec billing-v2 --agent kiro
+asa plan billing-v2
+asa enrich billing-v2 --agent ollama
+asa dev billing-v2 --agent cursor
+asa verify billing-v2
+asa review billing-v2 --agent codex
+asa report <run-id>
 ```
 
 Einzelne Schritte mit `--dry-run` probieren:
 
 ```bash
-agentflow dev billing-v2 --agent cursor --dry-run
+asa dev billing-v2 --agent cursor --dry-run
 ```
 
 ## Konfigurationsvorgaben
 
-Aus `.agentflow/config.yaml.example`:
+Aus `.asagiri/config.yaml.example`:
 
 ```yaml
 work:
@@ -63,7 +63,7 @@ work:
 ## Abkürzung über Intent
 
 ```bash
-agentflow work "develop billing-v2" --stop-after verify
+asa work "develop billing-v2" --stop-after verify
 ```
 
 Die Intent-Auflösung wählt das Feature; die V3-Pipeline wendet Budgets und Kontextoptimierung an.
@@ -73,7 +73,7 @@ Die Intent-Auflösung wählt das Feature; die V3-Pipeline wendet Budgets und Kon
 | Symptom | Vorgehen |
 | --- | --- |
 | `kiro` nicht auf `PATH` | `agents.kiro.command` setzen oder Kiro-CLI installieren |
-| Verify schlägt fehl | Tests lokal beheben; `agentflow verify billing-v2 --force` nur, wenn die State Machine es erlaubt |
+| Verify schlägt fehl | Tests lokal beheben; `asa verify billing-v2 --force` nur, wenn die State Machine es erlaubt |
 | Dirty-Git-Blockade | Committen oder stashen — oder `policies.require_clean_git` bewusst anpassen |
 
 ## Verwandtes

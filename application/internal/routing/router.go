@@ -3,7 +3,7 @@ package routing
 import (
 	"strings"
 
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/config"
+	"github.com/LaProgrammerie/asagiri/application/internal/config"
 )
 
 // Decision is model/agent routing outcome.

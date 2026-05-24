@@ -5,7 +5,7 @@ description: Mapear IDs de agente a comandos CLI y timeouts en config.yaml.
 
 # Configuración de agentes
 
-AgentFlow no habla con APIs de agentes directamente. Arranca cada agente como **subproceso sin shell** (`application/internal/agent/exec`), pasando un `argv` plano desde tu config. Cada clave bajo `agents:` es un id lógico que referencias desde flags (`--agent`), `work.default_agent` y reglas de enrutamiento.
+Asagiri no habla con APIs de agentes directamente. Arranca cada agente como **subproceso sin shell** (`application/internal/agent/exec`), pasando un `argv` plano desde tu config. Cada clave bajo `agents:` es un id lógico que referencias desde flags (`--agent`), `work.default_agent` y reglas de enrutamiento.
 
 El bloque siguiente es una forma realista: varios ids apuntan a ejecutables distintos, con `args`, modelos, timeouts opcionales y un endpoint HTTP estilo Ollama donde ese tipo de agente lo espera.
 
@@ -57,7 +57,7 @@ work:
   default_enricher: ollama
 ```
 
-Puedes anular por invocación, p. ej. `agentflow dev feat --agent cursor` o `agentflow review feat --agent codex`.
+Puedes anular por invocación, p. ej. `asa dev feat --agent cursor` o `asa review feat --agent codex`.
 
 ## Dry-run
 

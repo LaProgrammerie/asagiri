@@ -7,11 +7,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/config"
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/contextopt"
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/cost"
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/intent"
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/tui"
+	"github.com/LaProgrammerie/asagiri/application/internal/config"
+	"github.com/LaProgrammerie/asagiri/application/internal/contextopt"
+	"github.com/LaProgrammerie/asagiri/application/internal/cost"
+	"github.com/LaProgrammerie/asagiri/application/internal/intent"
+	"github.com/LaProgrammerie/asagiri/application/internal/tui"
 )
 
 func mustWd() string {

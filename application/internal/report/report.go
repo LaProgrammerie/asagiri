@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/store/sqlite"
+	"github.com/LaProgrammerie/asagiri/application/internal/store/sqlite"
 )
 
 type Step struct {
@@ -53,7 +53,7 @@ func NewWriter(repoRoot string) *Writer {
 }
 
 func (w *Writer) Write(run sqlite.Run, tasks []sqlite.Task, steps []Step) (string, string, error) {
-	runDir := filepath.Join(w.RepoRoot, ".agentflow", "runs", run.ID)
+	runDir := filepath.Join(w.RepoRoot, ".asagiri", "runs", run.ID)
 	if err := os.MkdirAll(runDir, 0o755); err != nil {
 		return "", "", fmt.Errorf("create run report dir: %w", err)
 	}
@@ -88,7 +88,7 @@ func (w *Writer) Write(run sqlite.Run, tasks []sqlite.Task, steps []Step) (strin
 
 func toMarkdown(r RunReport) string {
 	var sb strings.Builder
-	sb.WriteString("# AgentFlow Report\n\n")
+	sb.WriteString("# Asagiri Report\n\n")
 	sb.WriteString(fmt.Sprintf("- Run: `%s`\n", r.RunID))
 	sb.WriteString(fmt.Sprintf("- Feature: `%s`\n", r.Feature))
 	sb.WriteString(fmt.Sprintf("- Status: `%s`\n", r.Status))

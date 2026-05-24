@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://laprogrammerie.github.io/hyper-fast-builder/schemas/config.schema.json",
-  "title": "AgentFlow config",
-  "description": "Schema for .agentflow/config.yaml (top-level keys). Regenerate when Config struct changes materially.",
+  "$id": "https://laprogrammerie.github.io/asagiri/schemas/config.schema.json",
+  "title": "Asagiri config",
+  "description": "Schema for .asagiri/config.yaml (top-level keys). Regenerate when Config struct changes materially.",
   "type": "object",
   "properties": {
     "project": { "type": "object" },

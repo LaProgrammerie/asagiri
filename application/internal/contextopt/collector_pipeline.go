@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/config"
+	"github.com/LaProgrammerie/asagiri/application/internal/config"
 )
 
 // CollectForPipeline gathers context files. When investigation already produced
@@ -29,7 +29,7 @@ func CollectForPipeline(repoRoot, feature string, cfg *config.Config, opts Colle
 	if feature != "" {
 		paths = append(paths,
 			filepath.Join(".kiro", "specs", feature),
-			filepath.Join(".agentflow", "specs", feature),
+			filepath.Join(".asagiri", "specs", feature),
 		)
 	}
 	for _, p := range cfg.Sources.Local.Paths {

@@ -3,8 +3,8 @@ package contextopt
 import (
 	"testing"
 
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/config"
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/investigation"
+	"github.com/LaProgrammerie/asagiri/application/internal/config"
+	"github.com/LaProgrammerie/asagiri/application/internal/investigation"
 )
 
 func TestBuildPackOrdering(t *testing.T) {

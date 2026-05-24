@@ -6,9 +6,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/config"
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/intent"
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/source"
+	"github.com/LaProgrammerie/asagiri/application/internal/config"
+	"github.com/LaProgrammerie/asagiri/application/internal/intent"
+	"github.com/LaProgrammerie/asagiri/application/internal/source"
 )
 
 // Source implements source.Source for Notion (specv2 §8).

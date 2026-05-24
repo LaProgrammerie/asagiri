@@ -5,7 +5,7 @@ description: Ejecutar modelos locales para enriquecimiento, enrutamiento y respa
 
 # Ollama
 
-Ollama respalda los pasos **locales** en AgentFlow: pases de enriquecimiento, el resolvedor de intención cuando `intent.resolver.use_ollama_fallback` está activo y el enrutamiento consciente del coste orientado a `work.default_enricher`. No es una integración de producto aparte: es el extremo HTTP y las etiquetas de modelo que define bajo `agents.ollama`, más las entradas correspondientes en `models`.
+Ollama respalda los pasos **locales** en Asagiri: pases de enriquecimiento, el resolvedor de intención cuando `intent.resolver.use_ollama_fallback` está activo y el enrutamiento consciente del coste orientado a `work.default_enricher`. No es una integración de producto aparte: es el extremo HTTP y las etiquetas de modelo que define bajo `agents.ollama`, más las entradas correspondientes en `models`.
 
 ## Configuración
 
@@ -34,7 +34,7 @@ Arranque el daemon, descargue los pesos referenciados y deje que `doctor` confir
 ```bash
 ollama serve
 ollama pull qwen2.5-coder:14b
-agentflow doctor
+asa doctor
 ```
 
 ## Uso
@@ -42,13 +42,13 @@ agentflow doctor
 `enrich` llama a Ollama directamente cuando pasa `--agent ollama`; `work --prefer-local` mantiene en el perfil local los pasos elegibles que describa su enrutamiento.
 
 ```bash
-agentflow enrich billing-v2 --agent ollama
-agentflow work "refactor utils" --prefer-local
+asa enrich billing-v2 --agent ollama
+asa work "refactor utils" --prefer-local
 ```
 
 ## Incrustaciones / RAG
 
-`embedding_model` está reservado para el trabajo de recuperación que el proyecto aún no ha completado. Hoy, `agentflow index` persiste **fragmentos de texto** en SQLite: no debe esperar búsqueda por similitud vectorial en una compilación estándar.
+`embedding_model` está reservado para el trabajo de recuperación que el proyecto aún no ha completado. Hoy, `asa index` persiste **fragmentos de texto** en SQLite: no debe esperar búsqueda por similitud vectorial en una compilación estándar.
 
 <Callout type="experimental">
 Las incrustaciones vectoriales y la recuperación semántica RAG figuran en la hoja de ruta (véase `ROADMAP.md` en la raíz del repositorio). No espere búsqueda basada en incrustaciones en la v1.

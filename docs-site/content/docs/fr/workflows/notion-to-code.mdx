@@ -7,7 +7,7 @@ description: Synchroniser Notion avec specs locales et n’exécuter que sur ins
 
 ## Principe
 
-**Notion n’est jamais la source d’exécution.** AgentFlow s’appuie toujours sur un **instantané local** sous `.agentflow/specs/` (ou les chemins `sources.local.paths`). La synchro ramène ce qui vit côté cloud ; `work` lit ensuite fichiers synchronisés et état SQLite.
+**Notion n’est jamais la source d’exécution.** Asagiri s’appuie toujours sur un **instantané local** sous `.asagiri/specs/` (ou les chemins `sources.local.paths`). La synchro ramène ce qui vit côté cloud ; `work` lit ensuite fichiers synchronisés et état SQLite.
 
 Les parties prenantes produit peuvent donc garder Notion comme atelier alors que l’ingénierie rejoue des runs à partir de clichés fichier immutables — ce découpage évite les mauvaises surprises lorsque l’équipe métier renomme des propriétés ou réordonne une base sans prévenir engineering.
 
@@ -17,7 +17,7 @@ Sync Notion requiert config + PAT valides. Traitez l’outil comme expérimental
 
 ## Configurer Notion
 
-YAML reflète le schéma canonique : activez le connecteur, nommez la variable d’environnement du PAT, rattachez l’identifiant de base de données des specs et pointez l’import par défaut vers `.agentflow/specs` (vous pouvez le personnaliser ailleurs).
+YAML reflète le schéma canonique : activez le connecteur, nommez la variable d’environnement du PAT, rattachez l’identifiant de base de données des specs et pointez l’import par défaut vers `.asagiri/specs` (vous pouvez le personnaliser ailleurs).
 
 ```yaml
 sources:
@@ -25,7 +25,7 @@ sources:
     enabled: true
     token_env: NOTION_TOKEN
     specs_database_id: "<your-database-id>"
-    import_path: .agentflow/specs
+    import_path: .asagiri/specs
 ```
 
 Exporter secret :
@@ -39,26 +39,26 @@ export NOTION_TOKEN="ntn_..."
 `sync notion` accepte des URL canoniques de page alors que **`sync all`** balaie ensemble toutes les sources encore actives, ce qui garde plusieurs flux auxiliaires cohérents.
 
 ```bash
-agentflow sync notion --page "https://www.notion.so/..."
+asa sync notion --page "https://www.notion.so/..."
 # ou énumération + synchro combinée sources actives :
-agentflow sync all
+asa sync all
 ```
 
 Aperçu dry-run :
 
 ```bash
-agentflow --dry-run sync notion --page "https://www.notion.so/..."
+asa --dry-run sync notion --page "https://www.notion.so/..."
 ```
 
 Mode interactif peut demander confirmation avant d’écraser une spec locale modifiée.
 
 ## Exécuter depuis instantanés
 
-Liste + pipelines consultent encore `.agentflow/specs` après sync :
+Liste + pipelines consultent encore `.asagiri/specs` après sync :
 
 ```bash
-agentflow inbox --source notion
-agentflow work "develop billing-v2" --source notion
+asa inbox --source notion
+asa work "develop billing-v2" --source notion
 ```
 
 ## Arbitrages

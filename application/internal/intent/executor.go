@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/config"
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/workflow"
+	"github.com/LaProgrammerie/asagiri/application/internal/config"
+	"github.com/LaProgrammerie/asagiri/application/internal/workflow"
 )
 
 // Executor runs high-level plans via workflow primitives.
@@ -96,7 +96,7 @@ func (e *Executor) runStep(ctx context.Context, step PlanStep, intent ResolvedIn
 }
 
 func formatPrimitive(step PlanStep) string {
-	parts := append([]string{"agentflow", step.Command}, step.Args...)
+	parts := append([]string{"asa", step.Command}, step.Args...)
 	return strings.Join(parts, " ")
 }
 

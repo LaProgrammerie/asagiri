@@ -8,7 +8,7 @@ import (
 
 // PrintWorkReport renders boxed UX for work (specv2 §12).
 func PrintWorkReport(w io.Writer, intent ResolvedIntent, plan ExecutionPlan, result ExecuteResult) {
-	fmt.Fprintln(w, "AgentFlow resolved intent")
+	fmt.Fprintln(w, "Asagiri resolved intent")
 	fmt.Fprintln(w, strings.Repeat("─", 25))
 	// Instruction line filled by caller when available
 	if intent.Reason != "" && intent.Reason != "deterministic" && intent.Reason != "ollama" {
@@ -44,7 +44,7 @@ func PrintContinueReport(w io.Writer, feature, taskID, state, nextCmd string) {
 		fmt.Fprintf(w, "Task:    %s\n", taskID)
 	}
 	fmt.Fprintf(w, "State:   %s\n", state)
-	fmt.Fprintf(w, "Next:    %s\n", strings.TrimPrefix(nextCmd, "agentflow "))
+	fmt.Fprintf(w, "Next:    %s\n", strings.TrimPrefix(nextCmd, "asa "))
 	fmt.Fprintln(w, "Running:")
 	fmt.Fprintln(w, nextCmd)
 }

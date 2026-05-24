@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/telemetry"
+	"github.com/LaProgrammerie/asagiri/application/internal/telemetry"
 	"github.com/spf13/cobra"
 )
 

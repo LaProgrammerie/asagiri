@@ -9,7 +9,7 @@ La integración Notion está en `application/internal/source/notion`. El invaria
 
 ## Configuración
 
-Los nombres de propiedad deben coincidir con el esquema de tu workspace; AgentFlow no adivina layouts de Notion.
+Los nombres de propiedad deben coincidir con el esquema de tu workspace; Asagiri no adivina layouts de Notion.
 
 ```yaml
 sources:
@@ -22,7 +22,7 @@ sources:
     status_property: Status
     title_property: Name
     updated_time_property: Last edited time
-    import_path: .agentflow/specs
+    import_path: .asagiri/specs
 ```
 
 El token API se lee de la variable de entorno que nombra `token_env` (por convención `NOTION_TOKEN`).
@@ -33,14 +33,14 @@ Exporta el token, apunta `sync` a una URL de página o ejecuta sync completo, lu
 
 ```bash
 export NOTION_TOKEN="..."
-agentflow sync notion --page "https://notion.so/..."
-agentflow sync all
-agentflow inbox --source notion
+asa sync notion --page "https://notion.so/..."
+asa sync all
+asa inbox --source notion
 ```
 
 ## Seguridad
 
-Notion permanece **apagado** hasta `enabled: true`. Para ensayo: `agentflow --dry-run sync notion --page ...` sin efectos no deseados. Si ya existe una spec local y stdin es TTY, hay avisos antes de sobrescribir trabajo.
+Notion permanece **apagado** hasta `enabled: true`. Para ensayo: `asa --dry-run sync notion --page ...` sin efectos no deseados. Si ya existe una spec local y stdin es TTY, hay avisos antes de sobrescribir trabajo.
 
 <Callout type="experimental">
 Los esquemas API de Notion difieren por workspace. Valida nombres de propiedad (`status_property`, etc.) antes de confiar en sync en producción.

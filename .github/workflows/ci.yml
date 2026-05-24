@@ -37,7 +37,7 @@ jobs:
         run: go test -race ./...
 
       - name: Build
-        run: go build -o bin/agentflow ./application/cmd/agentflow
+        run: go build -o bin/asa ./application/cmd/asa
 
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v7

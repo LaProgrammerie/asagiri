@@ -16,7 +16,7 @@ func TestDefaultVars(t *testing.T) {
 func TestStringDefaults(t *testing.T) {
 	got := String()
 	for _, want := range []string{
-		"AgentFlow vdev",
+		"Asagiri vdev",
 		"commit: unknown",
 		"built: unknown",
 	} {
@@ -29,10 +29,10 @@ func TestStringStructure(t *testing.T) {
 	require.False(t, strings.HasSuffix(got, "\n"), "String() must not include trailing newline")
 
 	lines := strings.Split(got, "\n")
-	require.Len(t, lines, 3, "spec: AgentFlow vX, commit:, built: on three lines")
+	require.Len(t, lines, 3, "spec: Asagiri vX, commit:, built: on three lines")
 
-	require.True(t, strings.HasPrefix(lines[0], "AgentFlow v"), "line 1: %q", lines[0])
-	require.NotEmpty(t, strings.TrimPrefix(lines[0], "AgentFlow v"), "version value after prefix")
+	require.True(t, strings.HasPrefix(lines[0], "Asagiri v"), "line 1: %q", lines[0])
+	require.NotEmpty(t, strings.TrimPrefix(lines[0], "Asagiri v"), "version value after prefix")
 
 	require.True(t, strings.HasPrefix(lines[1], "commit: "), "line 2: %q", lines[1])
 	require.NotEmpty(t, strings.TrimSpace(strings.TrimPrefix(lines[1], "commit: ")), "commit value after prefix")

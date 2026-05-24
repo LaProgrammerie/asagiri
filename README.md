@@ -1,8 +1,8 @@
-# AgentFlow
+# Asagiri
 
 Deterministic orchestration for AI coding workflows.
 
-AgentFlow turns specs into auditable, cost-aware development runs using local investigation, git worktrees, external coding agents, validation commands, and reproducible reports.
+Asagiri turns specs into auditable, cost-aware development runs using local investigation, git worktrees, external coding agents, validation commands, and reproducible reports.
 
 ## Why
 
@@ -17,24 +17,24 @@ AgentFlow turns specs into auditable, cost-aware development runs using local in
 
 ```bash
 brew tap LaProgrammerie/tap
-brew install agentflow
-agentflow version
+brew install asa
+asa version
 ```
 
 Requires the [homebrew-tap](https://github.com/LaProgrammerie/homebrew-tap) repository and a published release.
 
 ### Manual install (released binary)
 
-Download an archive from [GitHub Releases](https://github.com/LaProgrammerie/hyper-fast-builder/releases) for your OS/arch (`agentflow_Darwin_arm64.tar.gz`, `agentflow_Linux_x86_64.tar.gz`, `agentflow_Windows_arm64.zip`, etc.).
+Download an archive from [GitHub Releases](https://github.com/LaProgrammerie/asagiri/releases) for your OS/arch (`asa_Darwin_arm64.tar.gz`, `asa_Linux_x86_64.tar.gz`, `asa_Windows_arm64.zip`, etc.).
 
 ```bash
 VERSION=v0.1.0
-curl -LO "https://github.com/LaProgrammerie/hyper-fast-builder/releases/download/${VERSION}/checksums.txt"
-curl -LO "https://github.com/LaProgrammerie/hyper-fast-builder/releases/download/${VERSION}/agentflow_Darwin_arm64.tar.gz"
+curl -LO "https://github.com/LaProgrammerie/asagiri/releases/download/${VERSION}/checksums.txt"
+curl -LO "https://github.com/LaProgrammerie/asagiri/releases/download/${VERSION}/asa_Darwin_arm64.tar.gz"
 sha256sum -c checksums.txt
-tar -xzf agentflow_Darwin_arm64.tar.gz
-sudo install -m 755 agentflow /usr/local/bin/agentflow
-agentflow version
+tar -xzf asa_Darwin_arm64.tar.gz
+sudo install -m 755 asa /usr/local/bin/asa
+asa version
 ```
 
 Adjust `VERSION`, archive name, and install path for your platform.
@@ -44,17 +44,17 @@ Adjust `VERSION`, archive name, and install path for your platform.
 Requirements: Go 1.25+, `git`, `make`.
 
 ```bash
-git clone https://github.com/LaProgrammerie/hyper-fast-builder.git
-cd hyper-fast-builder
+git clone https://github.com/LaProgrammerie/asagiri.git
+cd asagiri
 go mod download
 make build
-./bin/agentflow version
+./bin/asa version
 ```
 
 ### Verify
 
 ```bash
-agentflow doctor
+asa doctor
 ```
 
 See [`docs/release-process.md`](docs/release-process.md) for maintainers.
@@ -62,10 +62,10 @@ See [`docs/release-process.md`](docs/release-process.md) for maintainers.
 ## Quickstart
 
 ```bash
-export AGENTFLOW_DRY_RUN=1   # optional: no external agent binaries
-./bin/agentflow init
-./bin/agentflow doctor
-./bin/agentflow work "develop my-feature" --dry-run --plan-only --yes
+export ASA_DRY_RUN=1   # optional: no external agent binaries
+./bin/asa init
+./bin/asa doctor
+./bin/asa work "develop my-feature" --dry-run --plan-only --yes
 ```
 
 See [`examples/quickstart/`](examples/quickstart/) for a longer walkthrough.
@@ -73,10 +73,10 @@ See [`examples/quickstart/`](examples/quickstart/) for a longer walkthrough.
 ## Core workflow
 
 ```bash
-./bin/agentflow work "develop billing-v2" --estimate-only
-./bin/agentflow work "develop billing-v2"
-./bin/agentflow status
-./bin/agentflow report <run-id>
+./bin/asa work "develop billing-v2" --estimate-only
+./bin/asa work "develop billing-v2"
+./bin/asa status
+./bin/asa report <run-id>
 ```
 
 Primitive pipeline (Kiro → plan → dev → verify): [`spec.md`](spec.md) · Intent layer: [`specv2.md`](specv2.md) · Cost/perf: [`specv3.md`](specv3.md)
@@ -88,7 +88,7 @@ Public docs (Fumadocs, static export on **Cloudflare Pages**) — **en** (defaul
 Build locally:
 
 ```bash
-go run ./application/cmd/agentflow docs generate-cli --output docs-site/content/docs/en/cli/generated
+go run ./application/cmd/asa docs generate-cli --output docs-site/content/docs/en/cli/generated
 cd docs-site && corepack enable && pnpm install && pnpm run docs:check
 # static output: docs-site/out/
 ```
@@ -103,7 +103,7 @@ cd docs-site && corepack enable && pnpm install && pnpm run docs:check
 
 ## Contributing
 
-See [`CONTRIBUTING.md`](CONTRIBUTING.md) and the [contributing guide](https://laprogrammerie.github.io/hyper-fast-builder/docs/contributing/).
+See [`CONTRIBUTING.md`](CONTRIBUTING.md) and the [contributing guide](https://laprogrammerie.github.io/asagiri/docs/contributing/).
 
 ## License
 

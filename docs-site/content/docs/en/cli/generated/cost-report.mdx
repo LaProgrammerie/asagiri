@@ -1,20 +1,20 @@
 ---
-title: Cost Report · AgentFlow CLI
+title: Cost Report · Asagiri CLI
 description: Historique des coûts
 ---
 
-CLI path: **`agentflow cost report`**
+CLI path: **`asa cost report`**
 
 ## When to use
 
-Use **cost** when reconciling SQLite-backed telemetry with pricing tables declared in **.agentflow/config.yaml** or when slicing spend over a bounded recency window.
+Use **cost** when reconciling SQLite-backed telemetry with pricing tables declared in **.asagiri/config.yaml** or when slicing spend over a bounded recency window.
 
 > Original CLI synopsis: Historique des coûts
 
 ## Usage
 
 ```bash
-agentflow cost report [flags]
+asa cost report [flags]
 ```
 
 ## Options
@@ -27,7 +27,7 @@ agentflow cost report [flags]
 ## Examples
 
 ```bash
-agentflow cost report
+asa cost report
 ```
 
 > Wire richer samples through **cobra.Command.Example** when the happy path warrants copy/paste-friendly automation beyond this scaffold.
@@ -39,7 +39,7 @@ agentflow cost report
 ## Failure modes
 
 - Cobra rejects unknown flags or arity mismatches before any repository side effects occur.
-- AgentFlow cannot resolve scaffolding when the command is invoked outside an initialised checkout.
+- Asagiri cannot resolve scaffolding when the command is invoked outside an initialised checkout.
 - SQLite contention or corrupted telemetry prevent summarisation queries from completing.
 - Malformed **--since** payloads fail fast before aggregates are queried.
 

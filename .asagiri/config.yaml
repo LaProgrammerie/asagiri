@@ -9,11 +9,11 @@ specs:
 
 state:
   backend: sqlite
-  path: .agentflow/state.sqlite
+  path: .asagiri/state.sqlite
 
 worktrees:
-  base_path: .agentflow/worktrees
-  branch_prefix: agentflow
+  base_path: .asagiri/worktrees
+  branch_prefix: asagiri
   cleanup_policy: keep_failed
 
 agents:

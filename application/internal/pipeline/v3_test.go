@@ -6,19 +6,19 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/config"
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/intent"
+	"github.com/LaProgrammerie/asagiri/application/internal/config"
+	"github.com/LaProgrammerie/asagiri/application/internal/intent"
 )
 
 func TestRunV3PipelineEstimateOnly(t *testing.T) {
 	dir := t.TempDir()
 	writeFile(t, filepath.Join(dir, "go.mod"), "module example.com/t\n\ngo 1.25\n")
-	writeFile(t, filepath.Join(dir, ".agentflow", "config.yaml"), `
+	writeFile(t, filepath.Join(dir, ".asagiri", "config.yaml"), `
 project:
   name: t
 state:
   backend: sqlite
-  path: .agentflow/state.sqlite
+  path: .asagiri/state.sqlite
 pricing:
   currency: EUR
   models:
@@ -26,7 +26,7 @@ pricing:
       input_per_1m_tokens: 1
       output_per_1m_tokens: 2
 `)
-	cfg, err := config.Load(filepath.Join(dir, ".agentflow", "config.yaml"), dir)
+	cfg, err := config.Load(filepath.Join(dir, ".asagiri", "config.yaml"), dir)
 	if err != nil {
 		t.Fatal(err)
 	}

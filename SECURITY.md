@@ -23,20 +23,20 @@ We aim to acknowledge reports within a few business days.
 
 In scope:
 
-- AgentFlow CLI and libraries under `application/`
-- Default configuration and local state under `.agentflow/`
+- Asagiri CLI and libraries under `application/`
+- Default configuration and local state under `.asagiri/`
 - Documentation site build pipeline (no secrets in static output)
 
 Out of scope:
 
 - Third-party coding agents (Kiro, Cursor, Codex, Ollama, etc.) — follow their vendors' policies
-- User-provided API keys and environment secrets — never commit them; AgentFlow redacts common patterns in logs but cannot guarantee zero leakage from misconfiguration
+- User-provided API keys and environment secrets — never commit them; Asagiri redacts common patterns in logs but cannot guarantee zero leakage from misconfiguration
 
 ## Safe usage
 
-- Run `agentflow doctor` after `init`
+- Run `asa doctor` after `init`
 - Keep `policies` and `validation` enabled for production repos
 - Treat MCP and Notion sync as **experimental** until marked stable in the docs
 - Review cloud model routing and budgets before enabling `allow-cloud` flags
 
-See the [security documentation](https://laprogrammerie.github.io/hyper-fast-builder/docs/security/) for the full model.
+See the [security documentation](https://laprogrammerie.github.io/asagiri/docs/security/) for the full model.

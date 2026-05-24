@@ -1,4 +1,4 @@
-# Quickstart AgentFlow (dry-run)
+# Quickstart Asagiri (dry-run)
 
 Ce dossier documente un parcours **sans agents cloud** pour valider l’installation.
 
@@ -11,16 +11,16 @@ Ce dossier documente un parcours **sans agents cloud** pour valider l’installa
 
 ```bash
 make build
-export AGENTFLOW_DRY_RUN=1
-./bin/agentflow init
-./bin/agentflow doctor
-./bin/agentflow work "développe agentflow-test" --dry-run --plan-only --yes
-./bin/agentflow estimate agentflow-test
+export ASA_DRY_RUN=1
+./bin/asa init
+./bin/asa doctor
+./bin/asa work "développe asa-test" --dry-run --plan-only --yes
+./bin/asa estimate asa-test
 ```
 
 ## Config minimale
 
-Copier `.agentflow/config.yaml.example` vers `.agentflow/config.yaml` à la racine du projet cible.
+Copier `.asagiri/config.yaml.example` vers `.asagiri/config.yaml` à la racine du projet cible.
 
 `mcp.enabled` reste `false` par défaut (sécurité).
 

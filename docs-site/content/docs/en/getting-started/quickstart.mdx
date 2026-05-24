@@ -1,11 +1,11 @@
 ---
 title: Quickstart
-description: Run AgentFlow end-to-end in under ten minutes with dry-run safety.
+description: Run Asagiri end-to-end in under ten minutes with dry-run safety.
 ---
 
 # Quickstart
 
-This guide walks through AgentFlow in under ten minutes using **`--dry-run`**. You will see how intent resolves into a plan and cost estimate without invoking external agents or validation shells—so you can explore orchestration safely on a real repository layout.
+This guide walks through Asagiri in under ten minutes using **`--dry-run`**. You will see how intent resolves into a plan and cost estimate without invoking external agents or validation shells—so you can explore orchestration safely on a real repository layout.
 
 When you are comfortable with the flow, remove `--dry-run` only after agents and validation commands are configured.
 
@@ -17,8 +17,8 @@ Start from a built binary and a clean project tree:
 make build
 export PATH="$PWD/bin:$PATH"
 cd your-repo
-agentflow init
-agentflow doctor
+asa init
+asa doctor
 ```
 
 `doctor` surfaces configuration gaps (missing agents, MCP settings, budget files) before you spend tokens on a full run.
@@ -28,8 +28,8 @@ agentflow doctor
 Natural-language `work` is the highest-level entry point. These commands show planning and estimation without side effects:
 
 ```bash
-agentflow work "develop my-feature" --dry-run --plan-only
-agentflow work "develop my-feature" --dry-run --estimate-only
+asa work "develop my-feature" --dry-run --plan-only
+asa work "develop my-feature" --dry-run --estimate-only
 ```
 
 `--plan-only` resolves intent and prints the execution plan. `--estimate-only` runs the V3 pipeline through cost and context estimation **without** calling external agent CLIs.
@@ -39,12 +39,12 @@ agentflow work "develop my-feature" --dry-run --estimate-only
 If you already maintain a Kiro spec folder (for example `.kiro/specs/my-feature/`), you can exercise each pipeline step in isolation:
 
 ```bash
-agentflow plan my-feature --dry-run
-agentflow enrich my-feature --dry-run
-agentflow dev my-feature --dry-run
-agentflow verify my-feature --dry-run
-agentflow review my-feature --dry-run
-agentflow status --dry-run
+asa plan my-feature --dry-run
+asa enrich my-feature --dry-run
+asa dev my-feature --dry-run
+asa verify my-feature --dry-run
+asa review my-feature --dry-run
+asa status --dry-run
 ```
 
 Dry-run here means orchestration and logging run locally; external processes are not spawned.
@@ -54,19 +54,19 @@ Dry-run here means orchestration and logging run locally; external processes are
 After a dry-run `work` creates run metadata, inspect artifacts:
 
 ```bash
-agentflow status --dry-run
-agentflow report <run-id> --dry-run
+asa status --dry-run
+asa report <run-id> --dry-run
 ```
 
-Reports are written under `.agentflow/runs/<run-id>/report.md` with companion JSON for tooling.
+Reports are written under `.asagiri/runs/<run-id>/report.md` with companion JSON for tooling.
 
 ## Run for real
 
 When configuration is ready and you accept external process execution, escalate deliberately:
 
 ```bash
-agentflow work "develop my-feature" --estimate-only   # cost gate first
-agentflow work "develop my-feature"                   # guided confirmation by default
+asa work "develop my-feature" --estimate-only   # cost gate first
+asa work "develop my-feature"                   # guided confirmation by default
 ```
 
 Use `--estimate-only` as an economic gate before paying for agent time. The default `work` path still prompts for confirmation unless you opt into non-interactive flags documented in the CLI reference.

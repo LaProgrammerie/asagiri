@@ -3,7 +3,7 @@ package cli
 import (
 	"fmt"
 
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/mcp"
+	"github.com/LaProgrammerie/asagiri/application/internal/mcp"
 	"github.com/spf13/cobra"
 )
 
@@ -19,7 +19,7 @@ func newMcpCmd(dryRun *bool) *cobra.Command {
 			}
 			defer c.Close()
 			if !c.Config.MCP.Enabled {
-				return fmt.Errorf("MCP désactivé : mcp.enabled: true dans .agentflow/config.yaml")
+				return fmt.Errorf("MCP désactivé : mcp.enabled: true dans .asagiri/config.yaml")
 			}
 			return mcp.ServeStdio(c.RepoRoot, c.Config)
 		},

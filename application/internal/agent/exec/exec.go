@@ -10,9 +10,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/agent"
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/config"
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/redact"
+	"github.com/LaProgrammerie/asagiri/application/internal/agent"
+	"github.com/LaProgrammerie/asagiri/application/internal/config"
+	"github.com/LaProgrammerie/asagiri/application/internal/env"
+	"github.com/LaProgrammerie/asagiri/application/internal/redact"
 )
 
 // Executor runs one configured agent command as a subprocess.
@@ -31,7 +32,7 @@ func New(name string, cfg config.Agent, dryRun bool) (*Executor, error) {
 		name:    name,
 		command: cfg.Command,
 		args:    append([]string{}, cfg.Args...),
-		dryRun:  dryRun || os.Getenv("AGENTFLOW_DRY_RUN") == "1",
+		dryRun:  dryRun || env.DryRunEnabled(),
 	}, nil
 }
 

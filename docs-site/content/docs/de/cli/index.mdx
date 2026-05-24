@@ -1,11 +1,11 @@
 ---
 title: CLI-Überblick
-description: AgentFlow-Befehlsfamilien und verlinkte Flag-Referenz (generiert).
+description: Asagiri-Befehlsfamilien und verlinkte Flag-Referenz (generiert).
 ---
 
 # CLI-Überblick
 
-Die **`agentflow`-Binärdatei (`application/cmd/agentflow`)** ist die zentrale Oberfläche: Projekt initialisieren, die spezgetriebene Pipeline in konkrete Verben aufteilen, Kost-Artefakte inspizieren und Betriebspflege erledigen. Im Alltag verläuft der Datenstrom oft über **`work`**, wenn natürliche Sprache eine ganze Pipeline abbilden soll, oder über benannte Schritte wie **`plan`**, **`dev`** und **`verify`**, wenn `.kiro/specs/<feature>/` bereits Struktur liefert. Die Gruppierung unten ordnet die Begriffe — verbindliche Flags und der Unterbefehlsbaum stammen aus Cobra und stehen in der **[generierten CLI-Referenz](/docs/de/cli/generated)**; nach strukturellen CLI-Änderungen Docgen ausführen.
+Die **`asa`-Binärdatei (`application/cmd/asa`)** ist die zentrale Oberfläche: Projekt initialisieren, die spezgetriebene Pipeline in konkrete Verben aufteilen, Kost-Artefakte inspizieren und Betriebspflege erledigen. Im Alltag verläuft der Datenstrom oft über **`work`**, wenn natürliche Sprache eine ganze Pipeline abbilden soll, oder über benannte Schritte wie **`plan`**, **`dev`** und **`verify`**, wenn `.kiro/specs/<feature>/` bereits Struktur liefert. Die Gruppierung unten ordnet die Begriffe — verbindliche Flags und der Unterbefehlsbaum stammen aus Cobra und stehen in der **[generierten CLI-Referenz](/docs/de/cli/generated)**; nach strukturellen CLI-Änderungen Docgen ausführen.
 
 ## Globales Verhalten
 
@@ -16,7 +16,7 @@ Simulations-Flags verhalten sich über verschachtelte Subbefehle konsistent:
 | `--dry-run` | Simuliert ohne echte Agents oder Validierungs-Shells |
 | (persistent) | Wird an abgeleitete Befehle vererbt |
 
-Umgebungsvariablen wie `AGENTFLOW_DRY_RUN=1` und `AGENTFLOW_YES=1` spiegeln gängige Schalter; die vollständige Liste steht unter [Umgebungsvariablen](/docs/de/reference/environment-variables).
+Umgebungsvariablen wie `ASA_DRY_RUN=1` und `ASA_YES=1` spiegeln gängige Schalter; die vollständige Liste steht unter [Umgebungsvariablen](/docs/de/reference/environment-variables).
 
 ## Befehlsgruppen im Überblick
 
@@ -39,7 +39,7 @@ Die Tabelle ist eine Orientierung — keine Aussage darüber, welche Befehle nur
 Kurzüberblicke und deutschsprachige Stub-Seiten für ausgewählte Befehle liegen unter **[CLI generiert](/docs/de/cli/generated)**. Nach Änderungen an Cobra:
 
 ```bash
-go run ./application/cmd/agentflow docs generate-cli \
+go run ./application/cmd/asa docs generate-cli \
   --output docs-site/content/docs/en/cli/generated
 ```
 
@@ -50,9 +50,9 @@ go run ./application/cmd/agentflow docs generate-cli \
 Minimaler Check vor dem Anbinden externer Agents:
 
 ```bash
-agentflow init
-agentflow doctor
-agentflow work "my feature" --dry-run --plan-only
+asa init
+asa doctor
+asa work "my feature" --dry-run --plan-only
 ```
 
 Danach [Schnellstart](/docs/de/getting-started/quickstart) und bei konfigurierten Hooks [Erster Workflow](/docs/de/getting-started/first-workflow).

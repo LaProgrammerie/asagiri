@@ -8,13 +8,14 @@ import (
 	"os"
 	"strings"
 
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/intent"
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/source"
-	srcnotion "github.com/LaProgrammerie/hyper-fast-builder/application/internal/source/notion"
+	"github.com/LaProgrammerie/asagiri/application/internal/env"
+	"github.com/LaProgrammerie/asagiri/application/internal/intent"
+	"github.com/LaProgrammerie/asagiri/application/internal/source"
+	srcnotion "github.com/LaProgrammerie/asagiri/application/internal/source/notion"
 )
 
 func isInteractive() bool {
-	if strings.TrimSpace(os.Getenv("AGENTFLOW_YES")) == "1" {
+	if env.YesEnabled() {
 		return false
 	}
 	fi, err := os.Stdin.Stat()

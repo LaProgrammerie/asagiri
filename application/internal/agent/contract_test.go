@@ -6,14 +6,14 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/LaProgrammerie/hyper-fast-builder/application/pkg/agentflow"
+	"github.com/LaProgrammerie/asagiri/application/pkg/asagiri"
 )
 
 func TestAgentContextResultRoundTrip(t *testing.T) {
-	task := &agentflow.Task{
+	task := &asagiri.Task{
 		ID:    "t-1",
 		Title: "Do thing",
-		Scope: agentflow.TaskScope{AllowedPaths: []string{"application/**"}},
+		Scope: asagiri.TaskScope{AllowedPaths: []string{"application/**"}},
 	}
 	ctx := BuildContext("run-1", task, []string{"spec.md"})
 	res := DryRunResult("ok")
@@ -21,8 +21,8 @@ func TestAgentContextResultRoundTrip(t *testing.T) {
 	if err := WriteLogs(repo, "t-1", ctx, res); err != nil {
 		t.Fatal(err)
 	}
-	var readCtx agentflow.AgentContext
-	body, _ := os.ReadFile(filepath.Join(repo, ".agentflow", "logs", "t-1", "context.json"))
+	var readCtx asagiri.AgentContext
+	body, _ := os.ReadFile(filepath.Join(repo, ".asagiri", "logs", "t-1", "context.json"))
 	if err := json.Unmarshal(body, &readCtx); err != nil {
 		t.Fatal(err)
 	}

@@ -1,4 +1,6 @@
-Spec produit & technique — AgentFlow
+> **Historique** — spec rédigée sous le nom **AgentFlow** ; produit actuel : **Asagiri** / CLI **`asa`** (`spec-rename.md`).
+
+Spec produit & technique — AgentFlow (legacy)
 
 1. Vision
 

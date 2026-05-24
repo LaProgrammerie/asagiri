@@ -9,7 +9,7 @@ var (
 	Date    = "unknown"
 )
 
-// String returns human-readable version metadata for `agentflow version`.
+// String returns human-readable version metadata for `asa version`.
 func String() string {
-	return fmt.Sprintf("AgentFlow v%s\ncommit: %s\nbuilt: %s", Version, Commit, Date)
+	return fmt.Sprintf("Asagiri v%s\ncommit: %s\nbuilt: %s", Version, Commit, Date)
 }

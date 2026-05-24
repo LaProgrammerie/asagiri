@@ -7,29 +7,29 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/plan"
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/store/sqlite"
-	"github.com/LaProgrammerie/hyper-fast-builder/application/pkg/agentflow"
+	"github.com/LaProgrammerie/asagiri/application/internal/plan"
+	"github.com/LaProgrammerie/asagiri/application/internal/store/sqlite"
+	"github.com/LaProgrammerie/asagiri/application/pkg/asagiri"
 	"gopkg.in/yaml.v3"
 )
 
-func planToCanonical(feature string, t plan.Task) agentflow.Task {
+func planToCanonical(feature string, t plan.Task) asagiri.Task {
 	now := time.Now().UTC()
-	task := agentflow.Task{
+	task := asagiri.Task{
 		ID:      t.ID,
 		Title:   t.Title,
 		Feature: feature,
-		Status:  agentflow.StatusPending,
+		Status:  asagiri.StatusPending,
 		Risk:    "medium",
 		Type:    "implementation",
-		Source: agentflow.TaskSource{
+		Source: asagiri.TaskSource{
 			Spec: fmt.Sprintf(".kiro/specs/%s/tasks.md", feature),
 		},
-		Scope: agentflow.TaskScope{
+		Scope: asagiri.TaskScope{
 			AllowedPaths: []string{"application/**"},
 		},
 		Acceptance: t.Checks,
-		Agents: agentflow.TaskAgents{
+		Agents: asagiri.TaskAgents{
 			Implementer: "cursor",
 			Reviewer:      "codex",
 			Enricher:      "ollama",
@@ -42,15 +42,15 @@ func planToCanonical(feature string, t plan.Task) agentflow.Task {
 	return task
 }
 
-func payloadToCanonical(payloadJSON string) (agentflow.Task, error) {
-	var task agentflow.Task
+func payloadToCanonical(payloadJSON string) (asagiri.Task, error) {
+	var task asagiri.Task
 	if err := json.Unmarshal([]byte(payloadJSON), &task); err != nil {
-		return agentflow.Task{}, err
+		return asagiri.Task{}, err
 	}
 	return task, nil
 }
 
-func canonicalToPayload(task agentflow.Task) (string, error) {
+func canonicalToPayload(task asagiri.Task) (string, error) {
 	body, err := json.Marshal(task)
 	if err != nil {
 		return "", err
@@ -58,8 +58,8 @@ func canonicalToPayload(task agentflow.Task) (string, error) {
 	return string(body), nil
 }
 
-func (s *Service) persistCanonicalTaskFiles(feature string, tasks []agentflow.Task) error {
-	dir := filepath.Join(s.repoRoot, ".agentflow", "tasks", feature)
+func (s *Service) persistCanonicalTaskFiles(feature string, tasks []asagiri.Task) error {
+	dir := filepath.Join(s.repoRoot, ".asagiri", "tasks", feature)
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		return fmt.Errorf("create tasks dir: %w", err)
 	}
@@ -87,7 +87,7 @@ func (s *Service) persistCanonicalTaskFiles(feature string, tasks []agentflow.Ta
 func (s *Service) transitionTask(task sqlite.Task, to string, force bool) error {
 	from := task.Status
 	if from == "" {
-		from = agentflow.StatusPending
+		from = asagiri.StatusPending
 	}
 	if err := TransitionTask(from, to, force); err != nil {
 		return err

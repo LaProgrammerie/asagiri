@@ -26,12 +26,12 @@ Les procédures **génériques** (review, release, debug, plan, refactor) resten
 ### Workflow intention (specv2)
 
 ```bash
-agentflow inbox --source local
-agentflow sync notion --feature ma-feature   # si spec Notion
-agentflow work "développe ma-feature" --plan-only
-agentflow work "développe ma-feature" --yes
-agentflow continue
-agentflow next --execute
+asa inbox --source local
+asa sync notion --feature ma-feature   # si spec Notion
+asa work "développe ma-feature" --plan-only
+asa work "développe ma-feature" --yes
+asa continue
+asa next --execute
 ```
 
 Les primitives (`plan`, `dev`, `verify`, …) restent l’API stable pour CI et debug.
@@ -57,12 +57,12 @@ Règle simple : **si un humain ou un agent pourrait se tromper de périmètre de
 
 1. Cloner le dépôt, installer **Go** (version `go.mod`).
 2. `go mod download`
-3. `make build && ./bin/agentflow init && ./bin/agentflow doctor`
+3. `make build && ./bin/asa init && ./bin/asa doctor`
 4. Optionnel : `make dev` — stack Docker.
 5. Boucle feature : `plan` → `enrich` → `dev` → `verify` → `review` → `report` / `pr` (ajouter `--dry-run` sans agents installés).
 6. Avant PR : `go test -race ./...` ; `make lint` si golangci-lint disponible (Go ≥ version module).
 
-Sans Docker : `./bin/agentflow` directement sur l’hôte.
+Sans Docker : `./bin/asa` directement sur l’hôte.
 
 ---
 

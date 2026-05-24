@@ -5,7 +5,7 @@ description: Valeurs renvoyées par la CLI en succès ou échec.
 
 # Codes de sortie
 
-AgentFlow suit les usages Go/Cobra : scripts et pipelines peuvent bifurquer sur `$?` sans adaptations.
+Asagiri suit les usages Go/Cobra : scripts et pipelines peuvent bifurquer sur `$?` sans adaptations.
 
 | Code | Signification |
 | --- | --- |
@@ -18,9 +18,9 @@ AgentFlow suit les usages Go/Cobra : scripts et pipelines peuvent bifurquer sur 
 Les extraits montrent la différence entre soucis de syntaxe (sortie **2**), bonnes voies (**0** lorsque tout passe pendant `doctor` ou une estimation seule qui réussit), et problèmes d’exploration budgétaire ou validations qui montent comme **1** avec message sur stderr.
 
 ```bash
-agentflow work                    # exit 2 — argument instruction manquant
-agentflow doctor                  # exit 0 quand tous contrôles passent
-agentflow work "x" --estimate-only # exit 0 quand l’estimation fonctionne
+asa work                    # exit 2 — argument instruction manquant
+asa doctor                  # exit 0 quand tous contrôles passent
+asa work "x" --estimate-only # exit 0 quand l’estimation fonctionne
 ```
 
 Les blocages budgétaires et validations échouées remontent en **exit 1** avec stderr.
@@ -30,7 +30,7 @@ Les blocages budgétaires et validations échouées remontent en **exit 1** avec
 Combiner avec `||` dans vos scripts et rappeler `--dry-run` si vous vérifiez seulement le câblage CI sans faire échouer l’étape lorsqu’un agent n’est pas installé.
 
 ```bash
-agentflow verify my-feature || echo "verify failed"
+asa verify my-feature || echo "verify failed"
 ```
 
 `--dry-run` en CI diminue codes non-zero dus uniquement aux binaires agent absents alors que vous ne testez que l’écorchage.

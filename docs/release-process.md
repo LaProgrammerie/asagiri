@@ -1,6 +1,6 @@
 # Release process
 
-AgentFlow binaries are published from **hyper-fast-builder** via [GoReleaser](https://goreleaser.com/) when a SemVer tag `v*` is pushed.
+Asagiri binaries are published from **asagiri** via [GoReleaser](https://goreleaser.com/) when a SemVer tag `v*` is pushed.
 
 ## Prerequisites
 
@@ -19,15 +19,15 @@ git push origin v0.1.0
 ```
 
 3. GitHub Actions workflow [`.github/workflows/release.yml`](../.github/workflows/release.yml) runs tests and GoReleaser.
-4. A [GitHub Release](https://github.com/LaProgrammerie/hyper-fast-builder/releases) is published with multi-platform archives and `checksums.txt`.
-5. GoReleaser updates `Formula/agentflow.rb` in `LaProgrammerie/homebrew-tap` (requires `HOMEBREW_TAP_GITHUB_TOKEN`).
+4. A [GitHub Release](https://github.com/LaProgrammerie/asagiri/releases) is published with multi-platform archives and `checksums.txt`.
+5. GoReleaser updates `Formula/asa.rb` in `LaProgrammerie/homebrew-tap` (requires `HOMEBREW_TAP_GITHUB_TOKEN`).
 6. Verify installation:
 
 ```bash
 brew update
-brew install LaProgrammerie/tap/agentflow
-agentflow version
-agentflow doctor
+brew install LaProgrammerie/tap/asa
+asa version
+asa doctor
 ```
 
 ## Local dry run
@@ -51,10 +51,10 @@ Never commit tokens. Do not echo secrets in CI logs.
 
 ## Version injection
 
-Builds set `application/internal/version` via ldflags (`Version`, `Commit`, `Date`). `agentflow version` prints:
+Builds set `application/internal/version` via ldflags (`Version`, `Commit`, `Date`). `asa version` prints:
 
 ```
-AgentFlow v0.1.0
+Asagiri v0.1.0
 commit: abc1234
 built: 2026-05-17T12:00:00Z
 ```

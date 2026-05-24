@@ -5,7 +5,7 @@ description: Go modules under application/internal and the execution pipeline.
 
 # Architecture overview
 
-AgentFlow ships as a Go CLI (`application/cmd/agentflow`) with most behavior in `application/internal/` and shared contracts in `application/pkg/agentflow`. This split keeps the binary thin while isolating parsing, planning, investigation, costing, and storage behind explicit packages you can reason about from the filesystem layout alone.
+Asagiri ships as a Go CLI (`application/cmd/asa`) with most behavior in `application/internal/` and shared contracts in `application/pkg/asa`. This split keeps the binary thin while isolating parsing, planning, investigation, costing, and storage behind explicit packages you can reason about from the filesystem layout alone.
 
 ## Execution pipeline
 
@@ -51,11 +51,11 @@ flowchart TD
 
 ## State storage
 
-Runs and tasks persist in **SQLite** at `state.path` (default `.agentflow/state.sqlite`). Artefacts for each run land under `.agentflow/runs/<run-id>/`, which keeps prompts, logs, and intermediate outputs addressable without rereading the database.
+Runs and tasks persist in **SQLite** at `state.path` (default `.asagiri/state.sqlite`). Artefacts for each run land under `.asagiri/runs/<run-id>/`, which keeps prompts, logs, and intermediate outputs addressable without rereading the database.
 
 ## Extension points
 
-You can introduce new agents through config alone; wire new quality gates via `validation.commands`; add routing strategies under `routing.strategies`; and expose optional MCP tools when `mcp.enabled: true`. Those hooks are intentional seams: most teams extend AgentFlow without forking the Go entrypoint.
+You can introduce new agents through config alone; wire new quality gates via `validation.commands`; add routing strategies under `routing.strategies`; and expose optional MCP tools when `mcp.enabled: true`. Those hooks are intentional seams: most teams extend Asagiri without forking the Go entrypoint.
 
 ## Related
 

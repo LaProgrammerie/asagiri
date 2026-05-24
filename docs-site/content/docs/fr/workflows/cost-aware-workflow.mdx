@@ -5,12 +5,12 @@ description: Estimer, optimiser contexte et plafonner avant d’inviter les agen
 
 # Workflow soucieux des coûts
 
-Cette page opérationnalise **`spec-doc` §11.4** : chaque drapeau et clé listés existent bien dans vos builds AgentFlow et enchaîne estimation, optimisation des packs budgétés, puis préférences **locales** là où votre stratégie de routage permet — commandes verbatim reproduites pour écarter ambiguïtés.
+Cette page opérationnalise **`spec-doc` §11.4** : chaque drapeau et clé listés existent bien dans vos builds Asagiri et enchaîne estimation, optimisation des packs budgétés, puis préférences **locales** là où votre stratégie de routage permet — commandes verbatim reproduites pour écarter ambiguïtés.
 
 ## 1. Estimation par tâche
 
 ```bash
-agentflow estimate billing-v2 --task task-003 --dry-run
+asa estimate billing-v2 --task task-003 --dry-run
 ```
 
 Affiche entrées/sorties heuristiques + coût estimé suivant tableau `pricing`.
@@ -18,16 +18,16 @@ Affiche entrées/sorties heuristiques + coût estimé suivant tableau `pricing`.
 ## 2. Optimisation contextual
 
 ```bash
-agentflow context billing-v2 --task task-003 --optimize
+asa context billing-v2 --task task-003 --optimize
 ```
 
-Construire pack avant gros prompts. Désactiver avec `agentflow work ... --no-context-reduction`.
+Construire pack avant gros prompts. Désactiver avec `asa work ... --no-context-reduction`.
 
 ## 3. Lancer sous budget
 
 ```bash
-agentflow work "develop billing-v2" --budget 0.50 --estimate-only
-agentflow work "develop billing-v2" --budget 0.50
+asa work "develop billing-v2" --budget 0.50 --estimate-only
+asa work "develop billing-v2" --budget 0.50
 ```
 
 `budgets.per_run.max_estimated_cost` s’active quand `--budget` vaut zero. Bloque si surcharge sauf confirmations prompt adoptées **`--yes` après BudgetPending**, ou **`--allow-over-budget`** autorisée par policies config.
@@ -35,7 +35,7 @@ agentflow work "develop billing-v2" --budget 0.50
 ## 4. Priorité locale
 
 ```bash
-agentflow work "develop billing-v2" --prefer-local --no-cloud
+asa work "develop billing-v2" --prefer-local --no-cloud
 ```
 
 `--allow-cloud` ré‑admet cloud où restrictions le demandent.

@@ -5,7 +5,7 @@ description: "Werkzeuge des MCP-Servers, sobald mcp.enabled in der Konfiguration
 
 # MCP-Tools
 
-Wenn in der Konfiguration **`mcp.enabled`** gesetzt ist, registriert `mcp-serve` Werkzeuge, die auf dieselben Investigation- und Kontextpfade wie die CLI zurückgreifen. Konkrete Tool-Namen und JSON-Schemas werden hier nicht fest eingefroren — nach jedem Upgrade von AgentFlow sollten Clients **`tools/list`** aufrufen, um die aktuelle Oberfläche zu sehen.
+Wenn in der Konfiguration **`mcp.enabled`** gesetzt ist, registriert `mcp-serve` Werkzeuge, die auf dieselben Investigation- und Kontextpfade wie die CLI zurückgreifen. Konkrete Tool-Namen und JSON-Schemas werden hier nicht fest eingefroren — nach jedem Upgrade von Asagiri sollten Clients **`tools/list`** aufrufen, um die aktuelle Oberfläche zu sehen.
 
 ## Typische Fähigkeiten
 
@@ -32,13 +32,13 @@ Die Konfiguration entspricht den gleichen Leitplanken wie die CLI: globale `max_
 Server starten, MCP-Client per stdio anbinden, dann wie vom JSON-RPC-Protokoll erwartet `tools/list` senden.
 
 ```bash
-agentflow mcp-serve
+asa mcp-serve
 # Editor-MCP-Client verbindet sich über stdio und sendet z. B.:
 # {"jsonrpc":"2.0","id":1,"method":"tools/list"}
 ```
 
 <Callout type="experimental">
-Die Tool-Oberfläche bleibt bewusst klein und kann sich ändern — keine nicht dokumentierte Automation in Produktion ohne feste AgentFlow-Version pflegen.
+Die Tool-Oberfläche bleibt bewusst klein und kann sich ändern — keine nicht dokumentierte Automation in Produktion ohne feste Asagiri-Version pflegen.
 </Callout>
 
 ## Verwandtes

@@ -27,8 +27,8 @@ func TestCreateAndRemoveWorktree(t *testing.T) {
 	runGit(t, repo, "add", ".")
 	runGit(t, repo, "commit", "-m", "init")
 
-	basePath := filepath.Join(repo, ".agentflow", "worktrees")
-	mgr := New(repo, basePath, "agentflow", "", false)
+	basePath := filepath.Join(repo, ".asagiri", "worktrees")
+	mgr := New(repo, basePath, "asa", "", false)
 
 	path, _, err := mgr.Create(context.Background(), "feature-a", "task-001")
 	require.NoError(t, err)

@@ -5,8 +5,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/cli"
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/cli/docgen"
+	"github.com/LaProgrammerie/asagiri/application/internal/cli"
+	"github.com/LaProgrammerie/asagiri/application/internal/cli/docgen"
 )
 
 func TestCLICommandsDocumented(t *testing.T) {

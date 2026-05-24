@@ -5,7 +5,7 @@ description: Go-Module unter application/internal und Ausführungs-Pipeline.
 
 # Architektur-Übersicht
 
-AgentFlow ist eine Go-CLI (`application/cmd/agentflow`). Das meiste Verhalten liegt in `application/internal/`, gemeinsame Verträge in `application/pkg/agentflow`. Diese Aufteilung hält das Binary überschaubar und bündelt Parsing, Planung, Untersuchung, Kosten und Persistenz in Packages, deren Rolle Sie allein aus der Ordnerstruktur ableiten können.
+Asagiri ist eine Go-CLI (`application/cmd/asa`). Das meiste Verhalten liegt in `application/internal/`, gemeinsame Verträge in `application/pkg/asa`. Diese Aufteilung hält das Binary überschaubar und bündelt Parsing, Planung, Untersuchung, Kosten und Persistenz in Packages, deren Rolle Sie allein aus der Ordnerstruktur ableiten können.
 
 ## Ausführungs-Pipeline
 
@@ -51,11 +51,11 @@ flowchart TD
 
 ## Zustandsspeicher
 
-Runs und Tasks werden in **SQLite** unter `state.path` persistiert (Standard `.agentflow/state.sqlite`). Artefakte pro Run liegen unter `.agentflow/runs/<run-id>/`, sodass Prompts, Logs und Zwischenergebnisse ohne erneutes Auslesen der Datenbank auffindbar bleiben.
+Runs und Tasks werden in **SQLite** unter `state.path` persistiert (Standard `.asagiri/state.sqlite`). Artefakte pro Run liegen unter `.asagiri/runs/<run-id>/`, sodass Prompts, Logs und Zwischenergebnisse ohne erneutes Auslesen der Datenbank auffindbar bleiben.
 
 ## Erweiterungspunkte
 
-Sie können neue Agenten über die Konfiguration einbinden, Qualitätsgates über `validation.commands` verdrahten, Routing-Strategien unter `routing.strategies` ergänzen und — wenn `mcp.enabled: true` — optionale MCP-Tools bereitstellen. Das sind bewusste Nahtstellen: Die meisten Teams erweitern AgentFlow, ohne den Go-Einstieg zu forken.
+Sie können neue Agenten über die Konfiguration einbinden, Qualitätsgates über `validation.commands` verdrahten, Routing-Strategien unter `routing.strategies` ergänzen und — wenn `mcp.enabled: true` — optionale MCP-Tools bereitstellen. Das sind bewusste Nahtstellen: Die meisten Teams erweitern Asagiri, ohne den Go-Einstieg zu forken.
 
 ## Siehe auch
 

@@ -8,11 +8,11 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/config"
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/store/sqlite"
+	"github.com/LaProgrammerie/asagiri/application/internal/config"
+	"github.com/LaProgrammerie/asagiri/application/internal/store/sqlite"
 )
 
-const agentflowDir = ".agentflow"
+const runtimeDir = ".asagiri"
 
 var runtimeDirs = []string{"runs", "tasks", "logs", "worktrees"}
 
@@ -26,17 +26,17 @@ func GitRoot(startDir string) (string, error) {
 	return strings.TrimSpace(string(out)), nil
 }
 
-// Init bootstraps .agentflow/ in the Git repository containing startDir.
+// Init bootstraps .asagiri/ in the Git repository containing startDir.
 func Init(startDir string) error {
 	repoRoot, err := GitRoot(startDir)
 	if err != nil {
 		return err
 	}
 
-	base := filepath.Join(repoRoot, agentflowDir)
+	base := filepath.Join(repoRoot, runtimeDir)
 	for _, sub := range runtimeDirs {
 		if err := os.MkdirAll(filepath.Join(base, sub), 0o755); err != nil {
-			return fmt.Errorf("créer %s/%s: %w", agentflowDir, sub, err)
+			return fmt.Errorf("créer %s/%s: %w", runtimeDir, sub, err)
 		}
 	}
 
@@ -124,11 +124,11 @@ func Doctor(startDir string) ([]DoctorCheck, error) {
 	}
 
 	for _, sub := range runtimeDirs {
-		p := filepath.Join(repoRoot, agentflowDir, sub)
+		p := filepath.Join(repoRoot, runtimeDir, sub)
 		if _, err := os.Stat(p); err != nil {
 			checks = append(checks, DoctorCheck{
 				Name: "dir:" + sub,
-				Err:  fmt.Errorf("%s manquant — lancez agentflow init", filepath.Join(agentflowDir, sub)),
+				Err:  fmt.Errorf("%s manquant — lancez asa init", filepath.Join(runtimeDir, sub)),
 			})
 		}
 	}
@@ -153,7 +153,7 @@ func Doctor(startDir string) ([]DoctorCheck, error) {
 	if v < 1 {
 		checks = append(checks, DoctorCheck{
 			Name: "schema",
-			Err:  fmt.Errorf("schéma non migré (version %d) — lancez agentflow init", v),
+			Err:  fmt.Errorf("schéma non migré (version %d) — lancez asa init", v),
 		})
 		return checks, nil
 	}
@@ -178,7 +178,7 @@ func FormatDoctor(w io.Writer, checks []DoctorCheck) error {
 		}
 	}
 	if ok {
-		_, err := fmt.Fprintln(w, "AgentFlow est prêt.")
+		_, err := fmt.Fprintln(w, "Asagiri est prêt.")
 		return err
 	}
 	return fmt.Errorf("doctor: au moins un contrôle a échoué")

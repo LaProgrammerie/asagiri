@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/version"
+	"github.com/LaProgrammerie/asagiri/application/internal/version"
 	"github.com/stretchr/testify/require"
 )
 
@@ -29,7 +29,7 @@ func TestVersion(t *testing.T) {
 
 func TestVersionFormat(t *testing.T) {
 	got := version.String()
-	for _, line := range []string{"AgentFlow v", "commit: ", "built: "} {
+	for _, line := range []string{"Asagiri v", "commit: ", "built: "} {
 		require.Contains(t, got, line)
 	}
 }
@@ -51,7 +51,7 @@ func TestVersionCLIOutputStructure(t *testing.T) {
 	require.Len(t, lines, 3, "spec: three lines before trailing newline")
 
 	require.Equal(t, version.String(), body)
-	require.True(t, strings.HasPrefix(lines[0], "AgentFlow v"))
+	require.True(t, strings.HasPrefix(lines[0], "Asagiri v"))
 	require.True(t, strings.HasPrefix(lines[1], "commit: "))
 	require.True(t, strings.HasPrefix(lines[2], "built: "))
 }
@@ -70,8 +70,8 @@ func TestRootHelpShowsWorkflowExample(t *testing.T) {
 	out := buf.String()
 	for _, snippet := range []string{
 		"Exemple — développer une feature",
-		"agentflow init",
-		"agentflow plan billing-v2",
+		"asa init",
+		"asa plan billing-v2",
 		"--dry-run",
 	} {
 		if !bytes.Contains(buf.Bytes(), []byte(snippet)) {

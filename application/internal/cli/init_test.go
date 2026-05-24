@@ -26,12 +26,12 @@ func runGit(t *testing.T, dir string, args ...string) {
 
 func writeExampleConfig(t *testing.T, repo string) {
 	t.Helper()
-	af := filepath.Join(repo, ".agentflow")
+	af := filepath.Join(repo, ".asagiri")
 	if err := os.MkdirAll(af, 0o755); err != nil {
 		t.Fatal(err)
 	}
 	example := filepath.Join(af, "config.yaml.example")
-	src := filepath.Join("..", "..", "..", ".agentflow", "config.yaml.example")
+	src := filepath.Join("..", "..", "..", ".asagiri", "config.yaml.example")
 	data, err := os.ReadFile(src)
 	if err != nil {
 		// fallback minimal example
@@ -39,9 +39,9 @@ func writeExampleConfig(t *testing.T, repo string) {
   name: test
 state:
   backend: sqlite
-  path: .agentflow/state.sqlite
+  path: .asagiri/state.sqlite
 worktrees:
-  base_path: .agentflow/worktrees
+  base_path: .asagiri/worktrees
 `)
 	}
 	if err := os.WriteFile(example, data, 0o644); err != nil {
@@ -84,7 +84,7 @@ func TestInitAndDoubleInit(t *testing.T) {
 		t.Fatalf("first init: %v", err)
 	}
 
-	cfgPath := filepath.Join(dir, ".agentflow", "config.yaml")
+	cfgPath := filepath.Join(dir, ".asagiri", "config.yaml")
 	data, err := os.ReadFile(cfgPath)
 	if err != nil {
 		t.Fatal(err)
@@ -103,11 +103,11 @@ func TestInitAndDoubleInit(t *testing.T) {
 	}
 
 	for _, sub := range []string{"runs", "tasks", "logs", "worktrees"} {
-		if _, err := os.Stat(filepath.Join(dir, ".agentflow", sub)); err != nil {
+		if _, err := os.Stat(filepath.Join(dir, ".asagiri", sub)); err != nil {
 			t.Fatalf("missing %s: %v", sub, err)
 		}
 	}
-	if _, err := os.Stat(filepath.Join(dir, ".agentflow", "state.sqlite")); err != nil {
+	if _, err := os.Stat(filepath.Join(dir, ".asagiri", "state.sqlite")); err != nil {
 		t.Fatal("state.sqlite missing:", err)
 	}
 }

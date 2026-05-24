@@ -9,11 +9,11 @@ description: Deterministic orchestration, validation before trust, and honest li
 
 AI coding agents are powerful, but their outputs are not deterministic. Teams still need **repeatable** workflows: known steps, isolated branches, external validation, visible cost, and audit trails—not opaque runs where nobody can explain what happened or why.
 
-AgentFlow exists to make orchestration explicit. You configure the pipeline, the validation commands, and the economic guardrails; the tool coordinates execution and records what ran.
+Asagiri exists to make orchestration explicit. You configure the pipeline, the validation commands, and the economic guardrails; the tool coordinates execution and records what ran.
 
-## How AgentFlow approaches it
+## How Asagiri approaches it
 
-The default mental model is **spec → plan → implement → verify → review → report**. Each phase has a defined place in the state machine and in the reports under `.agentflow/runs/`.
+The default mental model is **spec → plan → implement → verify → review → report**. Each phase has a defined place in the state machine and in the reports under `.asagiri/runs/`.
 
 **Explicit state** means runs and tasks are backed by SQLite with a documented state machine. You can inspect status, resume, and correlate reports with run IDs instead of guessing from chat history.
 
@@ -23,14 +23,14 @@ The default mental model is **spec → plan → implement → verify → review 
 
 **Git worktree isolation** keeps one task on one branch and one working tree. Parallel work stays separated from your main checkout.
 
-**Validation by your commands** means `go test`, linters, and scripts you trust—not the agent claiming success. AgentFlow schedules those checks; it does not replace your test suite.
+**Validation by your commands** means `go test`, linters, and scripts you trust—not the agent claiming success. Asagiri schedules those checks; it does not replace your test suite.
 
 **Reproducible reports** capture markdown and JSON artifacts so operators and reviewers can audit a run days later.
 
 ## What we do not claim
 
 <Callout type="warning">
-AgentFlow does not guarantee correctness, security, or production readiness. It coordinates tools; humans and your test suite remain the authority.
+Asagiri does not guarantee correctness, security, or production readiness. It coordinates tools; humans and your test suite remain the authority.
 </Callout>
 
 ## Trade-offs worth understanding
@@ -42,7 +42,7 @@ AgentFlow does not guarantee correctness, security, or production readiness. It 
 | Worktree safety | Extra disk and git complexity |
 | Pluggable agents | You must install and configure each CLI |
 
-These trade-offs are intentional. AgentFlow favors **control and auditability** over the illusion of fully autonomous coding.
+These trade-offs are intentional. Asagiri favors **control and auditability** over the illusion of fully autonomous coding.
 
 ## Configuration levers
 

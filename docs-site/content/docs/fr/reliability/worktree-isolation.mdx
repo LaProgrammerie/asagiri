@@ -1,6 +1,6 @@
 ---
 title: Isolation par worktree
-description: Un worktree Git par tâche sous .agentflow/worktrees.
+description: Un worktree Git par tâche sous .asagiri/worktrees.
 ---
 
 # Isolation par worktree
@@ -11,15 +11,15 @@ La logique se trouve dans **`application/internal/worktree`**, activée lorsque 
 
 L’isolation reste prévisible :
 
-1. Pour chaque tâche AgentFlow crée un worktree sous `worktrees.base_path`
+1. Pour chaque tâche Asagiri crée un worktree sous `worktrees.base_path`
 2. Nom de branche `worktrees.branch_prefix` + id fonctionnalité/tâche
 3. Les sous-processus agents s’exécutent avec `WorkingDir` sur le chemin du worktree
-4. `agentflow clean` retire les worktrees selon `cleanup_policy`
+4. `asa clean` retire les worktrees selon `cleanup_policy`
 
 ```yaml
 worktrees:
-  base_path: .agentflow/worktrees
-  branch_prefix: agentflow
+  base_path: .asagiri/worktrees
+  branch_prefix: asa
   cleanup_policy: keep_failed   # keep_failed | always | ...
 ```
 

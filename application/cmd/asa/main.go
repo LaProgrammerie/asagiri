@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/cli"
+	"github.com/LaProgrammerie/asagiri/application/internal/cli"
 )
 
 func main() {

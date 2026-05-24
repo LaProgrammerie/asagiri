@@ -1,19 +1,19 @@
 ---
 title: Agenten-Übersicht
-description: Externe Coding-Agenten, die AgentFlow als Subprozesse aufruft.
+description: Externe Coding-Agenten, die Asagiri als Subprozesse aufruft.
 ---
 
 # Agenten-Übersicht
 
-AgentFlow ist eine Orchestratorschicht: Es werden keine Modellgewichte mitgeliefert und kein Hersteller-Zugang „aus der Box“. Sie deklarieren **externe CLIs** unter `agents:`; Routing, Standardwerte in `work` oder Befehlszeilen-Flags entscheiden, welches Executable für einen Schritt startet.
+Asagiri ist eine Orchestratorschicht: Es werden keine Modellgewichte mitgeliefert und kein Hersteller-Zugang „aus der Box“. Sie deklarieren **externe CLIs** unter `agents:`; Routing, Standardwerte in `work` oder Befehlszeilen-Flags entscheiden, welches Executable für einen Schritt startet.
 
 ## Unterstützte Muster
 
-Die Tabelle zeigt gängige logische IDs. Welches Binary tatsächlich läuft (`codex`, `cursor-agent`, Wrapper …) und welche statischen Argumente gesetzt werden, steht ausschließlich in **Ihrer** `config.yaml`. AgentFlow startet `command` ohne Shell mit optionalem `argv` und leitet Streams über den bestehenden Redaktionspfad für Geheimnisse.
+Die Tabelle zeigt gängige logische IDs. Welches Binary tatsächlich läuft (`codex`, `cursor-agent`, Wrapper …) und welche statischen Argumente gesetzt werden, steht ausschließlich in **Ihrer** `config.yaml`. Asagiri startet `command` ohne Shell mit optionalem `argv` und leitet Streams über den bestehenden Redaktionspfad für Geheimnisse.
 
 | Agent-ID (Beispiel) | Typische Rolle |
 | --- | --- |
-| `kiro` | Verfassen strukturierter Specs (`agentflow spec`) |
+| `kiro` | Verfassen strukturierter Specs (`asa spec`) |
 | `cursor` | Umsetzung (`dev`, häufiger Standard für `work`) |
 | `codex` / `claude` | Review oder intensiveres Reasoning |
 | `ollama` | Lokales Anreichern, Klassifikation, günstiges Pre-Review |
@@ -27,10 +27,10 @@ Die Exec-Schicht arbeitet ohne Shell-Interpolation und nur mit explizitem `argv`
 Wechseln Sie die Agent-ID pro Subbefehl, wenn sich die passende Werkbank zwischen Spezifikation, Implementierung und Review unterscheidet.
 
 ```bash
-agentflow spec feat --agent kiro
-agentflow enrich feat --agent ollama
-agentflow dev feat --agent cursor
-agentflow review feat --agent codex
+asa spec feat --agent kiro
+asa enrich feat --agent ollama
+asa dev feat --agent cursor
+asa review feat --agent codex
 ```
 
 ## Siehe auch

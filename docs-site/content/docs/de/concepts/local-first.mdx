@@ -9,12 +9,12 @@ description: Lokal untersuchen und Kontext verengen, bevor Cloud-Modelle aufgeru
 
 Ein ganzes Repository durch ein Cloud-Modell zu schicken ist langsam, teuer und gibt oft mehr Code preis als die Aufgabe erfordert. Viele technische Fragen werden kleiner, sobald Sie den Baum durchsuchen, Kandidatendateien listen und strukturiert packen — Arbeit, die auf Ihrer Maschine mit gewöhnlichen Tools hingehört, nicht in einem Remote-Prompt.
 
-## AgentFlows Ansatz
+## Asagiris Ansatz
 
-**Lokale Untersuchung und Kontextreduktion** sind ein erstklassiger Schritt vor den teuren Phasen. AgentFlow kann vorher eingrenzen, was das Repository verlässt:
+**Lokale Untersuchung und Kontextreduktion** sind ein erstklassiger Schritt vor den teuren Phasen. Asagiri kann vorher eingrenzen, was das Repository verlässt:
 
-1. **`agentflow investigate <feature>`** — begrenztes Grep, Kandidatendateien, Warnungen bei großen Dateien, zugehörige Tests
-2. **`agentflow context <feature> --optimize`** — Kontext sammeln, bewerten, in ein Pack verdichten
+1. **`asa investigate <feature>`** — begrenztes Grep, Kandidatendateien, Warnungen bei großen Dateien, zugehörige Tests
+2. **`asa context <feature> --optimize`** — Kontext sammeln, bewerten, in ein Pack verdichten
 3. **Routing** — Ollama oder lokale Profile für `summarize`, `classify`, `pre_review` und `context_selection`, wenn `routing.strategies.cost_aware` greift
 
 Praktisch verläuft das linear: Nutzerintent → Untersuchung → Kontext-Pack → Routing wählt lokal oder Cloud → beide Pfade laufen in die Validierung.
@@ -35,9 +35,9 @@ flowchart LR
 Untersuchung und Kontextoptimierung für ein Feature, dann Vorschau von `work` mit lokaler Präferenz und nur Schätzung:
 
 ```bash
-agentflow investigate billing-v2 --task task-003
-agentflow context billing-v2 --task task-003 --optimize
-agentflow work "develop billing-v2" --prefer-local --estimate-only
+asa investigate billing-v2 --task task-003
+asa context billing-v2 --task task-003 --optimize
+asa work "develop billing-v2" --prefer-local --estimate-only
 ```
 
 ## Abwägungen

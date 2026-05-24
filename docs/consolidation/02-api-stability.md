@@ -23,9 +23,9 @@ Flags `work` V3 documentés dans README ; pas de breaking change observé sur in
 | Investigation | `investigation` | pipeline, mcp |
 | TUI | `tui` | cli display uniquement |
 
-**Règle respectée :** `pkg/agentflow` = types stables ; `internal/*` non importable hors module.
+**Règle respectée :** `pkg/asagiri` = types stables ; `internal/*` non importable hors module.
 
-## `pkg/agentflow`
+## `pkg/asagiri`
 
 - Types tâches / statuts alignés spec §8.
 - Pas d’API runtime exportée (volontaire).
@@ -33,7 +33,7 @@ Flags `work` V3 documentés dans README ; pas de breaking change observé sur in
 ## Incohérences mineures (non bloquantes)
 
 - `context.go` renommé en `app_context.go` / `context_cmd.go` (clarification) — OK.
-- Nom module Go `hyper-fast-builder` vs branding **AgentFlow** — documenté README ; renommage module = breaking (post-OSS).
+- Nom module Go `asagiri` vs branding **Asagiri** — documenté README ; renommage module = breaking (phase 2, ADR-016).
 
 ## Actions
 

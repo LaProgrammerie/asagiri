@@ -5,7 +5,7 @@ description: Modules Go sous application/internal et pipeline d'exécution.
 
 # Vue d'ensemble de l'architecture
 
-AgentFlow est une CLI Go (`application/cmd/agentflow`) dont la majeure partie du comportement vit dans `application/internal/` et les contrats partagés dans `application/pkg/agentflow`. Cette séparation garde le binaire fin tout en isolant parsing, planification, investigation, coût et stockage derrière des packages explicites que vous pouvez raisonner depuis la seule arborescence.
+Asagiri est une CLI Go (`application/cmd/asa`) dont la majeure partie du comportement vit dans `application/internal/` et les contrats partagés dans `application/pkg/asa`. Cette séparation garde le binaire fin tout en isolant parsing, planification, investigation, coût et stockage derrière des packages explicites que vous pouvez raisonner depuis la seule arborescence.
 
 ## Pipeline d'exécution
 
@@ -51,11 +51,11 @@ flowchart TD
 
 ## Stockage d'état
 
-Runs et tâches persistent dans **SQLite** à `state.path` (défaut `.agentflow/state.sqlite`). Les artefacts de chaque run vont sous `.agentflow/runs/<run-id>/`, ce qui garde prompts, logs et sorties intermédiaires adressables sans relire la base.
+Runs et tâches persistent dans **SQLite** à `state.path` (défaut `.asagiri/state.sqlite`). Les artefacts de chaque run vont sous `.asagiri/runs/<run-id>/`, ce qui garde prompts, logs et sorties intermédiaires adressables sans relire la base.
 
 ## Points d'extension
 
-Nouveaux agents via la config seule ; nouvelles portes qualité via `validation.commands` ; stratégies de routage sous `routing.strategies` ; outils MCP optionnels quand `mcp.enabled: true`. Ce sont des coutures intentionnelles : la plupart des équipes étendent AgentFlow sans forker le point d'entrée Go.
+Nouveaux agents via la config seule ; nouvelles portes qualité via `validation.commands` ; stratégies de routage sous `routing.strategies` ; outils MCP optionnels quand `mcp.enabled: true`. Ce sont des coutures intentionnelles : la plupart des équipes étendent Asagiri sans forker le point d'entrée Go.
 
 ## Voir aussi
 

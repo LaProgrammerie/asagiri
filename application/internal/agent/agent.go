@@ -30,7 +30,7 @@ type RunResult struct {
 	EndedAt   string
 }
 
-// Agent is the stable contract used by AgentFlow.
+// Agent is the stable contract used by Asagiri.
 type Agent interface {
 	Name() string
 	Capabilities() Capabilities

@@ -1,9 +1,9 @@
 GO ?= go
 GOLANGCI_LINT ?= golangci-lint
-BINARY := agentflow
-CMD := ./application/cmd/agentflow
+BINARY := asa
+CMD := ./application/cmd/asa
 BIN_DIR := bin
-VERSION_PKG := github.com/LaProgrammerie/hyper-fast-builder/application/internal/version
+VERSION_PKG := github.com/LaProgrammerie/asagiri/application/internal/version
 RELEASE_VERSION ?= dev
 RELEASE_COMMIT ?= $(shell git rev-parse --short HEAD 2>/dev/null || echo unknown)
 RELEASE_DATE ?= $(shell date -u +"%Y-%m-%dT%H:%M:%SZ" 2>/dev/null || echo unknown)
@@ -17,7 +17,7 @@ COMPOSE := docker compose -f infrastructure/docker/docker-compose.yml
 .PHONY: help build run test lint fmt vet clean dev docker-up docker-down benchmark release-snapshot release-check
 
 benchmark: build ## Benchmark dry-run (estimate + work plan-only)
-	@AGENTFLOW_DRY_RUN=1 ./scripts/benchmark-workflow.sh
+	@ASA_DRY_RUN=1 ./scripts/benchmark-workflow.sh
 
 help: ## Affiche les cibles disponibles
 	@grep -E '^[a-zA-Z0-9_.-]+:.*##' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*## "}; {printf "  %-16s %s\n", $$1, $$2}'
@@ -26,7 +26,7 @@ build: ## Compile le binaire dans bin/
 	@mkdir -p $(BIN_DIR)
 	$(GO) build $(LDFLAGS) -o $(BIN_DIR)/$(BINARY) $(CMD)
 
-run: build ## Lance agentflow (ARGS=...)
+run: build ## Lance asa (ARGS=...)
 	$(BIN_DIR)/$(BINARY) $(ARGS)
 
 test: ## Lance les tests

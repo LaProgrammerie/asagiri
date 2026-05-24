@@ -1,7 +1,7 @@
 package intent
 
 import (
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/config"
+	"github.com/LaProgrammerie/asagiri/application/internal/config"
 )
 
 // IntentAction classifies user intent (specv2 §5).
@@ -118,7 +118,7 @@ type WorkOptions struct {
 	BudgetMajor     float64
 }
 
-// NextRecommendation is output for agentflow next.
+// NextRecommendation is output for asa next.
 type NextRecommendation struct {
 	Feature   string
 	TaskID    string

@@ -5,7 +5,7 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/investigation"
+	"github.com/LaProgrammerie/asagiri/application/internal/investigation"
 	"github.com/spf13/cobra"
 )
 

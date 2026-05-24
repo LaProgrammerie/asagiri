@@ -5,7 +5,7 @@ description: Rétablissement après une vérification, revue ratée ou exécutio
 
 # Récupération après échec
 
-AgentFlow matérialise des états de tâches explicites plutôt qu’imaginer progression à partir fichiers perdus récupération propre exige suivre ces transitions ou utiliser surcharges orchestrateur (`--force`, helpers resume) où supporté.
+Asagiri matérialise des états de tâches explicites plutôt qu’imaginer progression à partir fichiers perdus récupération propre exige suivre ces transitions ou utiliser surcharges orchestrateur (`--force`, helpers resume) où supporté.
 
 ## Machine à états
 
@@ -36,31 +36,31 @@ Transitions hors graphe erreur sauf commandes précises autorisées `--force`.
 
 ```bash
 # corriger code dans worktree ensuite:
-agentflow verify billing-v2 --force
+asa verify billing-v2 --force
 ```
 
 ### Échec review
 
 ```bash
-agentflow review billing-v2 --agent codex --force
+asa review billing-v2 --agent codex --force
 ```
 
 ### Exécution interrompue
 
 ```bash
-agentflow status
-agentflow resume <run-id>          # affiche prochain étape possible plan|enrich|dev...
-agentflow continue "resume billing-v2"   # continuation intentionnelle
+asa status
+asa resume <run-id>          # affiche prochain étape possible plan|enrich|dev...
+asa continue "resume billing-v2"   # continuation intentionnelle
 ```
 
 <Callout type="experimental">
-`agentflow resume <run-id> --execute` enchaîne sous global **`dry-run`** seulement — hors celui-ci aucune relance automatique agents : exécutez manuellement imprimées ou passez via `continue`.
+`asa resume <run-id> --execute` enchaîne sous global **`dry-run`** seulement — hors celui-ci aucune relance automatique agents : exécutez manuellement imprimées ou passez via `continue`.
 </Callout>
 
 ### Nettoyage worktrees
 
 ```bash
-agentflow clean
+asa clean
 ```
 
 Supprime suivant policy `cleanup_policy` (`keep_failed` conserve arbres erreur).
@@ -70,8 +70,8 @@ Supprime suivant policy `cleanup_policy` (`keep_failed` conserve arbres erreur).
 Pour relire pistes après coup ou aligner timelines reviews combinez rapport ID + investigative scans:
 
 ```bash
-agentflow report <run-id>
-agentflow investigate billing-v2
+asa report <run-id>
+asa investigate billing-v2
 ```
 
 ## Voir aussi

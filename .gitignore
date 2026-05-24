@@ -12,12 +12,12 @@ coverage.out
 *.test
 *.out
 
-# AgentFlow runtime (local)
-.agentflow/state.sqlite
-.agentflow/worktrees/
-.agentflow/runs/
-.agentflow/logs/
-!.agentflow/config.yaml.example
+# Asagiri runtime (local)
+.asagiri/state.sqlite
+.asagiri/worktrees/
+.asagiri/runs/
+.asagiri/logs/
+!.asagiri/config.yaml.example
 
 # Cursor local pointer to template repository (not versioned)
 .cursor/template-sync.env

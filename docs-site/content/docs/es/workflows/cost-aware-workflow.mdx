@@ -10,7 +10,7 @@ Aquí **`spec-doc` §11.4** tiene equivalente ejecutable cada flag existe en bui
 ## 1 Estimar tarea puntual
 
 ```bash
-agentflow estimate billing-v2 --task task-003 --dry-run
+asa estimate billing-v2 --task task-003 --dry-run
 ```
 
 Muestra heurísticas IO tokens + cost estimado usando su `pricing`.
@@ -18,7 +18,7 @@ Muestra heurísticas IO tokens + cost estimado usando su `pricing`.
 ## 2 Optimizar paquete contexto
 
 ```bash
-agentflow context billing-v2 --task task-003 --optimize
+asa context billing-v2 --task task-003 --optimize
 ```
 
 Construye packs reducidos antes prompts enormes puede desactivar `work ... --no-context-reduction`.
@@ -26,8 +26,8 @@ Construye packs reducidos antes prompts enormes puede desactivar `work ... --no-
 ## 3 Correr dentro presupuesto
 
 ```bash
-agentflow work "develop billing-v2" --budget 0.50 --estimate-only
-agentflow work "develop billing-v2" --budget 0.50
+asa work "develop billing-v2" --budget 0.50 --estimate-only
+asa work "develop billing-v2" --budget 0.50
 ```
 
 YAML `budgets.per_run.max_estimated_cost` actúa con `--budget` cero Sobrecoste bloqueando salvo consenso usuario (`--yes` tras pendiente Budget) ó `--allow-over-budget` permisible tras policy.
@@ -35,7 +35,7 @@ YAML `budgets.per_run.max_estimated_cost` actúa con `--budget` cero Sobrecoste 
 ## 4 Preferir localmente
 
 ```bash
-agentflow work "develop billing-v2" --prefer-local --no-cloud
+asa work "develop billing-v2" --prefer-local --no-cloud
 ```
 
 Combine `--allow-cloud` si estrategía exige reaperturas cloud conscientes.

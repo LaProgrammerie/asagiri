@@ -9,11 +9,11 @@ description: Deterministische Orchestrierung, Validierung vor Vertrauen, ehrlich
 
 KI-Coding-Agenten sind leistungsfähig; ihre Ausgaben sind probabilistisch und nicht garantiert wiederholbar. Teams brauchen dennoch **nachvollziehbare** Abläufe: klare Schritte, isolierte Branches, externe Validierung, sichtbare Kosten und prüfbare Spuren — statt Läufen, bei denen nachträglich kaum erklärbar ist, was geschah und warum.
 
-AgentFlow macht Orchestrierung **explizit**: Sie beschreiben Pipeline, Validierungsbefehle und wirtschaftliche Leitplanken; das Werkzeug koordiniert die Ausführung und dokumentiert sie.
+Asagiri macht Orchestrierung **explizit**: Sie beschreiben Pipeline, Validierungsbefehle und wirtschaftliche Leitplanken; das Werkzeug koordiniert die Ausführung und dokumentiert sie.
 
-## Wie AgentFlow das angeht
+## Wie Asagiri das angeht
 
-Die Leitmentalität ist **Spec → Plan → Implement → Verify → Review → Report**. Jede Phase hat einen festen Platz in der State Machine und in den Reports unter `.agentflow/runs/`.
+Die Leitmentalität ist **Spec → Plan → Implement → Verify → Review → Report**. Jede Phase hat einen festen Platz in der State Machine und in den Reports unter `.asagiri/runs/`.
 
 **Expliziter Zustand:** Läufe und Tasks werden in SQLite mit dokumentierten Übergängen geführt. Status abfragen, fortsetzen und Reports über Run-IDs zuordnen — ohne Chat-Verlauf zu rekonstruieren.
 
@@ -23,14 +23,14 @@ Die Leitmentalität ist **Spec → Plan → Implement → Verify → Review → 
 
 **Git-Worktree-Isolation:** Jede Aufgabe auf eigenem Branch und eigenem Arbeitsbaum. Parallel laufende Themen kollidieren seltener im gemeinsamen Checkout.
 
-**Validierung durch Ihre Befehle:** `go test`, Linter und Skripte, denen Sie vertrauen — nicht die Selbsteinschätzung des Modells. AgentFlow plant diese Prüfungen; sie ersetzen Ihre Testsuite nicht.
+**Validierung durch Ihre Befehle:** `go test`, Linter und Skripte, denen Sie vertrauen — nicht die Selbsteinschätzung des Modells. Asagiri plant diese Prüfungen; sie ersetzen Ihre Testsuite nicht.
 
 **Reproduzierbare Reports:** Markdown und JSON-Artefakte, damit Betrieb und Review einen Lauf auch Tage später nachvollziehen können.
 
 ## Was wir nicht behaupten
 
 <Callout type="warning">
-AgentFlow garantiert weder Korrektheit noch Sicherheit noch Produktionsreife eines Patches. Es verbindet Werkzeuge; Menschen und Ihre Testsuite bleiben die Instanz für die Bewertung der Änderung.
+Asagiri garantiert weder Korrektheit noch Sicherheit noch Produktionsreife eines Patches. Es verbindet Werkzeuge; Menschen und Ihre Testsuite bleiben die Instanz für die Bewertung der Änderung.
 </Callout>
 
 ## Bewusste Kompromisse
@@ -42,7 +42,7 @@ AgentFlow garantiert weder Korrektheit noch Sicherheit noch Produktionsreife ein
 | Schutz durch Worktrees | Mehr Speicher und etwas mehr Git-Verwaltung |
 | Auswechselbare Agents | Jedes CLI muss installiert, gewartet und policykonform sein |
 
-AgentFlow setzt auf **Steuerbarkeit und Prüfbarkeit** statt auf die Illusion vollständig autonomer Codierung.
+Asagiri setzt auf **Steuerbarkeit und Prüfbarkeit** statt auf die Illusion vollständig autonomer Codierung.
 
 ## Wichtige Konfigurationshebel
 

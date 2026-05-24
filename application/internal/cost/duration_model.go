@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/config"
+	"github.com/LaProgrammerie/asagiri/application/internal/config"
 )
 
 // RunHistory feeds duration modeling from prior executions.
