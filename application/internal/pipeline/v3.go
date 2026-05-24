@@ -93,7 +93,7 @@ func RunV3Pipeline(ctx context.Context, app App, resolved intent.ResolvedIntent,
 	}
 	out.Investigation = inv
 
-	entries, err := contextopt.Collect(app.RepoRoot, resolved.Feature, app.Config, contextopt.CollectOpts{})
+	entries, err := contextopt.CollectForPipeline(app.RepoRoot, resolved.Feature, app.Config, contextopt.CollectOpts{}, inv.CandidateFiles)
 	if err != nil {
 		return out, err
 	}

@@ -518,6 +518,21 @@ func (c *Config) Validate(repoRoot string) error {
 		}
 	}
 
+	if c.MCP.Enabled {
+		if c.MCP.MaxOutputBytes <= 0 {
+			return fmt.Errorf("mcp.max_output_bytes: doit être > 0 quand mcp.enabled")
+		}
+		if c.MCP.CommandTimeoutSec <= 0 {
+			return fmt.Errorf("mcp.command_timeout_seconds: doit être > 0 quand mcp.enabled")
+		}
+		if c.MCP.Investigation.CommandTimeoutSec <= 0 {
+			return fmt.Errorf("mcp.investigation.command_timeout_seconds: doit être > 0 quand mcp.enabled")
+		}
+	}
+	if c.MCP.MaxOutputBytes < 0 {
+		return fmt.Errorf("mcp.max_output_bytes: valeur négative")
+	}
+
 	return nil
 }
 

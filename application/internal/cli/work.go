@@ -3,7 +3,6 @@ package cli
 import (
 	"context"
 	"errors"
-	"fmt"
 	"os"
 	"time"
 
@@ -155,7 +154,7 @@ func newWorkCmd(dryRun *bool) *cobra.Command {
 			}
 
 			intent.PrintWorkReport(cmd.OutOrStdout(), resolved, plan, v3res.Exec)
-			fmt.Fprintf(cmd.OutOrStdout(), "Instruction: %s\n", instruction)
+			printWorkSummary(cmd.OutOrStdout(), instruction, v3res.Estimate, v3res.Exec)
 			return nil
 		},
 	}

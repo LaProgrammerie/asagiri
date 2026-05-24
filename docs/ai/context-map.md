@@ -6,6 +6,7 @@ Complements `AGENTS.md`: **where things live**, **who consumes what**, and **how
 
 | Topic | Where it lives |
 |-------|----------------|
+| **AgentFlow consolidation (OSS / fiabilisation)** | `spec-postv123.md`, `docs/consolidation/` |
 | **AgentFlow spec courante (cost/perf)** | `specv3.md` (repo root) |
 | **AgentFlow intent layer** | `specv2.md` (repo root) |
 | **AgentFlow V1 spec (historique)** | `spec.md` (repo root) |

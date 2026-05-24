@@ -1,32 +1,36 @@
-# Current spec — AgentFlow specv3
+# Current spec — AgentFlow consolidation (post-V3)
 
-**Phase :** `agentflow-specv3` (Cost, Performance & Token Optimization)  
+**Phase :** `spec-postv123` (consolidation, fiabilisation, OSS)  
 **Date :** 2026-05-17
 
 ## Résumé
 
-Couche cost/performance au-dessus de V1 + V2 : estimation locale tokens/coût/temps, investigation repo, optimisation contexte, budgets, métriques SQLite, TUI (rich/plain/json), MCP local.
+Phase de **consolidation** après livraison V3 : cohérence architecture, sécurité, performance, tests, explainability, documentation OSS. Pas d’extension fonctionnelle majeure.
 
 ## Critères de phase
 
 | Domaine | Statut |
 |---------|--------|
-| §4–7 Estimation / pricing / budget / durée | Livré |
-| §8–9 Context opt + investigation | Livré |
-| §10 MCP local (stdio, tools §10.2) | Livré (`mcp.enabled: false` par défaut) |
-| §11 Routing cost-aware | Livré (heuristique) |
-| §12 Extension `work` + flags V3 | Livré |
-| §13 TUI (lipgloss + fallback) | Livré |
-| §14–15 Métriques + rapport Cost & Performance | Livré |
-| §16 Commandes estimate/investigate/context/cost/inspect/mcp | Livré |
-| §17 Critères d'acceptation | Livré + tests |
+| Audit architecture & drift | Livré (`docs/consolidation/01-*`) |
+| API / primitives | Documenté (`02-*`) |
+| Sécurité & fiabilité | Audit + garde-fous MCP/redact/collecte |
+| Performance / coût | Quick win double-scan + benchmark |
+| Workflows agents | Matrice manuelle (`05-*`) |
+| Qualité | Tests ajoutés ; workflow/intent <50 % → roadmap |
+| UX CLI explainability | estimate + work résumé |
+| OSS readiness | Score 74/100 (`08-*`) |
 
 ## Specs
 
-- **Courante :** [`specv3.md`](../../../specv3.md)
-- **Intent layer :** [`specv2.md`](../../../specv2.md)
+- **Mission courante :** [`spec-postv123.md`](../../../spec-postv123.md)
+- **V3 cost/perf :** [`specv3.md`](../../../specv3.md)
+- **Intent :** [`specv2.md`](../../../specv2.md)
 - **V1 :** [`spec.md`](../../../spec.md)
 
 ## Handoff actif
 
 [`handoff.md`](handoff.md)
+
+## Scores consolidation
+
+Voir [`docs/consolidation/README.md`](../../consolidation/README.md) : OSS **74/100**, fiabilité **71/100**.

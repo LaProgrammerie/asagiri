@@ -1,9 +1,18 @@
 # AgentFlow (hyper-fast-builder)
 
-Orchestrateur CLI local en Go pour workflows de développement agentique (specs, worktrees, agents, validations).
+Orchestrateur CLI **local-first** et **cost-aware** pour workflows de développement agentique : specs, worktrees, agents, validations — de façon déterministe et observable.
 
-Spécification courante : [`specv3.md`](specv3.md) (cost/perf) ; intent layer : [`specv2.md`](specv2.md) ; V1 : [`spec.md`](spec.md).  
-Contexte agents et canon : [`AGENTS.md`](AGENTS.md), [`docs/ai/`](docs/ai/).
+**Philosophie :** les scans et l’investigation restent locaux ; les modèles cloud sont réservés aux étapes à forte valeur (spec, dev, review). AgentFlow estime tokens/coût **avant** exécution et explique le choix des tiers dans le terminal.
+
+| Spec | Rôle |
+|------|------|
+| [`spec-postv123.md`](spec-postv123.md) | Consolidation & OSS (mission courante) |
+| [`specv3.md`](specv3.md) | Cost / perf / MCP |
+| [`specv2.md`](specv2.md) | Intent layer |
+| [`spec.md`](spec.md) | Primitives V1 |
+
+Docs agents : [`AGENTS.md`](AGENTS.md), [`docs/ai/`](docs/ai/), audits : [`docs/consolidation/`](docs/consolidation/).  
+Roadmap : [`ROADMAP.md`](ROADMAP.md) · Contribuer : [`CONTRIBUTING.md`](CONTRIBUTING.md)
 
 ## Prérequis
 
@@ -17,9 +26,13 @@ Contexte agents et canon : [`AGENTS.md`](AGENTS.md), [`docs/ai/`](docs/ai/).
 ```bash
 go mod download
 make build
+export AGENTFLOW_DRY_RUN=1   # optionnel : sans binaires kiro/cursor
 ./bin/agentflow init
 ./bin/agentflow doctor
+./bin/agentflow work "développe ma-feature" --dry-run --plan-only --yes
 ```
+
+Benchmark dry-run : `make benchmark` · Exemple détaillé : [`examples/quickstart/`](examples/quickstart/).
 
 ## Commandes intention (specv2)
 

@@ -50,6 +50,22 @@ func TestLoadInvalidYAML(t *testing.T) {
 	}
 }
 
+func TestValidateMCPWhenEnabled(t *testing.T) {
+	dir := t.TempDir()
+	cfg := NewTestConfig("x")
+	cfg.MCP.Enabled = true
+	cfg.MCP.MaxOutputBytes = 0
+	if err := cfg.Validate(dir); err == nil {
+		t.Fatal("expected mcp validation error")
+	}
+	cfg.MCP.MaxOutputBytes = 1024
+	cfg.MCP.CommandTimeoutSec = 30
+	cfg.MCP.Investigation.CommandTimeoutSec = 30
+	if err := cfg.Validate(dir); err != nil {
+		t.Fatal(err)
+	}
+}
+
 func TestValidateAbsolutePathRejected(t *testing.T) {
 	dir := t.TempDir()
 	cfg := &Config{

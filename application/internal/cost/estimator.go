@@ -10,6 +10,7 @@ import (
 	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/contextopt"
 	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/investigation"
 	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/intent"
+	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/routing"
 )
 
 // BuildOpts tunes estimation without importing pipeline.
@@ -75,6 +76,17 @@ func BuildEstimate(ctx context.Context, plan intent.ExecutionPlan, inv investiga
 
 	for _, s := range plan.Steps {
 		step := estimatedFromPlanStep(s, cfg, agent, reviewer, enricher, sharedContext, outSplit)
+		if stepUsesCloudModel(s.Command) {
+			rd := routing.Route(cfg, s.Command, false, false, true)
+			if step.Reason == "" {
+				step.Reason = rd.Reason
+			} else {
+				step.Reason = step.Reason + "; routing=" + rd.Reason
+			}
+			if rd.Agent != "" && step.Agent == agent {
+				step.Agent = rd.Agent
+			}
+		}
 		hist := RunHistory{}
 		if defDM.Reader != nil {
 			hist.RecentDurations = defDM.Reader.DurationsFor(step.Name, step.Model, 8)

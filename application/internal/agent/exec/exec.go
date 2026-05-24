@@ -12,6 +12,7 @@ import (
 
 	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/agent"
 	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/config"
+	"github.com/LaProgrammerie/hyper-fast-builder/application/internal/redact"
 )
 
 // Executor runs one configured agent command as a subprocess.
@@ -90,8 +91,8 @@ func (e *Executor) Run(ctx context.Context, req agent.RunRequest) (agent.RunResu
 	result := agent.RunResult{
 		Command:   cmdLine,
 		ExitCode:  0,
-		Stdout:    stdoutBuf.String(),
-		Stderr:    stderrBuf.String(),
+		Stdout:    redact.String(stdoutBuf.String()),
+		Stderr:    redact.String(stderrBuf.String()),
 		DryRun:    false,
 		StartedAt: started.Format(time.RFC3339Nano),
 		EndedAt:   ended.Format(time.RFC3339Nano),

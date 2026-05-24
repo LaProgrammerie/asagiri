@@ -7,7 +7,10 @@ RELEASE_VERSION ?= dev
 LDFLAGS := -ldflags "-X github.com/LaProgrammerie/hyper-fast-builder/application/internal/version.Version=$(RELEASE_VERSION)"
 COMPOSE := docker compose -f infrastructure/docker/docker-compose.yml
 
-.PHONY: help build run test lint fmt vet clean dev docker-up docker-down
+.PHONY: help build run test lint fmt vet clean dev docker-up docker-down benchmark
+
+benchmark: build ## Benchmark dry-run (estimate + work plan-only)
+	@AGENTFLOW_DRY_RUN=1 ./scripts/benchmark-workflow.sh
 
 help: ## Affiche les cibles disponibles
 	@grep -E '^[a-zA-Z0-9_.-]+:.*##' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*## "}; {printf "  %-16s %s\n", $$1, $$2}'

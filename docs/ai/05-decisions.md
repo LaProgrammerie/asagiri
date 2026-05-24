@@ -18,6 +18,7 @@ Suggested format per entry:
 | ADR-008 | 2026-05-17 | **State machine** explicite dans `workflow/state_machine.go` ; `--force` ; `resume --execute` dry-run | spec §12 | Reprise hors dry-run = diagnostic uniquement |
 | ADR-009 | 2026-05-17 | **Intent Layer** (`internal/intent`) : resolver hybride + planner composant les primitives V1 ; sources via `internal/source` ; repo = vérité exécutable | specv2 §3–6 | Notion jamais exécuté sans sync local ; `NOTION_TOKEN` via env |
 | ADR-010 | 2026-05-17 | **V3 cost/perf** : packages `cost`, `contextopt`, `investigation`, `telemetry`, `tui` ; pipeline `RunV3Pipeline` ; prix **uniquement** via `pricing.models` (pas de hardcode) ; MCP stdio désactivé par défaut ; TUI isolée (`internal/tui`) | specv3 | Migration SQLite `run_metrics` / `step_metrics` ; `work --estimate-only` |
+| ADR-011 | 2026-05-17 | **Consolidation post-V3** : spec active `spec-postv123.md` ; collecte contexte via candidats investigation (`CollectForPipeline`) ; LICENSE **Apache 2.0** LaProgrammerie ; explainability dans sorties estimate/work ; package `redact` | Ouverture OSS, réduction I/O et dette | Audits `docs/consolidation/` ; pas de breaking CLI V1–V3 |
 
 ## Log
 
