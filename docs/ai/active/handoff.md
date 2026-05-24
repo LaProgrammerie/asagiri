@@ -1,69 +1,40 @@
 # Handoff — execution
 
-> **Prescriptive contract** for Cursor / Copilot / implementation. Derived from tasks / design under `.kiro/specs/`.  
-> Any action outside **allowed scope** or outside **files to change** is **out of contract** — update the spec and this file before expanding.  
-> See `docs/ai/context-map.md`.
+> **Prescriptive contract** for Cursor / Copilot / implementation.  
+> **Tranche `agentflow-spec-7-12` : en cours** (`2026-05-17`).
 
 ## Immediate objective
 
-*(One sentence: single deliverable for this session / iteration.)*
+Aligner code, tests, config et `docs/ai/` sur **spec.md §7–12** sans casser la V1 CLI §6.1.
 
-## Allowed scope
+## Allowed scope (agentflow-spec-7-12)
 
-- **In:** *(what must be done now)*
-- **Explicitly out:** *(what must not be touched or “improved” on initiative)*
+- `application/internal/config`, `workflow`, `agent`, `store/sqlite`, `validation`, `policy`, `rag`
+- `application/pkg/agentflow/types.go`
+- `application/internal/cli/` (+ commande `index`)
+- `.agentflow/config.yaml.example`
+- `docs/ai/` (handoff, current-spec, 02, 03, 05)
+- `README.md` (sections AgentFlow)
 
-## Files to change
+## Definition of Done — agentflow-spec-7-12
 
-*(As precise as possible: paths or globs; “create” vs “edit”.)*
+- [x] Config §7 : validation.commands, policies, agents étendus + défauts Go si `go.mod`
+- [x] Modèle tâche §8 : `pkg/agentflow/types`, fichiers `.agentflow/tasks/<feature>/*.yaml` + JSON
+- [x] Contrat agent §9 : `AgentContext` / `AgentResult`, logs `context.json` / `result.json`
+- [x] RAG §10 : `internal/rag`, `agentflow index`, enrich avec retriever/heuristique
+- [x] Interfaces §11 : `WorkflowEngine`, `TaskStore`, `WorktreeManager`, `Validator` (déclarées)
+- [x] State machine §12 : transitions, `--force`, `resume` + `--execute` (dry-run)
+- [x] `go test -race ./...` vert
+- [ ] `golangci-lint` vert (nécessite toolchain ≥ go.mod sur la machine CI/dev)
 
-- …
+## Hors scope
 
-## Files not to change
-
-*(Lock what would derail architecture, public contract, or other teams.)*
-
-- …
-
-## Implementation plan
-
-Split into **small**, **ordered**, **verifiable** steps (one step = observable outcome: file compiles, test green, manual behaviour reproducible).
-
-1. …
-2. …
-3. …
-
-## Tests to add / run
-
-- **Commands:** *(e.g. `pnpm test`, file target — see `docs/ai/03-standards.md`)*
-- **Cases to cover:** …
-- **Out of test scope:** …
-
-## Risks / invariants
-
-- **Invariants:** *(do not break: API, schema, perf, security)*
-- **Risks:** …
-
-## Definition of Done
-
-**Always** include at least (adapt wording to the repo):
-
-- [ ] Planned code / change **implemented** within handoff scope
-- [ ] Relevant **tests** passing (or explicit justification if untested area)
-- [ ] **Docs / spec** synced if impact is not code-only (`docs/ai/*`, `.kiro/specs/`, `current-spec.md` as applicable)
-
-*(Add task-specific criteria below.)*
-
-- [ ] …
-
-## Ambiguities / to resolve
-
-*(Optional but better than guessing: one line per open point; if none, write “None”.)*
-
-- …
+- Embeddings Ollama réels (index = chunks texte + LIKE ; `embeddings.sqlite` réservé)
+- Reprise automatique `resume` hors dry-run
+- Renommage `application/` → `agentflow/` (ADR-001)
 
 ## References
 
-- `docs/ai/active/current-spec.md`
-- Kiro spec: `.kiro/specs/<feature>/`
-- Architecture (useful sections): `docs/ai/02-architecture.md`
+- [`spec.md`](../../spec.md) §7–12
+- [`current-spec.md`](current-spec.md)
+- [`05-decisions.md`](../05-decisions.md) ADR-005 à ADR-008

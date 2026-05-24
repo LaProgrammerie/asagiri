@@ -1,0 +1,34 @@
+project:
+  name: my-project
+  default_branch: main
+
+specs:
+  kiro_path: .kiro/specs
+  active_spec_path: docs/ai/active/current-spec.md
+  handoff_path: docs/ai/active/handoff.md
+
+state:
+  backend: sqlite
+  path: .agentflow/state.sqlite
+
+worktrees:
+  base_path: .agentflow/worktrees
+  branch_prefix: agentflow
+  cleanup_policy: keep_failed
+
+agents:
+  kiro:
+    command: kiro
+    args: ["--cli"]
+  cursor:
+    command: cursor
+    args: ["agent", "run"]
+  codex:
+    command: codex
+    args: ["exec"]
+  ollama:
+    command: ollama
+    args: ["run", "qwen2.5-coder:7b"]
+  claude:
+    command: claude
+    args: ["code"]

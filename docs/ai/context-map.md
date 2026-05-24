@@ -6,8 +6,9 @@ Complements `AGENTS.md`: **where things live**, **who consumes what**, and **how
 
 | Topic | Where it lives |
 |-------|----------------|
+| **AgentFlow product & CLI spec (detail)** | `spec.md` (repo root) |
 | Short cross-tool index | `AGENTS.md` (root) |
-| Infra / Yoimachi (deploy) | `docs/ai/02-architecture.md` (canon), `infra/yoimachi/` (sources) |
+| Stack locale (Go, Docker, Makefile) | `docs/ai/02-architecture.md`, `docs/ai/03-standards.md`, `Makefile` |
 | Decisions / architecture / standards (detail) | `docs/ai/*.md` |
 | Native Kiro spec workflow artefacts | `.kiro/specs/<feature>/` (`requirements.md`, `design.md`, `tasks.md`, …) |
 | Spec summary **outside Kiro** | `docs/ai/active/current-spec.md` |

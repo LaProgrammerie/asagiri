@@ -1,29 +1,27 @@
-# Active spec (summary)
+# Current spec — AgentFlow
 
-> **Projection:** cross-tool **summary** kept aligned with `.kiro/specs/<feature>/`. Not a parallel workflow — see `docs/ai/context-map.md`.
+**Phase :** `agentflow-spec-7-12` (alignement spec §7–12)  
+**Date :** 2026-05-17
 
-## State
+## Résumé
 
-| Field | Value |
-|-------|--------|
-| **Phase** | `implementation-ready` *(or: requirements / design / tasks)* |
-| **Feature** | `template-placeholder` *(folder name under `.kiro/specs/`)* |
-| **Kiro source** | `.kiro/specs/template-placeholder/` *(actual path)* |
-| **Last synced** | `YYYY-MM-DD` *(update whenever spec → this file is synced)* |
+Extension de la V1 CLI : configuration riche, modèle de tâche canonique, contrat agent JSON, RAG local minimal, machine à états, commande `agentflow index`.
 
-## Summary
+## Critères de phase
 
-*(Goal of the iteration / feature — short summary aligned with `requirements.md` / `design.md`.)*
+| Domaine | Statut |
+|---------|--------|
+| §7 Configuration | Livré |
+| §8 Modèle tâche | Livré |
+| §9 Contrat agent | Livré |
+| §10 Ollama / RAG | Partiel (pas d’embeddings vectoriels) |
+| §11 Architecture Go | Livré (équivalence documentée) |
+| §12 State machine | Livré (resume auto = dry-run) |
 
-## Scope
+## Spec canonique
 
-- **In:** …
-- **Out:** …
+Détail complet : [`spec.md`](../../spec.md) §7–12 — ne pas dupliquer ici.
 
-## Acceptance criteria
+## Handoff actif
 
-1. …
-
-## References
-
-- Kiro folder: `.kiro/specs/<feature-name>/`
+[`handoff.md`](handoff.md)

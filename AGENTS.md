@@ -5,7 +5,7 @@ Fichier **court** chargé par Kiro à la racine. Le détail est dans `docs/ai/` 
 
 ## Rôle du dépôt
 
-**Template** : base [docker-starter](https://github.com/jolicode/docker-starter) (Docker + [Castor](https://castor.jolicode.com/)) + couche [AI Engineering](https://github.com/LaProgrammerie/ai-engineering-framework) (`docs/ai/`, `.kiro/`, `.cursor/`) + point d’ancrage infra [Yoimachi](https://github.com/LaProgrammerie/yoimachi) (`docs/ai/02-architecture.md`, `infra/yoimachi/`).
+**Template** : squelette **Go** (`application/`, `go.mod`) + **Docker Compose** local (`infrastructure/docker/`) + couche [AI Engineering](https://github.com/LaProgrammerie/ai-engineering-framework) (`docs/ai/`, `.kiro/`, `.cursor/`). Orchestration via **Makefile** — pas Castor, pas Yoimachi.
 
 **Après fork / copie :** remplace ce paragraphe par **une phrase** sur le produit ou service réel.
 
@@ -46,8 +46,8 @@ Voir `docs/ai/context-map.md` pour la carte complète.
 | Skills dépôt | `.kiro/skills/` |
 | Skills globales | `~/.kiro/skills/` |
 | Copilot | `.github/copilot-instructions.md` |
-| Infra déployable | `docs/ai/02-architecture.md`, `infra/yoimachi/` |
-| Docker / Castor (long) | `README.docker-starter.md` |
+| Stack / commandes | `docs/ai/02-architecture.md`, `docs/ai/03-standards.md`, `Makefile` |
+| Docker local | `infrastructure/docker/` |
 
 ## Invariants
 

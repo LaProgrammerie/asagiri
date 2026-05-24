@@ -1,19 +1,19 @@
 ---
 fileMatch:
-  - "**/*.php"
-  - "**/*.{ts,tsx,js,jsx,mjs,cjs}"
+  - "**/*.go"
 ---
 
-# Stack applicative (template)
+# Stack applicative (Go)
 
-Base **PHP** + Docker/Castor ; **Node** possible (builder ou service dédié). L’architecture cible est dans `docs/ai/02-architecture.md`.
+Module Go à la racine ; code sous `application/`. Runtime local optionnel via Docker Compose — voir `docs/ai/02-architecture.md`.
 
 ## Conventions
 
-- **PHP :** typage strict là où le projet l’adopte ; pas de shortcuts sur les erreurs aux frontières publiques (HTTP, CLI).
-- **TS/JS :** si présent, éviter `any` non justifié ; alignement avec `03-standards.md`.
+- `gofmt` / `go vet` ; golangci-lint si configuré.
+- Pas de logique métier dans `cmd/` ; `internal/` pour le code privé.
+- Erreurs retournées, pas de `panic` aux frontières publiques (HTTP, CLI).
 
 ## Pour Kiro / implémentation
 
-- Ne pas introduire de dépendances entre couches hors de ce que `docs/ai/02-architecture.md` autorise.
-- Les changements d’infra Docker ou Yoimachi doivent rester cohérents avec le canon architecture (`docs/ai/02-architecture.md`).
+- Ne pas introduire de dépendances ou services Docker hors de ce que `02-architecture.md` autorise.
+- Déploiement / IaC : hors scope sauf ADR dans `05-decisions.md`.

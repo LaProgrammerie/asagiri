@@ -1,295 +1,45 @@
 name: CI
 
-"on":
-    push:
-        branches: ["main"]
-        tags: ["v*"]
-    pull_request:
-        branches: ["main"]
-    schedule:
-        - cron: "0 0 * * MON"
-    workflow_dispatch:
-        inputs:
-            yoimachi_deploy:
-                description: "After tests, run Yoimachi validate/generate"
-                required: false
-                default: false
-                type: boolean
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
 
 concurrency:
-    group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-    cancel-in-progress: true
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 permissions:
-    contents: read
-    packages: read
-
-env:
-    ANSICON: 1
-    CASTOR_CONTEXT: ci
+  contents: read
 
 jobs:
-    bootstrap:
-        name: "1. Bootstrap - build + install"
-        runs-on: ubuntu-latest
-        env:
-            DS_PHP_VERSION: "8.4"
-        steps:
-            - uses: actions/checkout@v4
-            - uses: dorny/paths-filter@v3
-              id: filter
-              with:
-                  filters: |
-                      docker:
-                          - 'infrastructure/docker/**'
-                          - '**/Dockerfile'
-                          - 'docker-compose*.yml'
-                          - '**/docker-compose*.yml'
-            - uses: docker/setup-buildx-action@v3
-            - uses: castor-php/setup-castor@v0.1.0
-            - uses: ./.github/actions/ci-deps-cache
+  go:
+    name: Test & lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
 
-            - name: Compute GHCR registry from owner
-              shell: bash
-              run: |
-                  owner=$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')
-                  echo "DS_REGISTRY=ghcr.io/${owner}" >> "${GITHUB_ENV}"
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
 
-            - name: Workspace ownership for builder (UID 1000)
-              shell: bash
-              run: |
-                  sudo chown -R 1000:1000 "${GITHUB_WORKSPACE}"
-                  if [[ -f "${GITHUB_WORKSPACE}/.castor.stub.php" ]]; then
-                    sudo chmod a+w "${GITHUB_WORKSPACE}/.castor.stub.php"
-                  fi
+      - name: Download modules
+        run: go mod download
 
-            - name: Log in to GHCR
-              shell: bash
-              run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+      - name: Vet
+        run: go vet ./...
 
-            - name: Build images
-              run: castor docker:build
+      - name: Test
+        run: go test -race ./...
 
-            - name: Install dependencies
-              run: castor install
+      - name: Build
+        run: go build -o bin/agentflow ./application/cmd/agentflow
 
-            - name: Push BuildKit cache to GHCR (main + docker changes)
-              if: github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.filter.outputs.docker == 'true'
-              run: castor docker:push
-
-    lint-hadolint:
-        name: "2. Lint - hadolint"
-        needs: [bootstrap]
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v4
-            - uses: hadolint/hadolint-action@v3.1.0
-              with:
-                  dockerfile: infrastructure/docker/services/php/Dockerfile
-
-    lint:
-        name: "2. Lint - ${{ matrix.tool }}"
-        needs: [bootstrap]
-        runs-on: ubuntu-latest
-        strategy:
-            fail-fast: false
-            matrix:
-                tool: [phpstan, cs, twig-cs, deptrac, phparkitect, rector, qa-js, yoimachi-validate]
-        env:
-            DS_PHP_VERSION: "8.4"
-        steps:
-            - uses: actions/checkout@v4
-            - uses: castor-php/setup-castor@v0.1.0
-            - uses: ./.github/actions/ci-deps-cache
-
-            - name: Compute GHCR registry from owner
-              shell: bash
-              run: |
-                  owner=$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')
-                  echo "DS_REGISTRY=ghcr.io/${owner}" >> "${GITHUB_ENV}"
-
-            - name: Workspace ownership for builder (UID 1000)
-              shell: bash
-              run: |
-                  sudo chown -R 1000:1000 "${GITHUB_WORKSPACE}"
-                  if [[ -f "${GITHUB_WORKSPACE}/.castor.stub.php" ]]; then
-                    sudo chmod a+w "${GITHUB_WORKSPACE}/.castor.stub.php"
-                  fi
-
-            - name: Log in to GHCR
-              shell: bash
-              run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
-
-            - name: Build images + install
-              run: |
-                  set -euo pipefail
-                  castor docker:build
-                  castor install
-
-            - name: Setup Go for Yoimachi validation
-              if: matrix.tool == 'yoimachi-validate'
-              uses: actions/setup-go@v5
-              with:
-                  go-version: "1.22"
-
-            - name: Install Yoimachi CLI
-              if: matrix.tool == 'yoimachi-validate'
-              shell: bash
-              run: |
-                  set -euo pipefail
-                  go install github.com/LaProgrammerie/yoimachi/cmd/yoimachi@latest
-                  echo "$(go env GOPATH)/bin" >> "${GITHUB_PATH}"
-
-            - name: Run linter
-              run: |
-                  set -euo pipefail
-                  case "${{ matrix.tool }}" in
-                    phpstan) castor qa:phpstan ;;
-                    cs) castor qa:cs --dry-run ;;
-                    twig-cs) castor qa:twig-cs --dry-run ;;
-                    deptrac) castor qa:deptrac ;;
-                    phparkitect) castor qa:phparkitect ;;
-                    rector) castor qa:rector ;;
-                    qa-js) castor qa:qa-js ;;
-                    yoimachi-validate)
-                      castor deploy:validate
-                      ;;
-                    *) echo "Unknown tool"; exit 1 ;;
-                  esac
-
-    test:
-        name: "3. Test - php${{ matrix.php-version }} / ${{ matrix.suite }}"
-        needs: [bootstrap, lint-hadolint, lint]
-        runs-on: ubuntu-latest
-        strategy:
-            fail-fast: false
-            matrix:
-                php-version: ["8.3", "8.4", "8.5"]
-                suite: [phpunit-unit, phpunit-functional, e2e]
-        env:
-            DS_PHP_VERSION: ${{ matrix.php-version }}
-        steps:
-            - uses: actions/checkout@v4
-            - uses: docker/setup-buildx-action@v3
-            - uses: castor-php/setup-castor@v0.1.0
-            - uses: ./.github/actions/ci-deps-cache
-
-            - name: Compute GHCR registry from owner
-              shell: bash
-              run: |
-                  owner=$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')
-                  echo "DS_REGISTRY=ghcr.io/${owner}" >> "${GITHUB_ENV}"
-
-            - name: Workspace ownership for builder (UID 1000)
-              shell: bash
-              run: |
-                  sudo chown -R 1000:1000 "${GITHUB_WORKSPACE}"
-                  if [[ -f "${GITHUB_WORKSPACE}/.castor.stub.php" ]]; then
-                    sudo chmod a+w "${GITHUB_WORKSPACE}/.castor.stub.php"
-                  fi
-
-            - name: Log in to GHCR
-              shell: bash
-              run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
-
-            - name: Build + start stack
-              run: castor start
-
-            - name: Database setup
-              run: castor db:setup
-
-            - name: Seed test fixtures when available
-              if: matrix.suite == 'phpunit-functional' || matrix.suite == 'e2e'
-              run: castor db:fixtures-test
-
-            - name: Build frontend assets
-              if: matrix.suite == 'phpunit-functional' || matrix.suite == 'e2e'
-              run: castor app:assets:prod
-
-            - name: E2E stack healthcheck
-              id: e2e_healthcheck
-              if: matrix.suite == 'e2e'
-              continue-on-error: true
-              run: |
-                  set -euo pipefail
-                  retry_curl() {
-                    host="$1"
-                    path="$2"
-                    output="${3:-/dev/null}"
-                    attempts="${4:-15}"
-                    delay_seconds="${5:-2}"
-                    n=0
-                    until [ "$n" -ge "$attempts" ]; do
-                      if curl --fail --silent --show-error --insecure -H "Host: ${host}" "https://127.0.0.1${path}" > "${output}"; then
-                        return 0
-                      fi
-                      n=$((n+1))
-                      sleep "${delay_seconds}"
-                    done
-                    return 1
-                  }
-
-                  retry_curl "app.test" "/" /tmp/app-probe.html 15 2
-                  grep -Eq "Hello world|database OK|Environment:" /tmp/app-probe.html || true
-
-            - name: E2E diagnostics on healthcheck failure
-              if: matrix.suite == 'e2e' && steps.e2e_healthcheck.outcome == 'failure'
-              run: |
-                  set -euo pipefail
-                  docker compose -p app -f infrastructure/docker/docker-compose.yml -f infrastructure/docker/docker-compose.dev.yml logs --tail 200 || true
-
-            - name: Run test suite
-              run: |
-                  set -euo pipefail
-                  case "${{ matrix.suite }}" in
-                      phpunit-unit)
-                          castor qa:phpunit -- --testsuite unit
-                          ;;
-                      phpunit-functional)
-                          castor qa:phpunit -- --testsuite functional
-                          ;;
-                      e2e)
-                          castor cypress:test-all
-                          castor test:all-optimizations
-                          castor optimize:all
-                          ;;
-                      *)
-                          echo "Unknown suite: ${{ matrix.suite }}"
-                          exit 1
-                          ;;
-                  esac
-
-    deploy:
-        name: "4. Deploy - Yoimachi"
-        needs: [bootstrap, lint-hadolint, lint, test]
-        if: |
-            success() && (
-              startsWith(github.ref, 'refs/tags/v')
-              || (github.event_name == 'workflow_dispatch' && github.event.inputs.yoimachi_deploy == 'true')
-            )
-        runs-on: ubuntu-latest
-        permissions:
-            contents: read
-            id-token: write
-        steps:
-            - uses: actions/checkout@v4
-
-            - name: Setup Go
-              uses: actions/setup-go@v5
-              with:
-                  go-version: "1.22"
-
-            - name: Install Yoimachi CLI
-              shell: bash
-              run: |
-                  set -euo pipefail
-                  go install github.com/LaProgrammerie/yoimachi/cmd/yoimachi@latest
-                  echo "$(go env GOPATH)/bin" >> "${GITHUB_PATH}"
-
-            - uses: castor-php/setup-castor@v0.1.0
-
-            - name: Generate deployment artifacts with Castor + Yoimachi
-              run: |
-                  castor deploy:init
-                  castor deploy:plan
-                  castor deploy:apply
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v7
+        with:
+          version: v2.1.6

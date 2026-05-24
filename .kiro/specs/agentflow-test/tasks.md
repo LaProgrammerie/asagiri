@@ -1,0 +1,2 @@
+- [ ] Générer un plan de tâches
+- [ ] Exécuter un run dev en dry-run

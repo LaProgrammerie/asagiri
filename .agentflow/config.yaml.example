@@ -1,0 +1,63 @@
+# Exemple AgentFlow (spec.md §7.1). Après copie vers config.yaml, adaptez au dépôt.
+# Template Go : les commandes validation par défaut sont injectées si go.mod est présent
+# (go test ./..., go vet ./..., golangci-lint run). Surchargez validation.commands ci-dessous.
+
+project:
+  name: my-project
+  default_branch: main
+
+specs:
+  kiro_path: .kiro/specs
+  active_spec_path: docs/ai/active/current-spec.md
+  handoff_path: docs/ai/active/handoff.md
+
+state:
+  backend: sqlite
+  path: .agentflow/state.sqlite
+
+worktrees:
+  base_path: .agentflow/worktrees
+  branch_prefix: agentflow
+  cleanup_policy: keep_failed
+
+agents:
+  kiro:
+    command: kiro
+    args: ["--cli"]
+  cursor:
+    command: cursor-agent
+    default_model: auto
+    timeout: 3600
+  codex:
+    command: codex
+    timeout: 3600
+  claude:
+    command: claude
+    timeout: 3600
+  ollama:
+    endpoint: http://localhost:11434
+    model: qwen2.5-coder:14b
+    embedding_model: nomic-embed-text
+    timeout: 300
+
+validation:
+  commands:
+    - name: tests
+      command: go test ./...
+      required: true
+    - name: vet
+      command: go vet ./...
+      required: true
+    - name: lint
+      command: golangci-lint run
+      required: false
+
+policies:
+  require_clean_git: true
+  forbid_untracked_secret_files: true
+  max_files_changed_per_task: 20
+  allow_network: false
+  require_human_approval_for:
+    - database_migration
+    - security_sensitive_change
+    - dependency_upgrade

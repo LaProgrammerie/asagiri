@@ -1,56 +1,95 @@
 # Architecture
 
-> **À compléter au bootstrap.** Mets à jour quand une ADR change la structure.
-
 ## Vue d’ensemble
 
-- **Runtime local :** Docker Compose sous `infrastructure/docker/`, orchestré par les tâches **Castor** (`castor.php`).
-- **Application web par défaut :** répertoire `application/` (PHP), servi par la stack documentée dans [README.docker-starter.md](../../README.docker-starter.md).
-- **Tooling conteneurisé :** service `builder` pour Composer, Node, Yarn/npm selon docker-starter.
-- **Infra déployable :** pilotée par **Yoimachi** (YAML → Terraform/OpenTofu) avec sources sous `infra/yoimachi/`.
+- **Produit :** AgentFlow — CLI Cobra (`application/cmd/agentflow`).
+- **Langage :** Go — module unique (`go.mod` à la racine), code sous `application/internal/`.
+- **État local :** répertoire `.agentflow/` dans chaque dépôt Git cible (voir `spec.md` §2.2).
+- **Runtime local :** Docker Compose sous `infrastructure/docker/` (dev Go + deps) ; optionnel pour le CLI pur.
+- **Orchestration dev :** `Makefile` (`make build`, `make test`, `make dev`).
 
-## Composants runtime local (docker-starter)
+## Arborescence applicative
 
-- **`router` (Traefik) :** exposition locale des entrées HTTP/HTTPS sur `80` et `443` (dashboard `8080`) via `infrastructure/docker/docker-compose.dev.yml`.
-- **`frontend` (PHP app) :** service applicatif principal, branché au routeur via labels Traefik et monté sur le code du dépôt.
-- **`postgres` :** base locale par défaut (`postgres:16`) avec volume persistant `postgres-data`.
-- **`builder` :** conteneur outillé (Composer + Node + Yarn/npm) pour installer les dépendances et lancer les commandes de build/qualité.
-- **`worker_*` :** pattern prévu mais non activé par défaut ; activation à cadrer dans une ADR si un traitement asynchrone devient nécessaire.
+```
+application/
+  cmd/agentflow/main.go
+  internal/
+    cli/                 # commandes Cobra (une responsabilité par commande dans root.go)
+    config/              # config.yaml typée
+    bootstrap/           # init, doctor, GitRoot
+    agent/               # interface Agent
+    agent/exec/          # subprocess agents (sans shell)
+    worktree/            # git worktree par tâche
+    workflow/            # orchestration runs / steps / verify / PR
+    spec/                # lecture .kiro/specs/<feature>/ + fallback current-spec.md
+    plan/                # normalisation tâches markdown → JSON
+    report/              # report.md + report.json
+    store/sqlite/        # SQLite modernc, migrations embed
+    version/
+.agentflow/              # créé par agentflow init
+  config.yaml
+  state.sqlite           # gitignored
+  runs/ tasks/ logs/ worktrees/
+```
 
-## Contrat Castor (orchestration locale)
+## Packages clés
 
-- **Point d’entrée standard :** `castor start` construit les images, installe l’app, monte la stack et lance la migration.
-- **Install applicative :** `castor app:install`/`castor install` exécute Composer puis Yarn/npm selon les fichiers présents dans `application/`.
-- **Shell outillé :** `castor builder` pour les opérations de dev dans l’environnement conteneurisé.
-- **Règle équipe :** éviter les commandes Docker Compose ad hoc dans la doc projet ; documenter les workflows via Castor en priorité.
+| Package | Rôle |
+|---------|------|
+| `internal/config` | Struct YAML ; `Load` + validation chemins relatifs |
+| `internal/store/sqlite` | DB, migrations v1–v2, CRUD `runs` / `tasks` |
+| `internal/bootstrap` | `Init`, `Doctor` |
+| `internal/agent` + `agent/exec` | Interface agents ; exécution `exec.Command` (pas de shell) |
+| `internal/worktree` | Création / suppression worktrees Git |
+| `internal/workflow` | `PlanFeature`, `DevFeature`, `VerifyFeature`, etc. |
+| `internal/spec` | Lecture spec Kiro ou fallback |
+| `internal/plan` | Parse `tasks.md`, export JSON tâches |
+| `internal/report` | Rapports de run |
+| `internal/cli` | Surface utilisateur + `--dry-run` global |
 
-## Contrat Yoimachi (déploiement)
+## Flux critique V1
 
-- **Source de vérité déploiement :** `infra/yoimachi/` (fichiers YAML décrivant la cible).
-- **Pipeline logique :** `yoimachi.yaml -> parser -> catalog -> resolver -> planner -> generator -> terraform/tofu`.
-- **Chaîne de génération :** Yoimachi produit des artefacts Terraform/OpenTofu à partir du YAML ; les sorties générées ne remplacent pas les sources YAML.
-- **Référentiel d’exemples :** s’aligner sur les exemples officiels Yoimachi (`examples/`) plutôt que figer des conventions locales divergentes.
-- **Frontière locale vs déploiement :** Docker Starter décrit l’exécution locale ; Yoimachi décrit l’infra cible (staging/prod ou environnements alternatifs).
-- **Workflow nominal :** valider en local (`castor start`) -> décrire la cible dans `infra/yoimachi/` -> exécuter `yoimachi validate` puis `yoimachi generate`.
+```
+spec/plan → enrich → dev (worktree + agent) → verify → review → report / pr
+```
 
-## Limites
+État persistant : `runs.steps_json`, tâches `tasks.payload_json` + fichiers `.agentflow/tasks/<feature>/*.json`.
 
-- **Entrées / sorties :** trafic HTTP(S) entrant via `router` vers `frontend`; accès base via `postgres`; exécution outillée via `builder`.
-- **Dépendances externes :** Postgres local par défaut ; cache/broker/workers hors scope tant qu’aucune ADR ne les introduit.
-- **Interdit sans décision :** nouveau service d’infra durable (DB managée, broker, moteur de recherche, etc.) sans entrée `05-decisions.md`.
+## Contrat Makefile
 
-## Flux critiques
+| Cible | Action |
+|-------|--------|
+| `make build` | `bin/agentflow` |
+| `make test` | `go test ./...` |
+| `make lint` | `golangci-lint run` (toolchain Go ≥ `go.mod`) |
+| `make dev` | stack Docker dev |
 
-- **Bootstrap local :** `castor start` doit rester le chemin nominal pour démarrer un poste neuf.
-- **Cohérence dépendances :** installation PHP/Node doit rester encapsulée par les tâches Castor pour limiter les écarts d’environnement.
-- **Parité d’intention infra :** les capacités déclarées dans Yoimachi doivent rester compatibles avec les besoins identifiés côté runtime local.
+## Équivalence spec §11.1 ↔ dépôt (ADR-001)
 
-## Node.js
+| Spec `agentflow/` | Réel |
+|-------------------|------|
+| `cmd/agentflow/` | `application/cmd/agentflow/` |
+| `internal/cli/` | `application/internal/cli/` |
+| `internal/workflow/` (+ `state_machine.go`) | `application/internal/workflow/` |
+| `internal/agents/` | `application/internal/agent/` + `agent/exec/` |
+| `internal/git/worktree` | `application/internal/worktree/` |
+| `internal/validation/` | `application/internal/validation/` |
+| `internal/state/sqlite` | `application/internal/store/sqlite/` |
+| `internal/rag/` | `application/internal/rag/` |
+| `internal/policy/` | `application/internal/policy/` |
+| `pkg/agentflow/types` | `application/pkg/agentflow/` |
 
-Si l’app principale est **Node** : documente ici le service Docker, le root du code et comment il interagit avec le reverse-proxy — et mets `03-standards.md` à jour.
+Interfaces §11.2 : `WorkflowEngine`, `TaskStore`, `WorktreeManager`, `Validator` déclarées dans `internal/workflow/interfaces.go` ; implémentations = `Service`, `sqlite.Store`, `worktree.Manager`, `validation.Runner`.
+
+## Limites connues
+
+- Commandes §6.2 restantes : `bench`, `search`, `graph`, `export`.
+- RAG : recherche textuelle sur chunks (pas d’embeddings Ollama en V1).
+- `resume --execute` : dry-run uniquement.
+- Agents externes requis hors mode dry-run.
 
 ## Extension
 
-- **Nouveaux services locaux :** extension sous `infrastructure/docker/` + exposition via Castor.
-- **Nouvelles capacités de déploiement :** extension via `infra/yoimachi/` d’abord, puis mise à jour des sections Yoimachi dans `docs/ai/*` si procédure impactée.
-- **Décisions durables :** consigner tout changement structurel dans `docs/ai/05-decisions.md`.
+- Nouvelle commande : `internal/cli/` + `03-standards.md`.
+- Migration DB : `internal/store/sqlite/migrations/` + ADR si breaking.
+- Décisions : `05-decisions.md`.

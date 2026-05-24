@@ -17,4 +17,4 @@
 - **Handoff / spec → execution** workflow specific to this repo: `.kiro/skills/create-handoff/` if needed.
 - Do not suggest committing secrets or sensitive files that are not gitignored.
 
-**Stack (template) :** Docker + Castor (docker-starter), app PHP sous `application/` par défaut, Node possible dans le builder ou service dédié. Infra déployable : Yoimachi — `docs/ai/02-architecture.md` + `infra/yoimachi/`. Tests / commandes : `docs/ai/03-standards.md`.
+**Stack :** Go (`go.mod`, code under `application/`), Docker Compose local (`infrastructure/docker/`), orchestration via `Makefile`. No Castor, no Yoimachi in this template. Tests / commands: `docs/ai/03-standards.md`.

@@ -8,7 +8,14 @@ Suggested format per entry:
 
 | ID | Date | Decision | Context | Consequences |
 |----|------|----------|---------|--------------|
-| ADR-001 | YYYY-MM-DD | … | … | … |
+| ADR-001 | 2026-05-17 | Stack Go ; module racine ; code sous `application/` ; Docker local via Compose ; orchestration `Makefile` ; pas Castor ni Yoimachi dans le template | Adaptation du template AI Engineering depuis PHP/docker-starter | Doc, squelette `agentflow`, CI Go ; déploiement/IaC hors scope jusqu’à nouvelle ADR |
+| ADR-002 | 2026-05-17 | État AgentFlow en **SQLite** via `modernc.org/sqlite` (`CGO_ENABLED=0`) ; schéma V1 : `schema_version`, `runs`, `tasks` ; migrations SQL embarquées (`embed`) | Tranche `agentflow-init` — fondation traçable avant worktrees/agents | `state.sqlite` sous `.agentflow/` (gitignored) ; pas de Postgres pour l’état local V1 |
+| ADR-003 | 2026-05-17 | Agents via **subprocess** (`exec.Command`, pas de shell) ; mode **`--dry-run` / `AGENTFLOW_DRY_RUN=1`** pour CI et tests sans binaires kiro/cursor/codex | V1 workflow agentique reproductible | Config `agents.*` dans `config.yaml` ; logs factices en dry-run |
+| ADR-004 | 2026-05-17 | **Worktree Git par tâche** sous `.agentflow/worktrees/` ; branche `agentflow/<feature>/<task-id>` | Isolation des modifications agent | `clean` avec filtres `--merged` / `--failed` |
+| ADR-005 | 2026-05-17 | **Validation externe** : commandes depuis `validation.commands` (config) ou payload tâche ; défauts Go si `go.mod` | Principe §2.4 spec — l’agent ne valide pas seul | Pas de `composer` dans les défauts du template Go |
+| ADR-006 | 2026-05-17 | **Modèle tâche canonique** dans `pkg/agentflow` ; persistance YAML+JSON sous `.agentflow/tasks/` | spec §8 | Statuts §8.2 distincts des statuts `runs` |
+| ADR-007 | 2026-05-17 | **RAG local minimal** : `chunks.sqlite` + recherche LIKE ; pas d’embeddings en V1 | spec §10.3 | `agentflow index` ; enrich heuristique si index absent |
+| ADR-008 | 2026-05-17 | **State machine** explicite dans `workflow/state_machine.go` ; `--force` ; `resume --execute` dry-run | spec §12 | Reprise hors dry-run = diagnostic uniquement |
 
 ## Log
 

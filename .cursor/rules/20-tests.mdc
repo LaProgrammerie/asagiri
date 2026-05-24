@@ -1,10 +1,11 @@
 ---
-description: Tests — align with repo conventions
-globs: "**/*.{test,spec}.{ts,js,py}"
+description: Tests Go
+globs: "**/*_test.go"
 alwaysApply: false
 ---
 
 # Tests
 
-- Follow `docs/ai/03-standards.md` for naming and minimum coverage.
-- *(Adapt: runner, mocks, integration tests.)*
+- Suivre `docs/ai/03-standards.md` pour emplacement et politique de couverture.
+- `go test ./...` ou `make test` selon le handoff.
+- Tests d’intégration : tag `integration` ou package `_test` selon les conventions du dépôt.

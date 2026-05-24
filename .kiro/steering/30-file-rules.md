@@ -13,7 +13,7 @@ Do **not** rely on a single `fileMatch: "**/*"` for the whole repo: that removes
 
 | File | Zones (example) |
 |------|-----------------|
-| `31-stack.md` | `**/*.{ts,tsx}` (replace with your stack) |
+| `31-stack.md` | `**/*.go` |
 | `32-boundaries.md` | `**/api/**`, `**/migrations/**`, `infra/**` |
 
 Delete or rename these examples if your paths differ.

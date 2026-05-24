@@ -1,11 +1,3 @@
-/.castor.stub.php
-/infrastructure/docker/docker-compose.override.yml
-/infrastructure/docker/services/router/certs/*.pem
-
-# Tools
-.php-cs-fixer.cache
-.twig-cs-fixer.cache
-
 # OS / env
 .DS_Store
 *.log
@@ -13,30 +5,18 @@
 .env.*
 !.env.example
 
-# Node (assets ou app Node)
-node_modules/
-npm-debug.log*
-yarn-error.log*
-.pnpm-store/
+# Go
+/bin/
+coverage.out
+*.test
+*.out
 
-# Build / cache
-dist/
-.cache/
-coverage/
-*.tsbuildinfo
-
-# Terraform / OpenTofu (généré par Yoimachi ou local)
-**/.terraform/
-*.tfstate
-*.tfstate.*
-.terraform.lock.hcl
-crash.log
-crash.*.log
-override.tf
-override.tf.json
-*_override.tf
-*_override.tf.json
-.tflint.hcl.local
+# AgentFlow runtime (local)
+.agentflow/state.sqlite
+.agentflow/worktrees/
+.agentflow/runs/
+.agentflow/logs/
+!.agentflow/config.yaml.example
 
 # Cursor local pointer to template repository (not versioned)
 .cursor/template-sync.env

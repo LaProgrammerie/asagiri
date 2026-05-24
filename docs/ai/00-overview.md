@@ -2,9 +2,9 @@
 
 ## Rôle du dépôt
 
-Template **PHP** (par défaut) avec **Docker** et **Castor** ([docker-starter](https://github.com/jolicode/docker-starter)), complété par le workflow **spec → handoff → code** ([AI Engineering](https://github.com/LaProgrammerie/ai-engineering-framework)) et un emplacement pour l’infra générée par **Yoimachi**.
+**AgentFlow** — orchestrateur CLI local (Go) pour workflows de développement agentique : spec → tâches → worktrees → agents → validation → review, de façon déterministe et traçable. Ce dépôt contient le binaire `agentflow`, la couche AI Engineering (`docs/ai/`, `.kiro/`, `.cursor/`) et le runtime local optionnel (Docker Compose).
 
-*(À adapter : mission produit, contraintes, public.)*
+Détail produit : [`spec.md`](../../spec.md) à la racine.
 
 ## Carte du système de contexte
 
@@ -14,19 +14,21 @@ Pour les **sources de vérité**, Kiro vs Cursor vs Copilot, et specs vs `docs/a
 
 | Chemin | Rôle |
 |--------|------|
+| `spec.md` | Spec produit & technique AgentFlow (canon détaillé) |
 | `AGENTS.md` | Routeur court (toujours inclus par Kiro) |
 | `docs/ai/context-map.md` | Carte des fichiers et anti-dérive |
-| `docs/ai/` | Canon projet détaillé |
+| `docs/ai/` | Canon projet (stack, standards, ADR) |
 | `docs/ai/active/` | Résumé de spec + handoff d’exécution |
-| `docs/ai/02-architecture.md` | Canon de stack (Castor, docker-starter, Yoimachi) |
+| `.agentflow/` | État local AgentFlow (config, SQLite, runs, logs, worktrees) |
+| `.agentflow/config.yaml.example` | Schéma de configuration versionnable |
+| `bin/agentflow` | CLI compilée (`make build`) |
 | `.kiro/specs/` | Artefacts Kiro (requirements, design, tasks) |
-| `.kiro/steering/` | Contexte et règles ciblés Kiro |
-| `.kiro/skills/` | Skills **dépôt** (ex. create-handoff) |
-| `.cursor/rules/` | Règles Cursor courtes |
-| `castor.php`, `infrastructure/docker/` | Stack locale Docker |
+| `application/` | Code Go (`cmd/agentflow`, `internal/`) |
+| `Makefile` | Entrées nommées pour dev, test, Docker |
+| `infrastructure/docker/` | Compose et images locales |
 
 ## Liens rapides
 
-- Produit : `01-product.md`
+- Produit : `01-product.md` → `spec.md`
 - Architecture : `02-architecture.md`
 - Spec / handoff : `active/current-spec.md`, `active/handoff.md`

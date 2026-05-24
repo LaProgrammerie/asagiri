@@ -1,20 +1,29 @@
 # Produit
 
-> **À remplir au bootstrap :** sans objectif clair, les agents inventent des périmètres.
-
 ## Problème résolu
 
-*(Une phrase : pour qui, quelle valeur.)*
+**AgentFlow** industrialise les workflows de développement assistés par agents : spec → tâches → worktree → implémentation → validation → review → rapport, de façon déterministe et traçable en local.
+
+**Canon produit détaillé :** [`spec.md`](../../spec.md) (vision, CLI, config, workflow cible). Ce fichier résume ; ne pas dupliquer la spec complète ici.
 
 ## Utilisateurs / contexte
 
-*(Qui utilise le système, contraintes réglementaires ou métier si pertinent.)*
+Développeurs et équipes qui utilisent déjà Kiro, Cursor, Codex, Claude Code ou Ollama et veulent un orchestrateur CLI reproductible (pas un agent autonome généraliste).
 
-## Hors scope (template)
+## État V1 (tranches)
 
-- Ce dépôt est une **base** : docker-starter + conventions IA + point d’entrée Yoimachi.
-- L’implémentation métier vit dans `application/` (ou le dossier d’app que tu configures) et la spec sous `.kiro/specs/`.
+| Tranche | Statut |
+|---------|--------|
+| `agentflow-init` | Livré — `init`, `doctor`, config YAML, SQLite schéma V1 |
+| `plan` + lecture spec Kiro | Prochaine recommandée |
+| Agents, worktrees, workflow complet | À venir (voir `spec.md` §3) |
 
-## Critères de succès
+## Hors scope (V1)
 
-- …
+- UI desktop, dashboard web, orchestration distribuée, multi-user.
+- Castor, Yoimachi, déploiement production — sauf ADR future.
+- Voir § non-objectifs V1 dans `spec.md`.
+
+## Critères de succès (V1 globale)
+
+Voir objectifs fonctionnels dans `spec.md` §3.1 ; la fondation locale (`init` + état persistant) est en place.

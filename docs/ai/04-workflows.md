@@ -1,71 +1,80 @@
-# Project workflows
+# Workflows projet
 
-Operational doc for the team: more detail than the root [`README.md`](../../README.md).  
-**Generic** procedures (review, release, debug, plan, refactor) stay in **`~/.kiro/skills/`** so they are not duplicated in every repo.
-
----
-
-## Day to day: spec → handoff → implementation
-
-1. **Specify (Kiro)**  
-   Work in `.kiro/specs/<feature>/` (requirements → design → tasks per your process).
-
-2. **Summarize**  
-   Update `docs/ai/active/current-spec.md` whenever scope or acceptance criteria change in a **material** way.
-
-3. **Frame execution**  
-   Update `docs/ai/active/handoff.md` before a Cursor session or implementation PR (scope, files, plan, tests, DoD).  
-   Use the `.kiro/skills/create-handoff/` skill if you want a consistent handoff.
-
-4. **Implement**  
-   Follow the **handoff first**, then `03-standards.md` and useful sections of `02-architecture.md`.
-
-5. **Close the loop**  
-   If code reveals a spec gap: fix the **Kiro spec and projections** (`current-spec`, `handoff`) first, not only the code.
+Doc opérationnelle pour l’équipe : plus de détail que le [`README.md`](../../README.md) racine.  
+Les procédures **génériques** (review, release, debug, plan, refactor) restent dans **`~/.kiro/skills/`**.
 
 ---
 
-## What to update when (operational reminder)
+## Quotidien : spec → handoff → implémentation
 
-| Change type | Action |
-|-------------|--------|
-| Idea / business need that shifts product target | `01-product.md` |
-| New module, dependency, or moved boundary | `02-architecture.md` + `05-decisions.md` if durable |
-| New command, linter, or test policy | `03-standards.md` |
-| New team convention (branches, release, review) | This file (`04-workflows.md`) + `05-decisions.md` if structural |
-| Tasks or design of the active spec | `.kiro/specs/...` → then `current-spec.md` → then `handoff.md` if needed |
-| Only the next coding session changes | `handoff.md` (and spec if scope was wrong) |
+1. **Spécifier (Kiro)**  
+   Travail dans `.kiro/specs/<feature>/` (requirements → design → tasks).
 
-Simple rule: **if another human (or agent) could get scope wrong tomorrow, update the canonical file today.**
+2. **Résumer**  
+   Mettre à jour `docs/ai/active/current-spec.md` dès qu’un changement **matériel** de périmètre ou de critères d’acceptation.
+
+3. **Cadrer l’exécution**  
+   Mettre à jour `docs/ai/active/handoff.md` avant une session Cursor ou une PR (scope, fichiers, plan, tests, DoD).  
+   Skill dépôt : `.kiro/skills/create-handoff/` si besoin.
+
+4. **Implémenter**  
+   **Handoff d’abord**, puis `03-standards.md` et les sections utiles de `02-architecture.md`.
+
+5. **Boucler**  
+   Si le code révèle un trou de spec : corriger **Kiro + projections** (`current-spec`, `handoff`) avant de seulement patcher le code.
 
 ---
 
-## Local development
+## Quoi mettre à jour quand
 
-*(Fill in: install, dev server, env vars — point to `03-standards.md` for commands.)*
+| Type de changement | Action |
+|--------------------|--------|
+| Besoin métier / produit | `01-product.md` |
+| Nouveau module, service Docker, binaire | `02-architecture.md` + `05-decisions.md` si durable |
+| Nouvelle commande, linter, politique de tests | `03-standards.md` + `Makefile` |
+| Convention d’équipe (branches, release) | Ce fichier + `05-decisions.md` si structurel |
+| Tasks / design de la spec active | `.kiro/specs/...` → `current-spec.md` → `handoff.md` si besoin |
+| Prochaine session de code seulement | `handoff.md` |
 
-## Review and merge
+Règle simple : **si un humain ou un agent pourrait se tromper de périmètre demain, mets à jour le fichier canon aujourd’hui.**
 
-*(Branches, PRs, acceptance criteria.)*  
-Structured review: `code-review` skill in `~/.kiro/skills/`.
+---
+
+## Développement local
+
+1. Cloner le dépôt, installer **Go** (version `go.mod`).
+2. `go mod download`
+3. `make build && ./bin/agentflow init && ./bin/agentflow doctor`
+4. Optionnel : `make dev` — stack Docker.
+5. Boucle feature : `plan` → `enrich` → `dev` → `verify` → `review` → `report` / `pr` (ajouter `--dry-run` sans agents installés).
+6. Avant PR : `go test -race ./...` ; `make lint` si golangci-lint disponible (Go ≥ version module).
+
+Sans Docker : `./bin/agentflow` directement sur l’hôte.
+
+---
+
+## Review et merge
+
+*(Branches, PRs, critères d’acceptation.)*  
+Review structurée : skill `code-review` dans `~/.kiro/skills/`.
 
 ## Release
 
-*(Versioning, changelog, deploy.)*  
-Checklist: `release-checklist` skill in `~/.kiro/skills/`.
+*(Versioning, changelog, déploiement.)*  
+Checklist : skill `release-checklist` dans `~/.kiro/skills/`.
 
-## Incidents / production debug
+## Incidents / debug prod
 
-*(Short runbooks.)*  
-Diagnostics: `debugging` skill in `~/.kiro/skills/`.
+*(Runbooks courts.)*  
+Diagnostics : skill `debugging` dans `~/.kiro/skills/`.
 
 ---
 
-## Maintaining the “context system”
+## Maintenir le « système de contexte »
 
-**Tooling** changes (new Cursor rules, new Kiro steering file, hooks enabled):
+Changement d’outillage (nouvelle règle Cursor, steering Kiro, hooks) :
 
-1. Edit files under `.cursor/` or `.kiro/` as needed.
-2. If it changes a **durable** team rule: add a line to `05-decisions.md` + update `context-map.md` or this file if the human workflow changes.
+1. Éditer `.cursor/` ou `.kiro/` selon le cas.
+2. Si règle **durable** d’équipe : ligne dans `05-decisions.md` + `context-map.md` ou ce fichier si le workflow humain change.
 
-For “what each folder is for”, see [`context-map.md`](context-map.md) and the [README](../../README.md).
+Pour « à quoi sert chaque dossier », voir [`context-map.md`](context-map.md) et le [README](../../README.md).

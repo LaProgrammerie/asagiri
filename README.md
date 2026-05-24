@@ -1,58 +1,63 @@
-# Template projet — PHP / Node, Docker (Castor), IA, infra Yoimachi
+# AgentFlow (hyper-fast-builder)
 
-Ce dépôt est une **base composite** pour démarrer un produit web :
+Orchestrateur CLI local en Go pour workflows de développement agentique (specs, worktrees, agents, validations).
 
-| Couche | Rôle | Référence |
-|--------|------|-----------|
-| **Docker + Castor** | Stack locale (Traefik, PHP, Postgres, builder, tâches CLI) | [Castor](https://castor.jolicode.com/), [docker-starter](https://github.com/jolicode/docker-starter) — détail dans [`README.docker-starter.md`](README.docker-starter.md) |
-| **AI Engineering** | Spec → handoff → code, Kiro, Cursor, `docs/ai/` | [ai-engineering-framework](https://github.com/LaProgrammerie/ai-engineering-framework) |
-| **Infra / déploiement** | YAML → Terraform/OpenTofu (workspaces, destinations) | [Yoimachi](https://github.com/LaProgrammerie/yoimachi) — voir [`docs/ai/02-architecture.md`](docs/ai/02-architecture.md) et [`infra/yoimachi/`](infra/yoimachi/) |
+Spécification produit : [`spec.md`](spec.md).  
+Contexte agents et canon : [`AGENTS.md`](AGENTS.md), [`docs/ai/`](docs/ai/).
+
+## Prérequis
+
+- Go 1.25+ (voir `go.mod`)
+- `make`, `git`
+- Optionnel : Docker pour l’environnement conteneurisé de dev
+- Agents externes (kiro, cursor, codex, ollama, claude) configurés dans `.agentflow/config.yaml` — **non requis** avec `--dry-run`
 
 ## Démarrage rapide
 
-1. **Configurer** `castor.php` → `create_default_variables()` (`project_name`, `root_domain`, `php_version`, etc.).
-2. **Installer Castor** : [documentation officielle](https://castor.jolicode.com/).
-3. **Lancer la stack** : `castor start` (voir aussi [`README.dist.md`](README.dist.md) après `castor init`).
-4. **Couche IA** : lire [`AGENTS.md`](AGENTS.md) puis [`docs/ai/context-map.md`](docs/ai/context-map.md). Optionnel : cloner [ai-engineering-core](https://github.com/LaProgrammerie/ai-engineering-core) et exécuter `./sync-to-home.sh` pour les skills globales dans `~/.kiro`.
-5. **Infra déployable** : décrire l’app dans un `yoimachi.yaml` (voir [`docs/ai/02-architecture.md`](docs/ai/02-architecture.md)).
-
-## Structure utile
-
-```
-├── castor.php                 # Tâches Castor (docker-starter)
-├── application/               # Point d’entrée web PHP par défaut
-├── infrastructure/docker/     # Compose, Dockerfiles, Traefik
-├── docs/ai/                   # Canon projet + spec active (framework IA)
-├── .kiro/                     # Specs Kiro, steering, skill create-handoff
-├── .cursor/rules/             # Règles Cursor
-├── infra/yoimachi/            # Placeholder / exemple config Yoimachi
-└── README.docker-starter.md   # Doc amont docker-starter (longue)
+```bash
+go mod download
+make build
+./bin/agentflow init
+./bin/agentflow doctor
 ```
 
-## Node.js à côté de PHP
+## Commandes V1
 
-La stack par défaut est **PHP** (docker-starter). Le **builder** inclut déjà Node/Yarn pour les assets. Pour une app **Node** principale, adapte `infrastructure/docker/` (service dédié, `Dockerfile`, nginx) et mets à jour [`docs/ai/03-standards.md`](docs/ai/03-standards.md) avec les commandes réelles.
+| Commande | Description |
+|----------|-------------|
+| `agentflow init` | Bootstrap `.agentflow/` + SQLite |
+| `agentflow doctor` | Contrôles Git, config, schéma |
+| `agentflow spec <feature> --agent kiro` | Phase spec via agent |
+| `agentflow plan <feature>` | Normalise tâches (Kiro ou `current-spec.md`) |
+| `agentflow enrich <feature> [--task id] --agent ollama` | Enrichit le payload tâche |
+| `agentflow dev <feature> [--task id] --agent cursor` | Worktree + implémentation |
+| `agentflow verify <feature> [--task id]` | Validations (`go test`, `go vet`, `make lint`) |
+| `agentflow review <feature> --agent codex` | Review indépendante |
+| `agentflow status` | Liste des runs |
+| `agentflow index` | Index RAG local (`application/`, `docs/`, `.kiro/`, `spec.md`, `go.mod`) |
+| `agentflow resume <run-id> [--execute]` | Prochain step ; `--execute` en dry-run |
+| `agentflow report <run-id>` | Rapport markdown + JSON |
+| `agentflow clean [--merged] [--failed]` | Nettoie worktrees |
+| `agentflow pr <feature>` | Diff + checklist PR |
 
-## Tâches prêtes (Castor)
-
-- QA : `castor qa:all`, `castor qa:static-checks`, `castor qa:qa-js`
-- Frontend : `castor app:assets:dev`, `castor app:assets:prod`, `castor app:assets:watch`
-- Optimisations : `castor optimize:all` (scripts npm si présents)
-- Tests frontend optionnels : `castor test:all-optimizations` (scripts npm si présents)
-- Déploiement infra : `castor deploy:validate`, `castor deploy:generate`, `castor deploy:deploy` (Yoimachi)
-
-## Initialisation « produit » (docker-starter)
-
-Quand le squelette te convient :
+**Dry-run (tests / CI sans agents) :**
 
 ```bash
-castor init
+./bin/agentflow plan agentflow-test --dry-run
+./bin/agentflow dev agentflow-test --dry-run
 ```
 
-Cela remplace ce README par le flux documenté dans docker-starter ; **préserve** manuellement les sections « IA » et « Yoimachi » (ou fusionne depuis ce fichier / `README.dist.md`).
+## Makefile
 
-## Crédits licences
+| Cible | Description |
+|-------|-------------|
+| `make build` | Compile `bin/agentflow` |
+| `make test` | `go test ./...` |
+| `make lint` | `golangci-lint run` |
+| `make dev` | Conteneur dev Docker |
 
-- **docker-starter** : MIT, [JoliCode](https://jolicode.com/).
-- **Fichiers issus de ai-engineering-template** : MIT, [LaProgrammerie](https://github.com/LaProgrammerie).
-- **Yoimachi** : voir le dépôt amont (fichiers d’exemple sous `infra/yoimachi/`).
+## Configuration
+
+Copier `.agentflow/config.yaml.example` → `.agentflow/config.yaml` (fait automatiquement par `init` si l’example existe).
+
+Sections **validation** (commandes nommées), **policies** (git propre, secrets, plafond fichiers) et agents étendus : voir `spec.md` §7.1. Le template Go préremplit `go test`, `go vet`, `golangci-lint run` lorsque `go.mod` est présent.
