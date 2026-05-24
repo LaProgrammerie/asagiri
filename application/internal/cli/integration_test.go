@@ -77,6 +77,9 @@ agents:
 	for _, args := range [][]string{
 		{"init"},
 		{"index", "--dry-run"},
+		{"work", "développe agentflow-test", "--dry-run", "--plan-only"},
+		{"inbox", "--source", "local"},
+		{"next", "--feature", "agentflow-test"},
 		{"plan", "agentflow-test", "--dry-run"},
 		{"enrich", "agentflow-test", "--dry-run"},
 		{"dev", "agentflow-test", "--dry-run"},

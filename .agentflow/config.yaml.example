@@ -6,6 +6,37 @@ project:
   name: my-project
   default_branch: main
 
+intent:
+  enabled: true
+  default_mode: guided
+  resolver:
+    use_ollama_fallback: true
+    min_confidence: 0.75
+    ask_when_below_confidence: true
+
+work:
+  default_agent: cursor
+  default_reviewer: codex
+  default_enricher: ollama
+  stop_after: report
+  auto_verify: true
+  auto_review: false
+  max_tasks_per_run: 1
+  require_plan_confirmation: true
+
+sources:
+  local:
+    enabled: true
+    paths:
+      - .agentflow/specs
+      - .kiro/specs
+      - docs/ai/active
+  notion:
+    enabled: false
+    token_env: NOTION_TOKEN
+    specs_database_id: ""
+    import_path: .agentflow/specs
+
 specs:
   kiro_path: .kiro/specs
   active_spec_path: docs/ai/active/current-spec.md

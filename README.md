@@ -2,7 +2,7 @@
 
 Orchestrateur CLI local en Go pour workflows de développement agentique (specs, worktrees, agents, validations).
 
-Spécification produit : [`spec.md`](spec.md).  
+Spécification produit : [`specv2.md`](specv2.md) (intent layer) ; historique V1 : [`spec.md`](spec.md).  
 Contexte agents et canon : [`AGENTS.md`](AGENTS.md), [`docs/ai/`](docs/ai/).
 
 ## Prérequis
@@ -21,7 +21,34 @@ make build
 ./bin/agentflow doctor
 ```
 
-## Commandes V1
+## Commandes intention (specv2)
+
+| Commande | Description |
+|----------|-------------|
+| `agentflow work "<instruction>"` | Résout l’intention, affiche/exécute un plan de primitives |
+| `agentflow continue [--feature] [--run]` | Reprend le travail le plus pertinent |
+| `agentflow next [--feature] [--execute]` | Prochaine action recommandée |
+| `agentflow inbox [--source notion\|local]` | Liste les specs candidates |
+| `agentflow sync notion\|all [--page URL] [--feature] [--force]` | Import Notion → `.agentflow/specs/` |
+
+Options `work` : `--agent`, `--reviewer`, `--plan-only`, `--yes`, `--max-tasks`, `--stop-after`, `--no-review`, `--source`.
+
+```bash
+./bin/agentflow work "développe agentflow-test" --dry-run --plan-only
+./bin/agentflow continue
+./bin/agentflow inbox --source local
+```
+
+### Notion
+
+1. Activer dans `.agentflow/config.yaml` : `sources.notion.enabled: true`
+2. Exporter le token : `export NOTION_TOKEN=secret_…` (jamais loggé par AgentFlow)
+3. Optionnel : `sources.notion.specs_database_id` pour l’inbox database
+4. Sync : `./bin/agentflow sync notion --page 'https://notion.so/…'`
+
+Test d’intégration Notion (opt-in) : `NOTION_TOKEN` + `NOTION_TEST_PAGE_ID` → `go test -tags=integration ./application/internal/source/notion/...`
+
+## Commandes V1 (primitives)
 
 | Commande | Description |
 |----------|-------------|

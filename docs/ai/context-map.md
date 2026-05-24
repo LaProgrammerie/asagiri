@@ -6,7 +6,8 @@ Complements `AGENTS.md`: **where things live**, **who consumes what**, and **how
 
 | Topic | Where it lives |
 |-------|----------------|
-| **AgentFlow product & CLI spec (detail)** | `spec.md` (repo root) |
+| **AgentFlow product & CLI spec (évolution)** | `specv2.md` (repo root) |
+| **AgentFlow V1 spec (historique)** | `spec.md` (repo root) |
 | Short cross-tool index | `AGENTS.md` (root) |
 | Stack locale (Go, Docker, Makefile) | `docs/ai/02-architecture.md`, `docs/ai/03-standards.md`, `Makefile` |
 | Decisions / architecture / standards (detail) | `docs/ai/*.md` |

@@ -1,26 +1,28 @@
-# Current spec — AgentFlow
+# Current spec — AgentFlow specv2
 
-**Phase :** `agentflow-spec-7-12` (alignement spec §7–12)  
+**Phase :** `agentflow-specv2` (Intent Layer & sources externes)  
 **Date :** 2026-05-17
 
 ## Résumé
 
-Extension de la V1 CLI : configuration riche, modèle de tâche canonique, contrat agent JSON, RAG local minimal, machine à états, commande `agentflow index`.
+Couche haut niveau au-dessus des primitives V1 : intentions en langage naturel, plan d’exécution inspectable, sync Notion → `.agentflow/specs/`, inbox multi-sources.
 
 ## Critères de phase
 
 | Domaine | Statut |
 |---------|--------|
-| §7 Configuration | Livré |
-| §8 Modèle tâche | Livré |
-| §9 Contrat agent | Livré |
-| §10 Ollama / RAG | Partiel (pas d’embeddings vectoriels) |
-| §11 Architecture Go | Livré (équivalence documentée) |
-| §12 State machine | Livré (resume auto = dry-run) |
+| §4 Commandes work/continue/next/inbox/sync | Livré |
+| §5 IntentResolver | Livré |
+| §6 HighLevelPlanner | Livré |
+| §7–8 Sources Local + Notion | Livré (Notion database si `specs_database_id`) |
+| §9 Config intent/work/sources | Livré |
+| §10–13 Modes, UX, sécurité | Livré |
+| §14 Critères d’acceptation | Livré + tests |
 
 ## Spec canonique
 
-Détail complet : [`spec.md`](../../spec.md) §7–12 — ne pas dupliquer ici.
+- **Évolution / produit :** [`specv2.md`](../../../specv2.md)
+- **Historique V1 :** [`spec.md`](../../../spec.md)
 
 ## Handoff actif
 

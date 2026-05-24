@@ -14,8 +14,10 @@
 application/
   cmd/agentflow/main.go
   internal/
-    cli/                 # commandes Cobra (une responsabilité par commande dans root.go)
-    config/              # config.yaml typée
+    cli/                 # Cobra : primitives V1 + work/continue/next/inbox/sync
+    intent/              # resolver, planner, executor (specv2)
+    source/              # LocalSource, Notion (specv2 §7–8)
+    config/              # config.yaml typée (+ intent, work, sources)
     bootstrap/           # init, doctor, GitRoot
     agent/               # interface Agent
     agent/exec/          # subprocess agents (sans shell)
@@ -46,6 +48,16 @@ application/
 | `internal/plan` | Parse `tasks.md`, export JSON tâches |
 | `internal/report` | Rapports de run |
 | `internal/cli` | Surface utilisateur + `--dry-run` global |
+| `internal/intent` | Résolution d’intention, plan haut niveau, exécution via `workflow` |
+| `internal/source` | Abstraction sources ; sync vers `.agentflow/specs/<feature>/` |
+
+## Flux intention (specv2)
+
+```
+instruction → IntentResolver → HighLevelPlanner → primitives (spec/plan/dev/…) → rapport
+```
+
+Sources externes (Notion) : **sync obligatoire** avant exécution — jamais de spec distante directe.
 
 ## Flux critique V1
 

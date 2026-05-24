@@ -26,6 +26,60 @@ type Config struct {
 	Agents     map[string]Agent     `yaml:"agents"`
 	Validation ValidationConfig     `yaml:"validation"`
 	Policies   Policies             `yaml:"policies"`
+	Intent     IntentConfig         `yaml:"intent"`
+	Work       WorkConfig           `yaml:"work"`
+	Sources    SourcesConfig        `yaml:"sources"`
+}
+
+// IntentConfig controls the intent layer (specv2 §9).
+type IntentConfig struct {
+	Enabled     bool                 `yaml:"enabled"`
+	DefaultMode string               `yaml:"default_mode"`
+	Resolver    IntentResolverConfig `yaml:"resolver"`
+}
+
+// IntentResolverConfig tunes hybrid resolution.
+type IntentResolverConfig struct {
+	UseOllamaFallback       bool    `yaml:"use_ollama_fallback"`
+	MinConfidence           float64 `yaml:"min_confidence"`
+	AskWhenBelowConfidence  bool    `yaml:"ask_when_below_confidence"`
+}
+
+// WorkConfig defaults for work/continue (specv2 §9).
+type WorkConfig struct {
+	DefaultAgent            string `yaml:"default_agent"`
+	DefaultReviewer         string `yaml:"default_reviewer"`
+	DefaultEnricher         string `yaml:"default_enricher"`
+	StopAfter               string `yaml:"stop_after"`
+	AutoVerify              bool   `yaml:"auto_verify"`
+	AutoReview              bool   `yaml:"auto_review"`
+	MaxTasksPerRun          int    `yaml:"max_tasks_per_run"`
+	RequirePlanConfirmation bool   `yaml:"require_plan_confirmation"`
+}
+
+// SourcesConfig lists external spec sources (specv2 §9).
+type SourcesConfig struct {
+	Local  LocalSourceConfig  `yaml:"local"`
+	Notion NotionSourceConfig `yaml:"notion"`
+}
+
+// LocalSourceConfig scans local spec directories.
+type LocalSourceConfig struct {
+	Enabled bool     `yaml:"enabled"`
+	Paths   []string `yaml:"paths"`
+}
+
+// NotionSourceConfig configures Notion sync (specv2 §8).
+type NotionSourceConfig struct {
+	Enabled              bool   `yaml:"enabled"`
+	TokenEnv             string `yaml:"token_env"`
+	DefaultDatabaseID    string `yaml:"default_database_id"`
+	SpecsDatabaseID      string `yaml:"specs_database_id"`
+	TasksDatabaseID      string `yaml:"tasks_database_id"`
+	StatusProperty       string `yaml:"status_property"`
+	TitleProperty        string `yaml:"title_property"`
+	UpdatedTimeProperty  string `yaml:"updated_time_property"`
+	ImportPath           string `yaml:"import_path"`
 }
 
 type Project struct {
@@ -145,6 +199,71 @@ func (c *Config) applyDefaults(repoDirName string) {
 	if c.Policies.MaxFilesChangedPerTask == 0 {
 		c.Policies.MaxFilesChangedPerTask = 20
 	}
+	c.applyIntentDefaults()
+}
+
+func (c *Config) applyIntentDefaults() {
+	// intent.enabled defaults to true (specv2 §9)
+	if c.Intent.DefaultMode == "" && c.Intent.Resolver.MinConfidence == 0 {
+		c.Intent.Enabled = true
+	} else if c.Intent.DefaultMode != "" && !c.Intent.Enabled {
+		c.Intent.Enabled = true
+	}
+	if c.Intent.DefaultMode == "" {
+		c.Intent.DefaultMode = "guided"
+	}
+	if c.Intent.Resolver.MinConfidence == 0 {
+		c.Intent.Resolver.MinConfidence = 0.75
+	}
+	if !c.Intent.Resolver.UseOllamaFallback {
+		c.Intent.Resolver.UseOllamaFallback = true
+	}
+	if !c.Intent.Resolver.AskWhenBelowConfidence {
+		c.Intent.Resolver.AskWhenBelowConfidence = true
+	}
+	if c.Work.DefaultAgent == "" {
+		c.Work.DefaultAgent = "cursor"
+	}
+	if c.Work.DefaultReviewer == "" {
+		c.Work.DefaultReviewer = "codex"
+	}
+	if c.Work.DefaultEnricher == "" {
+		c.Work.DefaultEnricher = "ollama"
+	}
+	if c.Work.StopAfter == "" {
+		c.Work.StopAfter = "report"
+	}
+	if !c.Work.AutoVerify {
+		c.Work.AutoVerify = true
+	}
+	if c.Work.MaxTasksPerRun == 0 {
+		c.Work.MaxTasksPerRun = 1
+	}
+	if !c.Sources.Local.Enabled && len(c.Sources.Local.Paths) == 0 {
+		c.Sources.Local.Enabled = true
+	}
+	if len(c.Sources.Local.Paths) == 0 {
+		c.Sources.Local.Paths = []string{
+			".agentflow/specs",
+			".kiro/specs",
+			"docs/ai/active",
+		}
+	}
+	if c.Sources.Notion.TokenEnv == "" {
+		c.Sources.Notion.TokenEnv = "NOTION_TOKEN"
+	}
+	if c.Sources.Notion.ImportPath == "" {
+		c.Sources.Notion.ImportPath = ".agentflow/specs"
+	}
+	if c.Sources.Notion.StatusProperty == "" {
+		c.Sources.Notion.StatusProperty = "Status"
+	}
+	if c.Sources.Notion.TitleProperty == "" {
+		c.Sources.Notion.TitleProperty = "Name"
+	}
+	if c.Sources.Notion.UpdatedTimeProperty == "" {
+		c.Sources.Notion.UpdatedTimeProperty = "Last edited time"
+	}
 }
 
 // DefaultGoValidationCommands returns Go-oriented validation when go.mod exists.
@@ -198,8 +317,27 @@ func (c *Config) Validate(repoRoot string) error {
 			return err
 		}
 	}
+	if c.Sources.Notion.ImportPath != "" {
+		if err := validateRelPath("sources.notion.import_path", c.Sources.Notion.ImportPath, repoRoot); err != nil {
+			return err
+		}
+	}
+	for i, p := range c.Sources.Local.Paths {
+		if err := validateRelPath(fmt.Sprintf("sources.local.paths[%d]", i), p, repoRoot); err != nil {
+			return err
+		}
+	}
 
 	return nil
+}
+
+// NotionToken reads the configured env var for Notion API access.
+func (c *Config) NotionToken() string {
+	env := c.Sources.Notion.TokenEnv
+	if env == "" {
+		env = "NOTION_TOKEN"
+	}
+	return strings.TrimSpace(os.Getenv(env))
 }
 
 func validateRelPath(field, rel, repoRoot string) error {

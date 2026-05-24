@@ -16,6 +16,7 @@ Suggested format per entry:
 | ADR-006 | 2026-05-17 | **Modèle tâche canonique** dans `pkg/agentflow` ; persistance YAML+JSON sous `.agentflow/tasks/` | spec §8 | Statuts §8.2 distincts des statuts `runs` |
 | ADR-007 | 2026-05-17 | **RAG local minimal** : `chunks.sqlite` + recherche LIKE ; pas d’embeddings en V1 | spec §10.3 | `agentflow index` ; enrich heuristique si index absent |
 | ADR-008 | 2026-05-17 | **State machine** explicite dans `workflow/state_machine.go` ; `--force` ; `resume --execute` dry-run | spec §12 | Reprise hors dry-run = diagnostic uniquement |
+| ADR-009 | 2026-05-17 | **Intent Layer** (`internal/intent`) : resolver hybride + planner composant les primitives V1 ; sources via `internal/source` ; repo = vérité exécutable | specv2 §3–6 | Notion jamais exécuté sans sync local ; `NOTION_TOKEN` via env |
 
 ## Log
 

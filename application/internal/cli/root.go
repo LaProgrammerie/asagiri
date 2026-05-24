@@ -18,9 +18,10 @@ func newRootCmd() *cobra.Command {
 	var dryRun bool
 
 	root := &cobra.Command{
-		Use:   "agentflow",
-		Short: "Orchestrateur CLI local pour workflows de développement agentique",
-		Long:  "AgentFlow transforme des specs en tâches exécutables, isole le travail dans des worktrees et trace chaque run.",
+		Use:     "agentflow",
+		Short:   "Orchestrateur CLI local pour workflows de développement agentique",
+		Long:    rootLong,
+		Example: rootExample,
 	}
 	root.PersistentFlags().BoolVar(&dryRun, "dry-run", false, "Simuler les exécutions sans lancer d'agent ni commandes externes")
 
@@ -39,6 +40,11 @@ func newRootCmd() *cobra.Command {
 		newCleanCmd(&dryRun),
 		newPRCmd(&dryRun),
 		newIndexCmd(&dryRun),
+		newWorkCmd(&dryRun),
+		newContinueCmd(&dryRun),
+		newNextCmd(&dryRun),
+		newInboxCmd(&dryRun),
+		newSyncCmd(&dryRun),
 		&cobra.Command{
 			Use:   "version",
 			Short: "Afficher la version",

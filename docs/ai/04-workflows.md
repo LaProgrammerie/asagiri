@@ -23,6 +23,19 @@ Les procédures **génériques** (review, release, debug, plan, refactor) resten
 5. **Boucler**  
    Si le code révèle un trou de spec : corriger **Kiro + projections** (`current-spec`, `handoff`) avant de seulement patcher le code.
 
+### Workflow intention (specv2)
+
+```bash
+agentflow inbox --source local
+agentflow sync notion --feature ma-feature   # si spec Notion
+agentflow work "développe ma-feature" --plan-only
+agentflow work "développe ma-feature" --yes
+agentflow continue
+agentflow next --execute
+```
+
+Les primitives (`plan`, `dev`, `verify`, …) restent l’API stable pour CI et debug.
+
 ---
 
 ## Quoi mettre à jour quand

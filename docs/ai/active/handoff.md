@@ -1,40 +1,45 @@
 # Handoff — execution
 
 > **Prescriptive contract** for Cursor / Copilot / implementation.  
-> **Tranche `agentflow-spec-7-12` : en cours** (`2026-05-17`).
+> **Tranche `agentflow-specv2` : livrée** (`2026-05-17`).
 
 ## Immediate objective
 
-Aligner code, tests, config et `docs/ai/` sur **spec.md §7–12** sans casser la V1 CLI §6.1.
+Couche intention AgentFlow (specv2) : `work`, `continue`, `next`, `inbox`, `sync` ; resolver + planner ; sources Local + Notion ; sans régression des primitives V1.
 
-## Allowed scope (agentflow-spec-7-12)
+## Allowed scope (agentflow-specv2)
 
-- `application/internal/config`, `workflow`, `agent`, `store/sqlite`, `validation`, `policy`, `rag`
-- `application/pkg/agentflow/types.go`
-- `application/internal/cli/` (+ commande `index`)
+- `application/internal/intent/`
+- `application/internal/source/` (+ `notion/`)
+- `application/internal/cli/` (work, continue, next, inbox, sync)
+- `application/internal/config/`
 - `.agentflow/config.yaml.example`
-- `docs/ai/` (handoff, current-spec, 02, 03, 05)
-- `README.md` (sections AgentFlow)
+- `docs/ai/` (handoff, current-spec, 02, 03, 04, 05, context-map)
+- `README.md`
 
-## Definition of Done — agentflow-spec-7-12
+## Definition of Done — agentflow-specv2
 
-- [x] Config §7 : validation.commands, policies, agents étendus + défauts Go si `go.mod`
-- [x] Modèle tâche §8 : `pkg/agentflow/types`, fichiers `.agentflow/tasks/<feature>/*.yaml` + JSON
-- [x] Contrat agent §9 : `AgentContext` / `AgentResult`, logs `context.json` / `result.json`
-- [x] RAG §10 : `internal/rag`, `agentflow index`, enrich avec retriever/heuristique
-- [x] Interfaces §11 : `WorkflowEngine`, `TaskStore`, `WorktreeManager`, `Validator` (déclarées)
-- [x] State machine §12 : transitions, `--force`, `resume` + `--execute` (dry-run)
+- [x] Commandes §4 : `work`, `continue`, `next`, `inbox`, `sync` + options spec
+- [x] `IntentResolver` hybride (déterministe, fuzzy, Ollama fallback, ambiguïté CI)
+- [x] `HighLevelPlanner` + conditions §6.2
+- [x] Sources : `LocalSource`, `NotionSource` (httptest + intégration opt-in `NOTION_TOKEN`)
+- [x] Config `intent` / `work` / `sources`
+- [x] Modes guided / auto (`--yes`) / plan-only
+- [x] UX terminal boxed §12 ; `help.go` mis à jour
+- [x] Confirmations sync overwrite ; erreur structurée si ambigu non interactif
+- [x] Dette PHP `application/` supprimée (tests E2E, src)
 - [x] `go test -race ./...` vert
-- [ ] `golangci-lint` vert (nécessite toolchain ≥ go.mod sur la machine CI/dev)
+- [ ] `golangci-lint` (selon toolchain locale)
 
 ## Hors scope
 
-- Embeddings Ollama réels (index = chunks texte + LIKE ; `embeddings.sqlite` réservé)
-- Reprise automatique `resume` hors dry-run
-- Renommage `application/` → `agentflow/` (ADR-001)
+- Embeddings vectoriels RAG
+- Reprise `resume` automatique hors dry-run (inchangé V1)
+- GitHub Issues / Linear comme sources
 
 ## References
 
-- [`spec.md`](../../spec.md) §7–12
+- [`specv2.md`](../../../specv2.md) — spec produit évolution
+- [`spec.md`](../../../spec.md) — historique V1
 - [`current-spec.md`](current-spec.md)
-- [`05-decisions.md`](../05-decisions.md) ADR-005 à ADR-008
+- ADR-009 dans [`05-decisions.md`](../05-decisions.md)
