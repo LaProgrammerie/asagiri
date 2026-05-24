@@ -1,0 +1,12 @@
+---
+description: Synchronisation avec le template Generic project (port amont / aval)
+globs: .githooks/**,scripts/install-git-hooks.sh,.cursor/hooks/**,.cursor/hooks.json,.cursor/rules/*.mdc,.kiro/hooks/**,.kiro/steering/**
+alwaysApply: false
+---
+
+# Template Generic project
+
+- Apres une modif sous ces chemins, tranche : **specifique au projet** vs **reutilisable dans le template**.
+- Si reutilisable : reporter dans le depot **Generic project** (copie, branche dediee, ou cherry-pick), sans secrets ni logique metier locale.
+- Le port ne doit pas etre identique par defaut : choisir entre **import exact** et **adaptation au meme principe** selon le contexte.
+- Pour comparer regulierement : configurer `.cursor/template-sync.env` (voir `template-sync.env.example`) ; le hook de debut de session inspecte les **commits/fichiers recents du template (toutes zones)**.

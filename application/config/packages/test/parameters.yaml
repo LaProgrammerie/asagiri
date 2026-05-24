@@ -1,0 +1,4 @@
+parameters:
+  app.assets.dev.base_url: ''
+  app.assets.prod.base_url: ''
+  app.assets.cdn.base_url: ''

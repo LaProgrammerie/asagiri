@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+current_branch="$(git symbolic-ref --quiet --short HEAD || true)"
+
+if [[ -z "${current_branch}" ]]; then
+    echo "pre-rebase: detached HEAD, rebase refused."
+    exit 1
+fi
+
+if [[ "${current_branch}" == "main" || "${current_branch}" == "develop" ]]; then
+    echo "pre-rebase: rebase forbidden on ${current_branch}."
+    echo "Use merge/PR workflow instead."
+    exit 1
+fi
+
+if [[ ! "${current_branch}" =~ ^feature\/ ]]; then
+    echo "pre-rebase: branch '${current_branch}' is not allowed."
+    echo "Only feature/* branches can be rebased."
+    exit 1
+fi
+
+if [[ -n "$(git status --porcelain)" ]]; then
+    echo "pre-rebase: working tree is not clean."
+    echo "Commit/stash your changes before rebasing."
+    exit 1
+fi
+
+exit 0

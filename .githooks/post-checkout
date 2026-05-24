@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=.githooks/_refresh-after-update.sh
+source "${SCRIPT_DIR}/_refresh-after-update.sh"
+
+previous_ref="${1:-}"
+new_ref="${2:-}"
+is_branch_checkout="${3:-0}"
+
+if [[ "${is_branch_checkout}" != "1" ]]; then
+    exit 0
+fi
+
+if [[ -z "${previous_ref}" || -z "${new_ref}" ]]; then
+    warn_if_branch_behind_upstream
+    echo "Hooks: checkout refs unavailable, running safe install fallback."
+    castor install
+    exit 0
+fi
+
+changed_files="$(git diff --name-only "${previous_ref}" "${new_ref}" || true)"
+run_castor_install_if_needed "${changed_files}"
+warn_if_branch_behind_upstream

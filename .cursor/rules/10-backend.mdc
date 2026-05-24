@@ -1,0 +1,11 @@
+---
+description: Backend — PHP/Node selon dépôt
+globs: "**/*.{php,ts,tsx,js,jsx,mjs,cjs}"
+alwaysApply: false
+---
+
+# Backend
+
+- Suivre `docs/ai/02-architecture.md` et `03-standards.md`.
+- **PHP :** `application/` et conventions Composer du projet ; respecter les tâches Castor pour l’environnement Docker.
+- **Node :** uniquement si le dépôt définit une app ou des scripts Node — ne pas imposer de tooling non documenté dans `03-standards.md`.

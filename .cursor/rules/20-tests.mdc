@@ -1,0 +1,10 @@
+---
+description: Tests — align with repo conventions
+globs: "**/*.{test,spec}.{ts,js,py}"
+alwaysApply: false
+---
+
+# Tests
+
+- Follow `docs/ai/03-standards.md` for naming and minimum coverage.
+- *(Adapt: runner, mocks, integration tests.)*

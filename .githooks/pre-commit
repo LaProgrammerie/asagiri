@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "${REPO_ROOT}"
+
+echo "pre-commit: JS QA"
+castor qa:qa-js
+
+echo "pre-commit: PHP static checks"
+castor qa:phpstan
+castor qa:cs -d
+castor qa:deptrac
+castor qa:phparkitect
+castor qa:rector

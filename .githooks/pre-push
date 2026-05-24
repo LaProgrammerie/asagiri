@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "${REPO_ROOT}"
+
+echo "pre-push: PHPUnit unit"
+castor qa:phpunit -- --testsuite unit
+
+echo "pre-push: PHPUnit functional"
+castor qa:phpunit -- --testsuite functional
+
+echo "pre-push: Cypress"
+castor cypress:test-all

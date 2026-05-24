@@ -1,0 +1,29 @@
+{
+  "name": "generic-project-app",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "build": "echo 'build placeholder (replace with encore/vite build)'",
+    "dev": "echo 'dev placeholder (replace with encore/vite dev)'",
+    "watch": "echo 'watch placeholder (replace with encore/vite watch)'",
+    "lint:js": "eslint .",
+    "lint:js:fix": "eslint . --fix",
+    "format:check": "prettier . --check",
+    "format": "prettier . --write",
+    "check:deps": "depcheck .",
+    "qa:js": "npm run lint:js && npm run format:check && npm run check:deps",
+    "test:accessibility": "node tests/E2E/scripts/test-accessibility.js",
+    "test:mobile-ux": "node tests/E2E/scripts/test-mobile-ux.js",
+    "test:optimizations": "node tests/E2E/scripts/test-optimizations.js",
+    "test:all-optimizations": "node tests/E2E/scripts/test-all-optimizations.js",
+    "optimize:images": "echo 'optimize images placeholder'",
+    "optimize:og-image": "echo 'optimize og-image placeholder'",
+    "optimize:web-vitals": "echo 'optimize web-vitals placeholder'"
+  },
+  "devDependencies": {
+    "cypress": "^13.17.0",
+    "depcheck": "^1.4.7",
+    "eslint": "^9.26.0",
+    "prettier": "^3.3.3"
+  }
+}

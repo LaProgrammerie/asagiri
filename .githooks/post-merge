@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=.githooks/_refresh-after-update.sh
+source "${SCRIPT_DIR}/_refresh-after-update.sh"
+
+before_ref="${ORIG_HEAD:-}"
+if [[ -z "${before_ref}" ]]; then
+    warn_if_branch_behind_upstream
+    echo "Hooks: ORIG_HEAD not available, running safe install fallback."
+    castor install
+    exit 0
+fi
+
+changed_files="$(git diff --name-only "${before_ref}" HEAD || true)"
+run_castor_install_if_needed "${changed_files}"
+warn_if_branch_behind_upstream
