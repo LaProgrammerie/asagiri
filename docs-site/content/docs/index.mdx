@@ -1,0 +1,33 @@
+---
+title: AgentFlow
+description: Deterministic orchestration for AI coding workflows.
+---
+
+# AgentFlow
+
+Deterministic orchestration for AI coding workflows.
+
+AgentFlow turns specs into auditable, cost-aware development runs using local investigation, git worktrees, AI coding agents, validation commands, and reproducible reports.
+
+```bash
+agentflow work "develop billing-v2"
+```
+
+## Core ideas
+
+- **Local-first investigation** — scan and narrow context before cloud calls
+- **Cost and token estimation** — see spend before you run
+- **Git worktree isolation** — one task, one branch, one tree
+- **Agent routing** — pick the right tool per step
+- **Validation before trust** — external commands, not agent self-checks
+- **Reproducible reports** — markdown + JSON run history
+
+## Get started
+
+1. [Installation](/docs/getting-started/installation)
+2. [Quickstart](/docs/getting-started/quickstart)
+3. [First workflow](/docs/getting-started/first-workflow)
+
+<Callout type="warning">
+AgentFlow does not prove correctness. Validation and human review remain mandatory for critical changes.
+</Callout>

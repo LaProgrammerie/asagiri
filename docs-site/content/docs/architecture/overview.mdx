@@ -1,0 +1,20 @@
+---
+title: Architecture overview
+description: High-level pipeline view of Hyper Fast Builder.
+---
+
+# Architecture overview
+
+This page includes a **Mermaid** diagram illustrating the documentation and automation pipeline.
+
+<Callout type="local-first">
+
+The pipeline emphasizes local execution where possible; remote steps should be explicit.
+
+</Callout>
+
+<Mermaid chart="flowchart LR; spec[Kiro Spec] --> handoff[Handoff]; handoff --> cursor[Cursor / Agents]; cursor --> repo[Repo Changes]; repo --> ci[CI]; ci --> docsSite[Docs Site]" />
+
+## Components (placeholder)
+
+Expand each stage with concrete repositories, environments, and artifacts.

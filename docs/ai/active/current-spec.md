@@ -20,6 +20,12 @@ Phase de **consolidation** après livraison V3 : cohérence architecture, sécur
 | UX CLI explainability | estimate + work résumé |
 | OSS readiness | Score 74/100 (`08-*`) |
 
+## Documentation publique
+
+- **Spec site :** [`spec-doc.md`](../../../spec-doc.md)
+- **Implémentation :** `docs-site/` (Fumadocs, EN, GitHub Pages `/hyper-fast-builder`)
+- **Génération CLI :** `agentflow docs generate-cli`
+
 ## Specs
 
 - **Mission courante :** [`spec-postv123.md`](../../../spec-postv123.md)

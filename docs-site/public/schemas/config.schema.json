@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://laprogrammerie.github.io/hyper-fast-builder/schemas/config.schema.json",
+  "title": "AgentFlow config",
+  "description": "Schema for .agentflow/config.yaml (top-level keys). Regenerate when Config struct changes materially.",
+  "type": "object",
+  "properties": {
+    "project": { "type": "object" },
+    "specs": { "type": "object" },
+    "state": { "type": "object" },
+    "worktrees": { "type": "object" },
+    "agents": { "type": "object", "additionalProperties": { "type": "object" } },
+    "validation": { "type": "object" },
+    "policies": { "type": "object" },
+    "intent": { "type": "object" },
+    "work": { "type": "object" },
+    "sources": { "type": "object" },
+    "models": { "type": "object", "additionalProperties": { "type": "object" } },
+    "budgets": { "type": "object" },
+    "pricing": { "type": "object" },
+    "token_estimation": { "type": "object" },
+    "routing": { "type": "object" },
+    "ui": { "type": "object" },
+    "mcp": { "type": "object" }
+  },
+  "additionalProperties": false
+}

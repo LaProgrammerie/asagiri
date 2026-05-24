@@ -1,0 +1,92 @@
+---
+title: Work · AgentFlow CLI
+description: Exécuter une intention en langage naturel
+---
+
+CLI path: **`agentflow work`**
+
+## When to use
+
+Orchestration commands coordinate higher-order AgentFlow workloads such as ingestion, syncing, backlog triage, investigative passes, hydrated context payloads, coarse estimates, and workspace-specific automation.
+
+> Original CLI synopsis: Exécuter une intention en langage naturel
+
+## Usage
+
+```bash
+agentflow work [flags]
+```
+
+## Options
+
+| Flag | Scope | Default | Description |
+| --- | --- | --- | --- |
+| `--agent` | Local | `(empty)` | Agent d'implémentation |
+| `--allow-cloud` | Local | `false` | Autoriser cloud explicitement |
+| `--allow-over-budget` | Local | `false` | Dépasser le budget |
+| `--budget` | Local | `0` | Budget run EUR |
+| `--dry-run` | Inherited | `false` | Simuler les exécutions sans lancer d'agent ni commandes externes |
+| `--estimate-only` | Local | `false` | Estimation sans exécution |
+| `--max-duration` | Local | `0` | Durée max (minutes) |
+| `--max-input-tokens` | Local | `0` | Plafond tokens entrée |
+| `--max-output-tokens` | Local | `0` | Plafond tokens sortie |
+| `--max-tasks` | Local | `0` | Nombre max de tâches par run |
+| `--no-cloud` | Local | `false` | Interdire cloud |
+| `--no-context-reduction` | Local | `false` | Désactiver réduction contexte |
+| `--no-review` | Local | `false` | Désactiver la review |
+| `--plan-only` | Local | `false` | Afficher le plan sans exécuter |
+| `--prefer-local` | Local | `false` | Préférer étapes locales |
+| `--reviewer` | Local | `(empty)` | Agent de review |
+| `--show-context-plan` | Local | `false` | Afficher chemin context pack |
+| `--source` | Local | `(empty)` | Source externe (notion\|local) |
+| `--stop-after` | Local | `(empty)` | Arrêter après une étape (verify, dev, …) |
+| `--yes` | Local | `false` | Mode auto sans confirmation |
+
+## Examples
+
+```bash
+agentflow work
+```
+
+> Wire richer samples through **cobra.Command.Example** when the happy path warrants copy/paste-friendly automation beyond this scaffold.
+
+## What happens internally
+
+- Hydrates contextual services resolved from **$PWD**, coordinating git-bound automation, ingestion pipelines, syncing, backlog triage, investigations, MCP hooks, contextual hydration, coarse estimates, and similar orchestrations for this subtree.
+
+## Failure modes
+
+- Cobra rejects unknown flags or arity mismatches before any repository side effects occur.
+- AgentFlow cannot resolve scaffolding when the command is invoked outside an initialised checkout.
+- Downstream automation may fail whenever credentials, network endpoints, or cached prerequisites drift from expectations.
+
+## Related commands
+
+- [Clean](./clean.mdx)
+- [Completion](./completion.mdx)
+- [Context](./context.mdx)
+- [Continue](./continue.mdx)
+- [Cost](./cost.mdx)
+- [Dev](./dev.mdx)
+- [Docs](./docs.mdx)
+- [Doctor](./doctor.mdx)
+- [Enrich](./enrich.mdx)
+- [Estimate](./estimate.mdx)
+- [Help](./help.mdx)
+- [Inbox](./inbox.mdx)
+- [Index](./index.mdx)
+- [Init](./init.mdx)
+- [Inspect](./inspect.mdx)
+- [Investigate](./investigate.mdx)
+- [Mcp](./mcp.mdx)
+- [Next](./next.mdx)
+- [Plan](./plan.mdx)
+- [Pr](./pr.mdx)
+- [Report](./report.mdx)
+- [Resume](./resume.mdx)
+- [Review](./review.mdx)
+- [Spec](./spec.mdx)
+- [Status](./status.mdx)
+- [Sync](./sync.mdx)
+- [Verify](./verify.mdx)
+- [Version](./version.mdx)

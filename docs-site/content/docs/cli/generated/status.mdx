@@ -1,0 +1,73 @@
+---
+title: Status · AgentFlow CLI
+description: Afficher l'état des runs
+---
+
+CLI path: **`agentflow status`**
+
+## When to use
+
+Operational commands summarise historical runs or unblock automation by resuming deterministic workflow bookkeeping without rewriting task definitions manually.
+
+> Original CLI synopsis: Afficher l'état des runs
+
+## Usage
+
+```bash
+agentflow status [flags]
+```
+
+## Options
+
+| Flag | Scope | Default | Description |
+| --- | --- | --- | --- |
+| `--dry-run` | Inherited | `false` | Simuler les exécutions sans lancer d'agent ni commandes externes |
+
+## Examples
+
+```bash
+agentflow status
+```
+
+> Wire richer samples through **cobra.Command.Example** when the happy path warrants copy/paste-friendly automation beyond this scaffold.
+
+## What happens internally
+
+- Queries recent SQLite rows through the workflow façade and caps emitted records to preserve readable CLI ergonomics.
+
+## Failure modes
+
+- Cobra rejects unknown flags or arity mismatches before any repository side effects occur.
+- AgentFlow cannot resolve scaffolding when the command is invoked outside an initialised checkout.
+- Delegated subprocesses (**git**, MCP hosts, editor agents, etc.) can exit non-zero and bubble errors verbatim.
+
+## Related commands
+
+- [Clean](./clean.mdx)
+- [Completion](./completion.mdx)
+- [Context](./context.mdx)
+- [Continue](./continue.mdx)
+- [Cost](./cost.mdx)
+- [Dev](./dev.mdx)
+- [Docs](./docs.mdx)
+- [Doctor](./doctor.mdx)
+- [Enrich](./enrich.mdx)
+- [Estimate](./estimate.mdx)
+- [Help](./help.mdx)
+- [Inbox](./inbox.mdx)
+- [Index](./index.mdx)
+- [Init](./init.mdx)
+- [Inspect](./inspect.mdx)
+- [Investigate](./investigate.mdx)
+- [Mcp](./mcp.mdx)
+- [Next](./next.mdx)
+- [Plan](./plan.mdx)
+- [Pr](./pr.mdx)
+- [Report](./report.mdx)
+- [Resume](./resume.mdx)
+- [Review](./review.mdx)
+- [Spec](./spec.mdx)
+- [Sync](./sync.mdx)
+- [Verify](./verify.mdx)
+- [Version](./version.mdx)
+- [Work](./work.mdx)

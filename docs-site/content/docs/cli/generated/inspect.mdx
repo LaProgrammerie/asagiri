@@ -1,0 +1,74 @@
+---
+title: Inspect · AgentFlow CLI
+description: Inspection locale (symbol, tests, diff)
+---
+
+CLI path: **`agentflow inspect`**
+
+## When to use
+
+Use **inspect** when you need fast, offline answers about symbols, neighbouring tests, or a compact snapshot of unstaged Git changes without spawning remote agents.
+
+> Original CLI synopsis: Inspection locale (symbol, tests, diff)
+
+## Usage
+
+```bash
+agentflow inspect [flags]
+```
+
+## Options
+
+| Flag | Scope | Default | Description |
+| --- | --- | --- | --- |
+| `--dry-run` | Inherited | `false` | Simuler les exécutions sans lancer d'agent ni commandes externes |
+
+## Examples
+
+```bash
+agentflow inspect
+```
+
+> Wire richer samples through **cobra.Command.Example** when the happy path warrants copy/paste-friendly automation beyond this scaffold.
+
+## What happens internally
+
+- Hosts read-only inspectors that intentionally avoid spawning remote delegation agents so local workflows stay deterministic.
+
+## Failure modes
+
+- Cobra rejects unknown flags or arity mismatches before any repository side effects occur.
+- AgentFlow cannot resolve scaffolding when the command is invoked outside an initialised checkout.
+- Git probing fails when binaries are missing or repositories are shallow or incomplete.
+- Symbol lookups can legitimately return empty output whenever indexes lag behind edits.
+
+## Related commands
+
+- [Clean](./clean.mdx)
+- [Completion](./completion.mdx)
+- [Context](./context.mdx)
+- [Continue](./continue.mdx)
+- [Cost](./cost.mdx)
+- [Dev](./dev.mdx)
+- [Docs](./docs.mdx)
+- [Doctor](./doctor.mdx)
+- [Enrich](./enrich.mdx)
+- [Estimate](./estimate.mdx)
+- [Help](./help.mdx)
+- [Inbox](./inbox.mdx)
+- [Index](./index.mdx)
+- [Init](./init.mdx)
+- [Investigate](./investigate.mdx)
+- [Mcp](./mcp.mdx)
+- [Next](./next.mdx)
+- [Plan](./plan.mdx)
+- [Pr](./pr.mdx)
+- [Report](./report.mdx)
+- [Resume](./resume.mdx)
+- [Review](./review.mdx)
+- [Spec](./spec.mdx)
+- [Status](./status.mdx)
+- [Sync](./sync.mdx)
+- [Verify](./verify.mdx)
+- [Version](./version.mdx)
+- [Work](./work.mdx)

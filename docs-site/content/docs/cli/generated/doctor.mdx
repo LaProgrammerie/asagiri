@@ -1,0 +1,73 @@
+---
+title: Doctor · AgentFlow CLI
+description: Vérifier l'environnement et la configuration
+---
+
+CLI path: **`agentflow doctor`**
+
+## When to use
+
+Bootstrap commands scaffold or reconcile the AgentFlow working tree so subsequent workflow nodes can reliably resolve configuration and repository metadata.
+
+> Original CLI synopsis: Vérifier l'environnement et la configuration
+
+## Usage
+
+```bash
+agentflow doctor [flags]
+```
+
+## Options
+
+| Flag | Scope | Default | Description |
+| --- | --- | --- | --- |
+| `--dry-run` | Inherited | `false` | Simuler les exécutions sans lancer d'agent ni commandes externes |
+
+## Examples
+
+```bash
+agentflow doctor
+```
+
+> Wire richer samples through **cobra.Command.Example** when the happy path warrants copy/paste-friendly automation beyond this scaffold.
+
+## What happens internally
+
+- Probes requisite binaries and configuration coherence—including MCP switches and caches—to surface actionable diagnostics before workflows run hot.
+
+## Failure modes
+
+- Cobra rejects unknown flags or arity mismatches before any repository side effects occur.
+- AgentFlow cannot resolve scaffolding when the command is invoked outside an initialised checkout.
+- Downstream automation may fail whenever credentials, network endpoints, or cached prerequisites drift from expectations.
+
+## Related commands
+
+- [Clean](./clean.mdx)
+- [Completion](./completion.mdx)
+- [Context](./context.mdx)
+- [Continue](./continue.mdx)
+- [Cost](./cost.mdx)
+- [Dev](./dev.mdx)
+- [Docs](./docs.mdx)
+- [Enrich](./enrich.mdx)
+- [Estimate](./estimate.mdx)
+- [Help](./help.mdx)
+- [Inbox](./inbox.mdx)
+- [Index](./index.mdx)
+- [Init](./init.mdx)
+- [Inspect](./inspect.mdx)
+- [Investigate](./investigate.mdx)
+- [Mcp](./mcp.mdx)
+- [Next](./next.mdx)
+- [Plan](./plan.mdx)
+- [Pr](./pr.mdx)
+- [Report](./report.mdx)
+- [Resume](./resume.mdx)
+- [Review](./review.mdx)
+- [Spec](./spec.mdx)
+- [Status](./status.mdx)
+- [Sync](./sync.mdx)
+- [Verify](./verify.mdx)
+- [Version](./version.mdx)
+- [Work](./work.mdx)

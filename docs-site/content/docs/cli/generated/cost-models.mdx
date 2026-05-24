@@ -1,0 +1,47 @@
+---
+title: Cost Models · AgentFlow CLI
+description: Lister modèles et pricing configurés
+---
+
+CLI path: **`agentflow cost models`**
+
+## When to use
+
+Use **cost** when reconciling SQLite-backed telemetry with pricing tables declared in **.agentflow/config.yaml** or when slicing spend over a bounded recency window.
+
+> Original CLI synopsis: Lister modèles et pricing configurés
+
+## Usage
+
+```bash
+agentflow cost models [flags]
+```
+
+## Options
+
+| Flag | Scope | Default | Description |
+| --- | --- | --- | --- |
+| `--dry-run` | Inherited | `false` | Simuler les exécutions sans lancer d'agent ni commandes externes |
+
+## Examples
+
+```bash
+agentflow cost models
+```
+
+> Wire richer samples through **cobra.Command.Example** when the happy path warrants copy/paste-friendly automation beyond this scaffold.
+
+## What happens internally
+
+- Streams configured pricing slabs and YAML-defined model mappings to stdout strictly for auditing; no datastore mutation occurs during display.
+
+## Failure modes
+
+- Cobra rejects unknown flags or arity mismatches before any repository side effects occur.
+- AgentFlow cannot resolve scaffolding when the command is invoked outside an initialised checkout.
+- SQLite contention or corrupted telemetry prevent summarisation queries from completing.
+- Malformed **--since** payloads fail fast before aggregates are queried.
+
+## Related commands
+
+- [Cost Report](./cost-report.mdx)

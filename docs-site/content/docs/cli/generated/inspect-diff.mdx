@@ -1,0 +1,48 @@
+---
+title: Inspect Diff · AgentFlow CLI
+description: Résumé diff git
+---
+
+CLI path: **`agentflow inspect diff`**
+
+## When to use
+
+Use **inspect** when you need fast, offline answers about symbols, neighbouring tests, or a compact snapshot of unstaged Git changes without spawning remote agents.
+
+> Original CLI synopsis: Résumé diff git
+
+## Usage
+
+```bash
+agentflow inspect diff [flags]
+```
+
+## Options
+
+| Flag | Scope | Default | Description |
+| --- | --- | --- | --- |
+| `--dry-run` | Inherited | `false` | Simuler les exécutions sans lancer d'agent ni commandes externes |
+
+## Examples
+
+```bash
+agentflow inspect diff
+```
+
+> Wire richer samples through **cobra.Command.Example** when the happy path warrants copy/paste-friendly automation beyond this scaffold.
+
+## What happens internally
+
+- Spawns **git diff --stat** scoped with **git -C** at the AgentFlow-managed repository root, truncating very large summaries locally.
+
+## Failure modes
+
+- Cobra rejects unknown flags or arity mismatches before any repository side effects occur.
+- AgentFlow cannot resolve scaffolding when the command is invoked outside an initialised checkout.
+- Git probing fails when binaries are missing or repositories are shallow or incomplete.
+- Symbol lookups can legitimately return empty output whenever indexes lag behind edits.
+
+## Related commands
+
+- [Inspect Symbol](./inspect-symbol.mdx)
+- [Inspect Tests](./inspect-tests.mdx)

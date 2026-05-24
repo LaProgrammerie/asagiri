@@ -11,7 +11,12 @@ import (
 
 // Execute runs the agentflow CLI.
 func Execute() error {
-	return newRootCmd().Execute()
+	return RootCommand().Execute()
+}
+
+// RootCommand returns the cobra command tree wired for Execute().
+func RootCommand() *cobra.Command {
+	return newRootCmd()
 }
 
 func newRootCmd() *cobra.Command {
@@ -51,6 +56,7 @@ func newRootCmd() *cobra.Command {
 		newCostCmd(&dryRun),
 		newInspectCmd(&dryRun),
 		newMcpCmd(&dryRun),
+		newDocsCmd(),
 		&cobra.Command{
 			Use:   "version",
 			Short: "Afficher la version",

@@ -1,14 +1,19 @@
 # Handoff — execution
 
 > **Prescriptive contract** for Cursor / Copilot / implementation.  
-> **Tranche `spec-postv123` : consolidation & OSS readiness** (`2026-05-17`).
+> **Tranche `spec-doc` : documentation publique** + consolidation (`2026-05-17`).
 
 ## Immediate objective
 
-Consolidation technique AgentFlow : audits, garde-fous, tests packages critiques, explainability CLI, préparation open source — **sans nouvelles features marketing**.
+Site docs public Fumadocs (`docs-site/`), référence CLI générée, CI GitHub Pages — en parallèle de la consolidation OSS (`spec-postv123`).
 
 ## Allowed scope (spec-postv123)
 
+- `docs-site/` (Fumadocs, contenu EN, static export)
+- `.github/workflows/docs.yml`
+- `application/internal/cli/docgen/` + `docs` subcommand
+- `docs/decisions/`, `docs/contributing/`, `docs/specs/`
+- `CODE_OF_CONDUCT.md`, `SECURITY.md`
 - `application/internal/*` (refactors ciblés : pipeline, contextopt, config, cost, cli, redact, routing)
 - `docs/consolidation/`
 - `LICENSE`, `CONTRIBUTING.md`, `ROADMAP.md`, `examples/`, `scripts/benchmark-workflow.sh`
@@ -27,6 +32,9 @@ Consolidation technique AgentFlow : audits, garde-fous, tests packages critiques
 - [x] LICENSE Apache 2.0, CONTRIBUTING, ROADMAP, examples/quickstart
 - [x] `make benchmark` / script dry-run
 - [ ] Couverture `workflow` / `intent` > 50 % (roadmap §6)
+- [x] `docs-site` build static (`out/`) + workflow Pages
+- [x] MVP pages EN + CLI ref générée (`docs generate-cli`)
+- [x] `TestCLICommandsDocumented` (docgen)
 
 ## Hors scope
 

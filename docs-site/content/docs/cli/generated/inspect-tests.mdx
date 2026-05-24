@@ -1,0 +1,48 @@
+---
+title: Inspect Tests · AgentFlow CLI
+description: Tests liés à un chemin
+---
+
+CLI path: **`agentflow inspect tests`**
+
+## When to use
+
+Use **inspect** when you need fast, offline answers about symbols, neighbouring tests, or a compact snapshot of unstaged Git changes without spawning remote agents.
+
+> Original CLI synopsis: Tests liés à un chemin
+
+## Usage
+
+```bash
+agentflow inspect tests [flags]
+```
+
+## Options
+
+| Flag | Scope | Default | Description |
+| --- | --- | --- | --- |
+| `--dry-run` | Inherited | `false` | Simuler les exécutions sans lancer d'agent ni commandes externes |
+
+## Examples
+
+```bash
+agentflow inspect tests
+```
+
+> Wire richer samples through **cobra.Command.Example** when the happy path warrants copy/paste-friendly automation beyond this scaffold.
+
+## What happens internally
+
+- Executes the investigative scaffolding so the supplied filesystem path maps to heuristic related test suites.
+
+## Failure modes
+
+- Cobra rejects unknown flags or arity mismatches before any repository side effects occur.
+- AgentFlow cannot resolve scaffolding when the command is invoked outside an initialised checkout.
+- Git probing fails when binaries are missing or repositories are shallow or incomplete.
+- Symbol lookups can legitimately return empty output whenever indexes lag behind edits.
+
+## Related commands
+
+- [Inspect Diff](./inspect-diff.mdx)
+- [Inspect Symbol](./inspect-symbol.mdx)
