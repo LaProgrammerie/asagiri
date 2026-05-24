@@ -17,6 +17,7 @@ Suggested format per entry:
 | ADR-007 | 2026-05-17 | **RAG local minimal** : `chunks.sqlite` + recherche LIKE ; pas d’embeddings en V1 | spec §10.3 | `agentflow index` ; enrich heuristique si index absent |
 | ADR-008 | 2026-05-17 | **State machine** explicite dans `workflow/state_machine.go` ; `--force` ; `resume --execute` dry-run | spec §12 | Reprise hors dry-run = diagnostic uniquement |
 | ADR-009 | 2026-05-17 | **Intent Layer** (`internal/intent`) : resolver hybride + planner composant les primitives V1 ; sources via `internal/source` ; repo = vérité exécutable | specv2 §3–6 | Notion jamais exécuté sans sync local ; `NOTION_TOKEN` via env |
+| ADR-010 | 2026-05-17 | **V3 cost/perf** : packages `cost`, `contextopt`, `investigation`, `telemetry`, `tui` ; pipeline `RunV3Pipeline` ; prix **uniquement** via `pricing.models` (pas de hardcode) ; MCP stdio désactivé par défaut ; TUI isolée (`internal/tui`) | specv3 | Migration SQLite `run_metrics` / `step_metrics` ; `work --estimate-only` |
 
 ## Log
 

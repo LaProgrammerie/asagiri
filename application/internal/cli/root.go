@@ -45,6 +45,12 @@ func newRootCmd() *cobra.Command {
 		newNextCmd(&dryRun),
 		newInboxCmd(&dryRun),
 		newSyncCmd(&dryRun),
+		newEstimateCmd(&dryRun),
+		newInvestigateCmd(&dryRun),
+		newContextCmd(&dryRun),
+		newCostCmd(&dryRun),
+		newInspectCmd(&dryRun),
+		newMcpCmd(&dryRun),
 		&cobra.Command{
 			Use:   "version",
 			Short: "Afficher la version",

@@ -29,6 +29,113 @@ type Config struct {
 	Intent     IntentConfig         `yaml:"intent"`
 	Work       WorkConfig           `yaml:"work"`
 	Sources    SourcesConfig        `yaml:"sources"`
+	Models     ModelsConfig         `yaml:"models"`
+	Budgets    BudgetsConfig        `yaml:"budgets"`
+	Pricing    PricingConfig        `yaml:"pricing"`
+	TokenEst   TokenEstimationConfig `yaml:"token_estimation"`
+	Routing    RoutingConfig        `yaml:"routing"`
+	UI         UIConfig             `yaml:"ui"`
+	MCP        MCPConfig            `yaml:"mcp"`
+}
+
+// ModelsConfig maps logical model/agent profile ids (specv3 §3.1).
+type ModelsConfig map[string]ModelProfile
+
+// ModelProfile describes provider and usage hints for a logical model id.
+type ModelProfile struct {
+	Provider                   string   `yaml:"provider"`
+	Class                      string   `yaml:"class"`
+	Model                      string   `yaml:"model"`
+	InputCostPer1MTokens       float64  `yaml:"input_cost_per_1m_tokens"`
+	OutputCostPer1MTokens      float64  `yaml:"output_cost_per_1m_tokens"`
+	TypicalLatencyMsPer1KTokens int     `yaml:"typical_latency_ms_per_1k_tokens"`
+	MaxContextTokens           int      `yaml:"max_context_tokens"`
+	Usage                      []string `yaml:"usage"`
+}
+
+// BudgetsConfig limits estimated spend (specv3 §3.2).
+type BudgetsConfig struct {
+	DefaultCurrency string         `yaml:"default_currency"`
+	PerRun          BudgetLimits   `yaml:"per_run"`
+	PerTask         BudgetLimits   `yaml:"per_task"`
+	Daily           BudgetLimits   `yaml:"daily"`
+	Policies        BudgetPolicies `yaml:"policies"`
+}
+
+// BudgetLimits defines numeric caps for one tier.
+type BudgetLimits struct {
+	MaxEstimatedCost             float64 `yaml:"max_estimated_cost"`
+	MaxEstimatedTokens           int     `yaml:"max_estimated_tokens"`
+	RequireConfirmationAboveCost float64 `yaml:"require_confirmation_above_cost"`
+}
+
+// BudgetPolicies controls blocking and overrides.
+type BudgetPolicies struct {
+	BlockWhenOverBudget    bool   `yaml:"block_when_over_budget"`
+	AllowOverrideWithFlag  bool   `yaml:"allow_override_with_flag"`
+	OverrideFlag           string `yaml:"override_flag"`
+}
+
+// PricingConfig holds per-provider model token prices; no hardcoded defaults (specv3 §6.1).
+type PricingConfig struct {
+	Currency string                    `yaml:"currency"`
+	Models   map[string]ModelPricing   `yaml:"models"`
+}
+
+// ModelPricing is price sheet entry for a cloud model id (key = model name as used by API).
+type ModelPricing struct {
+	InputPer1MTokens  float64 `yaml:"input_per_1m_tokens"`
+	OutputPer1MTokens float64 `yaml:"output_per_1m_tokens"`
+	Source            string  `yaml:"source"`
+	UpdatedAt         string  `yaml:"updated_at"`
+}
+
+// TokenEstimationConfig tunes chars-per-token heuristics (specv3 §5.3).
+type TokenEstimationConfig struct {
+	DefaultCharsPerToken  float64 `yaml:"default_chars_per_token"`
+	CodeCharsPerToken     float64 `yaml:"code_chars_per_token"`
+	MarkdownCharsPerToken float64 `yaml:"markdown_chars_per_token"`
+	JSONCharsPerToken     float64 `yaml:"json_chars_per_token"`
+}
+
+// RoutingConfig selects local vs cloud steps (specv3 §11).
+type RoutingConfig struct {
+	DefaultStrategy string                       `yaml:"default_strategy"`
+	Strategies      map[string]RoutingStrategy   `yaml:"strategies"`
+}
+
+// RoutingStrategy lists task classes routed to each tier.
+type RoutingStrategy struct {
+	PreferLocalFor           []string `yaml:"prefer_local_for"`
+	UseCloudFastFor          []string `yaml:"use_cloud_fast_for"`
+	UseCloudHeavyFor         []string `yaml:"use_cloud_heavy_for"`
+	LocalFailuresBeforeCloud int      `yaml:"local_failures_before_cloud"`
+	CloudFastFailuresBeforeHeavy int  `yaml:"cloud_fast_failures_before_heavy"`
+}
+
+// UIConfig terminal UX (specv3 §13).
+type UIConfig struct {
+	Mode          string `yaml:"mode"` // auto | rich | plain | json
+	LiveLogs      bool   `yaml:"live_logs"`
+	ProgressBars  bool   `yaml:"progress_bars"`
+	Compact       bool   `yaml:"compact"`
+}
+
+// MCPConfig local MCP server limits (specv3 §10).
+type MCPConfig struct {
+	Enabled            bool                `yaml:"enabled"`
+	MaxOutputBytes     int                 `yaml:"max_output_bytes"`
+	CommandTimeoutSec  int                 `yaml:"command_timeout_seconds"`
+	SecretPathDenylist []string            `yaml:"secret_path_denylist"`
+	Investigation      InvestigationConfig `yaml:"investigation"`
+}
+
+// InvestigationConfig caps local repo scanning.
+type InvestigationConfig struct {
+	LargeFileBytes      int64    `yaml:"large_file_bytes"`
+	MaxGrepOutputBytes  int      `yaml:"max_grep_output_bytes"`
+	CommandTimeoutSec   int      `yaml:"command_timeout_seconds"`
+	SensitiveGlobs      []string `yaml:"sensitive_globs"`
 }
 
 // IntentConfig controls the intent layer (specv2 §9).
@@ -200,6 +307,89 @@ func (c *Config) applyDefaults(repoDirName string) {
 		c.Policies.MaxFilesChangedPerTask = 20
 	}
 	c.applyIntentDefaults()
+	c.applyV3Defaults()
+}
+
+func (c *Config) applyV3Defaults() {
+	if c.Budgets.DefaultCurrency == "" {
+		c.Budgets.DefaultCurrency = "EUR"
+	}
+	if c.Budgets.Policies.OverrideFlag == "" {
+		c.Budgets.Policies.OverrideFlag = "--allow-over-budget"
+	}
+	if c.Pricing.Models == nil {
+		c.Pricing.Models = map[string]ModelPricing{}
+	}
+	if c.Pricing.Currency == "" {
+		c.Pricing.Currency = c.Budgets.DefaultCurrency
+	}
+	if c.TokenEst.DefaultCharsPerToken == 0 {
+		c.TokenEst.DefaultCharsPerToken = 4
+	}
+	if c.TokenEst.CodeCharsPerToken == 0 {
+		c.TokenEst.CodeCharsPerToken = 3.2
+	}
+	if c.TokenEst.MarkdownCharsPerToken == 0 {
+		c.TokenEst.MarkdownCharsPerToken = 4.2
+	}
+	if c.TokenEst.JSONCharsPerToken == 0 {
+		c.TokenEst.JSONCharsPerToken = 3.6
+	}
+	if c.Routing.DefaultStrategy == "" {
+		c.Routing.DefaultStrategy = "cost_aware"
+	}
+	hadUIMode := strings.TrimSpace(c.UI.Mode) != ""
+	if c.UI.Mode == "" {
+		c.UI.Mode = "auto"
+	}
+	if !hadUIMode && !c.UI.Compact {
+		if !c.UI.LiveLogs {
+			c.UI.LiveLogs = true
+		}
+		if !c.UI.ProgressBars {
+			c.UI.ProgressBars = true
+		}
+	}
+	if c.MCP.MaxOutputBytes == 0 {
+		c.MCP.MaxOutputBytes = 1024 * 1024
+	}
+	if c.MCP.CommandTimeoutSec == 0 {
+		c.MCP.CommandTimeoutSec = 120
+	}
+	if len(c.MCP.SecretPathDenylist) == 0 {
+		c.MCP.SecretPathDenylist = []string{
+			".env", ".env.local", ".env.production", "credentials.json", "id_rsa", "id_ed25519",
+		}
+	}
+	if c.MCP.Investigation.LargeFileBytes == 0 {
+		c.MCP.Investigation.LargeFileBytes = 512 * 1024
+	}
+	if c.MCP.Investigation.MaxGrepOutputBytes == 0 {
+		c.MCP.Investigation.MaxGrepOutputBytes = 256 * 1024
+	}
+	if c.MCP.Investigation.CommandTimeoutSec == 0 {
+		c.MCP.Investigation.CommandTimeoutSec = c.MCP.CommandTimeoutSec
+	}
+	if len(c.MCP.Investigation.SensitiveGlobs) == 0 {
+		c.MCP.Investigation.SensitiveGlobs = []string{
+			"*.pem", "*.key", "*credentials*", "*secret*", ".git/*",
+		}
+	}
+}
+
+// AgentModel returns the configured model id for an agent entry, if any.
+func (c *Config) AgentModel(agentName string) string {
+	if c == nil || agentName == "" {
+		return ""
+	}
+	a, ok := c.Agents[agentName]
+	if !ok {
+		return ""
+	}
+	if strings.TrimSpace(a.Model) != "" {
+		return strings.TrimSpace(a.Model)
+	}
+	return strings.TrimSpace(a.DefaultModel)
 }
 
 func (c *Config) applyIntentDefaults() {
@@ -376,4 +566,21 @@ func ConfigPath(repoRoot string) string {
 // ExamplePath returns the example config path under repoRoot.
 func ExamplePath(repoRoot string) string {
 	return filepath.Join(repoRoot, DefaultExampleRel)
+}
+
+// NewTestConfig returns a config with applyDefaults + applyV3Defaults (for unit tests).
+func NewTestConfig(repoDirName string) *Config {
+	c := &Config{}
+	c.applyDefaults(repoDirName)
+	c.applyV3Defaults()
+	if c.Agents == nil {
+		c.Agents = map[string]Agent{}
+	}
+	if c.Models == nil {
+		c.Models = ModelsConfig{}
+	}
+	if c.Pricing.Models == nil {
+		c.Pricing.Models = map[string]ModelPricing{}
+	}
+	return c
 }

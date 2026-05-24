@@ -112,6 +112,10 @@ type WorkOptions struct {
 	Reviewer    string
 	Source      string
 	Interactive bool
+	// V3 optional mirrors (CLI may omit; work.go sets from flags).
+	EstimateOnly    bool
+	AllowOverBudget bool
+	BudgetMajor     float64
 }
 
 // NextRecommendation is output for agentflow next.

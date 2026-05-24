@@ -89,6 +89,14 @@ spec/plan → enrich → dev (worktree + agent) → verify → review → report
 | `internal/state/sqlite` | `application/internal/store/sqlite/` |
 | `internal/rag/` | `application/internal/rag/` |
 | `internal/policy/` | `application/internal/policy/` |
+| `internal/cost/` | Estimation tokens/coût/durée (specv3) |
+| `internal/contextopt/` | Collecte, scoring, réduction, pack contexte |
+| `internal/investigation/` | Grep, scan repo, symboles Go |
+| `internal/telemetry/` | Métriques run/step → SQLite |
+| `internal/tui/` | Affichage rich/plain/json (isolé du moteur) |
+| `internal/pipeline/` | `RunV3Pipeline` (séquence work V3) |
+| `internal/routing/` | Routing cost-aware local/cloud |
+| `internal/mcp/` | Serveur MCP stdio |
 | `pkg/agentflow/types` | `application/pkg/agentflow/` |
 
 Interfaces §11.2 : `WorkflowEngine`, `TaskStore`, `WorktreeManager`, `Validator` déclarées dans `internal/workflow/interfaces.go` ; implémentations = `Service`, `sqlite.Store`, `worktree.Manager`, `validation.Runner`.

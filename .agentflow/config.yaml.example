@@ -83,6 +83,81 @@ validation:
       command: golangci-lint run
       required: false
 
+# --- specv3 : coût / performance / tokens ---
+models:
+  ollama_local_qwen:
+    provider: ollama
+    class: local
+    model: qwen2.5-coder:14b
+    input_cost_per_1m_tokens: 0
+    output_cost_per_1m_tokens: 0
+    typical_latency_ms_per_1k_tokens: 120
+    max_context_tokens: 32000
+    usage: [summarize, classify, pre_review, context_selection]
+  gemini_flash:
+    provider: ollama_cloud
+    class: cloud_fast
+    model: gemini-3-flash-preview
+    usage: [implementation, intermediate_review]
+
+budgets:
+  default_currency: EUR
+  per_run:
+    max_estimated_cost: 1.00
+    max_estimated_tokens: 500000
+    require_confirmation_above_cost: 0.20
+  per_task:
+    max_estimated_cost: 0.30
+    max_estimated_tokens: 150000
+  daily:
+    max_estimated_cost: 10.00
+  policies:
+    block_when_over_budget: true
+    allow_override_with_flag: true
+    override_flag: "--allow-over-budget"
+
+pricing:
+  currency: EUR
+  models:
+    gemini-3-flash-preview:
+      input_per_1m_tokens: 0.00  # configurer manuellement
+      output_per_1m_tokens: 0.00
+      source: manual
+      updated_at: "2026-05-17"
+
+token_estimation:
+  default_chars_per_token: 4.0
+  code_chars_per_token: 3.2
+  markdown_chars_per_token: 4.2
+  json_chars_per_token: 3.6
+
+routing:
+  default_strategy: cost_aware
+  strategies:
+    cost_aware:
+      prefer_local_for: [summarize, classify, context_selection, pre_review, log_analysis]
+      use_cloud_fast_for: [implementation_medium, review_medium, planning_complex]
+      use_cloud_heavy_for: [architecture_critical, security_sensitive, large_refactor]
+      local_failures_before_cloud: 1
+      cloud_fast_failures_before_heavy: 1
+
+ui:
+  mode: auto  # auto | rich | plain | json
+  live_logs: true
+  progress_bars: true
+  compact: false
+
+mcp:
+  enabled: false
+  max_output_bytes: 1048576
+  command_timeout_seconds: 120
+  secret_path_denylist: [".env", "credentials.json", "id_rsa"]
+  investigation:
+    large_file_bytes: 524288
+    max_grep_output_bytes: 262144
+    command_timeout_seconds: 120
+    sensitive_globs: ["*.pem", ".git/*"]
+
 policies:
   require_clean_git: true
   forbid_untracked_secret_files: true

@@ -117,6 +117,7 @@ func (s *Store) Migrate() error {
 	}{
 		{1, "migrations/001_initial.sql"},
 		{2, "migrations/002_runs_tasks_v1.sql"},
+		{3, "migrations/003_run_step_metrics.sql"},
 	}
 
 	for _, m := range migrations {

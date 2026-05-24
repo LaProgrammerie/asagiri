@@ -1,28 +1,31 @@
-# Current spec — AgentFlow specv2
+# Current spec — AgentFlow specv3
 
-**Phase :** `agentflow-specv2` (Intent Layer & sources externes)  
+**Phase :** `agentflow-specv3` (Cost, Performance & Token Optimization)  
 **Date :** 2026-05-17
 
 ## Résumé
 
-Couche haut niveau au-dessus des primitives V1 : intentions en langage naturel, plan d’exécution inspectable, sync Notion → `.agentflow/specs/`, inbox multi-sources.
+Couche cost/performance au-dessus de V1 + V2 : estimation locale tokens/coût/temps, investigation repo, optimisation contexte, budgets, métriques SQLite, TUI (rich/plain/json), MCP local.
 
 ## Critères de phase
 
 | Domaine | Statut |
 |---------|--------|
-| §4 Commandes work/continue/next/inbox/sync | Livré |
-| §5 IntentResolver | Livré |
-| §6 HighLevelPlanner | Livré |
-| §7–8 Sources Local + Notion | Livré (Notion database si `specs_database_id`) |
-| §9 Config intent/work/sources | Livré |
-| §10–13 Modes, UX, sécurité | Livré |
-| §14 Critères d’acceptation | Livré + tests |
+| §4–7 Estimation / pricing / budget / durée | Livré |
+| §8–9 Context opt + investigation | Livré |
+| §10 MCP local (stdio, tools §10.2) | Livré (`mcp.enabled: false` par défaut) |
+| §11 Routing cost-aware | Livré (heuristique) |
+| §12 Extension `work` + flags V3 | Livré |
+| §13 TUI (lipgloss + fallback) | Livré |
+| §14–15 Métriques + rapport Cost & Performance | Livré |
+| §16 Commandes estimate/investigate/context/cost/inspect/mcp | Livré |
+| §17 Critères d'acceptation | Livré + tests |
 
-## Spec canonique
+## Specs
 
-- **Évolution / produit :** [`specv2.md`](../../../specv2.md)
-- **Historique V1 :** [`spec.md`](../../../spec.md)
+- **Courante :** [`specv3.md`](../../../specv3.md)
+- **Intent layer :** [`specv2.md`](../../../specv2.md)
+- **V1 :** [`spec.md`](../../../spec.md)
 
 ## Handoff actif
 

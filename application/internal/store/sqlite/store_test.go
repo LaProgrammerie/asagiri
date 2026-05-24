@@ -21,12 +21,12 @@ func TestMigrateFromEmpty(t *testing.T) {
 
 	v, err := store.SchemaVersion()
 	require.NoError(t, err)
-	require.Equal(t, 2, v)
+	require.Equal(t, 3, v)
 
 	require.NoError(t, store.Migrate())
 	v2, err := store.SchemaVersion()
 	require.NoError(t, err)
-	require.Equal(t, 2, v2)
+	require.Equal(t, 3, v2)
 }
 
 func TestTablesAndColumnsExist(t *testing.T) {

@@ -27,6 +27,21 @@ type RunReport struct {
 	Steps      []Step        `json:"steps"`
 	Tasks      []sqlite.Task `json:"tasks"`
 	Repository string        `json:"repository"`
+	Cost       *CostPerformance `json:"cost_performance,omitempty"`
+}
+
+// CostPerformance is an optional V3 section (specv3 §15).
+type CostPerformance struct {
+	EstimatedInputTokens  int    `json:"estimated_input_tokens"`
+	EstimatedOutputTokens int    `json:"estimated_output_tokens"`
+	ActualInputTokens     int    `json:"actual_input_tokens"`
+	ActualOutputTokens    int    `json:"actual_output_tokens"`
+	EstimatedCost         string `json:"estimated_cost"`
+	ActualCost            string `json:"actual_cost"`
+	EstimatedDuration     string `json:"estimated_duration"`
+	ActualDuration        string `json:"actual_duration"`
+	FilesScanned          int    `json:"files_scanned_local"`
+	CandidateFiles        int    `json:"candidate_files"`
 }
 
 type Writer struct {
@@ -96,12 +111,35 @@ func toMarkdown(r RunReport) string {
 	sb.WriteString("## Tasks\n\n")
 	if len(r.Tasks) == 0 {
 		sb.WriteString("- Aucune task\n")
-		return sb.String()
+	} else {
+		for _, task := range r.Tasks {
+			sb.WriteString(fmt.Sprintf("- `%s` [%s] %s\n", task.ID, task.Status, extractTaskTitle(task.PayloadJSON)))
+		}
 	}
-	for _, task := range r.Tasks {
-		sb.WriteString(fmt.Sprintf("- `%s` [%s] %s\n", task.ID, task.Status, extractTaskTitle(task.PayloadJSON)))
+	if r.Cost != nil {
+		sb.WriteString("\n")
+		sb.WriteString(CostPerformanceMarkdown(*r.Cost))
 	}
 	return sb.String()
+}
+
+// CostPerformanceMarkdown renders the Cost & Performance table (specv3 §15).
+func CostPerformanceMarkdown(c CostPerformance) string {
+	var sb strings.Builder
+	sb.WriteString("## Cost & Performance\n\n")
+	sb.WriteString("| Metric | Estimated | Actual |\n|---|---:|---:|\n")
+	sb.WriteString(fmt.Sprintf("| Input tokens | %s | %s |\n", formatInt(c.EstimatedInputTokens), formatInt(c.ActualInputTokens)))
+	sb.WriteString(fmt.Sprintf("| Output tokens | %s | %s |\n", formatInt(c.EstimatedOutputTokens), formatInt(c.ActualOutputTokens)))
+	sb.WriteString(fmt.Sprintf("| Cost | %s | %s |\n", c.EstimatedCost, c.ActualCost))
+	sb.WriteString(fmt.Sprintf("| Duration | %s | %s |\n", c.EstimatedDuration, c.ActualDuration))
+	sb.WriteString("\n## Local Work Saved\n\n")
+	sb.WriteString(fmt.Sprintf("- %s files scanned locally\n", formatInt(c.FilesScanned)))
+	sb.WriteString(fmt.Sprintf("- %s candidate files selected\n", formatInt(c.CandidateFiles)))
+	return sb.String()
+}
+
+func formatInt(n int) string {
+	return fmt.Sprintf("%d", n)
 }
 
 func extractTaskTitle(payloadJSON string) string {

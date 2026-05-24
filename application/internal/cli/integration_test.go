@@ -78,6 +78,8 @@ agents:
 		{"init"},
 		{"index", "--dry-run"},
 		{"work", "développe agentflow-test", "--dry-run", "--plan-only"},
+		{"work", "développe agentflow-test", "--dry-run", "--estimate-only"},
+		{"estimate", "agentflow-test", "--dry-run"},
 		{"inbox", "--source", "local"},
 		{"next", "--feature", "agentflow-test"},
 		{"plan", "agentflow-test", "--dry-run"},

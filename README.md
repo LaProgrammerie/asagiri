@@ -2,7 +2,7 @@
 
 Orchestrateur CLI local en Go pour workflows de développement agentique (specs, worktrees, agents, validations).
 
-Spécification produit : [`specv2.md`](specv2.md) (intent layer) ; historique V1 : [`spec.md`](spec.md).  
+Spécification courante : [`specv3.md`](specv3.md) (cost/perf) ; intent layer : [`specv2.md`](specv2.md) ; V1 : [`spec.md`](spec.md).  
 Contexte agents et canon : [`AGENTS.md`](AGENTS.md), [`docs/ai/`](docs/ai/).
 
 ## Prérequis
@@ -31,7 +31,27 @@ make build
 | `agentflow inbox [--source notion\|local]` | Liste les specs candidates |
 | `agentflow sync notion\|all [--page URL] [--feature] [--force]` | Import Notion → `.agentflow/specs/` |
 
-Options `work` : `--agent`, `--reviewer`, `--plan-only`, `--yes`, `--max-tasks`, `--stop-after`, `--no-review`, `--source`.
+Options `work` : `--agent`, `--reviewer`, `--plan-only`, `--yes`, `--max-tasks`, `--stop-after`, `--no-review`, `--source`, et (V3) `--estimate-only`, `--budget`, `--prefer-local`, `--max-input-tokens`, `--max-output-tokens`, `--allow-over-budget`, `--no-context-reduction`, etc.
+
+## Commandes cost/perf (specv3)
+
+| Commande | Description |
+|----------|-------------|
+| `agentflow estimate <feature> [--task]` | Estimation tokens/coût/temps sans exécuter |
+| `agentflow investigate <feature> [--task]` | Investigation locale (grep, candidats, tests) |
+| `agentflow context <feature> --show` / `--optimize` | Contexte pack + économies |
+| `agentflow cost report [--since 7d]` | Historique coûts (SQLite) |
+| `agentflow cost models` | Pricing et profils modèles configurés |
+| `agentflow inspect symbol\|tests\|diff` | Inspection ciblée |
+| `agentflow mcp serve` | MCP stdio (nécessite `mcp.enabled: true`) |
+
+Configurer `models`, `budgets`, `pricing`, `token_estimation`, `routing`, `ui` dans `.agentflow/config.yaml` (voir `config.yaml.example`).
+
+```bash
+./bin/agentflow estimate billing-v2 --task task-003
+./bin/agentflow work "développe billing-v2" --estimate-only --budget 0.50
+./bin/agentflow investigate billing-v2
+```
 
 ```bash
 ./bin/agentflow work "développe agentflow-test" --dry-run --plan-only
