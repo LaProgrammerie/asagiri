@@ -17,6 +17,32 @@ AgentFlow ist eine Go-CLI, die Specs, lokale Investigation, Git-Worktrees, exter
 
 Optional: **Ollama** für lokales Routing oder Enrichment; **Notion**-Token für Sync (`NOTION_TOKEN`).
 
+## Homebrew (macOS / Linux)
+
+```bash
+brew tap LaProgrammerie/tap
+brew install agentflow
+agentflow version
+```
+
+Die Formel wird bei jedem Release-Tag in [LaProgrammerie/homebrew-tap](https://github.com/LaProgrammerie/homebrew-tap) veröffentlicht.
+
+## Manuelle Installation (Release-Binary)
+
+Archive und Prüfsummen von [GitHub Releases](https://github.com/LaProgrammerie/hyper-fast-builder/releases) laden. Archivnamen folgen GoReleaser, z. B. `agentflow_Darwin_arm64.tar.gz`, `agentflow_Linux_x86_64.tar.gz`, `agentflow_Windows_arm64.zip`.
+
+```bash
+VERSION=v0.1.0
+curl -LO "https://github.com/LaProgrammerie/hyper-fast-builder/releases/download/${VERSION}/checksums.txt"
+curl -LO "https://github.com/LaProgrammerie/hyper-fast-builder/releases/download/${VERSION}/agentflow_Darwin_arm64.tar.gz"
+sha256sum -c checksums.txt
+tar -xzf agentflow_Darwin_arm64.tar.gz
+sudo install -m 755 agentflow /usr/local/bin/agentflow
+agentflow version
+```
+
+`VERSION`, Archivname und Installationspfad an OS und CPU anpassen.
+
 ## Installation aus dem Quellcode
 
 Repository klonen, mit dem Projekt-Makefile bauen, die Binärdatei unter `bin/` verwenden:
@@ -25,7 +51,7 @@ Repository klonen, mit dem Projekt-Makefile bauen, die Binärdatei unter `bin/` 
 git clone https://github.com/LaProgrammerie/hyper-fast-builder.git
 cd hyper-fast-builder
 make build
-# Binärdatei: ./bin/agentflow
+./bin/agentflow version
 ```
 
 `bin/` zum `PATH` hinzufügen oder `bin/agentflow` an einen Ort kopieren, der bereits auf `PATH` liegt.
@@ -48,7 +74,7 @@ Tragen Sie `.agentflow/state.sqlite` und `.agentflow/worktrees/` in `.gitignore`
 
 ## Einrichtung prüfen
 
-Nach der Installation oder wenn etwas nicht passt: `agentflow doctor`. Der Befehl prüft Git, die Existenz der Konfiguration, ob Agent-Befehle auf `PATH` auflösbar sind, und häufige Fehlkonfigurationen — bevor Sie Zeit in einen fehlschlagenden `work`-Lauf investieren.
+Nach jeder Installationsart (Homebrew, Release-Binary oder `make build`): `agentflow doctor`. Der Befehl prüft Git, die Existenz der Konfiguration, ob Agent-Befehle auf `PATH` auflösbar sind, und häufige Fehlkonfigurationen — bevor Sie Zeit in einen fehlschlagenden `work`-Lauf investieren.
 
 ```bash
 agentflow doctor

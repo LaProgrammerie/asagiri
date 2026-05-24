@@ -17,6 +17,32 @@ AgentFlow is a Go CLI that ties together specs, local investigation, git worktre
 
 Optional: **Ollama** for local enrichment or routing, and a **Notion** token for sync (`NOTION_TOKEN`).
 
+## Homebrew (macOS / Linux)
+
+```bash
+brew tap LaProgrammerie/tap
+brew install agentflow
+agentflow version
+```
+
+The formula is published from [LaProgrammerie/homebrew-tap](https://github.com/LaProgrammerie/homebrew-tap) when a release tag is pushed.
+
+## Manual install (released binary)
+
+Download archives and checksums from [GitHub Releases](https://github.com/LaProgrammerie/hyper-fast-builder/releases). Archive names follow GoReleaser conventions, for example `agentflow_Darwin_arm64.tar.gz`, `agentflow_Linux_x86_64.tar.gz`, or `agentflow_Windows_arm64.zip`.
+
+```bash
+VERSION=v0.1.0
+curl -LO "https://github.com/LaProgrammerie/hyper-fast-builder/releases/download/${VERSION}/checksums.txt"
+curl -LO "https://github.com/LaProgrammerie/hyper-fast-builder/releases/download/${VERSION}/agentflow_Darwin_arm64.tar.gz"
+sha256sum -c checksums.txt
+tar -xzf agentflow_Darwin_arm64.tar.gz
+sudo install -m 755 agentflow /usr/local/bin/agentflow
+agentflow version
+```
+
+Replace `VERSION`, the archive name, and the install path for your OS and CPU architecture.
+
 ## Install from source
 
 Clone the repository, build with the project `Makefile`, and use the binary under `bin/`:
@@ -25,7 +51,7 @@ Clone the repository, build with the project `Makefile`, and use the binary unde
 git clone https://github.com/LaProgrammerie/hyper-fast-builder.git
 cd hyper-fast-builder
 make build
-# binary: ./bin/agentflow
+./bin/agentflow version
 ```
 
 Add `bin/` to your `PATH`, or copy `bin/agentflow` into any directory that is already on `PATH`.
@@ -48,7 +74,7 @@ Ensure `.agentflow/state.sqlite` and `.agentflow/worktrees/` are listed in `.git
 
 ## Verify setup
 
-Run `agentflow doctor` after install or whenever something feels miswired. Doctor exercises git, checks that config exists, confirms agent commands resolve on `PATH`, and surfaces common misconfigurations before you spend time on a failing `work` run.
+After any install path (Homebrew, release binary, or `make build`), run `agentflow doctor`. Doctor exercises git, checks that config exists, confirms agent commands resolve on `PATH`, and surfaces common misconfigurations before you spend time on a failing `work` run.
 
 ```bash
 agentflow doctor

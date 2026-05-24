@@ -61,7 +61,7 @@ func newRootCmd() *cobra.Command {
 			Use:   "version",
 			Short: "Afficher la version",
 			RunE: func(cmd *cobra.Command, args []string) error {
-				fmt.Fprintln(cmd.OutOrStdout(), version.Version)
+				fmt.Fprintln(cmd.OutOrStdout(), version.String())
 				return nil
 			},
 		},

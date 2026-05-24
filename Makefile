@@ -3,11 +3,18 @@ GOLANGCI_LINT ?= golangci-lint
 BINARY := agentflow
 CMD := ./application/cmd/agentflow
 BIN_DIR := bin
+VERSION_PKG := github.com/LaProgrammerie/hyper-fast-builder/application/internal/version
 RELEASE_VERSION ?= dev
-LDFLAGS := -ldflags "-X github.com/LaProgrammerie/hyper-fast-builder/application/internal/version.Version=$(RELEASE_VERSION)"
+RELEASE_COMMIT ?= $(shell git rev-parse --short HEAD 2>/dev/null || echo unknown)
+RELEASE_DATE ?= $(shell date -u +"%Y-%m-%dT%H:%M:%SZ" 2>/dev/null || echo unknown)
+RELEASE_LDFLAGS := -s -w \
+	-X $(VERSION_PKG).Version=$(RELEASE_VERSION) \
+	-X $(VERSION_PKG).Commit=$(RELEASE_COMMIT) \
+	-X $(VERSION_PKG).Date=$(RELEASE_DATE)
+LDFLAGS := -ldflags "$(RELEASE_LDFLAGS)"
 COMPOSE := docker compose -f infrastructure/docker/docker-compose.yml
 
-.PHONY: help build run test lint fmt vet clean dev docker-up docker-down benchmark
+.PHONY: help build run test lint fmt vet clean dev docker-up docker-down benchmark release-snapshot release-check
 
 benchmark: build ## Benchmark dry-run (estimate + work plan-only)
 	@AGENTFLOW_DRY_RUN=1 ./scripts/benchmark-workflow.sh
@@ -39,7 +46,13 @@ vet: ## go vet
 	$(GO) vet ./...
 
 clean: ## Supprime les binaires locaux
-	rm -rf $(BIN_DIR) coverage.out
+	rm -rf $(BIN_DIR) coverage.out dist/
+
+release-snapshot: ## Build release artefacts locally (GoReleaser snapshot)
+	goreleaser release --snapshot --clean
+
+release-check: ## Validate .goreleaser.yaml
+	goreleaser check
 
 dev: docker-up ## Environnement de dev (conteneur Go + deps)
 

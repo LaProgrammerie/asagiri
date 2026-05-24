@@ -1,0 +1,75 @@
+version: 2
+
+project_name: agentflow
+
+before:
+  hooks:
+    - go mod tidy
+    - go test ./...
+
+builds:
+  - id: agentflow
+    main: ./application/cmd/agentflow
+    binary: agentflow
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w
+      - -X github.com/LaProgrammerie/hyper-fast-builder/application/internal/version.Version={{.Version}}
+      - -X github.com/LaProgrammerie/hyper-fast-builder/application/internal/version.Commit={{.Commit}}
+      - -X github.com/LaProgrammerie/hyper-fast-builder/application/internal/version.Date={{.Date}}
+
+archives:
+  - id: default
+    ids:
+      - agentflow
+    format_overrides:
+      - goos: windows
+        formats:
+          - zip
+    files:
+      - LICENSE
+      - README.md
+
+checksum:
+  name_template: checksums.txt
+
+snapshot:
+  version_template: "{{ incpatch .Version }}-next"
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^chore:"
+
+release:
+  github:
+    owner: LaProgrammerie
+    name: hyper-fast-builder
+  draft: false
+  prerelease: auto
+
+brews:
+  - name: agentflow
+    repository:
+      owner: LaProgrammerie
+      name: homebrew-tap
+      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
+    directory: Formula
+    homepage: "https://github.com/LaProgrammerie/hyper-fast-builder"
+    description: "Deterministic orchestration for AI coding workflows"
+    license: "Apache-2.0"
+    test: |
+      system "#{bin}/agentflow", "version"
+    install: |
+      bin.install "agentflow"

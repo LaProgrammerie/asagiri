@@ -1,4 +1,16 @@
-# Current spec — AgentFlow consolidation (post-V3)
+# Current spec — AgentFlow release distribution
+
+**Phase :** `spec-release` (GoReleaser, GitHub Releases, Homebrew)  
+**Date :** 2026-05-17
+
+## Spec active
+
+- **Mission courante :** [`spec-release.md`](../../../spec-release.md)
+- **Décision :** ADR-015 dans [`05-decisions.md`](../05-decisions.md)
+
+---
+
+# Previous phase — consolidation (post-V3)
 
 **Phase :** `spec-postv123` (consolidation, fiabilisation, OSS)  
 **Date :** 2026-05-17

@@ -13,6 +13,34 @@ AgentFlow turns specs into auditable, cost-aware development runs using local in
 
 ## Install
 
+### Homebrew (macOS / Linux)
+
+```bash
+brew tap LaProgrammerie/tap
+brew install agentflow
+agentflow version
+```
+
+Requires the [homebrew-tap](https://github.com/LaProgrammerie/homebrew-tap) repository and a published release.
+
+### Manual install (released binary)
+
+Download an archive from [GitHub Releases](https://github.com/LaProgrammerie/hyper-fast-builder/releases) for your OS/arch (`agentflow_Darwin_arm64.tar.gz`, `agentflow_Linux_x86_64.tar.gz`, `agentflow_Windows_arm64.zip`, etc.).
+
+```bash
+VERSION=v0.1.0
+curl -LO "https://github.com/LaProgrammerie/hyper-fast-builder/releases/download/${VERSION}/checksums.txt"
+curl -LO "https://github.com/LaProgrammerie/hyper-fast-builder/releases/download/${VERSION}/agentflow_Darwin_arm64.tar.gz"
+sha256sum -c checksums.txt
+tar -xzf agentflow_Darwin_arm64.tar.gz
+sudo install -m 755 agentflow /usr/local/bin/agentflow
+agentflow version
+```
+
+Adjust `VERSION`, archive name, and install path for your platform.
+
+### From source
+
 Requirements: Go 1.25+, `git`, `make`.
 
 ```bash
@@ -20,7 +48,16 @@ git clone https://github.com/LaProgrammerie/hyper-fast-builder.git
 cd hyper-fast-builder
 go mod download
 make build
+./bin/agentflow version
 ```
+
+### Verify
+
+```bash
+agentflow doctor
+```
+
+See [`docs/release-process.md`](docs/release-process.md) for maintainers.
 
 ## Quickstart
 
