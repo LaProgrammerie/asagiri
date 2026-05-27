@@ -1,0 +1,46 @@
+---
+title: Prototype as spec
+description: Use a clickable prototype as a source for stable flows and contracts.
+---
+
+# Prototype as spec
+
+In Asagiri, the prototype is an executable input to engineering, not the final deliverable.
+
+## Role of the prototype
+
+The prototype is used to:
+
+- make user journeys concrete;
+- expose actions, states, and routes;
+- derive flows and contracts;
+- feed generated specs and tasks.
+
+## What stays stable
+
+The stable layer is not UI code. It is the YAML model generated from it:
+
+- `product.yaml`
+- `flows/*.flow.yaml`
+- `screens/*.screen.yaml`
+- `contracts/*.yaml`
+
+These files are easy to diff, review, and patch.
+
+## Control points
+
+Before implementation, review:
+
+- missing error states;
+- destructive actions and confirmation policies;
+- auth and permission assumptions;
+- unresolved API contracts.
+
+## Limits
+
+The prototype does not guarantee correctness of domain logic, security, or production architecture. It improves discovery and alignment, then hands off to existing Asagiri workflows.
+
+## Related
+
+- [Executable Product Layer](/docs/concepts/executable-product-layer)
+- [Reference: flow schema](/docs/reference/flow-schema)

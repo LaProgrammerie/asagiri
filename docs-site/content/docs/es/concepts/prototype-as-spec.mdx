@@ -1,0 +1,32 @@
+---
+title: Prototipo como especificación
+description: Usar un prototipo clicable como fuente de flujos y contratos estables.
+---
+
+# Prototipo como especificación
+
+En Asagiri, el prototipo es una entrada ejecutable para ingeniería, no el entregable final.
+
+## Rol
+
+- hacer concretos los recorridos de usuario;
+- extraer acciones, estados y rutas;
+- derivar flujos, contratos, specs y tareas.
+
+## Capa estable
+
+- `product.yaml`
+- `flows/*.flow.yaml`
+- `screens/*.screen.yaml`
+- `contracts/*.yaml`
+
+Estos archivos son legibles, comparables y editables.
+
+## Control
+
+Antes de implementar, revisar:
+
+- estados de error faltantes;
+- acciones destructivas sin política de confirmación;
+- supuestos de auth/permisos;
+- contratos API no resueltos.

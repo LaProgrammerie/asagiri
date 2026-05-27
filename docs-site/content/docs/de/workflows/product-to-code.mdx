@@ -1,0 +1,27 @@
+---
+title: Produkt-zu-Code Workflow
+description: End-to-End von Produkt-Intent bis zum ausfuehrbaren Entwicklungsplan.
+---
+
+# Produkt-zu-Code Workflow
+
+Empfohlene Sequenz:
+
+```bash
+asa prototype create "Workspace SaaS mit Team-Einladungen" --product workspace-saas
+asa prototype run workspace-saas
+asa flows extract workspace-saas
+asa flows inspect workspace-saas
+asa contracts extract workspace-saas
+asa spec generate-from-product workspace-saas
+asa product review workspace-saas
+asa work "develop workspace-saas" --plan-only
+```
+
+## Outputs
+
+- klickbarer lokaler Prototyp;
+- Flow/Screen-YAML;
+- technische Vertraege;
+- generierte Specs/Tasks;
+- ausfuehrbarer Work-Plan.

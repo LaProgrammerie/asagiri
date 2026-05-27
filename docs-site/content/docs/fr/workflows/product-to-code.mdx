@@ -1,0 +1,27 @@
+---
+title: Workflow produit vers code
+description: Enchaînement complet d’une intention produit jusqu’au plan de dev.
+---
+
+# Workflow produit vers code
+
+Séquence recommandée :
+
+```bash
+asa prototype create "SaaS workspace avec invitations" --product workspace-saas
+asa prototype run workspace-saas
+asa flows extract workspace-saas
+asa flows inspect workspace-saas
+asa contracts extract workspace-saas
+asa spec generate-from-product workspace-saas
+asa product review workspace-saas
+asa work "develop workspace-saas" --plan-only
+```
+
+## Sorties
+
+- prototype local cliquable ;
+- flows/screens YAML ;
+- contrats techniques ;
+- specs/tasks générées ;
+- plan d’exécution `work`.

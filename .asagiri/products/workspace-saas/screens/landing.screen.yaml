@@ -1,0 +1,7 @@
+id: landing
+title: Landing
+route: /
+states:
+    - idle
+actions:
+    - click_get_started

@@ -1,0 +1,9 @@
+id: signup
+title: Signup
+route: /signup
+states:
+    - idle
+    - submitting
+    - error
+actions:
+    - submit_signup

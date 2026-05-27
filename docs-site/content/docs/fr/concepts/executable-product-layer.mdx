@@ -1,0 +1,38 @@
+---
+title: Couche produit exécutable
+description: Transformer une intention produit en prototype versionnable, flows, contrats et tâches.
+---
+
+# Couche produit exécutable
+
+La couche produit exécutable ajoute une entrée produit à Asagiri sans en faire un builder visuel générique. Tous les artefacts restent locaux, inspectables et versionnables.
+
+## Pipeline
+
+```text
+Intent
+  -> prototype
+  -> flows
+  -> contrats
+  -> specs générées
+  -> tâches exécutables
+  -> plan de travail
+```
+
+## Structure repo
+
+```text
+.asagiri/products/<product>/
+  intent.md
+  product.yaml
+  prototype/
+  flows/
+  screens/
+  contracts/
+  extraction/
+  generated-specs/
+```
+
+## Limites
+
+Le prototype n’est pas le code de production. Cette couche sert à aligner, dériver et auditer avant implémentation.

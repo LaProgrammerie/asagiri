@@ -3,6 +3,7 @@
   "pages": [
     "kiro-to-cursor",
     "notion-to-code",
+    "product-to-code",
     "cost-aware-workflow",
     "failure-recovery",
     "ci-workflow"

@@ -7,7 +7,7 @@ Complements `AGENTS.md`: **where things live**, **who consumes what**, and **how
 | Topic | Where it lives |
 |-------|----------------|
 | **Asagiri rebrand (spec-rename)** | `spec-rename.md`, `docs/ai/active/handoff.md`, ADR-016, `docs/migration/github-rename-asagiri.md` |
-| **Consolidation OSS / fiabilisation** | `spec-postv123.md`, `docs/consolidation/` |
+| **Consolidation OSS / fiabilisation** | `spec-consolidation-now.md` (actif), `spec-postv123.md` (historique), `docs/consolidation/` |
 | **Public documentation site** | `spec-doc.md`, `spec-deploy-doc.md`, `docs-site/` (Fumadocs → **Cloudflare Pages**, projet **`asagiri-docs`**) ; contenu `content/docs/{en,fr,de,es}/` — **en** défaut/fallback, référence CLI générée sous `en/cli/generated/` ; CI `.github/workflows/docs-cloudflare-pages.yml` |
 | **Doc / code / spec drift tracker** | `problems.md` (repo root) |
 | **Asagiri cost/perf (V3)** | `specv3.md` (repo root) |

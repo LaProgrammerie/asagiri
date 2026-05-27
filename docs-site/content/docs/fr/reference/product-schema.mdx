@@ -1,0 +1,29 @@
+---
+title: Schéma product
+description: Structure canonique de product.yaml.
+---
+
+# Schéma product
+
+`product.yaml` décrit un produit sous `.asagiri/products/<product>/`.
+
+## Forme minimale
+
+```yaml
+id: workspace-saas
+name: Workspace SaaS
+status: draft
+intent: >
+  Permettre de créer un workspace, inviter une équipe et finaliser la configuration.
+prototype:
+  stack: react
+  path: prototype
+  status: generated
+  mock_data: true
+```
+
+## Règles
+
+- `id` et `intent` requis ;
+- `prototype.path` relatif au repo ;
+- clés additionnelles tolérées pour compatibilité future.

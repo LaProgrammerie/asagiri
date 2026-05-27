@@ -1,0 +1,44 @@
+---
+title: Product to code workflow
+description: End-to-end workflow from product intent to executable work plan.
+---
+
+# Product to code workflow
+
+This workflow maps product intent to an implementation plan using the Executable Product Layer.
+
+## Recommended sequence
+
+```bash
+asa prototype create "Workspace SaaS with team invites" --product workspace-saas
+asa prototype run workspace-saas
+asa flows extract workspace-saas
+asa flows inspect workspace-saas
+asa contracts extract workspace-saas
+asa spec generate-from-product workspace-saas
+asa product review workspace-saas
+asa work "develop workspace-saas" --plan-only
+```
+
+## Outputs by stage
+
+| Stage | Output |
+| --- | --- |
+| prototype create | local clickable prototype + `product.yaml` |
+| flows extract | `flows/*.flow.yaml` + `screens/*.screen.yaml` |
+| contracts extract | API, permissions, events, analytics, observability contracts |
+| spec generate-from-product | requirements/design/tasks + canonical spec/task files |
+| work --plan-only | executable plan from generated tasks |
+
+## Review gates
+
+Before full execution (`asa work` without `--plan-only`), validate:
+
+- unresolved contracts;
+- sensitive actions (payment, auth, role change, deletion);
+- quality and acceptance criteria per generated task.
+
+## Related
+
+- [Executable Product Layer](/docs/concepts/executable-product-layer)
+- [CLI overview](/docs/cli)

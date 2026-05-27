@@ -1,0 +1,72 @@
+{
+  "product": "workspace-saas",
+  "flows": [
+    {
+      "ID": "workspace-onboarding",
+      "Title": "Workspace onboarding",
+      "Entry": "landing",
+      "Steps": [
+        {
+          "ID": "step-1",
+          "Screen": "landing",
+          "Action": "click_get_started",
+          "Next": "signup",
+          "ContractRef": "POST /api/workspaces",
+          "Sensitive": false,
+          "Errors": [
+            "email_taken"
+          ]
+        },
+        {
+          "ID": "step-2",
+          "Screen": "signup",
+          "Action": "submit_signup",
+          "Next": "dashboard",
+          "ContractRef": "TODO:auth.signup",
+          "Sensitive": true,
+          "Errors": [
+            "weak_password"
+          ]
+        }
+      ],
+      "Outcome": "workspace_created"
+    }
+  ],
+  "screens": [
+    {
+      "ID": "landing",
+      "Title": "Landing",
+      "Route": "/",
+      "States": [
+        "idle"
+      ],
+      "Actions": [
+        "click_get_started"
+      ]
+    },
+    {
+      "ID": "signup",
+      "Title": "Signup",
+      "Route": "/signup",
+      "States": [
+        "idle",
+        "submitting",
+        "error"
+      ],
+      "Actions": [
+        "submit_signup"
+      ]
+    },
+    {
+      "ID": "dashboard",
+      "Title": "Dashboard",
+      "Route": "/dashboard",
+      "States": [
+        "ready"
+      ],
+      "Actions": [
+        "invite_member"
+      ]
+    }
+  ]
+}

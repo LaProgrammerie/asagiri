@@ -1,0 +1,38 @@
+---
+title: Ausfuehrbare Product Layer
+description: Produkt-Intent in versionierbaren Prototyp, Flows, Vertraege und Tasks umwandeln.
+---
+
+# Ausfuehrbare Product Layer
+
+Die Executable Product Layer erweitert Asagiri um einen produktzentrierten Einstieg, ohne es in einen generischen UI-Builder zu verwandeln. Alle Artefakte bleiben lokal, nachvollziehbar und versionierbar.
+
+## Pipeline
+
+```text
+Intent
+  -> Prototyp
+  -> Flows
+  -> Vertraege
+  -> generierte Specs
+  -> ausfuehrbare Tasks
+  -> Work-Plan
+```
+
+## Repository-Struktur
+
+```text
+.asagiri/products/<product>/
+  intent.md
+  product.yaml
+  prototype/
+  flows/
+  screens/
+  contracts/
+  extraction/
+  generated-specs/
+```
+
+## Grenzen
+
+Der Prototyp ist kein Produktionscode. Diese Layer dient zur Ausrichtung, Ableitung und Review vor der Implementierung.

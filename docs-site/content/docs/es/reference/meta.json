@@ -1,4 +1,10 @@
 {
   "title": "Referencia",
-  "pages": ["environment-variables", "exit-codes"]
+  "pages": [
+    "environment-variables",
+    "exit-codes",
+    "product-schema",
+    "flow-schema",
+    "screen-schema"
+  ]
 }

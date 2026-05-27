@@ -1,4 +1,10 @@
 {
   "title": "Konzepte",
-  "pages": ["philosophy", "local-first", "cost-aware-workflows"]
+  "pages": [
+    "philosophy",
+    "local-first",
+    "cost-aware-workflows",
+    "executable-product-layer",
+    "prototype-as-spec"
+  ]
 }

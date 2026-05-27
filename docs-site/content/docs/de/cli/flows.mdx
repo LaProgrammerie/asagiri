@@ -1,0 +1,29 @@
+---
+title: flows Befehle
+description: Produkt-Flows aus einem Prototyp extrahieren und inspizieren.
+---
+
+# flows Befehle
+
+`asa flows` leitet strukturierte User-Flows aus dem Prototyp ab.
+
+## Extrahieren
+
+```bash
+asa flows extract workspace-saas
+```
+
+Erzeugt:
+
+- `flows/*.flow.yaml`
+- `screens/*.screen.yaml`
+- `extraction/extraction-report.md`
+
+## Inspizieren
+
+```bash
+asa flows inspect workspace-saas
+asa flows inspect workspace-saas --flow onboarding
+```
+
+Zeigt Schritt-/Action-Anzahl, ungeklaerte Vertraege und Risikostufe.

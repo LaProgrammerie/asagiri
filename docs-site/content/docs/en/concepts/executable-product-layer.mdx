@@ -1,0 +1,60 @@
+---
+title: Executable Product Layer
+description: Turn product intent into versioned prototype, flows, contracts, and implementation tasks.
+---
+
+# Executable Product Layer
+
+The Executable Product Layer adds a product-first entry point to Asagiri without turning it into a visual app builder. The goal is to keep every artifact local, inspectable, and versioned in the repository.
+
+## Pipeline
+
+```text
+Intent
+  -> prototype
+  -> flows
+  -> contracts
+  -> generated specs
+  -> executable tasks
+  -> work plan
+```
+
+## Repository structure
+
+For a product named `workspace-saas`, Asagiri stores artifacts under:
+
+```text
+.asagiri/products/workspace-saas/
+  intent.md
+  product.yaml
+  prototype/
+  flows/
+  screens/
+  contracts/
+  extraction/
+  generated-specs/
+```
+
+It also writes:
+
+```text
+.asagiri/specs/workspace-saas/
+.asagiri/tasks/workspace-saas/
+```
+
+## Why this exists
+
+- Keep intent-to-code traceability explicit.
+- Generate implementation-ready tasks from user flows.
+- Make contracts and risks reviewable before coding.
+- Keep deterministic, local-first defaults.
+
+## Boundaries
+
+This layer is not a replacement for architecture review, human validation, or backend implementation. The prototype is a working simulation, not production code.
+
+## Related
+
+- [Prototype as executable spec](/docs/concepts/prototype-as-spec)
+- [Workflow: product to code](/docs/workflows/product-to-code)
+- [CLI: prototype](/docs/cli/prototype)

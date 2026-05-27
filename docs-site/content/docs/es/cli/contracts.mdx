@@ -1,0 +1,24 @@
+---
+title: Comandos contracts
+description: Derivar contratos técnicos a partir de flujos extraídos.
+---
+
+# Comandos contracts
+
+`asa contracts extract` transforma flujos en contratos técnicos utilizables.
+
+## Extraer
+
+```bash
+asa contracts extract workspace-saas
+```
+
+Genera:
+
+- `contracts/api.openapi.yaml`
+- `contracts/permissions.yaml`
+- `contracts/events.yaml`
+- `contracts/analytics.yaml`
+- `contracts/observability.yaml`
+
+El reporte de extracción marca incertidumbres para revisar antes de implementar.

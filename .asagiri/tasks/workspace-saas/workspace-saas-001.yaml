@@ -1,0 +1,22 @@
+id: workspace-saas-001
+title: Implement workspace-saas first flow
+feature: workspace-saas
+status: pending
+type: implementation
+source:
+    spec: .kiro/specs/workspace-saas/tasks.md
+    section: generated-from-product
+scope:
+    allowed_paths:
+        - application/**
+        - .asagiri/products/workspace-saas/**
+acceptance:
+    - flows extracted
+    - contracts generated
+agents:
+    implementer: cursor
+    reviewer: codex
+    enricher: ollama
+metadata:
+    created_at: "2026-05-27T14:19:45Z"
+    updated_at: "2026-05-27T14:19:45Z"

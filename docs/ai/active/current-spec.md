@@ -1,17 +1,17 @@
-# Current spec — Asagiri rebrand (spec-rename)
+# Current spec — Executable Product Layer (spec-prototype)
 
-**Phase :** `spec-rename` + module path **`github.com/LaProgrammerie/asagiri`**  
-**Date :** 2026-05-20
+**Phase :** `spec-prototype`  
+**Date :** 2026-05-27
 
 ## Spec active
 
-- **Mission :** [`spec-rename.md`](../../../spec-rename.md)
-- **Décisions :** ADR-016, ADR-017 dans [`05-decisions.md`](../05-decisions.md)
-- **GitHub (humain) :** renommer le dépôt → [`docs/migration/github-rename-asagiri.md`](../../migration/github-rename-asagiri.md)
+- **Mission :** [`spec-prototype.md`](../../../spec-prototype.md)
+- **Source historique :** [`spec-postv123.md`](../../../spec-postv123.md)
+- **Décisions :** ADR-016/017 (contexte rename) dans [`05-decisions.md`](../05-decisions.md)
 
 ## Résumé
 
-Identité **Asagiri**, CLI **`asa`**, module et URLs **`LaProgrammerie/asagiri`**. Reste : renommer le dépôt sur GitHub (`hyper-fast-builder` → `asagiri`).
+Le rename **Asagiri / `asa`** est considéré livré. La tranche active implémente la couche produit exécutable: `asa prototype`, extraction flows/contracts, génération specs/tasks depuis produit et review produit, avec artefacts versionnables sous `.asagiri/products`, `.asagiri/specs` et `.asagiri/tasks`.
 
 ## Handoff actif
 
@@ -26,6 +26,17 @@ Identité **Asagiri**, CLI **`asa`**, module et URLs **`LaProgrammerie/asagiri`*
 
 - **Mission :** [`spec-release.md`](../../../spec-release.md)
 - **Décision :** ADR-015 (distribution sur repo `asagiri` ; formule Homebrew migrée vers **`asa`** sous ADR-016)
+
+---
+
+# Previous phase — Asagiri rebrand (spec-rename)
+
+**Phase :** `spec-rename` + module path **`github.com/LaProgrammerie/asagiri`**  
+**Date :** 2026-05-20
+
+- **Mission :** [`spec-rename.md`](../../../spec-rename.md)
+- **Résultat :** rebranding livré (produit, CLI, module, URLs)
+- **Migration repo GitHub :** déjà effectuée (runbook: [`docs/migration/github-rename-asagiri.md`](../../migration/github-rename-asagiri.md))
 
 ---
 

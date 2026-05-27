@@ -1,0 +1,52 @@
+---
+title: prototype commands
+description: Create, run, and patch local clickable prototypes.
+---
+
+# prototype commands
+
+`asa prototype` manages local product prototypes under `.asagiri/products/<product>/prototype`.
+
+## Create a prototype
+
+```bash
+asa prototype create "Workspace SaaS with team invites" --product workspace-saas
+```
+
+Creates:
+
+- `intent.md`
+- `product.yaml`
+- a minimal Vite/React prototype
+- initial extraction report metadata
+
+## Run a prototype
+
+```bash
+asa prototype run workspace-saas
+```
+
+Starts the local dev server for the generated prototype.
+
+## Patch a prototype
+
+```bash
+asa prototype patch workspace-saas "Add a 3-step onboarding before dashboard"
+```
+
+Applies targeted updates instead of rewriting the full prototype.
+
+## Safety constraints
+
+The product layer enforces local sandbox constraints:
+
+- no secret ingestion;
+- no `.env` reads for generation logic;
+- no write outside product directories;
+- no dependency install without confirmation.
+
+## Related
+
+- [CLI: flows](/docs/cli/flows)
+- [CLI: contracts](/docs/cli/contracts)
+- [Generated CLI reference](/docs/cli/generated)

@@ -1,0 +1,32 @@
+---
+title: Screen-Schema
+description: Framework-unabhaengige Struktur von .screen.yaml Dateien.
+---
+
+# Screen-Schema
+
+Jede `.screen.yaml` beschreibt einen Screen unabhaengig vom UI-Framework.
+
+## Minimale Form
+
+```yaml
+id: create_workspace
+route: /onboarding/workspace
+title: Create workspace
+layout: centered_form
+components:
+  - id: workspace_name_input
+    type: text_input
+    required: true
+  - id: submit_button
+    type: button
+    action: submit_workspace
+states:
+  loading: true
+  error: true
+  success: true
+```
+
+## Zweck
+
+UX-Anforderungen bleiben auditable ohne Abhaengigkeit von React/Vue-Implementierungsdetails.

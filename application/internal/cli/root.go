@@ -56,6 +56,10 @@ func newRootCmd() *cobra.Command {
 		newCostCmd(&dryRun),
 		newInspectCmd(&dryRun),
 		newMcpCmd(&dryRun),
+		newPrototypeCmd(&dryRun),
+		newFlowsCmd(&dryRun),
+		newContractsCmd(&dryRun),
+		newProductCmd(&dryRun),
 		newDocsCmd(),
 		&cobra.Command{
 			Use:   "version",
@@ -95,6 +99,7 @@ func newSpecCmd(dryRun *bool) *cobra.Command {
 		},
 	}
 	cmd.Flags().StringVar(&agentName, "agent", "kiro", "Agent utilisé pour la phase spec")
+	cmd.AddCommand(newSpecGenerateFromProductCmd(dryRun))
 	return cmd
 }
 

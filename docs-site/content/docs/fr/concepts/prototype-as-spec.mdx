@@ -1,0 +1,34 @@
+---
+title: Prototype comme spec
+description: Utiliser un prototype cliquable comme base pour des flows et contrats stables.
+---
+
+# Prototype comme spec
+
+Dans Asagiri, le prototype est une entrée exécutable pour l’ingénierie, pas le livrable final.
+
+## Rôle
+
+- rendre les parcours utilisateurs concrets ;
+- extraire actions, états et routes ;
+- dériver flows, contrats, specs et tasks.
+
+## Couche stable
+
+Les fichiers de référence sont :
+
+- `product.yaml`
+- `flows/*.flow.yaml`
+- `screens/*.screen.yaml`
+- `contracts/*.yaml`
+
+Ils restent lisibles, diffables et patchables.
+
+## Contrôle
+
+Avant implémentation, vérifier :
+
+- états d’erreur manquants ;
+- actions destructives sans politique de confirmation ;
+- hypothèses auth/permissions ;
+- contrats API non résolus.

@@ -1,0 +1,45 @@
+---
+title: Screen schema
+description: Framework-agnostic structure of .screen.yaml files.
+---
+
+# Screen schema
+
+Each `.screen.yaml` captures one screen independently from the UI framework.
+
+## Minimal shape
+
+```yaml
+id: create_workspace
+route: /onboarding/workspace
+title: Create workspace
+layout: centered_form
+components:
+  - id: workspace_name_input
+    type: text_input
+    required: true
+  - id: submit_button
+    type: button
+    action: submit_workspace
+states:
+  loading: true
+  error: true
+  success: true
+```
+
+## Why separate screens
+
+Screens make UX requirements reviewable without coupling to React/Vue component internals. They also help detect missing states before backend implementation.
+
+## Accessibility
+
+Capture accessibility constraints explicitly where relevant:
+
+- keyboard navigation;
+- required error messaging;
+- focus management assumptions.
+
+## Related
+
+- [Reference: flow schema](/docs/reference/flow-schema)
+- [CLI: flows](/docs/cli/flows)

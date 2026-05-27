@@ -1,0 +1,29 @@
+---
+title: Comandos flows
+description: Extraer e inspeccionar flujos de producto desde un prototipo.
+---
+
+# Comandos flows
+
+`asa flows` deriva recorridos de usuario estructurados desde el prototipo.
+
+## Extraer
+
+```bash
+asa flows extract workspace-saas
+```
+
+Genera:
+
+- `flows/*.flow.yaml`
+- `screens/*.screen.yaml`
+- `extraction/extraction-report.md`
+
+## Inspeccionar
+
+```bash
+asa flows inspect workspace-saas
+asa flows inspect workspace-saas --flow onboarding
+```
+
+Muestra cantidad de pasos/acciones, contratos no resueltos y nivel de riesgo.

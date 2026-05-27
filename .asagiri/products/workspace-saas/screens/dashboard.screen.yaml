@@ -1,0 +1,7 @@
+id: dashboard
+title: Dashboard
+route: /dashboard
+states:
+    - ready
+actions:
+    - invite_member

@@ -76,6 +76,13 @@ agents:
 
 	for _, args := range [][]string{
 		{"init"},
+		{"prototype", "create", "workspace onboarding", "--product", "workspace-saas"},
+		{"flows", "extract", "workspace-saas"},
+		{"contracts", "extract", "workspace-saas"},
+		{"spec", "generate-from-product", "workspace-saas"},
+		{"product", "review", "workspace-saas"},
+		{"flows", "inspect", "workspace-saas"},
+		{"work", "develop workspace-saas", "--dry-run", "--plan-only"},
 		{"index", "--dry-run"},
 		{"work", "développe agentflow-test", "--dry-run", "--plan-only"},
 		{"work", "développe agentflow-test", "--dry-run", "--estimate-only"},

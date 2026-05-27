@@ -1,0 +1,2 @@
+- [ ] Extract and validate flows
+- [ ] Generate contracts and specs

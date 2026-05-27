@@ -1,0 +1,42 @@
+---
+title: flows commands
+description: Extract and inspect product flows from a prototype.
+---
+
+# flows commands
+
+`asa flows` derives structured user flows from a local prototype.
+
+## Extract flows
+
+```bash
+asa flows extract workspace-saas
+```
+
+Writes:
+
+- `.asagiri/products/workspace-saas/flows/*.flow.yaml`
+- `.asagiri/products/workspace-saas/screens/*.screen.yaml`
+- `.asagiri/products/workspace-saas/extraction/extraction-report.md`
+
+## Inspect flows
+
+```bash
+asa flows inspect workspace-saas
+asa flows inspect workspace-saas --flow onboarding
+```
+
+Shows steps/actions count, unresolved contracts, and risk indicators.
+
+## Review hints
+
+Inspect warnings before generating implementation tasks:
+
+- missing error states;
+- destructive actions without policy;
+- unclear permission boundaries.
+
+## Related
+
+- [Reference: flow schema](/docs/reference/flow-schema)
+- [Reference: screen schema](/docs/reference/screen-schema)
