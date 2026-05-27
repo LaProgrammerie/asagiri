@@ -15,11 +15,17 @@ type Product struct {
 }
 
 type Flow struct {
-	ID      string     `yaml:"id"`
-	Title   string     `yaml:"title"`
-	Entry   string     `yaml:"entry_screen"`
-	Steps   []FlowStep `yaml:"steps"`
-	Outcome string     `yaml:"outcome"`
+	ID                       string          `yaml:"id"`
+	Title                    string          `yaml:"title"`
+	Entry                    string          `yaml:"entry_screen"`
+	Steps                    []FlowStep      `yaml:"steps"`
+	Outcome                  string          `yaml:"outcome"`
+	Business                 FlowBusiness    `yaml:"business,omitempty"`
+	Metrics                  []string        `yaml:"metrics,omitempty"`
+	ArchitectureImplications []string        `yaml:"architecture_implications,omitempty"`
+	Observability            FlowTelemetry   `yaml:"observability,omitempty"`
+	Security                 FlowSecurity    `yaml:"security,omitempty"`
+	CostProfile              FlowCostProfile `yaml:"cost_profile,omitempty"`
 }
 
 type FlowStep struct {
@@ -32,12 +38,58 @@ type FlowStep struct {
 	Errors      []string `yaml:"errors,omitempty"`
 }
 
+type FlowBusiness struct {
+	Objective          string `yaml:"objective,omitempty"`
+	Criticality        string `yaml:"criticality,omitempty"`
+	MonetizationImpact string `yaml:"monetization_impact,omitempty"`
+}
+
+type FlowTelemetry struct {
+	Traces  []string `yaml:"traces,omitempty"`
+	Metrics []string `yaml:"metrics,omitempty"`
+	Logs    []string `yaml:"logs,omitempty"`
+}
+
+type FlowSecurity struct {
+	RequiresAuthentication bool     `yaml:"requires_authentication,omitempty"`
+	SensitiveActions       []string `yaml:"sensitive_actions,omitempty"`
+}
+
+type FlowCostProfile struct {
+	ExpectedComplexity     string `yaml:"expected_complexity,omitempty"`
+	InfrastructureCostRisk string `yaml:"infrastructure_cost_risk,omitempty"`
+}
+
 type Screen struct {
 	ID      string   `yaml:"id"`
 	Title   string   `yaml:"title"`
 	Route   string   `yaml:"route"`
 	States  []string `yaml:"states,omitempty"`
 	Actions []string `yaml:"actions,omitempty"`
+}
+
+type BusinessIntent struct {
+	Objective struct {
+		Primary   string   `yaml:"primary"`
+		Secondary []string `yaml:"secondary,omitempty"`
+	} `yaml:"objective"`
+	TargetUsers    []string         `yaml:"target_users,omitempty"`
+	SuccessMetrics []BusinessMetric `yaml:"success_metrics,omitempty"`
+	Constraints    []string         `yaml:"constraints,omitempty"`
+	BusinessRisk   struct {
+		Level   string   `yaml:"level,omitempty"`
+		Reasons []string `yaml:"reasons,omitempty"`
+	} `yaml:"business_risk,omitempty"`
+	Monetization struct {
+		Model           string `yaml:"model,omitempty"`
+		ActivationEvent string `yaml:"activation_event,omitempty"`
+	} `yaml:"monetization,omitempty"`
+	ObservabilityRequirements []string `yaml:"observability_requirements,omitempty"`
+}
+
+type BusinessMetric struct {
+	ID     string `yaml:"id"`
+	Target string `yaml:"target"`
 }
 
 func ParseProductYAML(data []byte) (Product, error) {
@@ -62,6 +114,14 @@ func ParseScreenYAML(data []byte) (Screen, error) {
 		return Screen{}, fmt.Errorf("parse screen yaml: %w", err)
 	}
 	return s, ValidateScreen(s)
+}
+
+func ParseBusinessYAML(data []byte) (BusinessIntent, error) {
+	var b BusinessIntent
+	if err := yaml.Unmarshal(data, &b); err != nil {
+		return BusinessIntent{}, fmt.Errorf("parse business yaml: %w", err)
+	}
+	return b, ValidateBusiness(b)
 }
 
 func ValidateProduct(p Product) error {
@@ -104,6 +164,9 @@ func ValidateFlow(f Flow) error {
 			return fmt.Errorf("flow.steps[%d] sensitive action requires errors", i)
 		}
 	}
+	if f.Business.Criticality == "high" && len(f.Metrics) == 0 {
+		return fmt.Errorf("flow.metrics is required when business.criticality is high")
+	}
 	return nil
 }
 
@@ -120,3 +183,14 @@ func ValidateScreen(s Screen) error {
 	return nil
 }
 
+func ValidateBusiness(b BusinessIntent) error {
+	if strings.TrimSpace(b.Objective.Primary) == "" {
+		return fmt.Errorf("business.objective.primary is required")
+	}
+	for i, metric := range b.SuccessMetrics {
+		if strings.TrimSpace(metric.ID) == "" {
+			return fmt.Errorf("business.success_metrics[%d].id is required", i)
+		}
+	}
+	return nil
+}

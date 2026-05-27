@@ -14,7 +14,9 @@ asa prototype create "Workspace SaaS with team invites" --product workspace-saas
 asa prototype run workspace-saas
 asa flows extract workspace-saas
 asa flows inspect workspace-saas
+asa flows review workspace-saas
 asa contracts extract workspace-saas
+asa architecture derive workspace-saas
 asa spec generate-from-product workspace-saas
 asa product review workspace-saas
 asa work "develop workspace-saas" --plan-only
@@ -26,7 +28,9 @@ asa work "develop workspace-saas" --plan-only
 | --- | --- |
 | prototype create | local clickable prototype + `product.yaml` |
 | flows extract | `flows/*.flow.yaml` + `screens/*.screen.yaml` |
+| flows review | business-aware gap analysis (metrics/observability/security) |
 | contracts extract | API, permissions, events, analytics, observability contracts |
+| architecture derive | system projection report (API/async/security/infra) |
 | spec generate-from-product | requirements/design/tasks + canonical spec/task files |
 | work --plan-only | executable plan from generated tasks |
 

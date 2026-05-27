@@ -20,6 +20,9 @@ func TestParseAndValidateYAML(t *testing.T) {
 	s, err := ParseScreenYAML([]byte("id: s1\ntitle: Home\nroute: /\n"))
 	require.NoError(t, err)
 	require.Equal(t, "/", s.Route)
+
+	_, err = ParseBusinessYAML([]byte("objective:\n  primary: reduce onboarding friction\nsuccess_metrics:\n  - id: onboarding_completion_rate\n    target: \">=70%\"\n"))
+	require.NoError(t, err)
 }
 
 func TestRepositoryPathTraversalGuard(t *testing.T) {
@@ -43,6 +46,10 @@ func TestProductLayerGoldenAndGeneration(t *testing.T) {
 	summary, err := svc.InspectFlows(productName)
 	require.NoError(t, err)
 	require.NoError(t, svc.ExtractContracts(productName, false))
+	_, err = svc.ReviewFlows(productName, false)
+	require.NoError(t, err)
+	_, err = svc.DeriveArchitecture(productName, false)
+	require.NoError(t, err)
 	require.NoError(t, svc.GenerateSpecFromProduct(productName, false))
 	_, err = svc.ReviewProduct(productName, false)
 	require.NoError(t, err)
@@ -57,6 +64,45 @@ func TestProductLayerGoldenAndGeneration(t *testing.T) {
 	require.FileExists(t, filepath.Join(repoRoot, ".asagiri", "specs", productName, "spec.md"))
 	require.FileExists(t, filepath.Join(repoRoot, ".asagiri", "tasks", productName, productName+"-001.yaml"))
 	require.FileExists(t, filepath.Join(repoRoot, ".kiro", "specs", productName, "tasks.md"))
+	require.FileExists(t, filepath.Join(repoRoot, ".asagiri", "products", productName, "business.yaml"))
+	require.FileExists(t, filepath.Join(repoRoot, ".asagiri", "products", productName, "reviews", "flow-review.md"))
+	require.FileExists(t, filepath.Join(repoRoot, ".asagiri", "products", productName, "reviews", "architecture-review.md"))
+}
+
+func TestExtractContractsHardFailsOnUncoupledMetrics(t *testing.T) {
+	repoRoot := t.TempDir()
+	svc := NewService(repoRoot)
+	productName, err := svc.CreatePrototype(CreatePrototypeOptions{
+		Intent:  "workspace onboarding",
+		Product: "hard-fail-metrics",
+	})
+	require.NoError(t, err)
+
+	modelPath := filepath.Join(repoRoot, ".asagiri", "products", productName, "extraction", "extracted-model.yaml")
+	require.NoError(t, os.MkdirAll(filepath.Dir(modelPath), 0o755))
+	raw := []byte(`product: hard-fail-metrics
+business:
+  objective:
+    primary: reduce onboarding friction
+flows:
+  - id: onboarding
+    title: Onboarding
+    entry_screen: landing
+    steps:
+      - id: step-1
+        screen: landing
+        action: invite_member
+        contract_ref: POST /api/invite
+screens:
+  - id: landing
+    title: Landing
+    route: /
+`)
+	require.NoError(t, os.WriteFile(modelPath, raw, 0o644))
+
+	err = svc.ExtractContracts(productName, false)
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "strict coupling failed")
 }
 
 func readGolden(t *testing.T, name string) string {
@@ -66,4 +112,3 @@ func readGolden(t *testing.T, name string) string {
 	require.NoError(t, err)
 	return strings.TrimSpace(string(data))
 }
-

@@ -146,7 +146,30 @@ func newFlowsCmd(dryRun *bool) *cobra.Command {
 			return nil
 		},
 	}
-	cmd.AddCommand(extractCmd, inspectCmd)
+	reviewCmd := &cobra.Command{
+		Use:   "review <product>",
+		Short: "Analyser les gaps métier/metrics/observabilité des flows",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			startDir, err := os.Getwd()
+			if err != nil {
+				return err
+			}
+			actx, err := loadContext(startDir, *dryRun)
+			if err != nil {
+				return err
+			}
+			defer actx.Close()
+			svc := product.NewService(actx.RepoRoot)
+			summary, err := svc.ReviewFlows(args[0], actx.DryRun || *dryRun)
+			if err != nil {
+				return err
+			}
+			fmt.Fprintln(cmd.OutOrStdout(), summary)
+			return nil
+		},
+	}
+	cmd.AddCommand(extractCmd, inspectCmd, reviewCmd)
 	return cmd
 }
 
@@ -241,3 +264,34 @@ func newSpecGenerateFromProductCmd(dryRun *bool) *cobra.Command {
 	}
 }
 
+func newArchitectureCmd(dryRun *bool) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "architecture",
+		Short: "Projeter les implications système depuis les flows",
+	}
+	deriveCmd := &cobra.Command{
+		Use:   "derive <product>",
+		Short: "Dériver API/async/sécurité/observabilité/infra",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			startDir, err := os.Getwd()
+			if err != nil {
+				return err
+			}
+			actx, err := loadContext(startDir, *dryRun)
+			if err != nil {
+				return err
+			}
+			defer actx.Close()
+			svc := product.NewService(actx.RepoRoot)
+			summary, err := svc.DeriveArchitecture(args[0], actx.DryRun || *dryRun)
+			if err != nil {
+				return err
+			}
+			fmt.Fprintln(cmd.OutOrStdout(), summary)
+			return nil
+		},
+	}
+	cmd.AddCommand(deriveCmd)
+	return cmd
+}

@@ -34,6 +34,10 @@ It exposes backend and platform expectations before coding starts:
 
 The extraction report flags uncertain mappings that should be reviewed before implementation.
 
+## Strict coupling validation
+
+`asa contracts extract` now hard-fails when metrics/analytics/contracts coupling is incomplete (for example missing flow metrics, missing analytics metric/dashboard, or missing observability metric linkage).
+
 ## Related
 
 - [Workflow: product to code](/docs/workflows/product-to-code)

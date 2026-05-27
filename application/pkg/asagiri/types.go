@@ -21,23 +21,28 @@ const (
 
 // Task is the canonical task model (spec §8.1).
 type Task struct {
-	ID         string            `yaml:"id" json:"id"`
-	Title      string            `yaml:"title" json:"title"`
-	Feature    string            `yaml:"feature" json:"feature"`
-	Status     string            `yaml:"status" json:"status"`
-	Risk       string            `yaml:"risk,omitempty" json:"risk,omitempty"`
-	Type       string            `yaml:"type,omitempty" json:"type,omitempty"`
-	Source     TaskSource        `yaml:"source,omitempty" json:"source,omitempty"`
-	Scope      TaskScope         `yaml:"scope,omitempty" json:"scope,omitempty"`
-	Acceptance []string          `yaml:"acceptance,omitempty" json:"acceptance,omitempty"`
-	Validation TaskValidation    `yaml:"validation,omitempty" json:"validation,omitempty"`
-	Agents     TaskAgents        `yaml:"agents,omitempty" json:"agents,omitempty"`
-	Metadata   TaskMetadata      `yaml:"metadata,omitempty" json:"metadata,omitempty"`
+	ID         string         `yaml:"id" json:"id"`
+	Title      string         `yaml:"title" json:"title"`
+	Feature    string         `yaml:"feature" json:"feature"`
+	Status     string         `yaml:"status" json:"status"`
+	Risk       string         `yaml:"risk,omitempty" json:"risk,omitempty"`
+	Type       string         `yaml:"type,omitempty" json:"type,omitempty"`
+	Source     TaskSource     `yaml:"source,omitempty" json:"source,omitempty"`
+	Scope      TaskScope      `yaml:"scope,omitempty" json:"scope,omitempty"`
+	Acceptance []string       `yaml:"acceptance,omitempty" json:"acceptance,omitempty"`
+	Validation TaskValidation `yaml:"validation,omitempty" json:"validation,omitempty"`
+	Agents     TaskAgents     `yaml:"agents,omitempty" json:"agents,omitempty"`
+	Metadata   TaskMetadata   `yaml:"metadata,omitempty" json:"metadata,omitempty"`
 }
 
 type TaskSource struct {
-	Spec    string `yaml:"spec,omitempty" json:"spec,omitempty"`
-	Section string `yaml:"section,omitempty" json:"section,omitempty"`
+	Spec              string `yaml:"spec,omitempty" json:"spec,omitempty"`
+	Section           string `yaml:"section,omitempty" json:"section,omitempty"`
+	Product           string `yaml:"product,omitempty" json:"product,omitempty"`
+	Flow              string `yaml:"flow,omitempty" json:"flow,omitempty"`
+	Step              string `yaml:"step,omitempty" json:"step,omitempty"`
+	Action            string `yaml:"action,omitempty" json:"action,omitempty"`
+	BusinessObjective string `yaml:"business_objective,omitempty" json:"business_objective,omitempty"`
 }
 
 type TaskScope struct {
@@ -51,8 +56,8 @@ type TaskValidation struct {
 
 type TaskAgents struct {
 	Implementer string `yaml:"implementer,omitempty" json:"implementer,omitempty"`
-	Reviewer      string `yaml:"reviewer,omitempty" json:"reviewer,omitempty"`
-	Enricher      string `yaml:"enricher,omitempty" json:"enricher,omitempty"`
+	Reviewer    string `yaml:"reviewer,omitempty" json:"reviewer,omitempty"`
+	Enricher    string `yaml:"enricher,omitempty" json:"enricher,omitempty"`
 }
 
 type TaskMetadata struct {

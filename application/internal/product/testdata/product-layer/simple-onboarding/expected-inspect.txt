@@ -1,1 +1,1 @@
-flows=1 steps=2 screens=3 unresolved_contracts=1 risk=medium
+flows=1 steps=2 actions=2 screens=3 unresolved_contracts=1 metrics_gaps=0 risk=medium

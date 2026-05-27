@@ -1,17 +1,18 @@
-# Current spec — Executable Product Layer (spec-prototype)
+# Current spec — Executable Product Layer (spec-better-flow)
 
-**Phase :** `spec-prototype`  
+**Phase :** `spec-better-flow`  
 **Date :** 2026-05-27
 
 ## Spec active
 
-- **Mission :** [`spec-prototype.md`](../../../spec-prototype.md)
+- **Mission :** [`spec-better-flow.md`](../../../spec-better-flow.md)
+- **Base existante :** [`spec-prototype.md`](../../../spec-prototype.md)
 - **Source historique :** [`spec-postv123.md`](../../../spec-postv123.md)
 - **Décisions :** ADR-016/017 (contexte rename) dans [`05-decisions.md`](../05-decisions.md)
 
 ## Résumé
 
-Le rename **Asagiri / `asa`** est considéré livré. La tranche active implémente la couche produit exécutable: `asa prototype`, extraction flows/contracts, génération specs/tasks depuis produit et review produit, avec artefacts versionnables sous `.asagiri/products`, `.asagiri/specs` et `.asagiri/tasks`.
+Le rename **Asagiri / `asa`** est considéré livré. La tranche active étend la couche produit exécutable vers un mode **flow-centric et business-aware**: `business.yaml`, enrichissement des flows (objectif/métriques/implications), dérivation architecture (`asa architecture derive`), review de flows (`asa flows review`), génération des tasks en flow-first, et vérification du couplage métriques/analytics/contracts.
 
 ## Handoff actif
 
