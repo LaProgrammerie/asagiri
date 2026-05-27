@@ -1,0 +1,36 @@
+---
+title: Investigation engine
+description: Structured local investigation before agents modify code.
+---
+
+# Investigation engine
+
+The investigation layer (`spec-my-A` §25) answers: **what broke, where, and why** — before an implementation agent runs.
+
+## Pipeline
+
+```text
+symptom / intent
+  → scope resolution (flow, task, failed tests)
+  → local discovery (grep, symbols, tests)
+  → static analysis
+  → flow / contract correlation
+  → hypotheses (scored)
+  → context pack + root-cause graph
+  → targeted agent work
+```
+
+## Outputs
+
+Investigations produce versionable artefacts under `.asagiri/investigations/<id>/` so humans and agents share the same evidence.
+
+## Integration points
+
+- `asa work --investigate-first`
+- `asa verify --investigate-on-failure`
+- Runtime memory (`investigation` and `hypothesis` entries)
+
+## Related
+
+- [investigate CLI](/docs/cli/investigate)
+- [Executable Product Layer](/docs/concepts/executable-product-layer)

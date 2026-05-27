@@ -1,0 +1,68 @@
+---
+title: investigate command
+description: Local-first structured investigation before agent execution.
+---
+
+# investigate command
+
+`asa investigate` implements the Investigation & Root Cause Engine (`spec-my-A` §25).
+
+## Basic usage
+
+```bash
+asa investigate "why onboarding fails after invite"
+asa investigate "billing regression" --flow onboarding --depth deep --no-cloud
+asa investigate "scope check" --estimate-only
+```
+
+## Failure-driven scope
+
+```bash
+asa investigate "fix failing tests" --from-failed-tests
+```
+
+Parses `go test -json` output to narrow scope to failing packages and test files.
+
+## Work integration
+
+```bash
+asa work "develop workspace-saas" --plan-only --investigate-first
+asa verify billing-v2 --investigate-on-failure
+```
+
+## Artefacts
+
+Each investigation writes under `.asagiri/investigations/<id>/`:
+
+| File | Purpose |
+|------|---------|
+| `report.md` / `report.json` | Full investigation report |
+| `context-pack.json` | Minimal agent context |
+| `replay-pack.json` | Replay instructions |
+| `graph.json` | Root-cause graph |
+
+## Graph visualization
+
+```bash
+asa investigate graph <investigation-id>
+```
+
+## Modes
+
+| Depth | Behavior |
+|-------|----------|
+| `quick` | Smaller file cap, fast collectors |
+| `standard` | Default |
+| `deep` | Larger context pack |
+| `ci` | Tuned for CI / verify failures |
+
+## Safety
+
+- `--no-cloud` disables cloud model calls
+- Sensitive paths are excluded from context packs
+- Hypotheses are scored candidates, not confirmed root causes
+
+## Related
+
+- [Runtime commands](/docs/cli/runtime)
+- [Investigation concept](/docs/concepts/investigation)

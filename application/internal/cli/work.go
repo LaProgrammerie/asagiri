@@ -6,8 +6,11 @@ import (
 	"os"
 	"time"
 
+	"fmt"
+
 	"github.com/LaProgrammerie/asagiri/application/internal/cost"
 	"github.com/LaProgrammerie/asagiri/application/internal/intent"
+	"github.com/LaProgrammerie/asagiri/application/internal/investigation"
 	"github.com/LaProgrammerie/asagiri/application/internal/pipeline"
 	"github.com/spf13/cobra"
 )
@@ -33,7 +36,10 @@ func newWorkCmd(dryRun *bool) *cobra.Command {
 		noCloud        bool
 		allowCloud     bool
 		allowOver      bool
-		noCtxReduce    bool
+		noCtxReduce       bool
+		investigateFirst       bool
+		investigateOnFailure   bool
+		investigationDepth     string
 	)
 
 	cmd := &cobra.Command{
@@ -56,6 +62,29 @@ func newWorkCmd(dryRun *bool) *cobra.Command {
 			if err != nil {
 				return err
 			}
+
+			depth := investigation.Depth(investigationDepth)
+			if depth == "" {
+				depth = investigation.DepthStandard
+			}
+			if investigateFirst && !estimateOnly {
+				invReq := investigation.Request{
+					Symptom:      instruction,
+					Feature:      instruction,
+					Depth:        depth,
+					NoCloud:      noCloud,
+					EstimateOnly: false,
+					RepoRoot:     actx.RepoRoot,
+				}
+				rep, invErr := investigation.RunInvestigation(cmd.Context(), invReq, actx.Config)
+				if invErr != nil {
+					return invErr
+				}
+				_ = investigation.FeedMemory(actx.RepoRoot, rep)
+				fmt.Fprintf(cmd.OutOrStdout(), "investigate-first: %s (candidates: %d)\n",
+					rep.ID, len(rep.RootCauseCandidates))
+			}
+
 			interactive := isInteractive()
 			opts := intent.WorkOptions{
 				PlanOnly:    planOnly,
@@ -143,6 +172,9 @@ func newWorkCmd(dryRun *bool) *cobra.Command {
 					v3res, err = pipeline.RunV3Pipeline(context.Background(), app, resolved, plan, v3opts)
 				}
 				if err != nil {
+					if investigateOnFailure && !actx.DryRun && !*dryRun {
+						runInvestigationOnFailure(cmd, actx, instruction, depth, noCloud)
+					}
 					return err
 				}
 			}
@@ -177,5 +209,25 @@ func newWorkCmd(dryRun *bool) *cobra.Command {
 	cmd.Flags().BoolVar(&allowCloud, "allow-cloud", false, "Autoriser cloud explicitement")
 	cmd.Flags().BoolVar(&allowOver, "allow-over-budget", false, "Dépasser le budget")
 	cmd.Flags().BoolVar(&noCtxReduce, "no-context-reduction", false, "Désactiver réduction contexte")
+	cmd.Flags().BoolVar(&investigateFirst, "investigate-first", false, "Lancer une investigation avant le plan")
+	cmd.Flags().BoolVar(&investigateOnFailure, "investigate-on-failure", false, "Investigation locale si l'exécution échoue")
+	cmd.Flags().StringVar(&investigationDepth, "investigation-depth", "standard", "Profondeur investigation: quick|standard|deep|ci")
 	return cmd
+}
+
+func runInvestigationOnFailure(cmd *cobra.Command, actx *appContext, instruction string, depth investigation.Depth, noCloud bool) {
+	req := investigation.Request{
+		Symptom:         instruction,
+		Feature:         instruction,
+		Depth:           depth,
+		FromFailedTests: true,
+		NoCloud:         noCloud,
+		RepoRoot:        actx.RepoRoot,
+	}
+	rep, err := investigation.RunInvestigation(cmd.Context(), req, actx.Config)
+	if err != nil {
+		return
+	}
+	_ = investigation.FeedMemory(actx.RepoRoot, rep)
+	fmt.Fprintf(cmd.OutOrStdout(), "investigate-on-failure: %s\n", rep.ID)
 }

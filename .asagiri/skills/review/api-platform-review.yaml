@@ -1,0 +1,14 @@
+id: api-platform-review
+name: API Platform Review
+scope:
+  - backend
+  - architecture
+capabilities:
+  - contract_review
+  - resource_validation
+rules:
+  - avoid_anemic_resources
+checks:
+  - go test ./...
+metrics:
+  - review_success_rate

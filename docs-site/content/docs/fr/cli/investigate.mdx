@@ -1,0 +1,38 @@
+---
+title: Commande investigate
+description: Investigation locale structurée avant exécution agent.
+---
+
+# Commande investigate
+
+Moteur d'investigation (spec-my-A §25).
+
+## Usage
+
+```bash
+asa investigate "pourquoi l'onboarding échoue après invitation"
+asa investigate "tests" --from-failed-tests --depth deep --no-cloud
+asa investigate graph <investigation-id>
+```
+
+## Impact produit
+
+```bash
+asa investigate impact --flow onboarding --change "rendre les invitations asynchrones"
+```
+
+## Intégration work / verify
+
+```bash
+asa work "corriger onboarding" --investigate-first --investigation-depth deep
+asa work "corriger onboarding" --investigate-on-failure
+asa verify billing-v2 --investigate-on-failure
+```
+
+## Artefacts
+
+Sous `.asagiri/investigations/<id>/` :
+
+- `report.md`, `report.json`
+- **`context-pack.md`** et `context-pack.json`
+- `replay-pack.json`, `graph.json`

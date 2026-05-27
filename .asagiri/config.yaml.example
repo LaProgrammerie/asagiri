@@ -6,6 +6,12 @@ project:
   name: my-project
   default_branch: main
 
+runtime:
+  mode: guided
+  api:
+    port: 8765
+    socket: .asagiri/runtime/runtime.sock
+
 intent:
   enabled: true
   default_mode: guided

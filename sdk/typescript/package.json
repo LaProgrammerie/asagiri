@@ -1,0 +1,26 @@
+{
+  "name": "@laprogrammerie/asagiri",
+  "version": "0.1.0",
+  "description": "TypeScript client for the local Asagiri runtime API",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "node --import tsx --test src/*.test.ts"
+  },
+  "files": ["dist", "README.md"],
+  "devDependencies": {
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

@@ -42,6 +42,7 @@ type Config struct {
 	Routing    RoutingConfig        `yaml:"routing"`
 	UI         UIConfig             `yaml:"ui"`
 	MCP        MCPConfig            `yaml:"mcp"`
+	Runtime    RuntimeConfig        `yaml:"runtime"`
 }
 
 // ModelsConfig maps logical model/agent profile ids (specv3 §3.1).
@@ -381,6 +382,7 @@ func (c *Config) applyV3Defaults() {
 			"*.pem", "*.key", "*credentials*", "*secret*", ".git/*",
 		}
 	}
+	c.applyRuntimeDefaults()
 }
 
 // AgentModel returns the configured model id for an agent entry, if any.

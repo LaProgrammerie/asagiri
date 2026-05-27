@@ -1,0 +1,41 @@
+---
+title: Persistent runtime
+description: Local engineering runtime with sessions, memory, and events.
+---
+
+# Persistent runtime
+
+Asagiri evolves from a stateless CLI into a **local-first engineering runtime** (`spec-my-A` §24).
+
+## Architecture
+
+```text
+asa daemon run
+  ↓
+SQLite (.asagiri/runtime/runtime.db)
+  ↓
+sessions · branches · events · memory · hook queue
+  ↓
+workers execute whitelisted asa hooks
+```
+
+## Design principles
+
+- **Optional**: stateless commands keep working without a daemon
+- **Inspectable**: all state is on disk and versionable (hooks YAML, skills YAML)
+- **Safe**: hook commands must start with `asa`; no arbitrary shell by default
+- **Scoped memory**: entries are tagged by scope (project, product, flow, feature, …)
+
+## When to use it
+
+| Use case | Command |
+|----------|---------|
+| Long feature branch | `asa session create` |
+| Product flow experiment | `asa session branch` |
+| Cross-run learning | `asa memory list` |
+| Reactive automation | hooks on `session.created`, `flow.completed` |
+
+## Related
+
+- [Runtime CLI](/docs/cli/runtime)
+- [Investigation](/docs/concepts/investigation)

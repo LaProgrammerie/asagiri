@@ -1,22 +1,46 @@
-# Current spec — Executable Product Layer (spec-better-flow)
+# Current spec — Asagiri Executable Product Layer (spec-my-A)
 
-**Phase :** `spec-better-flow`  
+**Phase :** `spec-my-A`  
 **Date :** 2026-05-27
 
 ## Spec active
 
-- **Mission :** [`spec-better-flow.md`](../../../spec-better-flow.md)
-- **Base existante :** [`spec-prototype.md`](../../../spec-prototype.md)
-- **Source historique :** [`spec-postv123.md`](../../../spec-postv123.md)
-- **Décisions :** ADR-016/017 (contexte rename) dans [`05-decisions.md`](../05-decisions.md)
+- **Mission :** [`spec-my-A.md`](../../../spec-my-A.md) (~3200 lignes, §1–26)
+- **Historique :** [`spec-better-flow.md`](../../../spec-better-flow.md), [`spec-prototype.md`](../../../spec-prototype.md)
+- **Handoff :** [`handoff.md`](handoff.md)
 
 ## Résumé
 
-Le rename **Asagiri / `asa`** est considéré livré. La tranche active étend la couche produit exécutable vers un mode **flow-centric et business-aware**: `business.yaml`, enrichissement des flows (objectif/métriques/implications), dérivation architecture (`asa architecture derive`), review de flows (`asa flows review`), génération des tasks en flow-first, et vérification du couplage métriques/analytics/contracts.
+Extension complète d'Asagiri :
 
-## Handoff actif
+1. **Executable Product Layer** — prototype Vite/React déterministe, flows, contracts, specs/tasks pour `asa work`
+2. **Business Intent Layer** — `business.yaml`, flows enrichis, `asa flows review`, `asa architecture derive`, tasks traçables
+3. **Persistent Runtime** — `asa daemon`, `asa session`, `asa runtime events`, SQLite `.asagiri/runtime/`
+4. **Investigation Engine** — `asa investigate` structuré, context/replay packs, `asa work --investigate-first`
 
-[`handoff.md`](handoff.md)
+Branding : **Asagiri** / CLI **`asa`** / module `github.com/LaProgrammerie/asagiri`.
+
+## Écarts V1 assumés
+
+| Domaine | Écart | Suite |
+|---------|-------|-------|
+| Runtime | Pas de process daemon background réel | `asa daemon run` + supervisor |
+| Runtime | Memory/skills/hooks exécutables non livrés | phases §24.10–14 |
+| Investigation | Pas de root-cause graph | §25.25 phase 7 |
+| Investigation | `--from-failed-tests` heuristique | parse sortie `go test` |
+
+## Previous phases
+
+Voir sections historiques ci-dessous dans ce fichier (spec-release, spec-rename, spec-postv123).
+
+---
+
+# Previous phase — spec-better-flow
+
+**Phase :** `spec-better-flow` (fusionnée dans spec-my-A)  
+**Date :** 2026-05-27
+
+Flow-centric + business-aware ; détail dans `spec-my-A.md` §23.
 
 ---
 
@@ -58,19 +82,3 @@ Le rename **Asagiri / `asa`** est considéré livré. La tranche active étend l
 | Qualité | Tests ajoutés ; workflow/intent <50 % → roadmap |
 | UX CLI explainability | estimate + work résumé |
 | OSS readiness | Score 74/100 (`08-*`) |
-
-## Documentation publique
-
-- **Passe éditoriale :** [`spec-doc-v2.md`](../../../spec-doc-v2.md)
-- **Spec site (structure) :** [`spec-doc.md`](../../../spec-doc.md)
-- **Implémentation :** `docs-site/` (Fumadocs, i18n, static export → **Cloudflare Pages**)
-- **Déploiement :** [`spec-deploy-doc.md`](../../../spec-deploy-doc.md) — projet Pages **`asagiri-docs`** (ADR-016)
-- **Génération CLI :** `asa docs generate-cli`
-
-## Specs historiques
-
-- [`spec-postv123.md`](../../../spec-postv123.md), [`specv3.md`](../../../specv3.md), [`specv2.md`](../../../specv2.md), [`spec.md`](../../../spec.md)
-
-## Scores consolidation
-
-Voir [`docs/consolidation/README.md`](../../consolidation/README.md) : OSS **74/100**, fiabilité **71/100**.

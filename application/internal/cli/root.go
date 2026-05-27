@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/LaProgrammerie/asagiri/application/internal/investigation"
 	"github.com/LaProgrammerie/asagiri/application/internal/version"
 	"github.com/spf13/cobra"
 )
@@ -61,6 +62,12 @@ func newRootCmd() *cobra.Command {
 		newContractsCmd(&dryRun),
 		newArchitectureCmd(&dryRun),
 		newProductCmd(&dryRun),
+		newDaemonCmd(&dryRun),
+		newSessionCmd(&dryRun),
+		newRuntimeCmd(&dryRun),
+		newSkillsCmd(),
+		newMemoryCmd(),
+		newAnalysisCmd(),
 		newDocsCmd(),
 		&cobra.Command{
 			Use:   "version",
@@ -196,6 +203,7 @@ func newDevCmd(dryRun *bool) *cobra.Command {
 func newVerifyCmd(dryRun *bool) *cobra.Command {
 	var taskID string
 	var force bool
+	var investigateOnFailure bool
 	cmd := &cobra.Command{
 		Use:   "verify <feature>",
 		Short: "Exécuter les validations locales",
@@ -212,6 +220,21 @@ func newVerifyCmd(dryRun *bool) *cobra.Command {
 			defer ctx.Close()
 			runID, err := ctx.Workflow().VerifyFeature(context.Background(), args[0], taskID, force)
 			if err != nil {
+				if investigateOnFailure && !ctx.DryRun && !*dryRun {
+					req := investigation.Request{
+						Symptom:         "verify failed for " + args[0],
+						Feature:         args[0],
+						TaskID:          taskID,
+						FromFailedTests: true,
+						Depth:           investigation.DepthCI,
+						NoCloud:         true,
+						RepoRoot:        ctx.RepoRoot,
+					}
+					if rep, invErr := investigation.RunInvestigation(cmd.Context(), req, ctx.Config); invErr == nil {
+						_ = investigation.FeedMemory(ctx.RepoRoot, rep)
+						fmt.Fprintf(cmd.OutOrStdout(), "investigation on failure: %s\n", rep.ID)
+					}
+				}
 				return err
 			}
 			fmt.Fprintf(cmd.OutOrStdout(), "verify run: %s\n", runID)
@@ -220,6 +243,7 @@ func newVerifyCmd(dryRun *bool) *cobra.Command {
 	}
 	cmd.Flags().StringVar(&taskID, "task", "", "ID de tâche à vérifier")
 	cmd.Flags().BoolVar(&force, "force", false, "Relancer une étape déjà réussie")
+	cmd.Flags().BoolVar(&investigateOnFailure, "investigate-on-failure", false, "Lancer une investigation locale si la vérification échoue")
 	return cmd
 }
 

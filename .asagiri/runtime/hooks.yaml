@@ -1,0 +1,6 @@
+hooks:
+  on:
+    session.created:
+      - run: asa version
+    flow.completed:
+      - run: asa daemon status
