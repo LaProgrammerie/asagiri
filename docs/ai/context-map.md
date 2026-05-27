@@ -6,6 +6,7 @@ Complements `AGENTS.md`: **where things live**, **who consumes what**, and **how
 
 | Topic | Where it lives |
 |-------|----------------|
+| **Executable Product Layer (spec-my-A, livré)** | `spec-my-A.md`, `docs/ai/06-spec-my-a.md`, `docs/ai/active/handoff.md`, ADR-018/019 ; docs-site `en|fr|de|es` : `cli/runtime`, `runtime-serve`, `investigate`, `analysis`, `concepts/runtime`, `investigation`, `analysis-layer`, `reference/typescript-sdk`, `configuration/config-file` (bloc `runtime`) ; suite : `spec-phase-finale.md` |
 | **Asagiri rebrand (spec-rename)** | `spec-rename.md`, `docs/ai/active/handoff.md`, ADR-016, `docs/migration/github-rename-asagiri.md` |
 | **Consolidation OSS / fiabilisation** | `spec-consolidation-now.md` (actif), `spec-postv123.md` (historique), `docs/consolidation/` |
 | **Public documentation site** | `spec-doc.md`, `spec-deploy-doc.md`, `docs-site/` (Fumadocs → **Cloudflare Pages**, projet **`asagiri-docs`**) ; contenu `content/docs/{en,fr,de,es}/` — **en** défaut/fallback, référence CLI générée sous `en/cli/generated/` ; CI `.github/workflows/docs-cloudflare-pages.yml` |

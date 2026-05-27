@@ -1,0 +1,16 @@
+---
+title: analysis command
+description: Build local structural graphs for a product.
+---
+
+# `asa analysis build`
+
+Engineering analysis layer (`spec-my-A` §24.16).
+
+```bash
+asa analysis build --product workspace-saas
+```
+
+Writes `.asagiri/analysis/<product>/graphs.json` containing: symbol, dependency, flow, event, api, migration, ownership graphs.
+
+See [Engineering analysis layer](/docs/concepts/analysis-layer).

@@ -27,6 +27,9 @@ asa work [flags]
 | `--budget` | Local | `0` | Budget run EUR |
 | `--dry-run` | Inherited | `false` | Simuler les exécutions sans lancer d'agent ni commandes externes |
 | `--estimate-only` | Local | `false` | Estimation sans exécution |
+| `--investigate-first` | Local | `false` | Lancer une investigation avant le plan |
+| `--investigate-on-failure` | Local | `false` | Investigation locale si l'exécution échoue |
+| `--investigation-depth` | Local | `standard` | Profondeur investigation: quick\|standard\|deep\|ci |
 | `--max-duration` | Local | `0` | Durée max (minutes) |
 | `--max-input-tokens` | Local | `0` | Plafond tokens entrée |
 | `--max-output-tokens` | Local | `0` | Plafond tokens sortie |
@@ -62,16 +65,21 @@ asa work
 
 ## Related commands
 
+- [Analysis](./analysis.mdx)
+- [Architecture](./architecture.mdx)
 - [Clean](./clean.mdx)
 - [Completion](./completion.mdx)
 - [Context](./context.mdx)
 - [Continue](./continue.mdx)
+- [Contracts](./contracts.mdx)
 - [Cost](./cost.mdx)
+- [Daemon](./daemon.mdx)
 - [Dev](./dev.mdx)
 - [Docs](./docs.mdx)
 - [Doctor](./doctor.mdx)
 - [Enrich](./enrich.mdx)
 - [Estimate](./estimate.mdx)
+- [Flows](./flows.mdx)
 - [Help](./help.mdx)
 - [Inbox](./inbox.mdx)
 - [Index](./index.mdx)
@@ -79,12 +87,18 @@ asa work
 - [Inspect](./inspect.mdx)
 - [Investigate](./investigate.mdx)
 - [Mcp](./mcp.mdx)
+- [Memory](./memory.mdx)
 - [Next](./next.mdx)
 - [Plan](./plan.mdx)
 - [Pr](./pr.mdx)
+- [Product](./product.mdx)
+- [Prototype](./prototype.mdx)
 - [Report](./report.mdx)
 - [Resume](./resume.mdx)
 - [Review](./review.mdx)
+- [Runtime](./runtime.mdx)
+- [Session](./session.mdx)
+- [Skills](./skills.mdx)
 - [Spec](./spec.mdx)
 - [Status](./status.mdx)
 - [Sync](./sync.mdx)

@@ -19,6 +19,20 @@ project:
   default_branch: main
 ```
 
+## `runtime`
+
+Persistent engineering runtime (`spec-my-A` §24.17). Modes: `guided`, `interactive`, `headless`, `ci`, `review`, `exploration`.
+
+```yaml
+runtime:
+  mode: guided
+  api:
+    port: 8765
+    socket: .asagiri/runtime/runtime.sock
+```
+
+See [Runtime commands](/docs/cli/runtime) and [runtime serve](/docs/cli/runtime-serve).
+
 ## `intent`
 
 The `intent` block configures natural-language resolution for `work` and `continue` (`application/internal/intent`): whether the resolver runs, which mode it uses, and how it behaves when confidence is low or Ollama is available as a fallback.

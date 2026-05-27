@@ -1,0 +1,28 @@
+---
+title: TypeScript-SDK
+description: HTTP-Client für die lokale Asagiri-Runtime-API.
+---
+
+# TypeScript-SDK (`@laprogrammerie/asagiri`)
+
+Quellen: `sdk/typescript/` im Asagiri-Repository.
+
+## Installation (lokal)
+
+```bash
+cd sdk/typescript && npm install && npm run build
+```
+
+## Beispiel
+
+```ts
+import { AsagiriClient } from "@laprogrammerie/asagiri";
+
+const runtime = new AsagiriClient({ baseUrl: "http://127.0.0.1:8765" });
+const session = await runtime.startSession("onboarding-redesign", "workspace-saas", "onboarding");
+await runtime.runFlow(session.id, "onboarding");
+```
+
+Zuerst: `asa runtime serve --port 8765`.
+
+Siehe [runtime serve](/docs/de/cli/runtime-serve).

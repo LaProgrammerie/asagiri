@@ -6,6 +6,8 @@
     "cost-aware-workflows",
     "executable-product-layer",
     "prototype-as-spec",
+    "runtime",
+    "investigation",
     "analysis-layer"
   ]
 }

@@ -1,6 +1,6 @@
 ---
 title: Investigate · Asagiri CLI
-description: Investigation locale du dépôt
+description: Investigation locale structurée
 ---
 
 CLI path: **`asa investigate`**
@@ -9,7 +9,7 @@ CLI path: **`asa investigate`**
 
 Orchestration commands coordinate higher-order Asagiri workloads such as ingestion, syncing, backlog triage, investigative passes, hydrated context payloads, coarse estimates, and workspace-specific automation.
 
-> Original CLI synopsis: Investigation locale du dépôt
+> Original CLI synopsis: Investigation locale structurée
 
 ## Usage
 
@@ -21,7 +21,16 @@ asa investigate [flags]
 
 | Flag | Scope | Default | Description |
 | --- | --- | --- | --- |
+| `--depth` | Local | `standard` | Profondeur: quick\|standard\|deep\|ci |
 | `--dry-run` | Inherited | `false` | Simuler les exécutions sans lancer d'agent ni commandes externes |
+| `--estimate-only` | Local | `false` | Estimation sans rapport complet |
+| `--flow` | Local | `(empty)` | Flow produit |
+| `--from-failed-tests` | Local | `false` | Cibler les tests en échec |
+| `--max-duration` | Local | `0` | Durée max (minutes) |
+| `--max-files` | Local | `0` | Nombre max de fichiers dans le context pack |
+| `--no-cloud` | Local | `false` | Investigation 100% locale |
+| `--output` | Local | `markdown` | Sortie: markdown\|json |
+| `--run` | Local | `(empty)` | ID de run |
 | `--task` | Local | `(empty)` | ID de tâche |
 
 ## Examples
@@ -44,28 +53,39 @@ asa investigate
 
 ## Related commands
 
+- [Analysis](./analysis.mdx)
+- [Architecture](./architecture.mdx)
 - [Clean](./clean.mdx)
 - [Completion](./completion.mdx)
 - [Context](./context.mdx)
 - [Continue](./continue.mdx)
+- [Contracts](./contracts.mdx)
 - [Cost](./cost.mdx)
+- [Daemon](./daemon.mdx)
 - [Dev](./dev.mdx)
 - [Docs](./docs.mdx)
 - [Doctor](./doctor.mdx)
 - [Enrich](./enrich.mdx)
 - [Estimate](./estimate.mdx)
+- [Flows](./flows.mdx)
 - [Help](./help.mdx)
 - [Inbox](./inbox.mdx)
 - [Index](./index.mdx)
 - [Init](./init.mdx)
 - [Inspect](./inspect.mdx)
 - [Mcp](./mcp.mdx)
+- [Memory](./memory.mdx)
 - [Next](./next.mdx)
 - [Plan](./plan.mdx)
 - [Pr](./pr.mdx)
+- [Product](./product.mdx)
+- [Prototype](./prototype.mdx)
 - [Report](./report.mdx)
 - [Resume](./resume.mdx)
 - [Review](./review.mdx)
+- [Runtime](./runtime.mdx)
+- [Session](./session.mdx)
+- [Skills](./skills.mdx)
 - [Spec](./spec.mdx)
 - [Status](./status.mdx)
 - [Sync](./sync.mdx)

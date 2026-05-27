@@ -1,0 +1,27 @@
+---
+title: investigate-Befehl
+description: Strukturierte lokale Investigation vor Agent-Ausführung.
+---
+
+# `asa investigate`
+
+Investigation Engine (`spec-my-A` §25).
+
+```bash
+asa investigate "warum Onboarding nach Einladung fehlschlägt"
+asa investigate "tests" --from-failed-tests --no-cloud
+asa investigate graph <investigation-id>
+asa investigate impact --flow onboarding --change "Einladungen asynchron machen"
+```
+
+## Integration
+
+```bash
+asa work "…" --investigate-first --investigation-depth deep
+asa work "…" --investigate-on-failure
+asa verify <feature> --investigate-on-failure
+```
+
+## Artefakte
+
+Unter `.asagiri/investigations/<id>/`: `report.md`, `context-pack.md`, `replay-pack.json`, `graph.json`.

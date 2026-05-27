@@ -1,0 +1,30 @@
+---
+title: runtime serve
+description: API REST JSON local y socket Unix para embedding de runtime.
+---
+
+# `asa runtime serve`
+
+Expone la runtime persistente para **embedding** y clientes SDK.
+
+## HTTP (localhost)
+
+```bash
+asa runtime serve --port 8765
+```
+
+Solo **`127.0.0.1`**.
+
+## Socket Unix
+
+```bash
+asa runtime serve --socket .asagiri/runtime/runtime.sock
+```
+
+## Autenticación
+
+Archivo de token: `.asagiri/runtime/api.token` — cabecera `Authorization: Bearer <token>`.
+
+## Métricas (`GET /v1/status`)
+
+`active_sessions`, `memory_hits`, `context_reduction_ratio`, `runtime_event_rate`, `agent_failure_rate`, `flow_completion_rate`, `review_rejection_rate`.

@@ -1,84 +1,54 @@
 # Current spec — Asagiri Executable Product Layer (spec-my-A)
 
-**Phase :** `spec-my-A`  
+**Phase :** `spec-my-A` — **livrée**  
 **Date :** 2026-05-27
 
 ## Spec active
 
-- **Mission :** [`spec-my-A.md`](../../../spec-my-A.md) (~3200 lignes, §1–26)
-- **Historique :** [`spec-better-flow.md`](../../../spec-better-flow.md), [`spec-prototype.md`](../../../spec-prototype.md)
+- **Mission :** [`spec-my-A.md`](../../../spec-my-A.md) (§1–26)
 - **Handoff :** [`handoff.md`](handoff.md)
+- **Suite optionnelle :** [`spec-phase-finale.md`](../../../spec-phase-finale.md) (embeddings sémantiques Ollama + publish npm)
 
-## Résumé
+## Résumé livré
 
-Extension complète d'Asagiri :
+1. **Executable Product Layer** — `asa prototype`, `asa flows`, `asa contracts`, `asa spec generate-from-product`, compatibilité `asa work`
+2. **Business Intent** — `business.yaml`, `asa flows review`, `asa architecture derive`, tasks flow-first
+3. **Runtime persistant** — daemon/worker, sessions, branches, hooks, memory, skills, API HTTP + Unix socket, SDK Go/TS
+4. **Analysis layer** — `asa analysis build` → 7 graphes sous `.asagiri/analysis/<product>/`
+5. **Investigation** — rapport, `context-pack.md`, graph, `asa investigate impact`, intégration work/verify
 
-1. **Executable Product Layer** — prototype Vite/React déterministe, flows, contracts, specs/tasks pour `asa work`
-2. **Business Intent Layer** — `business.yaml`, flows enrichis, `asa flows review`, `asa architecture derive`, tasks traçables
-3. **Persistent Runtime** — `asa daemon`, `asa session`, `asa runtime events`, SQLite `.asagiri/runtime/`
-4. **Investigation Engine** — `asa investigate` structuré, context/replay packs, `asa work --investigate-first`
+Branding : **Asagiri** / **`asa`** / `github.com/LaProgrammerie/asagiri`.
 
-Branding : **Asagiri** / CLI **`asa`** / module `github.com/LaProgrammerie/asagiri`.
+## Documentation
 
-## Écarts V1 assumés
-
-| Domaine | Écart | Suite |
-|---------|-------|-------|
-| Runtime | Pas de process daemon background réel | `asa daemon run` + supervisor |
-| Runtime | Memory/skills/hooks exécutables non livrés | phases §24.10–14 |
-| Investigation | Pas de root-cause graph | §25.25 phase 7 |
-| Investigation | `--from-failed-tests` heuristique | parse sortie `go test` |
+- **Site docs** (EN / FR / DE / ES) : `cli/runtime`, `cli/runtime-serve`, `cli/investigate`, `cli/analysis`, `concepts/runtime`, `concepts/investigation`, `concepts/analysis-layer`, `reference/typescript-sdk`, bloc `runtime` dans `configuration/config-file`, CLI `generated/` regénéré
+- **Canon IA** : [`06-spec-my-a.md`](../06-spec-my-a.md), handoff audité, [`context-map.md`](../context-map.md)
+- ADR : 018 (spec-my-A), 019 (API + analysis)
 
 ## Previous phases
 
-Voir sections historiques ci-dessous dans ce fichier (spec-release, spec-rename, spec-postv123).
+Voir ci-dessous (spec-better-flow, spec-release, spec-rename, spec-postv123).
 
 ---
 
 # Previous phase — spec-better-flow
 
-**Phase :** `spec-better-flow` (fusionnée dans spec-my-A)  
-**Date :** 2026-05-27
-
-Flow-centric + business-aware ; détail dans `spec-my-A.md` §23.
+Fusionnée dans spec-my-A (§23).
 
 ---
 
 # Previous phase — release distribution (spec-release)
 
-**Phase :** `spec-release` (GoReleaser, GitHub Releases, Homebrew)  
-**Date :** 2026-05-17
-
-- **Mission :** [`spec-release.md`](../../../spec-release.md)
-- **Décision :** ADR-015 (distribution sur repo `asagiri` ; formule Homebrew migrée vers **`asa`** sous ADR-016)
+**Date :** 2026-05-17 — [`spec-release.md`](../../../spec-release.md), ADR-015
 
 ---
 
 # Previous phase — Asagiri rebrand (spec-rename)
 
-**Phase :** `spec-rename` + module path **`github.com/LaProgrammerie/asagiri`**  
-**Date :** 2026-05-20
-
-- **Mission :** [`spec-rename.md`](../../../spec-rename.md)
-- **Résultat :** rebranding livré (produit, CLI, module, URLs)
-- **Migration repo GitHub :** déjà effectuée (runbook: [`docs/migration/github-rename-asagiri.md`](../../migration/github-rename-asagiri.md))
+**Date :** 2026-05-20 — [`spec-rename.md`](../../../spec-rename.md), ADR-016
 
 ---
 
 # Previous phase — consolidation (post-V3)
 
-**Phase :** `spec-postv123` (consolidation, fiabilisation, OSS)  
-**Date :** 2026-05-17
-
-## Critères de phase
-
-| Domaine | Statut |
-|---------|--------|
-| Audit architecture & drift | Livré (`docs/consolidation/01-*`) |
-| API / primitives | Documenté (`02-*`) |
-| Sécurité & fiabilité | Audit + garde-fous MCP/redact/collecte |
-| Performance / coût | Quick win double-scan + benchmark |
-| Workflows agents | Matrice manuelle (`05-*`) |
-| Qualité | Tests ajoutés ; workflow/intent <50 % → roadmap |
-| UX CLI explainability | estimate + work résumé |
-| OSS readiness | Score 74/100 (`08-*`) |
+**Date :** 2026-05-17 — [`spec-postv123.md`](../../../spec-postv123.md)

@@ -5,6 +5,7 @@
     "exit-codes",
     "product-schema",
     "flow-schema",
-    "screen-schema"
+    "screen-schema",
+    "typescript-sdk"
   ]
 }

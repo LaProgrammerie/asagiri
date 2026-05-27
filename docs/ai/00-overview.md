@@ -14,7 +14,9 @@ Pour les **sources de vérité**, Kiro vs Cursor vs Copilot, et specs vs `docs/a
 
 | Chemin | Rôle |
 |--------|------|
-| `spec-rename.md` | Spec active — rebranding Asagiri / `asa` |
+| `spec-my-A.md` | Spec livrée — Executable Product Layer (§1–26) |
+| `spec-phase-finale.md` | Suite — embeddings Ollama + npm SDK |
+| `spec-rename.md` | Rebranding Asagiri / `asa` (historique) |
 | `spec.md` | Spec produit & technique V1 (historique) |
 | `AGENTS.md` | Routeur court (toujours inclus par Kiro) |
 | `docs/ai/context-map.md` | Carte des fichiers et anti-dérive |
@@ -31,6 +33,6 @@ Pour les **sources de vérité**, Kiro vs Cursor vs Copilot, et specs vs `docs/a
 
 ## Liens rapides
 
-- Produit : `01-product.md` → `spec-rename.md`
+- Produit : `01-product.md` → `06-spec-my-a.md`, `spec-my-A.md`
 - Architecture : `02-architecture.md`
 - Spec / handoff : `active/current-spec.md`, `active/handoff.md`

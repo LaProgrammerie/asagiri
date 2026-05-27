@@ -1,0 +1,30 @@
+---
+title: Runtime persistente
+description: Runtime de ingeniería local con sesiones, memoria y eventos.
+---
+
+# Runtime persistente
+
+Asagiri evoluciona de una CLI sin estado a una **runtime de ingeniería local-first** (`spec-my-A` §24).
+
+## Arquitectura
+
+```text
+asa daemon run → SQLite → sessions · events · memory · hooks
+```
+
+## Principios
+
+Opcional, inspeccionable, seguro (solo `asa …` en hooks), memoria acotada.
+
+## Modos
+
+```yaml
+runtime:
+  mode: guided  # guided | interactive | headless | ci | review | exploration
+```
+
+## Ver también
+
+- [Comandos runtime](/docs/es/cli/runtime)
+- [Investigation](/docs/es/concepts/investigation)

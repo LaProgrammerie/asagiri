@@ -1,4 +1,4 @@
 {
   "title": "CLI",
-  "pages": ["index", "prototype", "flows", "contracts", "runtime", "runtime-serve", "investigate", "generated"]
+  "pages": ["index", "prototype", "flows", "contracts", "runtime", "runtime-serve", "investigate", "analysis", "generated"]
 }

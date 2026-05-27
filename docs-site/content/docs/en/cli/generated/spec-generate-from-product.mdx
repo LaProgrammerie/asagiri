@@ -1,0 +1,47 @@
+---
+title: Spec Generate-from-product · Asagiri CLI
+description: Générer specs et tasks depuis un produit extrait
+---
+
+CLI path: **`asa spec generate-from-product`**
+
+## When to use
+
+Workflow commands advance tracked features across spec → plan → implementation → verification → reporting guardrails before opening a merge request.
+
+> Original CLI synopsis: Générer specs et tasks depuis un produit extrait
+
+## Usage
+
+```bash
+asa spec generate-from-product [flags]
+```
+
+## Options
+
+| Flag | Scope | Default | Description |
+| --- | --- | --- | --- |
+| `--dry-run` | Inherited | `false` | Simuler les exécutions sans lancer d'agent ni commandes externes |
+
+## Examples
+
+```bash
+asa spec generate-from-product
+```
+
+> Wire richer samples through **cobra.Command.Example** when the happy path warrants copy/paste-friendly automation beyond this scaffold.
+
+## What happens internally
+
+- Validates CLI arity, honours the global **--dry-run** switch, resolves repository metadata, hydrates SQLite-backed bookkeeping, then calls façade orchestration wrappers for the requested lifecycle stage.
+- Persists deterministic run identifiers so **status** and **resume** can continue automation deterministically afterward.
+
+## Failure modes
+
+- Cobra rejects unknown flags or arity mismatches before any repository side effects occur.
+- Asagiri cannot resolve scaffolding when the command is invoked outside an initialised checkout.
+- Delegated subprocesses (**git**, MCP hosts, editor agents, etc.) can exit non-zero and bubble errors verbatim.
+
+## Related commands
+
+_No sibling commands at this depth (Spec Generate-from-product)._

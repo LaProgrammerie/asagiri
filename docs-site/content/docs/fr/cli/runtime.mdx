@@ -5,13 +5,80 @@ description: Runtime local persistant, daemon, sessions, événements et mémoir
 
 # Commandes runtime
 
-Voir la version anglaise : [Runtime commands](/docs/en/cli/runtime).
+La couche runtime (`spec-my-A` §24) ajoute un environnement d'ingénierie **local-first** persistant au-dessus de la CLI stateless.
+
+## Daemon
 
 ```bash
 asa daemon start
 asa daemon start --detach
-asa session create onboarding-redesign --product workspace-saas
+asa daemon run
+asa daemon status
+asa daemon status --rich
+asa daemon stop
+```
+
+- `start` initialise l'état SQLite sous `.asagiri/runtime/`
+- `--detach` lance `asa daemon run` en arrière-plan (worker + file de hooks)
+- `run` : boucle worker longue durée (bus d'événements, exécution des hooks)
+- `--rich` : tableau de bord terminal (§24.20)
+
+## Sessions et branches
+
+```bash
+asa session create onboarding-redesign --product workspace-saas --flow onboarding
+asa session list
+asa session attach onboarding-redesign
+asa session branch onboarding-redesign --name onboarding-enterprise
+asa session graph
+```
+
+## Événements
+
+```bash
+asa runtime events
 asa runtime events --follow
+```
+
+## Mémoire
+
+```bash
 asa memory list
+asa memory list --scope feature
+asa memory list --query "échec onboarding"
+asa memory consolidate
+```
+
+Mémoire scoped dans `runtime.db` (`memory_entries`) : scoring, vieillissement, consolidation, embeddings déterministes (bag-of-words).
+
+## Skills
+
+```bash
 asa skills list
 ```
+
+Fichiers sous `.asagiri/skills/**/*.yaml`, filtrés par scope.
+
+## Hooks
+
+Fichier `.asagiri/runtime/hooks.yaml` — seules les commandes `asa …` sont exécutées par le worker.
+
+## API locale
+
+```bash
+asa runtime serve --port 8765
+asa runtime serve --socket .asagiri/runtime/runtime.sock
+```
+
+Voir [runtime serve](/docs/fr/cli/runtime-serve).
+
+## SDK
+
+Go in-process : `asagiri.Connect`  
+Go HTTP : `asagiri.ConnectHTTP`  
+TypeScript : `@laprogrammerie/asagiri` — voir [SDK TypeScript](/docs/fr/reference/typescript-sdk).
+
+## Voir aussi
+
+- [Investigation](/docs/fr/cli/investigate)
+- [Couche produit exécutable](/docs/fr/concepts/executable-product-layer)

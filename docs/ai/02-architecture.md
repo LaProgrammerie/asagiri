@@ -29,10 +29,24 @@ application/
     report/              # report.md + report.json
     store/sqlite/        # SQLite modernc, migrations embed
     version/
+    product/               # spec-my-A : prototype, flows, contracts
+    product/derivation/
+    runtime/               # spec-my-A : daemon, sessions, API
+    runtime/api/
+    memory/
+    skills/
+    analysis/              # spec-my-A : graphes structuraux
+    investigation/         # spec-my-A : pipeline investigation
+    embedutil/
 .asagiri/                # créé par asa init
   config.yaml
   state.sqlite           # gitignored
   runs/ tasks/ logs/ worktrees/
+  products/<product>/    # spec-my-A
+  runtime/               # runtime.db, hooks.yaml, api.token
+  analysis/<product>/
+  investigations/
+  skills/
 ```
 
 ## Packages clés
@@ -102,6 +116,15 @@ spec/plan → enrich → dev (worktree + agent) → verify → review → report
 | `internal/routing/` | Routing cost-aware local/cloud |
 | `internal/mcp/` | Serveur MCP stdio |
 | `pkg/agentflow/types` | `application/pkg/asagiri/` |
+| `internal/product/` | Prototype, extraction flows/contracts, génération specs |
+| `internal/runtime/` | Sessions, events, memory SQLite, worker, hooks |
+| `internal/runtime/api/` | REST `127.0.0.1` + socket Unix |
+| `internal/memory/` | Scoped memory, embeddings hash, retrieval |
+| `internal/skills/` | `.asagiri/skills/*.yaml` |
+| `internal/analysis/` | `asa analysis build` → graphs.json |
+| `internal/investigation/` | Rapport, graph, impact, context-pack |
+
+Détail spec-my-A : [`06-spec-my-a.md`](06-spec-my-a.md).
 
 Interfaces §11.2 : `WorkflowEngine`, `TaskStore`, `WorktreeManager`, `Validator` déclarées dans `internal/workflow/interfaces.go` ; implémentations = `Service`, `sqlite.Store`, `worktree.Manager`, `validation.Runner`.
 
