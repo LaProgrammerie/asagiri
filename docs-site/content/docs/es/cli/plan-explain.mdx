@@ -1,0 +1,38 @@
+---
+title: plan explain
+description: Explicar por qué el plan de ejecución está estructurado así.
+---
+
+# `asa plan explain`
+
+Muestra una explicación legible de dependencias, paralelismo y decisiones de riesgo para un flow de producto (`spec-my-C` §5.2).
+
+## Uso
+
+```bash
+asa plan explain workspace-saas --flow onboarding
+```
+
+## Flags
+
+| Flag | Descripción |
+|------|-------------|
+| `--flow` | **Obligatorio.** Id del flow bajo `.asagiri/products/<product>/flows/` |
+
+## Ejemplo de salida
+
+```text
+Execution Plan Explanation
+──────────────────────────
+Task task-003 depends on task-001 because it requires the Workspace aggregate.
+Task task-004 can run in parallel with task-005 because they touch independent paths.
+Security review is required because invite_member is a sensitive action.
+```
+
+Úsalo antes de `asa graph run` cuando el plan sea complejo o para onboarding del equipo.
+
+## Ver también
+
+- Generar plan: [`asa plan graph`](/docs/es/cli/plan-graph)
+- Export visual: [`asa graph visualize`](/docs/es/cli/graph-visualize)
+- Concepto: [Grafo de ejecución](/docs/es/concepts/execution-graph)

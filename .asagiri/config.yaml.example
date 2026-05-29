@@ -104,6 +104,58 @@ verification:
         - observability
         - security
 
+# Multi-agent coordination (spec-my-D §11)
+coordination:
+  max_parallel_agents: 2
+  default_isolation: isolated_worktree
+  require_independent_review: true
+  allow_self_review: false
+  require_security_review_for:
+    - auth
+    - permissions
+    - payments
+  assignment:
+    investigation: local
+    architecture_review: claude
+    implementation.medium: cursor
+    implementation.high: claude
+    security_review: codex
+    validation: local
+  profiles:
+    cursor-implementer:
+      agent: cursor
+      role: implementer
+      capabilities:
+        - implementation
+      restrictions:
+        - no_git_push
+      max_context_tokens: 128000
+      isolation: isolated_worktree
+    codex-reviewer:
+      agent: codex
+      role: reviewer
+      capabilities:
+        - architecture_review
+        - flow_review
+        - contract_review
+      restrictions:
+        - no_direct_write
+        - no_git_push
+      max_context_tokens: 32000
+      isolation: readonly
+    claude-architect:
+      agent: claude
+      role: architect
+      capabilities:
+        - architecture_review
+      isolation: isolated_worktree
+  pipeline:
+    - investigator
+    - architect
+    - implementer
+    - reviewer
+    - validator
+
 # Execution graph planner (spec-my-C §24)
 execution_graph:
   enabled: true

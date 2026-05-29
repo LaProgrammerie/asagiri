@@ -1,0 +1,56 @@
+---
+title: Graph Run · Asagiri CLI
+description: Planifier et exécuter (ou simuler) un graphe d'exécution
+---
+
+CLI path: **`asa graph run`**
+
+## When to use
+
+Orchestration commands coordinate higher-order Asagiri workloads such as ingestion, syncing, backlog triage, investigative passes, hydrated context payloads, coarse estimates, and workspace-specific automation.
+
+> Original CLI synopsis: Planifier et exécuter (ou simuler) un graphe d'exécution
+
+## Usage
+
+```bash
+asa graph run [flags]
+```
+
+## Options
+
+| Flag | Scope | Default | Description |
+| --- | --- | --- | --- |
+| `--budget` | Local | `0` | Budget cap in EUR (0 = use config/default) |
+| `--checkpoint-every` | Local | `(empty)` | Checkpoint cadence: node\|group |
+| `--ci` | Local | `false` | CI mode: conservative scheduling and non-zero exit on policy failure |
+| `--dry-run` | Local | `false` | Plan and persist artefacts without executing agents |
+| `--flow` | Local | `(empty)` | Flow id under .asagiri/products/<product>/flows/ |
+| `--json` | Local | `false` | Structured JSON output on stdout |
+| `--max-parallel` | Local | `0` | Override max parallel nodes (default from config) |
+| `--stop-on-risk` | Local | `(empty)` | Stop when highest risk reaches this level |
+| `--strict-trust` | Local | `false` | Treat trust warnings as failures |
+
+## Examples
+
+```bash
+asa graph run
+```
+
+> Wire richer samples through **cobra.Command.Example** when the happy path warrants copy/paste-friendly automation beyond this scaffold.
+
+## What happens internally
+
+- Hydrates contextual services resolved from **$PWD**, coordinating git-bound automation, ingestion pipelines, syncing, backlog triage, investigations, MCP hooks, contextual hydration, coarse estimates, and similar orchestrations for this subtree.
+
+## Failure modes
+
+- Cobra rejects unknown flags or arity mismatches before any repository side effects occur.
+- Asagiri cannot resolve scaffolding when the command is invoked outside an initialised checkout.
+- Downstream automation may fail whenever credentials, network endpoints, or cached prerequisites drift from expectations.
+
+## Related commands
+
+- [Graph Resume](./graph-resume.mdx)
+- [Graph Status](./graph-status.mdx)
+- [Graph Visualize](./graph-visualize.mdx)

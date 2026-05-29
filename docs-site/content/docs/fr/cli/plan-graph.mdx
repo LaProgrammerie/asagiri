@@ -1,0 +1,43 @@
+---
+title: plan graph
+description: Générer un graphe d'exécution sans lancer d'agents.
+---
+
+# `asa plan graph`
+
+Construit un graphe d'exécution avec dépendances pour un flow produit (`spec-my-C` §5.1). Persiste les artefacts sous `.asagiri/graphs/<graph-id>/` sans lancer d'agents.
+
+## Usage
+
+```bash
+asa plan graph workspace-saas --flow onboarding
+asa plan graph workspace-saas --flow onboarding --json
+asa plan graph workspace-saas --flow onboarding --output markdown
+asa plan graph workspace-saas --flow onboarding --ci --json
+```
+
+## Flags
+
+| Flag | Description |
+|------|-------------|
+| `--flow` | **Obligatoire.** Id du flow sous `.asagiri/products/<product>/flows/` |
+| `--from-product` | Planifier depuis la couche produit |
+| `--from-spec` | Inclure les tâches dérivées de la spec |
+| `--include-reviews` | Inclure review et validation (défaut : true) |
+| `--include-docs` | Inclure les nœuds documentation |
+| `--estimate` | Calculer coût et durée (défaut : true) |
+| `--output markdown` | Imprimer le plan en markdown sur stdout |
+| `--json` | JSON structuré (`graph`, `schedule`, `estimate`, `artifacts`) |
+| `--ci` | Planification conservatrice ; exit non-zéro si politique violée |
+
+Nécessite `execution_graph.enabled: true` dans la config.
+
+## Sortie
+
+Le résumé terminal affiche nœuds, groupes parallèles, coût/durée estimés, risque maximal et répertoire d'artefacts. Avec `--json`, stdout est lisible par CI.
+
+## Voir aussi
+
+- Explication : [`asa plan explain`](/docs/fr/cli/plan-explain)
+- Exécution : [`asa graph run`](/docs/fr/cli/graph-run)
+- Concept : [Graphe d'exécution](/docs/fr/concepts/execution-graph)

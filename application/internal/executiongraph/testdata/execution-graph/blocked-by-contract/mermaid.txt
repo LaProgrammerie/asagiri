@@ -1,0 +1,7 @@
+graph TD
+  derive_contracts[Generate onboarding API contracts]
+  implement_invite_member[Implement member invitation]
+  verify_contracts[Validate public contract compatibility]
+  derive_contracts -->|blocks| implement_invite_member
+  derive_contracts -->|validates| verify_contracts
+  verify_contracts -->|requires| implement_invite_member

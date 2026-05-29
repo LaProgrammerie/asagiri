@@ -1,0 +1,56 @@
+---
+title: Plan Graph · Asagiri CLI
+description: Générer un graphe d'exécution sans lancer d'agents
+---
+
+CLI path: **`asa plan graph`**
+
+## When to use
+
+Workflow commands advance tracked features across spec → plan → implementation → verification → reporting guardrails before opening a merge request.
+
+> Original CLI synopsis: Générer un graphe d'exécution sans lancer d'agents
+
+## Usage
+
+```bash
+asa plan graph [flags]
+```
+
+## Options
+
+| Flag | Scope | Default | Description |
+| --- | --- | --- | --- |
+| `--ci` | Local | `false` | CI mode: conservative scheduling and non-zero exit on policy failure |
+| `--dry-run` | Inherited | `false` | Simuler les exécutions sans lancer d'agent ni commandes externes |
+| `--estimate` | Local | `true` | Compute cost and duration estimates |
+| `--flow` | Local | `(empty)` | Flow id under .asagiri/products/<product>/flows/ |
+| `--from-product` | Local | `false` | Plan from product layer inputs |
+| `--from-spec` | Local | `false` | Include spec-derived tasks |
+| `--include-docs` | Local | `false` | Include documentation nodes |
+| `--include-reviews` | Local | `true` | Include review and validation nodes |
+| `--json` | Local | `false` | Structured JSON output on stdout |
+| `--output` | Local | `(empty)` | Output format: markdown |
+
+## Examples
+
+```bash
+asa plan graph
+```
+
+> Wire richer samples through **cobra.Command.Example** when the happy path warrants copy/paste-friendly automation beyond this scaffold.
+
+## What happens internally
+
+- Validates CLI arity, honours the global **--dry-run** switch, resolves repository metadata, hydrates SQLite-backed bookkeeping, then calls façade orchestration wrappers for the requested lifecycle stage.
+- Persists deterministic run identifiers so **status** and **resume** can continue automation deterministically afterward.
+
+## Failure modes
+
+- Cobra rejects unknown flags or arity mismatches before any repository side effects occur.
+- Asagiri cannot resolve scaffolding when the command is invoked outside an initialised checkout.
+- Delegated subprocesses (**git**, MCP hosts, editor agents, etc.) can exit non-zero and bubble errors verbatim.
+
+## Related commands
+
+- [Plan Explain](./plan-explain.mdx)

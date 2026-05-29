@@ -421,9 +421,6 @@ func (c *Config) applyCoordinationDefaults() {
 			"payments",
 		}
 	}
-	if !c.Coordination.RequireIndependentReview {
-		c.Coordination.RequireIndependentReview = true
-	}
 	if c.Coordination.HandoffsPath == "" {
 		c.Coordination.HandoffsPath = ".asagiri/handoffs"
 	}

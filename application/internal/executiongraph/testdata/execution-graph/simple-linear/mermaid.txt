@@ -1,0 +1,6 @@
+graph TD
+  implement_workspace_create[Implement workspace creation endpoint]
+  investigate_onboarding[Investigate onboarding flow]
+  verify_onboarding_flow[Verify onboarding flow integrity]
+  implement_workspace_create -->|validates| verify_onboarding_flow
+  investigate_onboarding -->|produces_context_for| implement_workspace_create

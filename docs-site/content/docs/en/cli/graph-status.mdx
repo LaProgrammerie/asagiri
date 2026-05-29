@@ -1,0 +1,27 @@
+---
+title: graph status
+description: Show the state of a persisted execution graph.
+---
+
+# `asa graph status`
+
+Displays the current state of a graph stored under `.asagiri/graphs/<graph-id>/` (`spec-my-C` §5.4).
+
+## Usage
+
+```bash
+asa graph status graph-2026-05-29-9307e4be
+asa graph status graph-2026-05-29-9307e4be --json
+```
+
+## Output
+
+Terminal mode prints graph id, product, flow, status, node/edge/checkpoint counts, estimated cost, and highest risk.
+
+With `--json`, returns the full graph document plus estimate snapshot.
+
+## Related
+
+- Resume interrupted run: [`asa graph resume`](/docs/cli/graph-resume)
+- Export diagram: [`asa graph visualize`](/docs/cli/graph-visualize)
+- Create plan: [`asa plan graph`](/docs/cli/plan-graph)

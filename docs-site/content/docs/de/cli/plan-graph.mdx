@@ -1,0 +1,43 @@
+---
+title: plan graph
+description: Execution Graph erzeugen, ohne Agents auszuführen.
+---
+
+# `asa plan graph`
+
+Erstellt einen abhängigkeitsbewussten Execution Graph für einen Produkt-Flow (`spec-my-C` §5.1). Persistiert Artefakte unter `.asagiri/graphs/<graph-id>/` ohne Agents zu starten.
+
+## Verwendung
+
+```bash
+asa plan graph workspace-saas --flow onboarding
+asa plan graph workspace-saas --flow onboarding --json
+asa plan graph workspace-saas --flow onboarding --output markdown
+asa plan graph workspace-saas --flow onboarding --ci --json
+```
+
+## Flags
+
+| Flag | Beschreibung |
+|------|--------------|
+| `--flow` | **Pflicht.** Flow-ID unter `.asagiri/products/<product>/flows/` |
+| `--from-product` | Planung aus Product Layer |
+| `--from-spec` | Spec-abgeleitete Tasks einbeziehen |
+| `--include-reviews` | Review- und Validierungsknoten (Standard: true) |
+| `--include-docs` | Dokumentationsknoten einbeziehen |
+| `--estimate` | Kosten- und Dauerschätzung (Standard: true) |
+| `--output markdown` | Plan als Markdown auf stdout |
+| `--json` | Strukturiertes JSON (`graph`, `schedule`, `estimate`, `artifacts`) |
+| `--ci` | Konservative Planung; Exit ≠ 0 bei Policy-Verstoß |
+
+Erfordert `execution_graph.enabled: true` in der Config.
+
+## Ausgabe
+
+Terminal-Zusammenfassung mit Knoten, Parallelgruppen, geschätzten Kosten/Dauer, höchstem Risiko und Artefaktverzeichnis. Mit `--json` maschinenlesbar für CI.
+
+## Siehe auch
+
+- Erklärung: [`asa plan explain`](/docs/de/cli/plan-explain)
+- Ausführung: [`asa graph run`](/docs/de/cli/graph-run)
+- Konzept: [Execution Graph](/docs/de/concepts/execution-graph)

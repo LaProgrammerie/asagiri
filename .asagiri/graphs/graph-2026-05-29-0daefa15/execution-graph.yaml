@@ -1,0 +1,33 @@
+id: graph-2026-05-29-0daefa15
+product: workspace-saas
+flow: workspace-onboarding
+status: ready
+created_at: "2026-05-29T08:51:51Z"
+strategy:
+    max_parallel: 2
+    stop_on_risk: high
+    budget: 0.5
+nodes:
+    - id: investigate-onboarding
+      type: investigation
+      title: Investigate onboarding flow
+      agent: local
+      risk: low
+      estimated_duration: 30s
+    - id: verify-onboarding-flow
+      type: validation
+      title: Verify onboarding flow integrity
+      agent: local
+      risk: medium
+      estimated_cost: 0.01
+      estimated_duration: 2m
+      required_checks:
+        - flows
+        - observability
+edges: []
+checkpoints:
+    - after: investigate-onboarding
+    - after: verify-onboarding-flow
+rollback:
+    strategy: worktree_reset
+    preserve_reports: true

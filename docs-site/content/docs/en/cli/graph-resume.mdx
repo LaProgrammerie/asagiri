@@ -1,0 +1,25 @@
+---
+title: graph resume
+description: Resume an interrupted execution graph from its last checkpoint.
+---
+
+# `asa graph resume`
+
+Continues a graph that was paused, failed, or interrupted, using persisted checkpoints (`spec-my-C` §5.5, §15).
+
+## Usage
+
+```bash
+asa graph resume graph-2026-05-29-9307e4be
+asa graph resume graph-2026-05-29-9307e4be --json
+```
+
+## Behaviour
+
+Loads `execution-graph.yaml` from `.asagiri/graphs/<graph-id>/`, restores node states from checkpoints, and runs remaining ready nodes. Emits `graph.*` runtime events during resume.
+
+## Related
+
+- Check status first: [`asa graph status`](/docs/cli/graph-status)
+- Initial run: [`asa graph run`](/docs/cli/graph-run)
+- Concept: [Execution graph](/docs/concepts/execution-graph)

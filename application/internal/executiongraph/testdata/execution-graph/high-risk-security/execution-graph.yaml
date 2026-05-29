@@ -1,0 +1,61 @@
+id: graph-2026-05-27-d4e5f6a7
+product: workspace-saas
+flow: onboarding
+status: planned
+created_at: "2026-05-27T12:00:00Z"
+strategy:
+  max_parallel: 1
+  stop_on_risk: high
+  strict_trust: true
+  budget: 1.00
+nodes:
+  - id: implement-invite-member
+    type: implementation
+    title: Implement member invitation
+    task: task-002
+    agent: cursor
+    risk: high
+    estimated_cost: 0.12
+    estimated_duration: 6m
+    required_checks:
+      - tests
+      - security
+      - observability
+  - id: security-review
+    type: review
+    title: Security review for invite_member
+    agent: codex
+    risk: high
+    required_checks:
+      - security
+  - id: trust-gate
+    type: trust_verification
+    title: Trust verification for sensitive action
+    agent: local
+    risk: high
+    required_checks:
+      - trust
+      - flows
+  - id: manual-approval
+    type: manual_approval
+    title: Human approval for permission model change
+    agent: local
+    risk: critical
+edges:
+  - from: implement-invite-member
+    to: security-review
+    type: validates
+    reason: invite_member is a sensitive action
+  - from: security-review
+    to: trust-gate
+    type: requires
+  - from: trust-gate
+    to: manual-approval
+    type: requires_human_approval
+checkpoints:
+  - after: implement-invite-member
+  - after: security-review
+  - after: trust-gate
+rollback:
+  strategy: worktree_reset
+  preserve_reports: true
