@@ -2,7 +2,7 @@ package config
 
 // RuntimeConfig controls persistent runtime behaviour (spec-my-A §24.17).
 type RuntimeConfig struct {
-	Mode string `yaml:"mode"`
+	Mode string           `yaml:"mode"`
 	API  RuntimeAPIConfig `yaml:"api"`
 }
 

@@ -1,41 +1,60 @@
-# Current spec — Asagiri Trust & Verification Engine (spec-my-B)
+# Current spec — Asagiri Multi-Agent Coordination System (spec-my-D)
 
-**Phase :** `spec-my-B` — **livrée** (`2026-05-29`)  
-**Audit clôture :** [`handoff.md`](handoff.md) — lots 1–6 [x], DoD global §26 [x], validation 2026-05-29
+**Phase :** `spec-my-D` — **en cours**  
+**Handoff :** [`handoff.md`](handoff.md) — lots 1–6 [ ], matrice D-* [ ]
 
-## Spec active (clôturée)
+## Spec active
 
-- **Mission :** [`spec-my-B.md`](../../../spec-my-B.md) (§1–29, critères §26)
-- **Canon :** [`06-spec-my-b.md`](../06-spec-my-b.md), ADR-020, ADR-021
-- **Handoff :** [`handoff.md`](handoff.md) — tous lots [x]
+- **Mission :** [`spec-my-D.md`](../../../spec-my-D.md) (§1–22, critères §20)
+- **Handoff :** [`handoff.md`](handoff.md)
 
-## Résumé spec-my-B
+## Résumé vision
 
-Couche **Trust & Verification** local-first :
+Couche **Multi-Agent Coordination** local-first — gouvernance explicite des agents au-dessus du graphe d'exécution :
 
 ```text
-implementation → trust checks → confidence (6 dimensions) → gates → review
+intent → execution graph → agent assignment → isolated execution
+  → cross-agent validation → trust gates → merge / reject
 ```
 
 | Lot | Focus | Statut |
 |-----|--------|--------|
-| **1** | Modèles, TrustEngine, rapports `.asagiri/trust/<id>/` | livré |
-| **2** | Pipeline Verify, checks de base, confidence | livré |
-| **3** | Checks avancés, blast radius | livré |
-| **4** | CLI, gates YAML, UX terminal | livré |
-| **5** | Runtime events, replay, `--strict-trust` | livré |
-| **6** | Canon + site EN/FR/DE/ES | livré |
+| **1** | Foundation §3–5, §18 — package `coordination/`, rôles, isolation, interfaces, config `coordination:` | [ ] |
+| **2** | Assignment & pipeline §6–7, §12 — assignation multi-critères, pipelines rejouables, context reduction | [ ] |
+| **3** | Handoffs & validation §8–9, §11 — `.asagiri/handoffs/`, cross-validation, policies | [ ] |
+| **4** | Budget, retry, conflict, merge §13–16 | [ ] |
+| **5** | Runtime §10, §17, worktrees §5 — events `agent.*`, coordination graph, runner + trust | [ ] |
+| **6** | UX terminal §19, acceptance §20, doc canon + site EN/FR/DE/ES | [ ] |
 
-**CLI :** `asa verify trust`, `asa trust gates`, `asa trust replay`, `asa work --strict-trust`  
-**Docs site :** `concepts/trust-engine`, `cli/verify-trust`, `cli/trust-gates`, `cli/trust-replay`, config `verification` ; EN `cli/generated/trust`, `verify-trust`, `trust-gates`, `trust-replay`
+**Artefacts cibles :** `.asagiri/handoffs/<handoff-id>/`  
+**Config :** bloc `coordination:` dans `.asagiri/config.yaml`  
+**Packages :** `application/internal/coordination/` (§18)
 
 Branding : **Asagiri** / **`asa`** / `github.com/LaProgrammerie/asagiri`.
 
-## Suite possible
+## Prérequis livrés
 
-- [`spec-phase-finale.md`](../../../spec-phase-finale.md) (embeddings Ollama + npm) — hors scope spec-my-B
+### spec-my-C — Execution Graph Planner
 
-## Prérequis livré — spec-my-A
+**Phase :** `spec-my-C` — **livrée** (`2026-05-29`)
+
+Planification orchestrée par graphe de dépendances : planner, scheduler, runner, checkpoints, CLI `plan graph` / `graph run|status|resume|visualize`.
+
+- **Spec :** [`spec-my-C.md`](../../../spec-my-C.md)
+- **Canon :** [`06-spec-my-c.md`](../06-spec-my-c.md), ADR-022
+- **Artefacts :** `.asagiri/graphs/<graph-id>/`
+
+### spec-my-B — Trust & Verification Engine
+
+**Phase :** `spec-my-B` — **livrée** (`2026-05-29`)
+
+Couche trust local-first : checks → confidence (6 dimensions) → gates → review.
+
+- **Spec :** [`spec-my-B.md`](../../../spec-my-B.md)
+- **Canon :** [`06-spec-my-b.md`](../06-spec-my-b.md), ADR-020, ADR-021
+- **CLI :** `asa verify trust`, `asa trust gates`, `asa trust replay`, `asa work --strict-trust`
+
+### spec-my-A — Product & Runtime Layer
 
 **Phase :** `spec-my-A` — **livrée** (`2026-05-27`)
 
@@ -48,9 +67,19 @@ Branding : **Asagiri** / **`asa`** / `github.com/LaProgrammerie/asagiri`.
 - **Spec :** [`spec-my-A.md`](../../../spec-my-A.md)
 - **Canon :** [`06-spec-my-a.md`](../06-spec-my-a.md), ADR-018, ADR-019
 
+## Phase ultérieure — reliquats transverses
+
+- [`spec-phase-finale.md`](../../../spec-phase-finale.md) — registre unique des écarts V1 / stubs après A, B, C, D (embeddings, npm, durcissements PF-*, reliquats CLI PF-X-*)
+
 ## Previous phases
 
 Voir ci-dessous (spec-better-flow, spec-release, spec-rename, spec-postv123).
+
+---
+
+# Previous phase — spec-my-C (archive résumé)
+
+**Livrée** `2026-05-29` — détail : [`06-spec-my-c.md`](../06-spec-my-c.md), handoff archivé dans historique git.
 
 ---
 

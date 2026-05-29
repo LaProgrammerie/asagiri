@@ -10,5 +10,6 @@ Public ADR excerpts for contributors. The canonical log lives in [`docs/ai/05-de
 | ADR-011 | Consolidation post-V3; Apache 2.0; `redact` package |
 | ADR-012 | Public docs: Fumadocs static site under `docs-site/` |
 | ADR-014 | Docs hosting: Cloudflare Pages (Wrangler CI), pnpm, `docs-check` for forks |
+| ADR-022 | Execution Graph Planner local-first (`.asagiri/graphs/`, conservative parallelism) |
 
 Full table: [`docs/ai/05-decisions.md`](../ai/05-decisions.md).

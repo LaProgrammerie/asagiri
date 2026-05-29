@@ -149,6 +149,39 @@ verification:
 
 See [Trust engine](/docs/concepts/trust-engine), [`asa verify trust`](/docs/cli/verify-trust), and [`asa trust gates`](/docs/cli/trust-gates).
 
+## `execution_graph`
+
+Execution graph planner defaults (`spec-my-C` §24). Controls parallelism, risk stopping, trust gates, and rollback behaviour for `asa plan graph` and `asa graph run`.
+
+```yaml
+execution_graph:
+  enabled: true
+  max_parallel: 2
+  default_strategy: risk_aware
+  require_checkpoints: true
+  stop_on_risk: high
+  allow_parallel_agents: true
+  require_isolated_worktrees: true
+  gates:
+    trust_required_for_high_risk: true
+    human_approval_for:
+      - migration
+      - security_sensitive
+      - public_contract_change
+  rollback:
+    require_strategy_for_high_risk: true
+    preserve_failed_worktrees: true
+```
+
+- `enabled` — master switch; when false, graph commands return an error
+- `max_parallel` — default concurrent nodes (never exceeds safe file-scope rules)
+- `stop_on_risk` — halt planning/runs when estimated risk reaches this level
+- `gates.trust_required_for_high_risk` — insert trust verification on high-risk nodes
+- `gates.human_approval_for` — node categories requiring manual approval
+- `rollback.require_strategy_for_high_risk` — planner must assign rollback for high-risk nodes
+
+See [Execution graph](/docs/concepts/execution-graph), [`asa plan graph`](/docs/cli/plan-graph), and [`asa graph run`](/docs/cli/graph-run).
+
 ## `models`
 
 `models` holds logical profiles for routing and cost (`specv3`). Keys are arbitrary ids; each entry ties a provider, cost class, model name, and which step classes may use it.

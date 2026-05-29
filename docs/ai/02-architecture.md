@@ -43,6 +43,7 @@ application/
     trust/confidence/
     trust/replay/
     trust/safeid/
+    executiongraph/        # spec-my-C : planner graphe d'exécution
 .asagiri/                # créé par asa init
   config.yaml
   state.sqlite           # gitignored
@@ -53,6 +54,7 @@ application/
   investigations/
   skills/
   trust/<trust-id>/      # spec-my-B : report.md, report.json, replay.yaml
+  graphs/<graph-id>/     # spec-my-C : execution-graph.yaml, plan.md, metrics.json, events.jsonl
 ```
 
 ## Packages clés
@@ -132,9 +134,13 @@ spec/plan → enrich → dev (worktree + agent) → verify → review → report
 | `internal/trust/` | `TrustEngine`, rapports `.asagiri/trust/<id>/`, gates, replay |
 | `internal/trust/checks/` | Runners de vérification (contracts, flows, blast-radius, …) |
 | `internal/trust/confidence/` | Agrégation 6 dimensions §7 spec-my-B |
+| `internal/executiongraph/` | Planner graphe : model, dependency, scheduler, estimator, risk, checkpoints, rollback, runner |
+| `internal/executiongraph/` (repository) | Persistance `.asagiri/graphs/<id>/` (YAML/JSON, plan.md, metrics) |
+| `internal/runtime/` (GraphEmitter) | Événements `graph.*` §19 spec-my-C |
 
 Détail spec-my-A : [`06-spec-my-a.md`](06-spec-my-a.md).  
-Détail spec-my-B : [`06-spec-my-b.md`](06-spec-my-b.md).
+Détail spec-my-B : [`06-spec-my-b.md`](06-spec-my-b.md).  
+Détail spec-my-C : [`06-spec-my-c.md`](06-spec-my-c.md).
 
 Interfaces §11.2 : `WorkflowEngine`, `TaskStore`, `WorktreeManager`, `Validator` déclarées dans `internal/workflow/interfaces.go` ; implémentations = `Service`, `sqlite.Store`, `worktree.Manager`, `validation.Runner`.
 
@@ -144,9 +150,31 @@ Interfaces §11.2 : `WorkflowEngine`, `TaskStore`, `WorktreeManager`, `Validator
 - Homebrew : `brew install LaProgrammerie/tap/asa`.
 - Docs publiques : `docs-site/` → Cloudflare Pages projet **`asagiri-docs`** ; `basePath` legacy **`/asagiri`** si `GITHUB_PAGES=true`.
 
+## Execution Graph (spec-my-C)
+
+Flux :
+
+```text
+product + flow → planner.Build → scheduler.Schedule → repository.SaveAll
+  → graph run (dry-run ou agents) → checkpoints → trust gates → report
+```
+
+Artefacts sous `.asagiri/graphs/<graph-id>/` :
+
+| Fichier | Rôle |
+|---------|------|
+| `execution-graph.yaml` / `.json` | Graphe canonique (nœuds, arêtes, checkpoints, rollback) |
+| `plan.md` | Résumé humain du plan |
+| `metrics.json` | Estimation coût, durée, risque, groupes parallèles |
+| `events.jsonl` / `timeline.jsonl` | Journal runtime |
+| `report.md` | Rapport post-exécution |
+
+CLI : `asa plan graph`, `asa plan explain`, `asa graph run|status|resume|visualize`.  
+Config : bloc `execution_graph:` (ADR-022).
+
 ## Limites connues
 
-- Commandes §6.2 restantes : `bench`, `search`, `graph`, `export`.
+- Commandes §6.2 restantes : `bench`, `search`, `export`.
 - RAG : recherche textuelle sur chunks (pas d’embeddings Ollama en V1).
 - `resume --execute` : dry-run uniquement.
 - Agents externes requis hors mode dry-run.

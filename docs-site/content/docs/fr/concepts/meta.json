@@ -9,6 +9,7 @@
     "runtime",
     "investigation",
     "analysis-layer",
-    "trust-engine"
+    "trust-engine",
+    "execution-graph"
   ]
 }

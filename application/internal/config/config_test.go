@@ -131,6 +131,82 @@ func TestValidateEscapeRejected(t *testing.T) {
 	}
 }
 
+func TestLoadExecutionGraphConfig(t *testing.T) {
+	dir := t.TempDir()
+	repo := filepath.Join(dir, "proj")
+	requireDirs(t, repo)
+	cfgPath := filepath.Join(repo, ".asagiri", "config.yaml")
+	if err := os.WriteFile(cfgPath, []byte(`
+project:
+  name: graph-test
+state:
+  backend: sqlite
+  path: .asagiri/state.sqlite
+execution_graph:
+  enabled: true
+  max_parallel: 3
+  default_strategy: cost_aware
+  require_checkpoints: true
+  stop_on_risk: critical
+  allow_parallel_agents: false
+  require_isolated_worktrees: true
+  gates:
+    trust_required_for_high_risk: true
+    human_approval_for:
+      - migration
+  rollback:
+    require_strategy_for_high_risk: true
+    preserve_failed_worktrees: false
+`), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	cfg, err := Load(cfgPath, repo)
+	if err != nil {
+		t.Fatalf("Load: %v", err)
+	}
+	if !cfg.ExecutionGraph.Enabled {
+		t.Fatal("expected execution graph enabled")
+	}
+	if cfg.ExecutionGraph.MaxParallel != 3 {
+		t.Fatalf("max_parallel: got %d", cfg.ExecutionGraph.MaxParallel)
+	}
+	if cfg.ExecutionGraph.DefaultStrategy != "cost_aware" {
+		t.Fatalf("default_strategy: got %q", cfg.ExecutionGraph.DefaultStrategy)
+	}
+	if cfg.ExecutionGraph.StopOnRisk != "critical" {
+		t.Fatalf("stop_on_risk: got %q", cfg.ExecutionGraph.StopOnRisk)
+	}
+	if cfg.ExecutionGraph.AllowParallelAgents {
+		t.Fatal("expected allow_parallel_agents false")
+	}
+	if !cfg.ExecutionGraph.Gates.TrustRequiredForHighRisk {
+		t.Fatal("expected trust_required_for_high_risk true")
+	}
+	if len(cfg.ExecutionGraph.Gates.HumanApprovalFor) != 1 || cfg.ExecutionGraph.Gates.HumanApprovalFor[0] != "migration" {
+		t.Fatalf("human_approval_for: got %v", cfg.ExecutionGraph.Gates.HumanApprovalFor)
+	}
+	if !cfg.ExecutionGraph.Rollback.RequireStrategyForHighRisk {
+		t.Fatal("expected require_strategy_for_high_risk true")
+	}
+	if cfg.ExecutionGraph.Rollback.PreserveFailedWorktrees {
+		t.Fatal("expected preserve_failed_worktrees false")
+	}
+}
+
+func TestExecutionGraphDefaults(t *testing.T) {
+	cfg := NewTestConfig("proj")
+	if cfg.ExecutionGraph.MaxParallel != 2 {
+		t.Fatalf("default max_parallel: got %d", cfg.ExecutionGraph.MaxParallel)
+	}
+	if cfg.ExecutionGraph.DefaultStrategy != "risk_aware" {
+		t.Fatalf("default strategy: got %q", cfg.ExecutionGraph.DefaultStrategy)
+	}
+	if cfg.ExecutionGraph.StopOnRisk != "high" {
+		t.Fatalf("default stop_on_risk: got %q", cfg.ExecutionGraph.StopOnRisk)
+	}
+}
+
 func TestLoadPoliciesAndValidation(t *testing.T) {
 	dir := t.TempDir()
 	repo := filepath.Join(dir, "proj")

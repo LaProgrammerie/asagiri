@@ -1,11 +1,14 @@
 # Asagiri — écarts doc / code / spec
 
+> **Registre maître phase finale :** [`spec-phase-finale.md`](spec-phase-finale.md) §1 (IDs **PF-***).  
+> Ce fichier garde la traçabilité historique **GAP-*** ; à synchroniser avec le registre PF lors des clôtures.
+
 | ID | Zone | Problème | Sévérité | Statut |
 | --- | --- | --- | --- | --- |
-| GAP-001 | CLI `resume` | Hors `--dry-run`, `asa resume <run-id>` affiche seulement le prochain step (`plan`, `dev`, …) et **n’exécute pas** les agents. L’enchaînement automatique existe uniquement via `resume --execute` avec `--dry-run` (`ResumeRunDryExecute` retourne une erreur sinon). | Moyenne | Documenté (Experimental) — implémentation future |
-| GAP-002 | Cost | Pas de tokenizers provider-exacts : estimation par heuristique `chars_per_token` uniquement (`cost/token_counter.go`). La roadmap P0 le prévoit ; la doc ne doit pas présenter les montants comme factures. | Faible | Limitation connue |
-| GAP-003 | RAG | `asa index` indexe des chunks SQLite ; pas d’embeddings vectoriels ni retrieval sémantique malgré `embedding_model` dans l’exemple config. | Faible | Roadmap P2 — Experimental en doc |
-| GAP-004 | Docgen | Les pages CLI générées utilisent un exemple minimal `asa <cmd>` sans args obligatoires (ex. `work` sans instruction) tant que `cobra.Command.Example` n’est pas renseigné. | Faible | Amélioration docgen |
+| GAP-001 | CLI `resume` | Hors `--dry-run`, `asa resume <run-id>` affiche seulement le prochain step (`plan`, `dev`, …) et **n’exécute pas** les agents. L’enchaînement automatique existe uniquement via `resume --execute` avec `--dry-run` (`ResumeRunDryExecute` retourne une erreur sinon). | Moyenne | → **PF-X-01** dans [`spec-phase-finale.md`](spec-phase-finale.md) |
+| GAP-002 | Cost | Pas de tokenizers provider-exacts : estimation par heuristique `chars_per_token` uniquement (`cost/token_counter.go`). La roadmap P0 le prévoit ; la doc ne doit pas présenter les montants comme factures. | Faible | → **PF-X-02** |
+| GAP-003 | RAG | `asa index` indexe des chunks SQLite ; pas d’embeddings vectoriels ni retrieval sémantique malgré `embedding_model` dans l’exemple config. | Faible | → **PF-X-03** (lien **PF-A-01**) |
+| GAP-004 | Docgen | Les pages CLI générées utilisent un exemple minimal `asa <cmd>` sans args obligatoires (ex. `work` sans instruction) tant que `cobra.Command.Example` n’est pas renseigné. | Faible | → **PF-X-04** |
 
 ## Aucun écart bloquant identifié le 2026-05-17
 

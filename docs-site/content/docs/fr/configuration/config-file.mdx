@@ -149,6 +149,39 @@ verification:
 
 Voir [Moteur de confiance](/docs/fr/concepts/trust-engine), [`asa verify trust`](/docs/fr/cli/verify-trust) et [`asa trust gates`](/docs/fr/cli/trust-gates).
 
+## `execution_graph`
+
+Défauts du planificateur de graphe d'exécution (`spec-my-C` §24). Contrôle parallélisme, arrêt sur risque, gates trust et rollback pour `asa plan graph` et `asa graph run`.
+
+```yaml
+execution_graph:
+  enabled: true
+  max_parallel: 2
+  default_strategy: risk_aware
+  require_checkpoints: true
+  stop_on_risk: high
+  allow_parallel_agents: true
+  require_isolated_worktrees: true
+  gates:
+    trust_required_for_high_risk: true
+    human_approval_for:
+      - migration
+      - security_sensitive
+      - public_contract_change
+  rollback:
+    require_strategy_for_high_risk: true
+    preserve_failed_worktrees: true
+```
+
+- `enabled` — interrupteur principal ; si false, les commandes graph échouent
+- `max_parallel` — nœuds concurrents par défaut (respecte les règles de scope fichier)
+- `stop_on_risk` — arrêt si le risque estimé atteint ce niveau
+- `gates.trust_required_for_high_risk` — vérification trust sur nœuds à haut risque
+- `gates.human_approval_for` — catégories nécessitant approbation manuelle
+- `rollback.require_strategy_for_high_risk` — stratégie rollback obligatoire pour nœuds à haut risque
+
+Voir [Graphe d'exécution](/docs/fr/concepts/execution-graph), [`asa plan graph`](/docs/fr/cli/plan-graph) et [`asa graph run`](/docs/fr/cli/graph-run).
+
 ## `models`
 
 `models` regroupe les profils logiques utilisés pour le routage et le coût (`specv3`). Les clés sont des identifiants arbitraires ; chaque entrée lie un fournisseur, une classe de coût, un nom de modèle et les classes d’étapes autorisées.

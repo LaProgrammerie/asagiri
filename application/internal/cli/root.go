@@ -69,6 +69,7 @@ func newRootCmd() *cobra.Command {
 		newSkillsCmd(),
 		newMemoryCmd(),
 		newAnalysisCmd(),
+		newGraphCmd(),
 		newDocsCmd(),
 		&cobra.Command{
 			Use:   "version",
@@ -113,7 +114,7 @@ func newSpecCmd(dryRun *bool) *cobra.Command {
 }
 
 func newPlanCmd(dryRun *bool) *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:   "plan <feature>",
 		Short: "Générer ou normaliser le plan de tâches",
 		Args:  cobra.ExactArgs(1),
@@ -135,6 +136,8 @@ func newPlanCmd(dryRun *bool) *cobra.Command {
 			return nil
 		},
 	}
+	cmd.AddCommand(newPlanGraphCmd(), newPlanExplainCmd())
+	return cmd
 }
 
 func newEnrichCmd(dryRun *bool) *cobra.Command {

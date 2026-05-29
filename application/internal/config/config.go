@@ -11,45 +11,120 @@ import (
 )
 
 const (
-	DefaultConfigRel      = ".asagiri/config.yaml"
-	DefaultExampleRel     = ".asagiri/config.yaml.example"
-	LegacyConfigRel       = ".agentflow/config.yaml"
-	LegacyExampleRel      = ".agentflow/config.yaml.example"
-	DefaultStateBackend   = "sqlite"
-	DefaultStatePath      = ".asagiri/state.sqlite"
-	DefaultWorktreesPath  = ".asagiri/worktrees"
-	DefaultBranchPrefix   = "asagiri"
+	DefaultConfigRel     = ".asagiri/config.yaml"
+	DefaultExampleRel    = ".asagiri/config.yaml.example"
+	LegacyConfigRel      = ".agentflow/config.yaml"
+	LegacyExampleRel     = ".agentflow/config.yaml.example"
+	DefaultStateBackend  = "sqlite"
+	DefaultStatePath     = ".asagiri/state.sqlite"
+	DefaultWorktreesPath = ".asagiri/worktrees"
+	DefaultBranchPrefix  = "asagiri"
 )
 
 var legacyConfigWarned sync.Map
 
 // Config mirrors .asagiri/config.yaml.
 type Config struct {
-	Project    Project              `yaml:"project"`
-	Specs      Specs                `yaml:"specs"`
-	State      State                `yaml:"state"`
-	Worktrees  Worktrees            `yaml:"worktrees"`
-	Agents     map[string]Agent     `yaml:"agents"`
-	Validation ValidationConfig     `yaml:"validation"`
-	Policies   Policies             `yaml:"policies"`
-	Intent     IntentConfig         `yaml:"intent"`
-	Work       WorkConfig           `yaml:"work"`
-	Sources    SourcesConfig        `yaml:"sources"`
-	Models     ModelsConfig         `yaml:"models"`
-	Budgets    BudgetsConfig        `yaml:"budgets"`
-	Pricing    PricingConfig        `yaml:"pricing"`
-	TokenEst   TokenEstimationConfig `yaml:"token_estimation"`
-	Routing    RoutingConfig        `yaml:"routing"`
-	UI         UIConfig             `yaml:"ui"`
-	MCP        MCPConfig            `yaml:"mcp"`
-	Runtime      RuntimeConfig        `yaml:"runtime"`
-	Verification VerificationConfig   `yaml:"verification"`
+	Project        Project               `yaml:"project"`
+	Specs          Specs                 `yaml:"specs"`
+	State          State                 `yaml:"state"`
+	Worktrees      Worktrees             `yaml:"worktrees"`
+	Agents         map[string]Agent      `yaml:"agents"`
+	Validation     ValidationConfig      `yaml:"validation"`
+	Policies       Policies              `yaml:"policies"`
+	Intent         IntentConfig          `yaml:"intent"`
+	Work           WorkConfig            `yaml:"work"`
+	Sources        SourcesConfig         `yaml:"sources"`
+	Models         ModelsConfig          `yaml:"models"`
+	Budgets        BudgetsConfig         `yaml:"budgets"`
+	Pricing        PricingConfig         `yaml:"pricing"`
+	TokenEst       TokenEstimationConfig `yaml:"token_estimation"`
+	Routing        RoutingConfig         `yaml:"routing"`
+	UI             UIConfig              `yaml:"ui"`
+	MCP            MCPConfig             `yaml:"mcp"`
+	Runtime        RuntimeConfig         `yaml:"runtime"`
+	Verification   VerificationConfig    `yaml:"verification"`
+	ExecutionGraph ExecutionGraphConfig  `yaml:"execution_graph"`
+	Coordination   CoordinationConfig    `yaml:"coordination"`
+}
+
+// CoordinationConfig holds multi-agent coordination defaults (spec-my-D §11).
+type CoordinationConfig struct {
+	MaxParallelAgents        int                        `yaml:"max_parallel_agents"`
+	DefaultIsolation         string                     `yaml:"default_isolation"`
+	RequireIndependentReview bool                       `yaml:"require_independent_review"`
+	AllowSelfReview          bool                       `yaml:"allow_self_review"`
+	RequireSecurityReviewFor []string                   `yaml:"require_security_review_for"`
+	Assignment               map[string]string          `yaml:"assignment"`
+	Profiles                 map[string]CoordinationProfile `yaml:"profiles"`
+	Pipeline                 []string                   `yaml:"pipeline"`
+	HandoffsPath             string                     `yaml:"handoffs_path"`
+	Retry                    CoordinationRetryConfig    `yaml:"retry"`
+	Escalation               CoordinationEscalationConfig `yaml:"escalation"`
+	Merge                    CoordinationMergeConfig    `yaml:"merge"`
+}
+
+// CoordinationProfile binds a logical profile to an agents: entry (spec-my-D §4).
+type CoordinationProfile struct {
+	Agent            string   `yaml:"agent"`
+	Role             string   `yaml:"role"`
+	Capabilities     []string `yaml:"capabilities,omitempty"`
+	Restrictions     []string `yaml:"restrictions,omitempty"`
+	MaxContextTokens int      `yaml:"max_context_tokens,omitempty"`
+	Isolation        string   `yaml:"isolation,omitempty"`
+}
+
+// CoordinationRetryConfig holds per-step retry caps (spec-my-D §14).
+type CoordinationRetryConfig struct {
+	Implementation CoordinationRetryStep `yaml:"implementation"`
+}
+
+// CoordinationRetryStep configures retries for one step class.
+type CoordinationRetryStep struct {
+	MaxAttempts int `yaml:"max_attempts"`
+}
+
+// CoordinationEscalationConfig names escalation targets after failures (spec-my-D §14).
+type CoordinationEscalationConfig struct {
+	AfterFailure       string `yaml:"after_failure"`
+	AfterSecondFailure string `yaml:"after_second_failure"`
+}
+
+// CoordinationMergeConfig defines merge gates (spec-my-D §16).
+type CoordinationMergeConfig struct {
+	Require  []string `yaml:"require"`
+	BlockIf  []string `yaml:"block_if"`
+}
+
+// ExecutionGraphConfig holds execution graph planner defaults (spec-my-C §24).
+type ExecutionGraphConfig struct {
+	Enabled                  bool                   `yaml:"enabled"`
+	MaxParallel              int                    `yaml:"max_parallel"`
+	DefaultStrategy          string                 `yaml:"default_strategy"`
+	RequireCheckpoints       bool                   `yaml:"require_checkpoints"`
+	StopOnRisk               string                 `yaml:"stop_on_risk"`
+	AllowParallelAgents      bool                   `yaml:"allow_parallel_agents"`
+	RequireIsolatedWorktrees bool                   `yaml:"require_isolated_worktrees"`
+	Gates                    ExecutionGraphGates    `yaml:"gates"`
+	Rollback                 ExecutionGraphRollback `yaml:"rollback"`
+}
+
+// ExecutionGraphGates configures trust and approval gates for graph execution.
+type ExecutionGraphGates struct {
+	TrustRequiredForHighRisk bool     `yaml:"trust_required_for_high_risk"`
+	HumanApprovalFor         []string `yaml:"human_approval_for"`
+}
+
+// ExecutionGraphRollback configures rollback behaviour for graph runs.
+type ExecutionGraphRollback struct {
+	RequireStrategyForHighRisk bool `yaml:"require_strategy_for_high_risk"`
+	PreserveFailedWorktrees    bool `yaml:"preserve_failed_worktrees"`
 }
 
 // VerificationConfig holds trust verification gates (spec-my-B §19).
 type VerificationConfig struct {
-	DefaultProfile string                  `yaml:"default_profile"`
-	Gates          map[string]GateProfile  `yaml:"gates"`
+	DefaultProfile string                 `yaml:"default_profile"`
+	Gates          map[string]GateProfile `yaml:"gates"`
 }
 
 // GateProfile defines blocking thresholds for a named gate set.
@@ -63,14 +138,14 @@ type ModelsConfig map[string]ModelProfile
 
 // ModelProfile describes provider and usage hints for a logical model id.
 type ModelProfile struct {
-	Provider                   string   `yaml:"provider"`
-	Class                      string   `yaml:"class"`
-	Model                      string   `yaml:"model"`
-	InputCostPer1MTokens       float64  `yaml:"input_cost_per_1m_tokens"`
-	OutputCostPer1MTokens      float64  `yaml:"output_cost_per_1m_tokens"`
-	TypicalLatencyMsPer1KTokens int     `yaml:"typical_latency_ms_per_1k_tokens"`
-	MaxContextTokens           int      `yaml:"max_context_tokens"`
-	Usage                      []string `yaml:"usage"`
+	Provider                    string   `yaml:"provider"`
+	Class                       string   `yaml:"class"`
+	Model                       string   `yaml:"model"`
+	InputCostPer1MTokens        float64  `yaml:"input_cost_per_1m_tokens"`
+	OutputCostPer1MTokens       float64  `yaml:"output_cost_per_1m_tokens"`
+	TypicalLatencyMsPer1KTokens int      `yaml:"typical_latency_ms_per_1k_tokens"`
+	MaxContextTokens            int      `yaml:"max_context_tokens"`
+	Usage                       []string `yaml:"usage"`
 }
 
 // BudgetsConfig limits estimated spend (specv3 §3.2).
@@ -91,15 +166,15 @@ type BudgetLimits struct {
 
 // BudgetPolicies controls blocking and overrides.
 type BudgetPolicies struct {
-	BlockWhenOverBudget    bool   `yaml:"block_when_over_budget"`
-	AllowOverrideWithFlag  bool   `yaml:"allow_override_with_flag"`
-	OverrideFlag           string `yaml:"override_flag"`
+	BlockWhenOverBudget   bool   `yaml:"block_when_over_budget"`
+	AllowOverrideWithFlag bool   `yaml:"allow_override_with_flag"`
+	OverrideFlag          string `yaml:"override_flag"`
 }
 
 // PricingConfig holds per-provider model token prices; no hardcoded defaults (specv3 §6.1).
 type PricingConfig struct {
-	Currency string                    `yaml:"currency"`
-	Models   map[string]ModelPricing   `yaml:"models"`
+	Currency string                  `yaml:"currency"`
+	Models   map[string]ModelPricing `yaml:"models"`
 }
 
 // ModelPricing is price sheet entry for a cloud model id (key = model name as used by API).
@@ -120,25 +195,25 @@ type TokenEstimationConfig struct {
 
 // RoutingConfig selects local vs cloud steps (specv3 §11).
 type RoutingConfig struct {
-	DefaultStrategy string                       `yaml:"default_strategy"`
-	Strategies      map[string]RoutingStrategy   `yaml:"strategies"`
+	DefaultStrategy string                     `yaml:"default_strategy"`
+	Strategies      map[string]RoutingStrategy `yaml:"strategies"`
 }
 
 // RoutingStrategy lists task classes routed to each tier.
 type RoutingStrategy struct {
-	PreferLocalFor           []string `yaml:"prefer_local_for"`
-	UseCloudFastFor          []string `yaml:"use_cloud_fast_for"`
-	UseCloudHeavyFor         []string `yaml:"use_cloud_heavy_for"`
-	LocalFailuresBeforeCloud int      `yaml:"local_failures_before_cloud"`
-	CloudFastFailuresBeforeHeavy int  `yaml:"cloud_fast_failures_before_heavy"`
+	PreferLocalFor               []string `yaml:"prefer_local_for"`
+	UseCloudFastFor              []string `yaml:"use_cloud_fast_for"`
+	UseCloudHeavyFor             []string `yaml:"use_cloud_heavy_for"`
+	LocalFailuresBeforeCloud     int      `yaml:"local_failures_before_cloud"`
+	CloudFastFailuresBeforeHeavy int      `yaml:"cloud_fast_failures_before_heavy"`
 }
 
 // UIConfig terminal UX (specv3 §13).
 type UIConfig struct {
-	Mode          string `yaml:"mode"` // auto | rich | plain | json
-	LiveLogs      bool   `yaml:"live_logs"`
-	ProgressBars  bool   `yaml:"progress_bars"`
-	Compact       bool   `yaml:"compact"`
+	Mode         string `yaml:"mode"` // auto | rich | plain | json
+	LiveLogs     bool   `yaml:"live_logs"`
+	ProgressBars bool   `yaml:"progress_bars"`
+	Compact      bool   `yaml:"compact"`
 }
 
 // MCPConfig local MCP server limits (specv3 §10).
@@ -152,10 +227,10 @@ type MCPConfig struct {
 
 // InvestigationConfig caps local repo scanning.
 type InvestigationConfig struct {
-	LargeFileBytes      int64    `yaml:"large_file_bytes"`
-	MaxGrepOutputBytes  int      `yaml:"max_grep_output_bytes"`
-	CommandTimeoutSec   int      `yaml:"command_timeout_seconds"`
-	SensitiveGlobs      []string `yaml:"sensitive_globs"`
+	LargeFileBytes     int64    `yaml:"large_file_bytes"`
+	MaxGrepOutputBytes int      `yaml:"max_grep_output_bytes"`
+	CommandTimeoutSec  int      `yaml:"command_timeout_seconds"`
+	SensitiveGlobs     []string `yaml:"sensitive_globs"`
 }
 
 // IntentConfig controls the intent layer (specv2 §9).
@@ -167,9 +242,9 @@ type IntentConfig struct {
 
 // IntentResolverConfig tunes hybrid resolution.
 type IntentResolverConfig struct {
-	UseOllamaFallback       bool    `yaml:"use_ollama_fallback"`
-	MinConfidence           float64 `yaml:"min_confidence"`
-	AskWhenBelowConfidence  bool    `yaml:"ask_when_below_confidence"`
+	UseOllamaFallback      bool    `yaml:"use_ollama_fallback"`
+	MinConfidence          float64 `yaml:"min_confidence"`
+	AskWhenBelowConfidence bool    `yaml:"ask_when_below_confidence"`
 }
 
 // WorkConfig defaults for work/continue (specv2 §9).
@@ -198,15 +273,15 @@ type LocalSourceConfig struct {
 
 // NotionSourceConfig configures Notion sync (specv2 §8).
 type NotionSourceConfig struct {
-	Enabled              bool   `yaml:"enabled"`
-	TokenEnv             string `yaml:"token_env"`
-	DefaultDatabaseID    string `yaml:"default_database_id"`
-	SpecsDatabaseID      string `yaml:"specs_database_id"`
-	TasksDatabaseID      string `yaml:"tasks_database_id"`
-	StatusProperty       string `yaml:"status_property"`
-	TitleProperty        string `yaml:"title_property"`
-	UpdatedTimeProperty  string `yaml:"updated_time_property"`
-	ImportPath           string `yaml:"import_path"`
+	Enabled             bool   `yaml:"enabled"`
+	TokenEnv            string `yaml:"token_env"`
+	DefaultDatabaseID   string `yaml:"default_database_id"`
+	SpecsDatabaseID     string `yaml:"specs_database_id"`
+	TasksDatabaseID     string `yaml:"tasks_database_id"`
+	StatusProperty      string `yaml:"status_property"`
+	TitleProperty       string `yaml:"title_property"`
+	UpdatedTimeProperty string `yaml:"updated_time_property"`
+	ImportPath          string `yaml:"import_path"`
 }
 
 type Project struct {
@@ -226,9 +301,9 @@ type State struct {
 }
 
 type Worktrees struct {
-	BasePath       string `yaml:"base_path"`
-	BranchPrefix   string `yaml:"branch_prefix"`
-	CleanupPolicy  string `yaml:"cleanup_policy"`
+	BasePath      string `yaml:"base_path"`
+	BranchPrefix  string `yaml:"branch_prefix"`
+	CleanupPolicy string `yaml:"cleanup_policy"`
 }
 
 type Agent struct {
@@ -255,11 +330,11 @@ type ValidationCommand struct {
 
 // Policies holds safety and governance rules (spec §7.1).
 type Policies struct {
-	RequireCleanGit              bool     `yaml:"require_clean_git"`
-	ForbidUntrackedSecretFiles     bool     `yaml:"forbid_untracked_secret_files"`
-	MaxFilesChangedPerTask         int      `yaml:"max_files_changed_per_task"`
-	AllowNetwork                   bool     `yaml:"allow_network"`
-	RequireHumanApprovalFor        []string `yaml:"require_human_approval_for"`
+	RequireCleanGit            bool     `yaml:"require_clean_git"`
+	ForbidUntrackedSecretFiles bool     `yaml:"forbid_untracked_secret_files"`
+	MaxFilesChangedPerTask     int      `yaml:"max_files_changed_per_task"`
+	AllowNetwork               bool     `yaml:"allow_network"`
+	RequireHumanApprovalFor    []string `yaml:"require_human_approval_for"`
 }
 
 // Load reads and validates config at path relative to repoRoot.
@@ -328,6 +403,52 @@ func (c *Config) applyDefaults(repoDirName string) {
 	}
 	c.applyIntentDefaults()
 	c.applyV3Defaults()
+	c.applyExecutionGraphDefaults()
+	c.applyCoordinationDefaults()
+}
+
+func (c *Config) applyCoordinationDefaults() {
+	if c.Coordination.MaxParallelAgents == 0 {
+		c.Coordination.MaxParallelAgents = 2
+	}
+	if c.Coordination.DefaultIsolation == "" {
+		c.Coordination.DefaultIsolation = "isolated_worktree"
+	}
+	if len(c.Coordination.RequireSecurityReviewFor) == 0 {
+		c.Coordination.RequireSecurityReviewFor = []string{
+			"auth",
+			"permissions",
+			"payments",
+		}
+	}
+	if !c.Coordination.RequireIndependentReview {
+		c.Coordination.RequireIndependentReview = true
+	}
+	if c.Coordination.HandoffsPath == "" {
+		c.Coordination.HandoffsPath = ".asagiri/handoffs"
+	}
+}
+
+func (c *Config) applyExecutionGraphDefaults() {
+	if !c.ExecutionGraph.Enabled {
+		c.ExecutionGraph.Enabled = true
+	}
+	if c.ExecutionGraph.MaxParallel == 0 {
+		c.ExecutionGraph.MaxParallel = 2
+	}
+	if c.ExecutionGraph.DefaultStrategy == "" {
+		c.ExecutionGraph.DefaultStrategy = "risk_aware"
+	}
+	if c.ExecutionGraph.StopOnRisk == "" {
+		c.ExecutionGraph.StopOnRisk = "high"
+	}
+	if len(c.ExecutionGraph.Gates.HumanApprovalFor) == 0 {
+		c.ExecutionGraph.Gates.HumanApprovalFor = []string{
+			"migration",
+			"security_sensitive",
+			"public_contract_change",
+		}
+	}
 }
 
 func (c *Config) applyV3Defaults() {
@@ -554,6 +675,41 @@ func (c *Config) Validate(repoRoot string) error {
 		return fmt.Errorf("mcp.max_output_bytes: valeur négative")
 	}
 
+	if err := c.validateCoordination(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (c *Config) validateCoordination() error {
+	co := c.Coordination
+	if co.MaxParallelAgents < 1 {
+		return fmt.Errorf("coordination.max_parallel_agents: doit être >= 1")
+	}
+	switch co.DefaultIsolation {
+	case "", "shared", "isolated_worktree", "readonly", "sandbox":
+	default:
+		return fmt.Errorf("coordination.default_isolation: mode inconnu %q", co.DefaultIsolation)
+	}
+	for id, p := range co.Profiles {
+		if strings.TrimSpace(p.Agent) == "" {
+			return fmt.Errorf("coordination.profiles[%q].agent: requis", id)
+		}
+		if _, ok := c.Agents[p.Agent]; !ok {
+			return fmt.Errorf("coordination.profiles[%q].agent: %q absent de agents:", id, p.Agent)
+		}
+		if p.Isolation != "" {
+			switch p.Isolation {
+			case "shared", "isolated_worktree", "readonly", "sandbox":
+			default:
+				return fmt.Errorf("coordination.profiles[%q].isolation: mode inconnu %q", id, p.Isolation)
+			}
+		}
+	}
+	if co.HandoffsPath != "" {
+		// validated when persisted; path may be created on first handoff
+	}
 	return nil
 }
 

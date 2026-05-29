@@ -149,6 +149,39 @@ verification:
 
 Siehe [Trust-Engine](/docs/de/concepts/trust-engine), [`asa verify trust`](/docs/de/cli/verify-trust) und [`asa trust gates`](/docs/de/cli/trust-gates).
 
+## `execution_graph`
+
+Standardwerte des Execution-Graph-Planers (`spec-my-C` §24). Steuert Parallelität, Risiko-Stopp, Trust-Gates und Rollback für `asa plan graph` und `asa graph run`.
+
+```yaml
+execution_graph:
+  enabled: true
+  max_parallel: 2
+  default_strategy: risk_aware
+  require_checkpoints: true
+  stop_on_risk: high
+  allow_parallel_agents: true
+  require_isolated_worktrees: true
+  gates:
+    trust_required_for_high_risk: true
+    human_approval_for:
+      - migration
+      - security_sensitive
+      - public_contract_change
+  rollback:
+    require_strategy_for_high_risk: true
+    preserve_failed_worktrees: true
+```
+
+- `enabled` — Hauptschalter; bei false schlagen Graph-Befehle fehl
+- `max_parallel` — Standard parallele Knoten (Datei-Scope-Regeln bleiben gültig)
+- `stop_on_risk` — Stopp wenn geschätztes Risiko dieses Niveau erreicht
+- `gates.trust_required_for_high_risk` — Trust-Verifikation auf Hochrisiko-Knoten
+- `gates.human_approval_for` — Kategorien mit manueller Freigabe
+- `rollback.require_strategy_for_high_risk` — Rollback-Strategie für Hochrisiko-Knoten erforderlich
+
+Siehe [Execution Graph](/docs/de/concepts/execution-graph), [`asa plan graph`](/docs/de/cli/plan-graph) und [`asa graph run`](/docs/de/cli/graph-run).
+
 ## `models`
 
 Logische Profile für Routing und Kosten (`specv3`). Schlüssel sind frei wählbare IDs; jeder Eintrag verbindet Provider, Cost-Klasse, Modellnamen und erlaubte Nutzungsklassen.
