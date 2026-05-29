@@ -204,6 +204,51 @@ func (s *Store) SaveStepMetric(ctx context.Context, m telemetry.StepMetric) erro
 	return nil
 }
 
+// SummarizeStepsSince aggregates step_metrics since a timestamp (specv3 §16.2).
+func (s *Store) SummarizeStepsSince(ctx context.Context, since time.Time) (telemetry.StepTotals, error) {
+	_ = ctx
+	var t telemetry.StepTotals
+	sinceStr := timeToText(since)
+	row := s.db.QueryRow(
+		`SELECT COUNT(*),
+		 SUM(CASE WHEN local = 1 THEN 1 ELSE 0 END),
+		 SUM(CASE WHEN local = 0 THEN 1 ELSE 0 END)
+		 FROM step_metrics
+		 WHERE id IN (
+		   SELECT sm.id FROM step_metrics sm
+		   JOIN run_metrics rm ON sm.run_id = rm.run_id
+		   WHERE rm.started_at IS NOT NULL AND rm.started_at >= ?
+		 )`,
+		sinceStr,
+	)
+	var local, cloud sql.NullInt64
+	if err := row.Scan(&t.StepCount, &local, &cloud); err != nil {
+		return t, fmt.Errorf("summarize steps: %w", err)
+	}
+	t.LocalSteps = int(local.Int64)
+	t.CloudSteps = int(cloud.Int64)
+	// Token savings: compare estimated input on local vs cloud steps (rough proxy).
+	var estLocal, estCloud sql.NullInt64
+	_ = s.db.QueryRow(
+		`SELECT
+		   COALESCE(SUM(CASE WHEN local = 1 THEN estimated_input_tokens ELSE 0 END), 0),
+		   COALESCE(SUM(CASE WHEN local = 0 THEN estimated_input_tokens ELSE 0 END), 0)
+		 FROM step_metrics sm
+		 JOIN run_metrics rm ON sm.run_id = rm.run_id
+		 WHERE rm.started_at IS NOT NULL AND rm.started_at >= ?`,
+		sinceStr,
+	).Scan(&estLocal, &estCloud)
+	if estLocal.Int64+estCloud.Int64 > 0 {
+		t.AvgTokenSavingsPct = float64(estLocal.Int64) / float64(estLocal.Int64+estCloud.Int64) * 100
+	}
+	return t, nil
+}
+
+// GetRunMetric returns one run_metrics row by id.
+func (s *Store) GetRunMetric(runID string) (*telemetry.RunMetric, error) {
+	return s.getRunMetric(runID)
+}
+
 // QuerySince lists run_metrics with started_at on or after since.
 func (s *Store) QuerySince(ctx context.Context, since time.Time) ([]telemetry.RunMetric, error) {
 	_ = ctx

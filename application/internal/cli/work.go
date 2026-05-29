@@ -165,15 +165,16 @@ func newWorkCmd(dryRun *bool) *cobra.Command {
 				},
 			}
 
-			v3res, err := pipeline.RunV3Pipeline(context.Background(), app, resolved, plan, v3opts)
+			v3res, err := pipeline.RunV3PreFlight(context.Background(), app, resolved, plan, v3opts)
 			if err != nil {
 				var pc *cost.BudgetPendingConfirmError
 				if errors.As(err, &pc) && !yes {
+					printEstimateBoxed(cmd.OutOrStdout(), v3res.Estimate, &v3res.Optimize)
 					if confirmErr := requireConfirm(opts, pc.Error()); confirmErr != nil {
 						return confirmErr
 					}
 					v3opts.UserConfirmedBudget = true
-					v3res, err = pipeline.RunV3Pipeline(context.Background(), app, resolved, plan, v3opts)
+					v3res, err = pipeline.RunV3PreFlight(context.Background(), app, resolved, plan, v3opts)
 				}
 				if err != nil {
 					if investigateOnFailure && !actx.DryRun && !*dryRun {
@@ -187,6 +188,14 @@ func newWorkCmd(dryRun *bool) *cobra.Command {
 
 			if estimateOnly || planOnly {
 				return nil
+			}
+
+			v3res, err = pipeline.RunV3Execute(context.Background(), app, resolved, plan, v3opts, v3res)
+			if err != nil {
+				if investigateOnFailure && !actx.DryRun && !*dryRun {
+					runInvestigationOnFailure(cmd, actx, instruction, depth, noCloud)
+				}
+				return err
 			}
 
 			intent.PrintWorkReport(cmd.OutOrStdout(), resolved, plan, v3res.Exec)

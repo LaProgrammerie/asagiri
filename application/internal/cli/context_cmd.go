@@ -84,7 +84,7 @@ func newContextCmd(dryRun *bool) *cobra.Command {
 			ReducedFiles: reduced,
 			OutputFormat: "markdown",
 		})
-		rawTok := contextopt.PackApproxTokens(pack, c.Config.TokenEst)
+		opt := contextopt.ComputeOptimize(entries, reduced, pack, c.Config.TokenEst)
 		if show {
 			fmt.Fprint(cmd.OutOrStdout(), contextopt.RenderPackMarkdown(pack))
 			if fromGraph {
@@ -94,7 +94,8 @@ func newContextCmd(dryRun *bool) *cobra.Command {
 			}
 		}
 		if optimize {
-			fmt.Fprintf(cmd.OutOrStdout(), "Original context: ~%d tokens\nOptimized: ~%d tokens\n", rawTok, rawTok)
+			fmt.Fprintf(cmd.OutOrStdout(), "Original context: %d tokens\nOptimized: %d tokens\nSavings: %.1f%%\n",
+				opt.OriginalTokens, opt.OptimizedTokens, opt.SavingsRatio*100)
 		}
 		return nil
 	}

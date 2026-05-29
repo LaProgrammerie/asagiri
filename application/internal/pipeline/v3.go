@@ -77,6 +77,18 @@ type App struct {
 
 // RunV3Pipeline runs investigation → context → estimate → budget → optional execution (specv3).
 func RunV3Pipeline(ctx context.Context, app App, resolved intent.ResolvedIntent, plan intent.ExecutionPlan, opts V3Options) (V3Result, error) {
+	pre, err := RunV3PreFlight(ctx, app, resolved, plan, opts)
+	if err != nil {
+		return pre, err
+	}
+	if opts.EstimateOnly {
+		return pre, nil
+	}
+	return RunV3Execute(ctx, app, resolved, plan, opts, pre)
+}
+
+// RunV3PreFlight runs local investigation, context optimization, estimate, and budget checks.
+func RunV3PreFlight(ctx context.Context, app App, resolved intent.ResolvedIntent, plan intent.ExecutionPlan, opts V3Options) (V3Result, error) {
 	var out V3Result
 	if app.Config == nil {
 		return out, fmt.Errorf("pipeline v3: config nil")
@@ -97,9 +109,19 @@ func RunV3Pipeline(ctx context.Context, app App, resolved intent.ResolvedIntent,
 	if err != nil {
 		return out, err
 	}
+	rawTok := contextopt.SumEntryTokens(entries, app.Config.TokenEst)
+
 	keywords := resolved.Feature + " " + resolved.TaskID
 	contextopt.ScoreByKeywords(entries, keywords, resolved.Feature)
-	reduced, redWarns := contextopt.Reduce(entries, app.Config, contextopt.ReduceOpts{})
+
+	var reduced []contextopt.FileEntry
+	var redWarns []string
+	if opts.NoContextReduce {
+		reduced = entries
+	} else {
+		reduced, redWarns = contextopt.Reduce(entries, app.Config, contextopt.ReduceOpts{})
+	}
+
 	packIn := contextopt.PackInput{
 		Feature:         resolved.Feature,
 		TaskID:          resolved.TaskID,
@@ -109,8 +131,11 @@ func RunV3Pipeline(ctx context.Context, app App, resolved intent.ResolvedIntent,
 		TaskDescription: plan.Intent.Reason,
 	}
 	out.ContextPack = contextopt.BuildPack(app.Config, packIn)
-	beforeTok := contextopt.PackApproxTokens(out.ContextPack, app.Config.TokenEst)
-	out.Optimize = contextopt.OptimizeResult{OriginalTokens: beforeTok, OptimizedTokens: beforeTok, Warnings: redWarns}
+	out.Optimize = contextopt.ComputeOptimize(entries, reduced, out.ContextPack, app.Config.TokenEst)
+	out.Optimize.Warnings = redWarns
+	if rawTok > 0 && out.Optimize.OriginalTokens == 0 {
+		out.Optimize.OriginalTokens = rawTok
+	}
 	if opts.ShowContextPlan {
 		_ = redWarns
 	}
@@ -120,6 +145,9 @@ func RunV3Pipeline(ctx context.Context, app App, resolved intent.ResolvedIntent,
 		RunID:               runID,
 		MaxOutputTokens:     opts.MaxOutputTokens,
 		DefaultOutputTokens: 4096,
+		PreferLocal:         opts.PreferLocal,
+		NoCloud:             opts.NoCloud,
+		AllowCloud:          opts.AllowCloud,
 	})
 	if err != nil {
 		return out, err
@@ -127,9 +155,9 @@ func RunV3Pipeline(ctx context.Context, app App, resolved intent.ResolvedIntent,
 	out.Estimate = est
 
 	over := cost.BudgetOverrides{
-		MaxCostMajor:       opts.BudgetMajor,
-		AllowOverBudget:    opts.AllowOverBudget || opts.UserConfirmedBudget,
-		InteractiveAllow:   opts.Interactive,
+		MaxCostMajor:     opts.BudgetMajor,
+		AllowOverBudget:  opts.AllowOverBudget || opts.UserConfirmedBudget,
+		InteractiveAllow: opts.Interactive,
 	}
 	check, err := cost.CheckBudget(est, app.Config, over)
 	if err != nil {
@@ -145,10 +173,19 @@ func RunV3Pipeline(ctx context.Context, app App, resolved intent.ResolvedIntent,
 		}
 	}
 
-	if opts.EstimateOnly {
-		return out, nil
+	if app.Store != nil {
+		_ = savePlannedStepMetrics(ctx, app.Store, runID, est)
 	}
+	return out, nil
+}
 
+// RunV3Execute continues after a successful pre-flight (metrics + agent steps).
+func RunV3Execute(ctx context.Context, app App, resolved intent.ResolvedIntent, plan intent.ExecutionPlan, opts V3Options, pre V3Result) (V3Result, error) {
+	out := pre
+	if app.Executor == nil {
+		return out, fmt.Errorf("pipeline v3: executor nil")
+	}
+	runID := out.MetricsRunID
 	if app.Store != nil {
 		_ = telemetry.SaveRunStarted(ctx, app.Store, runID, resolved.Feature, resolved.TaskID, time.Now().UTC())
 	}
@@ -163,9 +200,6 @@ func RunV3Pipeline(ctx context.Context, app App, resolved intent.ResolvedIntent,
 		NoReview:    opts.NoReview,
 		Agent:       opts.Agent,
 		Reviewer:    opts.Reviewer,
-	}
-	if app.Executor == nil {
-		return out, fmt.Errorf("pipeline v3: executor nil")
 	}
 	start := time.Now()
 	snap, err := intent.BuildSnapshot(app.RepoRoot, app.Config, app.Store)
@@ -184,13 +218,38 @@ func RunV3Pipeline(ctx context.Context, app App, resolved intent.ResolvedIntent,
 			TaskID:                resolved.TaskID,
 			StartedAt:             start,
 			FinishedAt:            time.Now().UTC(),
-			EstimatedInputTokens:  est.TotalInputTokens,
-			EstimatedOutputTokens: est.TotalOutputTokens,
-			EstimatedCostCents:    est.EstimatedCost.Cents,
+			EstimatedInputTokens:  out.Estimate.TotalInputTokens,
+			EstimatedOutputTokens: out.Estimate.TotalOutputTokens,
+			EstimatedCostCents:    out.Estimate.EstimatedCost.Cents,
 			ActualDuration:        time.Since(start),
 			Status:                "done",
 		}
 		_ = telemetry.SaveRunFinished(ctx, app.Store, fin)
 	}
 	return out, nil
+}
+
+func savePlannedStepMetrics(ctx context.Context, st *sqlite.Store, runID string, est cost.ExecutionEstimate) error {
+	if st == nil {
+		return nil
+	}
+	for _, step := range est.PlannedSteps {
+		m := telemetry.StepMetric{
+			ID:                    runID + ":" + step.Name,
+			RunID:                 runID,
+			StepName:              step.Name,
+			Agent:                 step.Agent,
+			Model:                 step.Model,
+			Local:                 step.Local,
+			EstimatedInputTokens:  step.InputTokens,
+			EstimatedOutputTokens: step.OutputTokens,
+			EstimatedCostCents:    step.EstimatedCost.Cents,
+			EstimatedDuration:     step.EstimatedDuration,
+			Status:                "planned",
+		}
+		if err := st.SaveStepMetric(ctx, m); err != nil {
+			return err
+		}
+	}
+	return nil
 }

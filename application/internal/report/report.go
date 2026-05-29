@@ -32,16 +32,19 @@ type RunReport struct {
 
 // CostPerformance is an optional V3 section (specv3 §15).
 type CostPerformance struct {
-	EstimatedInputTokens  int    `json:"estimated_input_tokens"`
-	EstimatedOutputTokens int    `json:"estimated_output_tokens"`
-	ActualInputTokens     int    `json:"actual_input_tokens"`
-	ActualOutputTokens    int    `json:"actual_output_tokens"`
-	EstimatedCost         string `json:"estimated_cost"`
-	ActualCost            string `json:"actual_cost"`
-	EstimatedDuration     string `json:"estimated_duration"`
-	ActualDuration        string `json:"actual_duration"`
-	FilesScanned          int    `json:"files_scanned_local"`
-	CandidateFiles        int    `json:"candidate_files"`
+	EstimatedInputTokens      int    `json:"estimated_input_tokens"`
+	EstimatedOutputTokens     int    `json:"estimated_output_tokens"`
+	ActualInputTokens         int    `json:"actual_input_tokens"`
+	ActualOutputTokens        int    `json:"actual_output_tokens"`
+	EstimatedCost             string `json:"estimated_cost"`
+	ActualCost                string `json:"actual_cost"`
+	EstimatedDuration         string `json:"estimated_duration"`
+	ActualDuration            string `json:"actual_duration"`
+	FilesScanned              int    `json:"files_scanned_local"`
+	CandidateFiles            int    `json:"candidate_files"`
+	LargeFilesSummarized      int    `json:"large_files_summarized"`
+	CloudContextReducedFrom   int    `json:"cloud_context_reduced_from_tokens"`
+	TokenSavingsPercent       float64 `json:"token_savings_percent"`
 }
 
 type Writer struct {
@@ -52,7 +55,8 @@ func NewWriter(repoRoot string) *Writer {
 	return &Writer{RepoRoot: repoRoot}
 }
 
-func (w *Writer) Write(run sqlite.Run, tasks []sqlite.Task, steps []Step) (string, string, error) {
+// Write persists run report artefacts; optional cost section when cost is non-nil.
+func (w *Writer) Write(run sqlite.Run, tasks []sqlite.Task, steps []Step, cost *CostPerformance) (string, string, error) {
 	runDir := filepath.Join(w.RepoRoot, ".asagiri", "runs", run.ID)
 	if err := os.MkdirAll(runDir, 0o755); err != nil {
 		return "", "", fmt.Errorf("create run report dir: %w", err)
@@ -66,6 +70,7 @@ func (w *Writer) Write(run sqlite.Run, tasks []sqlite.Task, steps []Step) (strin
 		Steps:      steps,
 		Tasks:      tasks,
 		Repository: w.RepoRoot,
+		Cost:       cost,
 	}
 
 	jsonPath := filepath.Join(runDir, "report.json")
@@ -135,6 +140,16 @@ func CostPerformanceMarkdown(c CostPerformance) string {
 	sb.WriteString("\n## Local Work Saved\n\n")
 	sb.WriteString(fmt.Sprintf("- %s files scanned locally\n", formatInt(c.FilesScanned)))
 	sb.WriteString(fmt.Sprintf("- %s candidate files selected\n", formatInt(c.CandidateFiles)))
+	if c.LargeFilesSummarized > 0 {
+		sb.WriteString(fmt.Sprintf("- %s large files summarized locally\n", formatInt(c.LargeFilesSummarized)))
+	}
+	if c.CloudContextReducedFrom > 0 {
+		sb.WriteString(fmt.Sprintf("- estimated cloud context reduced from %s to %s tokens\n",
+			formatInt(c.CloudContextReducedFrom), formatInt(c.ActualInputTokens)))
+	}
+	if c.TokenSavingsPercent > 0 {
+		sb.WriteString(fmt.Sprintf("- estimated token savings: %.1f%%\n", c.TokenSavingsPercent))
+	}
 	return sb.String()
 }
 

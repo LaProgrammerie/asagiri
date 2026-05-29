@@ -15,6 +15,14 @@ type CostTotals struct {
 	EstimatedOutputTok  int64
 }
 
+// StepTotals aggregates step_metrics for cost report (specv3 §16.2).
+type StepTotals struct {
+	StepCount         int
+	LocalSteps        int
+	CloudSteps        int
+	AvgTokenSavingsPct float64
+}
+
 // SummarizeSince aggregates run_metrics rows for reporting.
 func SummarizeSince(ctx context.Context, st MetricsStore, since time.Time) (CostTotals, error) {
 	var zero CostTotals
@@ -34,6 +42,14 @@ func SummarizeSince(ctx context.Context, st MetricsStore, since time.Time) (Cost
 		t.EstimatedOutputTok += int64(r.EstimatedOutputTokens)
 	}
 	return t, nil
+}
+
+// SummarizeStepsSince aggregates step_metrics for the reporting window.
+func SummarizeStepsSince(ctx context.Context, st MetricsStore, since time.Time) (StepTotals, error) {
+	if st == nil {
+		return StepTotals{}, nil
+	}
+	return st.SummarizeStepsSince(ctx, since)
 }
 
 // RunSummary is formatted cost report for CLI.

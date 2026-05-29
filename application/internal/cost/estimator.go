@@ -18,6 +18,9 @@ type BuildOpts struct {
 	RunID               string
 	MaxOutputTokens     int
 	DefaultOutputTokens int
+	PreferLocal         bool
+	NoCloud             bool
+	AllowCloud          bool
 }
 
 // BuildEstimate projects tokens, cost, and duration for a plan (specv3 §3.3).
@@ -75,7 +78,7 @@ func BuildEstimate(ctx context.Context, plan intent.ExecutionPlan, inv investiga
 	for _, s := range plan.Steps {
 		step := estimatedFromPlanStep(s, cfg, agent, reviewer, enricher, packText, invText, outSplit)
 		if stepUsesCloudModel(s.Command) {
-			rd := routing.Route(cfg, s.Command, false, false, true)
+			rd := routing.Route(cfg, s.Command, opts.PreferLocal, opts.NoCloud, opts.AllowCloud)
 			if step.Reason == "" {
 				step.Reason = rd.Reason
 			} else {

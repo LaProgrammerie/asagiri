@@ -36,10 +36,19 @@ func newCostReportCmd(dryRun *bool) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			fmt.Fprintf(cmd.OutOrStdout(), "Last %d days\n%s\nRuns: %d\nEstimated cost: %.2f\nActual cost: %.2f\n",
+			steps, err := telemetry.SummarizeStepsSince(context.Background(), c.Store, sinceT)
+			if err != nil {
+				return err
+			}
+			localPct, cloudPct := stepMixPercent(steps)
+			fmt.Fprintf(cmd.OutOrStdout(), "Last %d days\n%s\nRuns: %d\nEstimated cost: €%.2f\nActual cost: €%.2f\n",
 				days, repeatDash(11), tot.RunCount,
 				float64(tot.EstimatedCostCents)/100,
 				float64(tot.ActualCostCents)/100)
+			if steps.StepCount > 0 {
+				fmt.Fprintf(cmd.OutOrStdout(), "Local steps:       %.0f%%\nCloud steps:       %.0f%%\nAvg token savings: %.0f%%\n",
+					localPct, cloudPct, steps.AvgTokenSavingsPct)
+			}
 			return nil
 		},
 	}
@@ -84,4 +93,12 @@ func parseSinceDays(s string) (int, error) {
 
 func repeatDash(n int) string {
 	return strings.Repeat("-", n)
+}
+
+func stepMixPercent(st telemetry.StepTotals) (local, cloud float64) {
+	total := st.LocalSteps + st.CloudSteps
+	if total == 0 {
+		return 0, 0
+	}
+	return float64(st.LocalSteps) / float64(total) * 100, float64(st.CloudSteps) / float64(total) * 100
 }

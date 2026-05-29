@@ -1,40 +1,28 @@
-# Current spec — spec-my-F livrée
+# Current spec — specv3 livrée
 
-**Phase :** [`spec-my-F.md`](../../../spec-my-F.md) — **livrée** (`2026-05-29`)  
-**Handoff :** [`handoff.md`](handoff.md) — tranche spec-my-F, matrice F-* 100 %
+**Phase :** [`specv3.md`](../../../specv3.md) — **livrée** (`2026-05-29`)  
+**Handoff :** [`handoff.md`](handoff.md) — tranche specv3, matrice 100 %
 
 ## Spec active
 
-- **Registre :** [`spec-my-F.md`](../../../spec-my-F.md) — Replay & Deterministic Execution
-- **Canon :** [`06-spec-my-f.md`](../06-spec-my-f.md)
+- **Registre :** [`specv3.md`](../../../specv3.md) — Cost, Performance & Token Optimization
+- **Canon :** [`06-spec-v3.md`](../06-spec-v3.md)
 - **Handoff :** [`handoff.md`](handoff.md)
 
-## Résumé — livrables F
+## Résumé — livrables V3
 
 | Bloc | Contenu |
 |------|---------|
-| **Replay package** | `.asagiri/replays/<id>/`, `replay.yaml`, capture graph/trust/investigation/handoffs |
-| **CLI** | `asa replay create|run|compare|explain|snapshot` |
-| **Modes** | full, simulation, offline, audit, compare ; `--strict` |
-| **Compare** | Coût, trust diff, divergences graph/artefacts |
-| **Config** | Bloc `replay:` dans `config.yaml` |
-| **Docs** | Site 4 locales + docgen `en/cli/generated/replay*` |
+| **Pipeline** | `RunV3PreFlight` → affichage → `RunV3Execute` |
+| **CLI** | `estimate`, `work --estimate-only`, `context`, `cost`, `investigate`, `mcp serve` |
+| **Métriques** | SQLite `run_metrics` / `step_metrics`, `cost report` |
+| **Contexte** | reduce/pack, savings mesurés, `--no-context-reduction` |
+| **TUI** | rich / plain / json (`ui.mode`) |
+| **MCP** | tools `asagiri.*`, désactivé par défaut |
+| **Rapport** | section Cost & Performance dans `report.md` |
 
-## Stack A–F (référence)
+## Stack A–F + PF
 
-| Spec | Statut |
-|------|--------|
-| A + PF-A | Livré |
-| B | Livré |
-| C + PF-C | Livré |
-| D + D-FULL | Livré |
-| E | Livré |
-| **F** | **Livré** |
-
-Canon : [`06-spec-my-a.md`](../06-spec-my-a.md) … [`06-spec-my-f.md`](../06-spec-my-f.md).
-
-## Phase finale
-
-[`spec-phase-finale.md`](../../../spec-phase-finale.md) — **livrée** (`2026-05-29`) ; registre PF-* 100 % ; [`problems.md`](../../../problems.md) GAP-* clôturés.
+Toutes livrées — voir [`context-map.md`](../context-map.md).
 
 Branding : **Asagiri** / **`asa`** / `github.com/LaProgrammerie/asagiri`.

@@ -722,7 +722,11 @@ func (s *Service) GenerateReport(runID string) (string, string, error) {
 			EndedAt:   step.EndedAt,
 		})
 	}
-	return s.reportWriter.Write(*run, tasks, steps)
+	var costSec *report.CostPerformance
+	if m, err := s.store.GetRunMetric(run.ID); err == nil && m != nil {
+		costSec = report.FromRunMetric(*m)
+	}
+	return s.reportWriter.Write(*run, tasks, steps, costSec)
 }
 
 func (s *Service) Clean(ctx context.Context, onlyMerged bool, onlyFailed bool) (int, error) {

@@ -17,7 +17,7 @@ Complements `AGENTS.md`: **where things live**, **who consumes what**, and **how
 | **Consolidation OSS / fiabilisation** | `spec-consolidation-now.md` (actif), `spec-postv123.md` (historique), `docs/consolidation/` |
 | **Public documentation site** | `spec-doc.md`, `spec-deploy-doc.md`, `docs-site/` (Fumadocs → **Cloudflare Pages**, projet **`asagiri-docs`**) ; contenu `content/docs/{en,fr,de,es}/` — **en** défaut/fallback, référence CLI générée sous `en/cli/generated/` ; CI `.github/workflows/docs-cloudflare-pages.yml` |
 | **Doc / code / spec drift tracker** | `problems.md` (repo root) |
-| **Asagiri cost/perf (V3)** | `specv3.md` (repo root) |
+| **Asagiri cost/perf (V3, livré)** | `specv3.md`, `docs/ai/06-spec-v3.md`, ADR-010 ; `internal/cost/`, `contextopt/`, `pipeline/` ; docs-site `cost-performance/`, `concepts/cost-aware-workflows` |
 | **Intent layer** | `specv2.md` (repo root) |
 | **V1 spec (historique, noms AgentFlow)** | `spec.md` (repo root) |
 | Short cross-tool index | `AGENTS.md` (root) |
