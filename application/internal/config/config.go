@@ -63,27 +63,27 @@ type KnowledgeConfig struct {
 // ReplayConfig holds replay capture defaults (spec-my-F §22).
 type ReplayConfig struct {
 	CapturePrompts         *bool `yaml:"capture_prompts"`
-	CaptureRuntimeEvents     *bool `yaml:"capture_runtime_events"`
-	CaptureAgentOutputs      *bool `yaml:"capture_agent_outputs"`
-	RedactSecrets            *bool `yaml:"redact_secrets"`
-	OfflineModeDefault       bool  `yaml:"offline_mode_default"`
-	CompressThresholdBytes   int   `yaml:"compress_threshold_bytes"`
+	CaptureRuntimeEvents   *bool `yaml:"capture_runtime_events"`
+	CaptureAgentOutputs    *bool `yaml:"capture_agent_outputs"`
+	RedactSecrets          *bool `yaml:"redact_secrets"`
+	OfflineModeDefault     bool  `yaml:"offline_mode_default"`
+	CompressThresholdBytes int   `yaml:"compress_threshold_bytes"`
 }
 
 // CoordinationConfig holds multi-agent coordination defaults (spec-my-D §11).
 type CoordinationConfig struct {
-	MaxParallelAgents        int                        `yaml:"max_parallel_agents"`
-	DefaultIsolation         string                     `yaml:"default_isolation"`
-	RequireIndependentReview bool                       `yaml:"require_independent_review"`
-	AllowSelfReview          bool                       `yaml:"allow_self_review"`
-	RequireSecurityReviewFor []string                   `yaml:"require_security_review_for"`
-	Assignment               map[string]string          `yaml:"assignment"`
+	MaxParallelAgents        int                            `yaml:"max_parallel_agents"`
+	DefaultIsolation         string                         `yaml:"default_isolation"`
+	RequireIndependentReview bool                           `yaml:"require_independent_review"`
+	AllowSelfReview          bool                           `yaml:"allow_self_review"`
+	RequireSecurityReviewFor []string                       `yaml:"require_security_review_for"`
+	Assignment               map[string]string              `yaml:"assignment"`
 	Profiles                 map[string]CoordinationProfile `yaml:"profiles"`
-	Pipeline                 []string                   `yaml:"pipeline"`
-	HandoffsPath             string                     `yaml:"handoffs_path"`
-	Retry                    CoordinationRetryConfig    `yaml:"retry"`
-	Escalation               CoordinationEscalationConfig `yaml:"escalation"`
-	Merge                    CoordinationMergeConfig    `yaml:"merge"`
+	Pipeline                 []string                       `yaml:"pipeline"`
+	HandoffsPath             string                         `yaml:"handoffs_path"`
+	Retry                    CoordinationRetryConfig        `yaml:"retry"`
+	Escalation               CoordinationEscalationConfig   `yaml:"escalation"`
+	Merge                    CoordinationMergeConfig        `yaml:"merge"`
 }
 
 // CoordinationProfile binds a logical profile to an agents: entry (spec-my-D §4).
@@ -114,8 +114,8 @@ type CoordinationEscalationConfig struct {
 
 // CoordinationMergeConfig defines merge gates (spec-my-D §16).
 type CoordinationMergeConfig struct {
-	Require  []string `yaml:"require"`
-	BlockIf  []string `yaml:"block_if"`
+	Require []string `yaml:"require"`
+	BlockIf []string `yaml:"block_if"`
 }
 
 // ExecutionGraphConfig holds execution graph planner defaults (spec-my-C §24).
@@ -246,12 +246,20 @@ type RoutingStrategy struct {
 	CloudFastFailuresBeforeHeavy int      `yaml:"cloud_fast_failures_before_heavy"`
 }
 
-// UIConfig terminal UX (specv3 §13).
+// UIConfig terminal UX (specv3 §13 + spec-ui §29).
 type UIConfig struct {
-	Mode         string `yaml:"mode"` // auto | rich | plain | json
-	LiveLogs     bool   `yaml:"live_logs"`
-	ProgressBars bool   `yaml:"progress_bars"`
-	Compact      bool   `yaml:"compact"`
+	Mode                      string `yaml:"mode"` // auto | rich | plain | json
+	LiveLogs                  bool   `yaml:"live_logs"`
+	ProgressBars              bool   `yaml:"progress_bars"`
+	Compact                   bool   `yaml:"compact"`
+	DefaultScreen             string `yaml:"default_screen"`
+	Theme                     string `yaml:"theme"`
+	Mouse                     bool   `yaml:"mouse"`
+	Animations                bool   `yaml:"animations"`
+	RefreshIntervalMs         int    `yaml:"refresh_interval_ms"`
+	CompactThreshold          int    `yaml:"compact_threshold"`
+	ShowCLIEquivalents        bool   `yaml:"show_cli_equivalents"`
+	ConfirmDestructiveActions bool   `yaml:"confirm_destructive_actions"`
 }
 
 // MCPConfig local MCP server limits (specv3 §10).
@@ -506,6 +514,7 @@ func (c *Config) applyExecutionGraphDefaults() {
 }
 
 func (c *Config) applyV3Defaults() {
+	hadAnyUISettings := uiHasAnySettings(c.UI)
 	if c.Budgets.DefaultCurrency == "" {
 		c.Budgets.DefaultCurrency = "EUR"
 	}
@@ -554,6 +563,24 @@ func (c *Config) applyV3Defaults() {
 			c.UI.ProgressBars = true
 		}
 	}
+	if c.UI.DefaultScreen == "" {
+		c.UI.DefaultScreen = "mission"
+	}
+	if c.UI.Theme == "" {
+		c.UI.Theme = "asagiri-dark"
+	}
+	if c.UI.RefreshIntervalMs == 0 {
+		c.UI.RefreshIntervalMs = 500
+	}
+	if c.UI.CompactThreshold == 0 {
+		c.UI.CompactThreshold = 100
+	}
+	if !hadAnyUISettings {
+		c.UI.Mouse = true
+		c.UI.Animations = true
+		c.UI.ShowCLIEquivalents = true
+		c.UI.ConfirmDestructiveActions = true
+	}
 	if c.MCP.MaxOutputBytes == 0 {
 		c.MCP.MaxOutputBytes = 1024 * 1024
 	}
@@ -580,6 +607,21 @@ func (c *Config) applyV3Defaults() {
 		}
 	}
 	c.applyRuntimeDefaults()
+}
+
+func uiHasAnySettings(ui UIConfig) bool {
+	return strings.TrimSpace(ui.Mode) != "" ||
+		ui.LiveLogs ||
+		ui.ProgressBars ||
+		ui.Compact ||
+		strings.TrimSpace(ui.DefaultScreen) != "" ||
+		strings.TrimSpace(ui.Theme) != "" ||
+		ui.Mouse ||
+		ui.Animations ||
+		ui.RefreshIntervalMs > 0 ||
+		ui.CompactThreshold > 0 ||
+		ui.ShowCLIEquivalents ||
+		ui.ConfirmDestructiveActions
 }
 
 // AgentModel returns the configured model id for an agent entry, if any.

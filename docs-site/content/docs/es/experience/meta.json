@@ -1,0 +1,13 @@
+{
+  "title": "Experience",
+  "pages": [
+    "index",
+    "mission-control",
+    "dashboard",
+    "command-palette",
+    "keyboard-shortcuts",
+    "mouse-support",
+    "themes",
+    "accessibility"
+  ]
+}

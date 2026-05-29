@@ -1,0 +1,25 @@
+---
+title: Experience Platform
+description: Cockpit interactivo de terminal sobre la CLI estable de Asagiri.
+---
+
+# Experience Platform
+
+Asagiri ofrece dos interfaces complementarias:
+
+- CLI estable para CI, scripts y automatización;
+- cockpit interactivo para exploración y supervisión en vivo.
+
+Entrada interactiva:
+
+```bash
+asa
+```
+
+En TTY abre Mission Control. Fuera de TTY se mantiene el comportamiento CLI clásico.
+
+## Principios
+
+- CLI-first: cada acción UI tiene comando equivalente.
+- Sin lógica de negocio en `internal/ui`.
+- Progressive disclosure: primero resumen, luego detalle.

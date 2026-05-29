@@ -4,16 +4,18 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/spf13/cobra"
 	"github.com/LaProgrammerie/asagiri/application/internal/replay"
+	uiapp "github.com/LaProgrammerie/asagiri/application/internal/ui/app"
+	"github.com/spf13/cobra"
 )
 
-func newReplayCmd() *cobra.Command {
+func newReplayCmd(dryRun *bool) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "replay",
 		Short: "Capturer, rejouer et comparer des workflows d'ingénierie",
 	}
 	cmd.AddCommand(
+		newReplayOpenCmd(dryRun),
 		newReplayCreateCmd(),
 		newReplayRunCmd(),
 		newReplayCompareCmd(),
@@ -21,6 +23,17 @@ func newReplayCmd() *cobra.Command {
 		newReplaySnapshotCmd(),
 	)
 	return cmd
+}
+
+func newReplayOpenCmd(dryRun *bool) *cobra.Command {
+	return &cobra.Command{
+		Use:   "open <replay-id>",
+		Short: "Ouvrir Replay Explorer",
+		Args:  cobra.ExactArgs(1),
+		RunE: runUIScreenCommandWithOptions(dryRun, uiapp.ScreenReplay, func(args []string, opts *uiapp.Options) {
+			opts.ReplayID = args[0]
+		}),
+	}
 }
 
 func newReplayCreateCmd() *cobra.Command {

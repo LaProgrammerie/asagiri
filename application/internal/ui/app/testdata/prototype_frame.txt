@@ -1,0 +1,30 @@
+ ╭───────────────────────────────────────────────────────────────────────────────────────╮ 
+ │ ASAGIRI                                                                               │ 
+ │ Screen: prototype  |  Runtime: stopped                                                │ 
+ │                                                                                       │ 
+ │ ╭───────────────────────────────────────────────────────────────────────────────────╮ │ 
+ │ │ Prototype Mode                                                                    │ │ 
+ │ │ Prototype Mode                                                                    │ │ 
+ │ │ Product: workspace-saas                                                           │ │ 
+ │ │ Stage: flow                                                                       │ │ 
+ │ │ Done: wireframe -> journey -> flow                                                │ │ 
+ │ │                                                                                   │ │ 
+ │ │ Wireframe                                                                         │ │ 
+ │ │ Title: workspace saas                                                             │ │ 
+ │ │ Path: .asagiri/products/workspace-saas/prototype/src/App.tsx                      │ │ 
+ │ │ Email    [____________]                                                           │ │ 
+ │ │ Password [____________]                                                           │ │ 
+ │ │ [ Sign in ]                                                                       │ │ 
+ │ │                                                                                   │ │ 
+ │ │ Flow extraction                                                                   │ │ 
+ │ │ - workspace-onboarding/step-1 action=click_get_started screen=landing next=signup │ │ 
+ │ │   contract=POST /api/workspaces trust=pending metric=onboarding_completion_rate   │ │ 
+ │ │                                                                                   │ │ 
+ │ │ Pipeline actions                                                                  │ │ 
+ │ │ - asa contracts extract workspace-saas                                            │ │ 
+ │ │ - asa architecture derive workspace-saas                                          │ │ 
+ │ │ - open prototype: asa prototype                                                   │ │ 
+ │ ╰───────────────────────────────────────────────────────────────────────────────────╯ │ 
+ │                                                                                       │ 
+ │ Screen: prototype  |  CLI: asa prototype                                              │ 
+ ╰───────────────────────────────────────────────────────────────────────────────────────╯ 

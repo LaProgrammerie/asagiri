@@ -1,0 +1,35 @@
+Mission Control
+=============
+Workspace: -  Branch: -
+Runtime: running (3 sessions)  Session: inactive
+
+Runtime
+Agents: 0
+Sessions: 0
+Queue: 2
+Cost today: €0.00
+Cost month: €0.00
+Updated: 2026-05-29T12:34:56Z
+
+Recent runs
+- run-1  spec-ui  running
+- run-2  specv3  completed
+
+
+Trust
+- unavailable
+
+
+Active flow
+-
+- none
+
+
+Agent theatre
+- none
+
+
+Recent events
+Filter: all (stub)  Search: (none)
+- 12:32:56  runtime.started
+- 12:33:56  session.created

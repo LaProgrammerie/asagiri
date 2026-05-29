@@ -1,0 +1,28 @@
+---
+title: Command Palette
+description: Global action launcher with command search and CLI equivalents.
+---
+
+# Command Palette
+
+Open the palette from any screen:
+
+```text
+Ctrl+P
+```
+
+## Capabilities
+
+- fuzzy search through key actions;
+- quick navigation to core screens;
+- dispatch of command-bus actions;
+- visible CLI equivalents for reproducibility.
+
+## Safety behavior
+
+Destructive actions show a confirmation modal with:
+
+- impact summary;
+- CLI equivalent;
+- rollback note;
+- explicit confirmation (`y` / `N`).

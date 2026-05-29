@@ -1,0 +1,27 @@
+---
+title: Accessibility
+description: Keyboard-first Bedienung, no-animation Modus und plain/json Alternativen.
+---
+
+# Accessibility
+
+Bereitgestellte Funktionen:
+
+- vollstaendige Tastatur-Navigation;
+- high-contrast Theme;
+- no-animation Modus;
+- Shortcut-Hilfe via `?`;
+- plain/json Fallback ausserhalb des interaktiven Modus.
+
+## Empfohlene Konfiguration
+
+```yaml
+ui:
+  theme: high-contrast
+  animations: false
+  mouse: true
+```
+
+## Lineare Ausgabe
+
+Fuer CI oder Screen-Reader-nahe Workflows nutze `ui.mode: plain` sowie `--plain` / `--json`.

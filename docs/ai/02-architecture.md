@@ -51,6 +51,16 @@ application/
     knowledge/renderers/
     knowledge/sqlite/
     replay/                # spec-my-F : replay packages ingénierie (≠ trust/replay)
+    tui/                   # specv3 : façade rich/plain/json (pipeline work — pas Bubble Tea)
+    ui/                    # spec-ui ADR-027 : Experience Platform Bubble Tea
+      app/                 # tea.Model, router, bootstrap `asa`
+      bus/                 # CommandBus / QueryBus → services métier
+      layout/              # single, split-h, split-v (lot 1)
+      theme/               # palettes Lip Gloss
+      components/          # widgets composables
+      screens/             # mission, dashboard, explorers…
+      input/               # clavier, souris
+      state/               # état navigation UI (pas SQLite métier)
 .asagiri/                # créé par asa init
   config.yaml
   state.sqlite           # gitignored
@@ -81,7 +91,10 @@ application/
 | `internal/spec` | Lecture spec Kiro ou fallback |
 | `internal/plan` | Parse `tasks.md`, export JSON tâches |
 | `internal/report` | Rapports de run |
-| `internal/cli` | Surface utilisateur + `--dry-run` global |
+| `internal/cli` | Surface utilisateur + `--dry-run` global ; `asa` sans args → `ui/app.Run` si TTY |
+| `internal/tui` | Façade sortie V3 (`UI` interface : rich/plain/json) — **pas** d’event loop ; utilisé par `pipeline` et commandes `work`/`estimate` |
+| `internal/ui` | Experience Platform Bubble Tea (ADR-027) ; **client** du moteur via `ui/bus` uniquement |
+| `internal/ui/bus` | Adapters Command/Query → `workflow`, `pipeline`, `runtime`, `trust`, `knowledge`, `replay`, `executiongraph`, `investigation` |
 | `internal/intent` | Résolution d’intention, plan haut niveau, exécution via `workflow` |
 | `internal/source` | Abstraction sources ; sync vers `.asagiri/specs/<feature>/` |
 | `pkg/asagiri` | Types partagés (ex-`pkg/agentflow`) |
@@ -264,9 +277,52 @@ Artefacts sous `.asagiri/replays/<replay-id>/` :
 CLI : `asa replay create|run|compare|explain|snapshot`.  
 Config : bloc `replay:` (`capture_*`, `redact_secrets`, `offline_mode_default`, `compress_threshold_bytes`). UX terminal : `replay.WriteReplay*` (§26).
 
+## Experience Platform (spec-ui, ADR-027)
+
+### Principe
+
+```text
+CLI Cobra (asa <cmd>)          internal/ui (asa → Mission Control)
+        │                                │
+        └──────── ui/bus ────────────────┘
+                      │
+    workflow · pipeline · runtime · trust · knowledge
+    replay · executiongraph · investigation · coordination
+```
+
+- **`internal/ui`** : navigation, layout, thème, widgets — **zéro** logique trust/graph/workflow dans les écrans.
+- **`internal/tui`** : rendu ligne de commande du pipeline V3 ; reste la cible de `--rich` / `--plain` / `--json` hors application interactive.
+- Toute action TUI doit exposer `CLIEquivalent()` (spec §3.1).
+
+### Entrée
+
+| Invocation | Comportement |
+|------------|--------------|
+| `asa` (TTY) | Lance `ui/app.Run` → écran `ui.default_screen` (défaut `mission`) |
+| `asa` (non-TTY) | Aide Cobra |
+| `asa work "…"` | Inchangé — CLI directe |
+
+### Config `ui:` (specv3 + spec-ui §29)
+
+Champs specv3 : `mode`, `live_logs`, `progress_bars`, `compact`.  
+Champs Experience Platform : `default_screen`, `theme`, `mouse`, `animations`, `refresh_interval_ms`, `compact_threshold`, `show_cli_equivalents`, `confirm_destructive_actions`.
+
+### Layout Experience Platform
+
+`single` · `split-horizontal` · `split-vertical` — focus par panneau, seuil `compact_threshold` colonnes, resize souris basique (wheel/drag divider).
+
+Polish livré : mode no-animation, aide accessibilité (`?`), responsive compact/wide/ultra-wide sur dashboard.
+
+### Dépendances Charm
+
+`bubbletea`, `lipgloss` (déjà), `bubbles`, `huh`, `glamour` — versions figées dans ADR-027.
+
+Détail : [`docs/decisions/027-experience-platform-ui.md`](../decisions/027-experience-platform-ui.md).
+
 ## Limites connues
 
 - Commandes §6.2 restantes : `bench`, `search`, `export`.
+- **Experience Platform** : tranche livrée lots 1–6 ; conserver l’invariant « CLI-first + équivalent CLI visible ».
 - **Mémoire runtime** : embedder pluggable (ADR-025) ; **`asa memory doctor`** vérifie Ollama, dimensions, orphelins.
 - **Index RAG** : `asa index` persiste des embeddings (`runtime.memory.embedder`) ; `index search` cosinus par défaut, `--keyword` pour LIKE.
 - **`asa resume --execute`** : enchaîne les steps restants (agents réels hors `--dry-run` global) ; sans `--execute`, diagnostic du prochain step.

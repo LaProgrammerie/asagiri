@@ -1,0 +1,16 @@
+Agents Watch
+
+[implementer] cursor (running)
+Task: Edit invitation service
+Files: 12
+Hypothesis: missing retry in API client
+Tokens: 4200  Cost: €0.09
+Duration: 3m12s
+Last output: added retry strategy and tests
+Confidence: 78%
+CLI: asa agents watch
+
+[reviewer] codex (waiting)
+Task: Review API contract changes
+Last output: waiting for implementation completion
+CLI: asa agents watch

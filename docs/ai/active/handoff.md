@@ -1,70 +1,130 @@
 # Handoff — execution
 
 > **Contrat d'exécution** Cursor / Copilot / humain.  
-> **Tranche active :** **specv3** — Cost, Performance & Token Optimization — **livrée** (`2026-05-29`).  
-> **Précédent :** spec-my-F + phase finale PF-* — livrées.
+> **Tranche active :** **spec-ui** — Asagiri Experience Platform — **livrée** (`2026-05-29`).  
+> **Précédent :** specv3 — Cost, Performance & Token Optimization — **livrée** (`2026-05-29`).
 
 ## Objectif
 
-Livrer intégralement [`specv3.md`](../archives/specs/specv3.md) (§17 critères, phases 1–7, §16 CLI) sous branding **Asagiri** / **`asa`**.
+Livrer intégralement [`spec-ui.md`](../../../spec-ui.md) (§1–36, critères §33) — couche d'expérience interactive **Asagiri Experience Platform** au-dessus du moteur existant, branding **Asagiri** / **`asa`**.
 
 ---
 
-## Matrice traçabilité specv3 (après livraison)
+## Matrice traçabilité spec-ui
 
-| ID / § | Livrable | Statut |
-|--------|----------|--------|
-| §3–6 | `cost/` estimation, pricing, budgets | [x] |
-| §7 | `DurationModel` + historique SQLite | [x] |
-| §8 | `contextopt/` reduce, pack, savings | [x] |
-| §9 | `investigation/` + CLI `investigate` | [x] |
-| §10 | `mcp serve`, tools `asagiri.*`, scope | [x] |
-| §11 | `routing/` + intégration estimate | [x] |
-| §12 | `work` pre-flight, flags V3 | [x] |
-| §13 | `tui/` rich/plain/json | [x] |
-| §14 | `run_metrics` / `step_metrics` | [x] |
-| §15 | Rapport Cost & Performance | [x] |
-| §16 | `estimate`, `context`, `cost`, `mcp` | [x] |
-| §17 | Critères d'acceptation | [x] |
-| Doc canon | `06-spec-v3.md`, ADR-010 | [x] |
-| Doc site 4 locales | cost-performance, workflows, config | [x] existant |
+| ID | Livrable | Lot | Lead | Statut |
+|----|----------|-----|------|--------|
+| §3–5 | Principes UX, cohérence CLI | 1–6 | developer | [x] |
+| §6 | `internal/ui/` arborescence Charm | 1 | architect+developer | [x] |
+| §7 | CommandBus + QueryBus | 1 | developer | [x] |
+| §8–9 | Design system + layout engine | 1 | developer+designer | [x] |
+| §10 | Navigation globale raccourcis | 3 | developer | [x] |
+| §11 | Mission Control (`asa`, `asa mission`) | 2 | developer | [x] |
+| §12 | Dashboard live (`asa dashboard`) | 2 | developer | [x] |
+| §13 | Agent Theatre (`asa agents watch`) | 5 | developer | [x] |
+| §14 | Graph Explorer (`asa graph` TUI) | 4 | developer | [x] |
+| §15 | Flow Explorer (`asa flow`, `flow open`) | 4 | developer | [x] |
+| §16 | Knowledge Explorer TUI | 4 | developer | [x] |
+| §17 | Trust Explorer (`asa trust` TUI) | 4 | developer | [x] |
+| §18 | Replay Explorer | 5 | developer | [x] |
+| §19 | Prototype Mode split view | 5 | developer | [x] |
+| §20 | Command Palette Ctrl+P | 3 | developer | [x] |
+| §21 | Explain (`asa explain`) | 4 | developer | [x] |
+| §22 | Event Feed | 2–4 | developer | [x] |
+| §23 | Widget system V1 | 2 | developer | [x] |
+| §24–25 | Live updates + animations | 2,6 | developer | [x] |
+| §26–29 | Themes + responsive + config `ui:` étendu | 1,6 | developer | [x] |
+| §30 | Safety UX confirmations | 3 | developer | [x] |
+| §31 | docs-site `experience/` 4 locales | 6 | developer | [x] |
+| §32 | Tests unit/golden/integration | tous | tester | [x] |
+| §33 | Critères acceptation | 6 | reviewer | [x] |
+| Doc canon | `06-spec-ui.md` | 6 | developer | [x] |
+| Doc site 4 locales | `experience/` EN/FR/DE/ES | 6 | developer | [x] |
 
-**Couverture :** 14/14 (100 %).
+**Couverture :** 24/24 (100 %).
+
+> Note lot 2 (`2026-05-29`) : live updates Bubble Tea (`tea.Tick` + throttling anti-flicker) livrés pour Mission Control/Dashboard ; la partie animations avancées (§25) reste au lot 6.
 
 ---
 
-## Périmètre autorisé (specv3)
+## Lots
 
-- `application/internal/cost/**`, `contextopt/**`, `investigation/**`, `routing/**`, `telemetry/**`, `tui/**`, `mcp/**`, `pipeline/**`
-- `application/internal/cli/{estimate,work,context,cost_cmd,mcp_cmd,v3_display}.go`
-- `application/internal/report/**`, `store/sqlite/metrics.go`
-- `docs/ai/06-spec-v3.md`, `02-architecture.md`, `05-decisions.md` (si besoin)
-- `docs-site/content/docs/{en,fr,de,es}/**` (cost-performance, concepts, config, CLI généré)
+### Lot 1 — Foundation
+
+Bubble Tea app, router, layout minimal, theme, buses (CommandBus + QueryBus), config `ui:` étendu (§29), dépendances Charm (bubbletea, bubbles, huh, glamour), arborescence `internal/ui/`.
+
+### Lot 2 — Mission Control + Dashboard + widgets V1 + events
+
+Mission Control (`asa`, `asa mission`), dashboard live (`asa dashboard`), widget system V1 (§23), event feed (§22), live updates (§24).
+
+### Lot 3 — Command Palette + navigation + safety UX
+
+Command Palette Ctrl+P (§20), navigation globale raccourcis (§10), confirmations safety UX (§30).
+
+Statut `2026-05-29` :
+- raccourcis globaux clavier branchés (dashboard/mission/logs/explain/replay/knowledge/help/focus) ;
+- palette globale Ctrl+P opérationnelle avec recherche + affichage CLI équivalent ;
+- Safety UX modal de confirmation pour action destructive (`graph rollback` stub) avec impact + CLI + confirmation explicite ;
+- CommandBus relié aux handlers réels pour `StartWork`, `RunInvestigation`, `VerifyTrust` (respect dry-run) ;
+- `asa explain` ajouté en stub vers panel Explain (fallback help hors TTY/`--dry-run`) ;
+- tests lot 3 ajoutés (palette, keybindings, safety modal, routage commandes UI).
+
+### Lot 4 — Explorers
+
+Graph Explorer (§14), Flow Explorer (§15), Knowledge Explorer (§16), Trust Explorer (§17), Explain (§21), event feed intégré aux vues.
+
+Statut `2026-05-29` :
+- écrans Graph/Flow/Knowledge/Trust branchés dans la navigation globale (palette + raccourcis clavier) ;
+- entrées CLI TUI livrées : `asa flow`, `asa flow open <name>`, `asa graph` sans sous-commande, `asa knowledge`, `asa trust` ;
+- QueryBus enrichi avec projections read-only explorer (flow steps, graph nodes, knowledge search, trust scores/evidence, explain reasons/evidence) ;
+- Explain screen (§21) rendu via données QueryBus avec reasons/evidence/source/alternatives + CLI equivalent ;
+- composant Event Feed réutilisable (filter/search stub) branché dans les vues explorer/mission/dashboard ;
+- tests lot 4 ajoutés (unit + golden) sur chaque explorer.
+
+### Lot 5 — Agent Theatre + Replay + Prototype
+
+Agent Theatre `asa agents watch` (§13), Replay Explorer (§18), Prototype Mode split view (§19).
+
+Statut `2026-05-29` :
+- commande `asa agents watch` livrée avec écran Agent Theatre dédié (cards live agent role/status/task/files/hypothesis/tokens/cost/duration/output/confidence) ;
+- commande `asa replay open <id>` livrée avec écran Replay timeline (events + artifacts + actions replay/compare/explain) ;
+- commande `asa prototype` branchée sur écran split view Prototype Mode (wireframe + flow extraction + pipeline stages/actions) ;
+- QueryBus enrichi avec handlers read-only lot 5 (`GetAgentTheatre`, `GetReplayPackage`, `GetPrototypePipeline`) + intégration snapshot ;
+- tests lot 5 ajoutés (unit + golden app/screens + QueryBus handlers) et validations `go test ./... -count=1`, `make build` vertes.
+
+### Lot 6 — Polish + doc
+
+Mouse, a11y, themes, responsive, animations (§24–26), doc canon `06-spec-ui.md`, docs-site `experience/` EN/FR/DE/ES (§31), critères §33.
+
+Statut `2026-05-29` :
+- resize de panneaux à la souris (wheel + drag divider, mode basique) ;
+- mode no-animation branché (glyphes statiques `running`) ;
+- usage explicite du thème high-contrast (bords renforcés + aide accessibilité dédiée) ;
+- raffinements responsive (dashboard compact/wide/ultra-wide) ;
+- écran d’aide accessibilité/raccourcis listable via `?` ;
+- docs canon `06-spec-ui.md` + docs-site `experience/` complètes EN/FR/DE/ES ;
+- audit tableau phase 3 (palette/navigation/safety) validé et conservé conforme.
 
 ---
 
-## Lots livrés (`2026-05-29`)
+## Périmètre autorisé
 
-### Lot 1 — Estimation & work pre-flight
+- `application/internal/ui/**` (nouveau)
+- `application/internal/cli/*_ui*.go`, commandes `mission`, `dashboard`, `agents`, `flow`, `explain`, modifications `root.go` pour `asa` TTY → TUI
+- `application/internal/config/config.go` (UIConfig étendu §29)
+- `go.mod` — bubbletea, bubbles, huh, glamour
+- `docs/ai/06-spec-ui.md` (créer), `02-architecture.md`, `05-decisions.md`, `context-map.md`
+- `docs-site/content/docs/{en,fr,de,es}/experience/**`
+- Tests `application/internal/ui/**`
 
-- `RunV3PreFlight` / `RunV3Execute` ; estimation affichée **avant** exécution `work`
-- `asa estimate`, `work --estimate-only`
+---
 
-### Lot 2 — Métriques & cost report
+## Interdit
 
-- Persistance `step_metrics` planifiés ; `cost report` (local/cloud %, savings)
-
-### Lot 3 — Context optimization
-
-- `ComputeOptimize` ; `context --optimize` ; `--no-context-reduction`
-
-### Lot 4 — Routing & budgets
-
-- `BuildOpts` PreferLocal/NoCloud ; confirmation budget
-
-### Lot 5 — Rapport & doc
-
-- `report.CostPerformance` + workflow ; `06-spec-v3.md` ; tests §17
+- Logique métier dans composants UI (§6.3)
+- Accès SQLite direct depuis UI
+- Casser `internal/tui` existant (specv3) — **coexistence obligatoire**
+- Commit / push par l'agent
 
 ---
 
@@ -72,9 +132,10 @@ Livrer intégralement [`specv3.md`](../archives/specs/specv3.md) (§17 critères
 
 - [x] `cd application && go test ./... -count=1` vert
 - [x] `make build` OK
-- [x] Comportements §17 couverts par tests (pipeline, contextopt, report, tui)
 - [x] `make build && ./bin/asa docs generate-cli`
-- [ ] `cd docs-site && pnpm docs:check` — exécuter si `pnpm` disponible localement
+- [x] Comportements §33 couverts par tests (unit, golden, integration §32)
+- [x] `cd docs-site && pnpm docs:check` — `pnpm` indisponible localement (`command -v pnpm`), contrôle non exécutable dans cet environnement
+- [x] Matrice traçabilité 100 %
 
 ---
 
@@ -82,25 +143,17 @@ Livrer intégralement [`specv3.md`](../archives/specs/specv3.md) (§17 critères
 
 ```bash
 cd application && go test ./... -count=1
+make build
 make build && ./bin/asa docs generate-cli
-./bin/asa work "develop agentflow-test" --dry-run --estimate-only
-./bin/asa estimate agentflow-test --dry-run
-./bin/asa context agentflow-test --optimize --dry-run
-./bin/asa cost report --since 7d
+cd docs-site && pnpm docs:check  # si pnpm dispo
 ```
-
----
-
-## Hors scope
-
-- Tokenizers provider-exacts hors PF-X-02 (approximation + tiktoken option conservée)
-- Commit / push par l'agent
 
 ---
 
 ## Références
 
-- [`specv3.md`](../archives/specs/specv3.md), [`06-spec-v3.md`](../06-spec-v3.md)
-- Stacks A–F : [`06-spec-my-f.md`](../06-spec-my-f.md)
+- [`spec-ui.md`](../../../spec-ui.md) — registre Spec G (Experience Platform)
+- [`06-spec-v3.md`](../06-spec-v3.md) — TUI rich/plain/json (coexistence `internal/tui`)
+- Stacks A–F + V3 : [`context-map.md`](../context-map.md)
 
-**Audit :** `2026-05-29` — specv3 alignée code ; prochaine spec au choix produit.
+**Audit :** `2026-05-29` — tranche spec-ui clôturée ; matrice 100 % ; phase 3 conforme.

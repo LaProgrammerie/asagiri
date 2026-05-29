@@ -1,0 +1,4 @@
+Knowledge search: invite_member
+- action:invite_member [action] invite_member
+  Path: application/internal/invitations/service.go  Score: 86%
+  CLI: asa knowledge query "invite_member"

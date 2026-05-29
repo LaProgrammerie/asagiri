@@ -1,0 +1,34 @@
+---
+title: Accessibility
+description: Keyboard-first navigation, no-animation mode, and plain/json alternatives.
+---
+
+# Accessibility
+
+The Experience Platform includes explicit accessibility support:
+
+- complete keyboard navigation;
+- high-contrast theme;
+- no-animation mode;
+- listable shortcut help screen (`?`);
+- plain/json fallback outside interactive mode.
+
+## Recommended configuration
+
+```yaml
+ui:
+  theme: high-contrast
+  animations: false
+  mouse: true
+```
+
+## Screen-reader and CI fallback
+
+For fully linear outputs, use non-interactive modes:
+
+```yaml
+ui:
+  mode: plain
+```
+
+or run commands with `--plain` / `--json` where available.

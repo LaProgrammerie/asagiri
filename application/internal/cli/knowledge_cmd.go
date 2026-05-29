@@ -12,10 +12,11 @@ import (
 	_ "github.com/LaProgrammerie/asagiri/application/internal/knowledge/sqlite"
 )
 
-func newKnowledgeCmd() *cobra.Command {
+func newKnowledgeCmd(dryRun *bool) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "knowledge",
 		Short: "Construire et interroger le graphe de connaissance",
+		RunE:  runUIScreenCommand(dryRun, "knowledge"),
 	}
 	cmd.AddCommand(
 		newKnowledgeBuildCmd(),

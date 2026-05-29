@@ -14,6 +14,7 @@ import (
 	"github.com/LaProgrammerie/asagiri/application/internal/config"
 	"github.com/LaProgrammerie/asagiri/application/internal/executiongraph"
 	"github.com/LaProgrammerie/asagiri/application/internal/trust"
+	uiapp "github.com/LaProgrammerie/asagiri/application/internal/ui/app"
 )
 
 var (
@@ -51,10 +52,11 @@ type GraphResumeResult struct {
 	Result executiongraph.GraphRunResult `json:"result"`
 }
 
-func newGraphCmd() *cobra.Command {
+func newGraphCmd(dryRun *bool) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "graph",
 		Short: "Exécuter et inspecter les graphes d'exécution",
+		RunE:  runUIScreenCommand(dryRun, uiapp.ScreenGraph),
 	}
 	cmd.AddCommand(
 		newGraphRunCmd(),

@@ -248,6 +248,14 @@ ui:
   live_logs: true
   progress_bars: true
   compact: false
+  default_screen: mission
+  theme: asagiri-dark
+  mouse: true
+  animations: true
+  refresh_interval_ms: 500
+  compact_threshold: 100
+  show_cli_equivalents: true
+  confirm_destructive_actions: true
 
 mcp:
   enabled: false

@@ -1,0 +1,8 @@
+Trust Summary
+Overall: 74%  Residual risk: medium
+Gate: warn
+Gate reason: security confidence below profile target
+- Security 71%
+  finding: no retry validation for invite_member
+  evidence: security.flow check report
+  CLI: asa verify trust onboarding --strict

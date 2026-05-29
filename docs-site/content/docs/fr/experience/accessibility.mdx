@@ -1,0 +1,27 @@
+---
+title: Accessibilité
+description: Navigation clavier, mode sans animation et alternatives plain/json.
+---
+
+# Accessibilité
+
+Fonctions livrées :
+
+- navigation clavier complète ;
+- thème high-contrast ;
+- mode no-animation ;
+- écran listable des raccourcis (`?`) ;
+- fallback plain/json hors mode interactif.
+
+## Configuration recommandée
+
+```yaml
+ui:
+  theme: high-contrast
+  animations: false
+  mouse: true
+```
+
+## Mode linéaire
+
+Pour un rendu strictement linéaire (CI ou lecteur d’écran), utiliser `ui.mode: plain` ou les sorties `--plain` / `--json`.

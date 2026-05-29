@@ -30,6 +30,7 @@ func newRootCmd() *cobra.Command {
 		Short:   "Asagiri — orchestration locale pour workflows agentiques",
 		Long:    rootLong,
 		Example: rootExample,
+		RunE:    runRootUICommand(&dryRun),
 	}
 	root.PersistentFlags().BoolVar(&dryRun, "dry-run", false, "Simuler les exécutions sans lancer d'agent ni commandes externes")
 
@@ -41,7 +42,7 @@ func newRootCmd() *cobra.Command {
 		newEnrichCmd(&dryRun),
 		newDevCmd(&dryRun),
 		newVerifyCmd(&dryRun),
-		newTrustCmd(),
+		newTrustCmd(&dryRun),
 		newReviewCmd(&dryRun),
 		newStatusCmd(&dryRun),
 		newResumeCmd(&dryRun),
@@ -71,11 +72,16 @@ func newRootCmd() *cobra.Command {
 		newSkillsCmd(),
 		newMemoryCmd(),
 		newAnalysisCmd(),
-		newGraphCmd(),
-		newKnowledgeCmd(),
-		newReplayCmd(),
+		newGraphCmd(&dryRun),
+		newFlowCmd(&dryRun),
+		newKnowledgeCmd(&dryRun),
+		newReplayCmd(&dryRun),
 		newImpactCmd(),
 		newDocsCmd(),
+		newMissionCmd(&dryRun),
+		newDashboardCmd(&dryRun),
+		newAgentsCmd(&dryRun),
+		newExplainCmd(&dryRun),
 		&cobra.Command{
 			Use:   "version",
 			Short: "Afficher la version",

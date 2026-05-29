@@ -18,10 +18,11 @@ import (
 
 var errTrustCIFailed = errors.New("trust verification failed CI policy")
 
-func newTrustCmd() *cobra.Command {
+func newTrustCmd(dryRun *bool) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "trust",
 		Short: "Moteur de confiance — gates et replay",
+		RunE:  runUIScreenCommand(dryRun, "trust"),
 	}
 	cmd.AddCommand(newTrustGatesCmd(), newTrustReplayCmd())
 	return cmd

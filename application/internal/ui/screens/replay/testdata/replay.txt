@@ -1,0 +1,21 @@
+Replay
+ID: replay-001
+Created: 2026-05-29T08:02:00Z
+Repo: feature/spec-ui @ abcdef123456
+Mode: simulation
+
+Artifacts
+- graph/execution-graph.json
+- runtime/events.jsonl
+
+Timeline
+- 08:12:00 investigation.started
+- 08:14:00 graph.generated artifact=graph/execution-graph.json
+- 08:16:00 implementation.started
+
+Actions
+- jump to event (stub)
+- inspect artifact (stub)
+- compare run: asa replay compare <replay-a> <replay-b>
+- replay offline: asa replay run replay-001 --offline
+- open replay: asa replay open replay-001

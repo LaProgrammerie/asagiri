@@ -1,0 +1,21 @@
+Graph: graph-001
+Flow: onboarding
+Status: running
+
+Nodes
+- investigate [succeeded] investigate risk=low
+  CLI: asa graph status graph-001
+- implement [blocked] implement risk=high
+  blocked by: investigate
+  CLI: asa graph status graph-001
+
+Actions
+- open node (stub)
+- view dependencies (stub)
+- export mermaid/json: asa graph visualize <graph-id> --format mermaid
+
+Events
+Filter: all (stub)  Search: (none)
+CLI: asa runtime events --type <filter> --search <query>
+- 11:00:00  graph.generated
+- 11:01:00  graph.blocked

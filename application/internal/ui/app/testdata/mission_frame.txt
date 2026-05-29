@@ -1,0 +1,46 @@
+ ╭─────────────────────────────────────────────────────────────────────╮ 
+ │ ASAGIRI                                                             │ 
+ │ Screen: mission  |  Runtime: running                                │ 
+ │                                                                     │ 
+ │ ╭──────────────────────────────────────────────────╮                │ 
+ │ │ ASAGIRI                                          │                │ 
+ │ │ Workspace: workspace-saas  Branch: onboarding-v2 │                │ 
+ │ │ Runtime: running  Session: active                │                │ 
+ │ ╰──────────────────────────────────────────────────╯                │ 
+ │ ╭───────────────────────────────╮╭────────────────────────────────╮ │ 
+ │ │ Runtime                       ││ Trust                          │ │ 
+ │ │ Runtime                       ││ Trust                          │ │ 
+ │ │ Agents: 2                     ││ - Architecture  ████████░░ 82% │ │ 
+ │ │ Sessions: 1                   ││ - Security      ███████░░░ 71% │ │ 
+ │ │ Queue: 2                      ││ - Observability ██████░░░░ 63% │ │ 
+ │ │ Cost today: €0.42             ││ - Regression    ████████░░ 78% │ │ 
+ │ │ Cost month: €6.10             ││ - Overall       ████████░░ 76% │ │ 
+ │ │ Updated: 2026-05-29T12:34:56Z │╰────────────────────────────────╯ │ 
+ │ │                               │                                   │ 
+ │ │ Recent runs                   │                                   │ 
+ │ │ - run-1  spec-ui  running     │                                   │ 
+ │ │ - run-2  specv3  completed    │                                   │ 
+ │ │                               │                                   │ 
+ │ ╰───────────────────────────────╯                                   │ 
+ │ ╭──────────────────────────────────────────────────────╮            │ 
+ │ │ Active Flow                                          │            │ 
+ │ │ Active flow                                          │            │ 
+ │ │ onboarding                                           │            │ 
+ │ │ ✓ create_workspace  ⠋ invite_member  ○ accept_invite │            │ 
+ │ ╰──────────────────────────────────────────────────────╯            │ 
+ │ ╭────────────────────────╮                                          │ 
+ │ │ Agent Theatre          │                                          │ 
+ │ │ Agent theatre          │                                          │ 
+ │ │ - investigator ✓ codex │                                          │ 
+ │ │ - implementer ⠋ cursor │                                          │ 
+ │ ╰────────────────────────╯                                          │ 
+ │ ╭────────────────────────────────────╮                              │ 
+ │ │ Events                             │                              │ 
+ │ │ Recent events                      │                              │ 
+ │ │ Filter: all (stub)  Search: (none) │                              │ 
+ │ │ - 12:32:56  runtime.started        │                              │ 
+ │ │ - 12:33:56  session.created        │                              │ 
+ │ ╰────────────────────────────────────╯                              │ 
+ │                                                                     │ 
+ │ Screen: mission  |  CLI: asa mission                                │ 
+ ╰─────────────────────────────────────────────────────────────────────╯ 

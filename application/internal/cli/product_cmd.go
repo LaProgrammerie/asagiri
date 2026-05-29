@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/LaProgrammerie/asagiri/application/internal/product"
+	uiapp "github.com/LaProgrammerie/asagiri/application/internal/ui/app"
 	"github.com/spf13/cobra"
 )
 
@@ -15,6 +16,7 @@ func newPrototypeCmd(dryRun *bool) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "prototype",
 		Short: "Gérer les prototypes produit exécutables",
+		RunE:  runUIScreenCommandWithOptions(dryRun, uiapp.ScreenPrototype, nil),
 	}
 	createCmd := &cobra.Command{
 		Use:   `create "<intent>"`,

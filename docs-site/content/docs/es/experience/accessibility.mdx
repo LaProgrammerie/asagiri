@@ -1,0 +1,27 @@
+---
+title: Accesibilidad
+description: Navegación teclado-first, modo sin animaciones y fallback plain/json.
+---
+
+# Accesibilidad
+
+Soporte incluido:
+
+- navegación completa por teclado;
+- tema high-contrast;
+- modo no-animation;
+- pantalla de ayuda de atajos (`?`);
+- fallback plain/json fuera del modo interactivo.
+
+## Configuración recomendada
+
+```yaml
+ui:
+  theme: high-contrast
+  animations: false
+  mouse: true
+```
+
+## Salida lineal
+
+Para CI o uso orientado a lector de pantalla, usa `ui.mode: plain` y opciones `--plain` / `--json`.

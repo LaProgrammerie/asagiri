@@ -449,3 +449,77 @@ func TestValidateUnsupportedBackend(t *testing.T) {
 		t.Fatal("expected backend error")
 	}
 }
+
+func TestUIDefaultsExtended(t *testing.T) {
+	cfg := NewTestConfig("proj")
+	if cfg.UI.DefaultScreen != "mission" {
+		t.Fatalf("default_screen: got %q", cfg.UI.DefaultScreen)
+	}
+	if cfg.UI.Theme != "asagiri-dark" {
+		t.Fatalf("theme: got %q", cfg.UI.Theme)
+	}
+	if cfg.UI.RefreshIntervalMs != 500 {
+		t.Fatalf("refresh_interval_ms: got %d", cfg.UI.RefreshIntervalMs)
+	}
+	if cfg.UI.CompactThreshold != 100 {
+		t.Fatalf("compact_threshold: got %d", cfg.UI.CompactThreshold)
+	}
+	if !cfg.UI.Mouse || !cfg.UI.Animations || !cfg.UI.ShowCLIEquivalents || !cfg.UI.ConfirmDestructiveActions {
+		t.Fatalf("expected UI booleans to default true: %+v", cfg.UI)
+	}
+}
+
+func TestLoadUIConfigExtended(t *testing.T) {
+	dir := t.TempDir()
+	repo := filepath.Join(dir, "proj")
+	requireDirs(t, repo)
+	cfgPath := filepath.Join(repo, ".asagiri", "config.yaml")
+	if err := os.WriteFile(cfgPath, []byte(`
+project:
+  name: ui-test
+state:
+  backend: sqlite
+  path: .asagiri/state.sqlite
+ui:
+  mode: auto
+  live_logs: true
+  progress_bars: true
+  compact: false
+  default_screen: settings
+  theme: cyber
+  mouse: false
+  animations: false
+  refresh_interval_ms: 750
+  compact_threshold: 120
+  show_cli_equivalents: false
+  confirm_destructive_actions: false
+`), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	cfg, err := Load(cfgPath, repo)
+	if err != nil {
+		t.Fatalf("Load: %v", err)
+	}
+	if cfg.UI.DefaultScreen != "settings" {
+		t.Fatalf("default_screen: got %q", cfg.UI.DefaultScreen)
+	}
+	if cfg.UI.Theme != "cyber" {
+		t.Fatalf("theme: got %q", cfg.UI.Theme)
+	}
+	if cfg.UI.Mouse {
+		t.Fatal("expected mouse false")
+	}
+	if cfg.UI.Animations {
+		t.Fatal("expected animations false")
+	}
+	if cfg.UI.ShowCLIEquivalents {
+		t.Fatal("expected show_cli_equivalents false")
+	}
+	if cfg.UI.ConfirmDestructiveActions {
+		t.Fatal("expected confirm_destructive_actions false")
+	}
+	if cfg.UI.RefreshIntervalMs != 750 || cfg.UI.CompactThreshold != 120 {
+		t.Fatalf("ui intervals: %+v", cfg.UI)
+	}
+}

@@ -1,0 +1,9 @@
+Flow: onboarding
+⠋ invite_member (running)
+  API: POST /invitations
+  Service: InvitationService
+  Event: member.invited
+  Trust: 71%  Risk: medium
+  Tests: InvitationServiceTest
+  Metrics: invitation_success_rate
+  CLI: asa flow open onboarding

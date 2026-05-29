@@ -1,0 +1,18 @@
+Explain
+Subject: Why is this node blocked?
+
+Reasons
+- Dependency investigate is not completed
+
+Evidence
+- Node implement blocked by investigate
+
+Source
+- query-bus read-only
+
+Alternatives
+- asa graph
+- asa trust
+
+CLI equivalent
+asa explain --subject "Why is this node blocked?"
