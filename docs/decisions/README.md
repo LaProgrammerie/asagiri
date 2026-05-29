@@ -11,5 +11,10 @@ Public ADR excerpts for contributors. The canonical log lives in [`docs/ai/05-de
 | ADR-012 | Public docs: Fumadocs static site under `docs-site/` |
 | ADR-014 | Docs hosting: Cloudflare Pages (Wrangler CI), pnpm, `docs-check` for forks |
 | ADR-022 | Execution Graph Planner local-first (`.asagiri/graphs/`, conservative parallelism) |
+| ADR-023 | Multi-agent coordination foundation (`internal/coordination/`, `coordination:`, `agent.*` events) |
+| ADR-024 | Engineering knowledge graph foundation (`internal/knowledge/`, `.asagiri/knowledge/graph.sqlite`) |
+| ADR-025 | Pluggable memory embeddings (`hash` / Ollama / opt-in cloud) — PF-A-01 |
+| ADR-026 | npm TypeScript SDK (`@laprogrammerie/asagiri`, tag `sdk-v*`) — PF-A-02 |
+| ADR-023 (D-FULL) | Coordination worktrees + `NodeExecutor` + assignment history scoring |
 
 Full table: [`docs/ai/05-decisions.md`](../ai/05-decisions.md).

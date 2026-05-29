@@ -1,0 +1,13 @@
+{
+  "graph_id": "graph-2026-05-29-e740ee05",
+  "product": "workspace-saas",
+  "flow": "workspace-onboarding",
+  "nodes": 3,
+  "edges": 1,
+  "parallel_groups": 2,
+  "checkpoints": 2,
+  "estimated_cost": 0.02,
+  "estimated_duration": "4m",
+  "highest_risk": "medium",
+  "budget_status": "OK"
+}

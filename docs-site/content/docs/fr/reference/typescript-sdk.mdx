@@ -7,13 +7,21 @@ description: Client HTTP pour l'API runtime locale Asagiri.
 
 Sources : `sdk/typescript/` dans le dépôt Asagiri.
 
-## Installation (dépôt local)
+## Installation
+
+Depuis npm (tags `sdk-v*`) :
+
+```bash
+npm install @laprogrammerie/asagiri
+```
+
+Depuis le dépôt :
 
 ```bash
 cd sdk/typescript && npm install && npm run build
 ```
 
-Publication npm : voir `sdk/typescript/PUBLISHING.md` (phase [`spec-phase-finale`](../../../../spec-phase-finale.md)).
+Publication CI : workflow `sdk-npm-publish.yml`, secret `NPM_TOKEN`.
 
 ## Exemple
 

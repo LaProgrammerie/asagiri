@@ -1,21 +1,62 @@
 package memory
 
 import (
+	"context"
 	"fmt"
 	"strings"
 	"time"
 
+	"github.com/LaProgrammerie/asagiri/application/internal/memory/embedder"
 	"github.com/LaProgrammerie/asagiri/application/internal/runtime"
 )
 
 // Engine provides scoped memory retrieval, scoring, aging, and consolidation (spec-my-A §24.10–13).
 type Engine struct {
-	store *runtime.Store
+	store    *runtime.Store
+	embedder embedder.Embedder
 }
 
-// NewEngine wraps a runtime store.
+// NewEngine wraps a runtime store with the process-wide embedder.
 func NewEngine(store *runtime.Store) *Engine {
-	return &Engine{store: store}
+	return &Engine{store: store, embedder: embedder.Current()}
+}
+
+func (e *Engine) embedQuery(ctx context.Context, query string) ([]float32, error) {
+	if e.embedder != nil {
+		return e.embedder.Embed(ctx, query)
+	}
+	return embedder.EmbedText(ctx, query)
+}
+
+// Reindex recomputes embeddings for all memory entries (spec-phase-finale PF-A-01).
+func (e *Engine) Reindex(ctx context.Context) (int, error) {
+	if e == nil || e.store == nil {
+		return 0, fmt.Errorf("memory: store required")
+	}
+	emb := e.embedder
+	if emb == nil {
+		emb = embedder.Current()
+	}
+	entries, err := e.store.ListMemory("", 0)
+	if err != nil {
+		return 0, err
+	}
+	var n int
+	for _, ent := range entries {
+		if strings.TrimSpace(ent.Summary) == "" {
+			continue
+		}
+		vec, err := emb.Embed(ctx, ent.Summary)
+		if err != nil {
+			return n, err
+		}
+		ent.EmbeddingJSON = MarshalEmbedding(vec)
+		if err := e.store.UpsertMemory(ent); err != nil {
+			return n, err
+		}
+		n++
+	}
+	return n, nil
 }
 
 // Retrieve returns memory entries for a scope, ordered by relevance.

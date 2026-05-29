@@ -149,9 +149,12 @@ func TestDefaultRunnerStrictTrustBlocksTrustGate(t *testing.T) {
 			"production": {RequiredChecks: []string{"contracts"}},
 		},
 	})
+	eng := trust.NewEngine(repo)
+	eng.Gates = gates
 	result, err := runner.Run(context.Background(), graph, sched, RunOptions{
 		StrictTrust: true,
 		Gates:       gates,
+		TrustEngine: eng,
 	})
 	require.Error(t, err)
 	require.ErrorIs(t, err, ErrTrustGateBlocked)
@@ -169,7 +172,9 @@ func TestApplyTrustEnrichmentInsertsGateForPublicContract(t *testing.T) {
 			ContractRef: "POST /api/workspaces",
 		},
 	}
-	out, edges := ApplyTrustEnrichment(nodes, bindings, nil, TrustEnrichmentInput{})
+	out, edges := ApplyTrustEnrichment(nodes, bindings, nil, TrustEnrichmentInput{
+		Gates: TrustGateConfig{TrustRequiredForHighRisk: true},
+	})
 	require.Len(t, out, 2)
 	require.Equal(t, NodeTypeTrustVerification, out[1].Type)
 	require.Equal(t, "trust-gate-click-get-started", out[1].ID)
@@ -201,6 +206,90 @@ func TestApplyInvestigationEnrichmentInsertsBeforeSensitiveTask(t *testing.T) {
 	}
 	require.True(t, found)
 	require.NotEmpty(t, edges)
+}
+
+func TestDefaultRunnerCheckpointEveryNode(t *testing.T) {
+	repo := writeMinimalPlanningFixture(t)
+	runGitInit(t, repo)
+
+	planner := Planner{
+		RepoRoot: repo,
+		Inferer:  DefaultDependencyInferer{},
+		Now:      func() time.Time { return time.Date(2026, 5, 29, 12, 0, 0, 0, time.UTC) },
+	}
+	graph, err := planner.Build(t.Context(), GraphPlanRequest{
+		Product:        "minimal-product",
+		Flow:           "workspace-onboarding",
+		IncludeReviews: true,
+	})
+	require.NoError(t, err)
+
+	sched := DefaultScheduler{}
+	schedule, err := sched.Schedule(t.Context(), ScheduleRequest{Graph: graph})
+	require.NoError(t, err)
+
+	repoObj := NewRepository(repo)
+	_, err = repoObj.SaveAll(graph, &schedule)
+	require.NoError(t, err)
+
+	runner := NewRunner(repo)
+	_, err = runner.Run(t.Context(), graph, schedule, RunOptions{CheckpointEvery: CheckpointEveryNode})
+	require.NoError(t, err)
+
+	executed := 0
+	for _, n := range graph.Nodes {
+		if n.Status == NodeStatusSucceeded {
+			executed++
+		}
+	}
+	require.Greater(t, executed, 0)
+
+	count, err := repoObj.CountCheckpoints(graph.ID)
+	require.NoError(t, err)
+	require.Equal(t, executed, count)
+}
+
+func TestDefaultRunnerCheckpointEveryGroup(t *testing.T) {
+	repo := writeMinimalPlanningFixture(t)
+	runGitInit(t, repo)
+
+	planner := Planner{
+		RepoRoot: repo,
+		Inferer:  DefaultDependencyInferer{},
+		Now:      func() time.Time { return time.Date(2026, 5, 29, 12, 0, 0, 0, time.UTC) },
+	}
+	graph, err := planner.Build(t.Context(), GraphPlanRequest{
+		Product:        "minimal-product",
+		Flow:           "workspace-onboarding",
+		IncludeReviews: true,
+	})
+	require.NoError(t, err)
+
+	sched := DefaultScheduler{}
+	schedule, err := sched.Schedule(t.Context(), ScheduleRequest{Graph: graph})
+	require.NoError(t, err)
+	require.Greater(t, len(schedule.ParallelGroups), 1)
+
+	repoObj := NewRepository(repo)
+	_, err = repoObj.SaveAll(graph, &schedule)
+	require.NoError(t, err)
+
+	runner := NewRunner(repo)
+	_, err = runner.Run(t.Context(), graph, schedule, RunOptions{CheckpointEvery: CheckpointEveryGroup})
+	require.NoError(t, err)
+
+	executed := 0
+	for _, n := range graph.Nodes {
+		if n.Status == NodeStatusSucceeded {
+			executed++
+		}
+	}
+	require.Greater(t, executed, 0)
+
+	count, err := repoObj.CountCheckpoints(graph.ID)
+	require.NoError(t, err)
+	require.Less(t, count, executed)
+	require.Equal(t, len(schedule.ParallelGroups), count)
 }
 
 func runGitInit(t *testing.T, repo string) {

@@ -15,6 +15,7 @@ func newInvestigateCmd(dryRun *bool) *cobra.Command {
 	var (
 		taskID          string
 		flow            string
+		action          string
 		runID           string
 		fromFailedTests bool
 		depth           string
@@ -38,6 +39,7 @@ func newInvestigateCmd(dryRun *bool) *cobra.Command {
 				Symptom:         args[0],
 				Feature:         args[0],
 				Flow:            flow,
+				Action:          action,
 				TaskID:          taskID,
 				RunID:           runID,
 				FromFailedTests: fromFailedTests,
@@ -91,6 +93,7 @@ func newInvestigateCmd(dryRun *bool) *cobra.Command {
 	}
 	cmd.Flags().StringVar(&taskID, "task", "", "ID de tâche")
 	cmd.Flags().StringVar(&flow, "flow", "", "Flow produit")
+	cmd.Flags().StringVar(&action, "action", "", "Action dans le flow (enrichit le graphe de connaissance)")
 	cmd.Flags().StringVar(&runID, "run", "", "ID de run")
 	cmd.Flags().BoolVar(&fromFailedTests, "from-failed-tests", false, "Cibler les tests en échec")
 	cmd.Flags().StringVar(&depth, "depth", "standard", "Profondeur: quick|standard|deep|ci")

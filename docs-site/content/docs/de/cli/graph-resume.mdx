@@ -18,6 +18,10 @@ asa graph resume graph-2026-05-29-9307e4be --json
 
 Lädt `execution-graph.yaml` aus `.asagiri/graphs/<graph-id>/`, stellt Knotenstatus aus Checkpoints wieder her und führt verbleibende ready-Knoten aus. Emittiert `graph.*`-Runtime-Ereignisse während Resume.
 
+Ohne gespeicherten **Checkpoint** schlägt der Befehl mit einer klaren Fehlermeldung fehl. Zuerst [`asa graph run`](/docs/de/cli/graph-run) mit `--checkpoint-every node` oder `group` ausführen.
+
+Bei `execution_graph.enabled: false` liefern Graph-Befehle (inkl. resume) einen Fehler.
+
 ## Siehe auch
 
 - Status prüfen: [`asa graph status`](/docs/de/cli/graph-status)

@@ -18,6 +18,10 @@ asa graph resume graph-2026-05-29-9307e4be --json
 
 Charge `execution-graph.yaml` depuis `.asagiri/graphs/<graph-id>/`, restaure les états des nœuds depuis les checkpoints et exécute les nœuds prêts restants. Émet des événements `graph.*` pendant la reprise.
 
+Sans **checkpoint** persisté, la commande échoue avec un message explicite. Lancez d'abord [`asa graph run`](/docs/fr/cli/graph-run) avec `--checkpoint-every node` ou `group`.
+
+Si `execution_graph.enabled: false`, les commandes graph (dont resume) renvoient une erreur.
+
 ## Voir aussi
 
 - Vérifier l'état : [`asa graph status`](/docs/fr/cli/graph-status)

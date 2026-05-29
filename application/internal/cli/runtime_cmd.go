@@ -156,16 +156,21 @@ func newSkillsCmd() *cobra.Command {
 
 func newMemoryCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "memory",
-		Short: "Mémoire persistante runtime",
+		Use:     "memory",
+		Short:   "Mémoire persistante runtime",
+		Example: "  asa memory list --scope session\n  asa memory list --query \"checkout flow\"\n  asa memory reindex",
 	}
 	var scope, query string
 	listCmd := &cobra.Command{
-		Use:   "list",
-		Short: "Lister les entrées mémoire",
+		Use:     "list",
+		Short:   "Lister les entrées mémoire",
+		Example: "  asa memory list --scope session\n  asa memory list --query \"payment webhook\"",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			root, err := os.Getwd()
 			if err != nil {
+				return err
+			}
+			if err := configureMemoryEmbedder(root); err != nil {
 				return err
 			}
 			store, err := runtime.Open(root)
@@ -176,7 +181,7 @@ func newMemoryCmd() *cobra.Command {
 			eng := memory.NewEngine(store)
 			var entries []runtime.MemoryEntry
 			if query != "" {
-				entries, err = eng.RetrieveByQuery(query, 50)
+				entries, err = eng.RetrieveByQuery(cmd.Context(), query, 50)
 			} else {
 				entries, err = eng.Retrieve(runtime.MemoryScope(scope), nil, 50)
 			}
@@ -190,8 +195,9 @@ func newMemoryCmd() *cobra.Command {
 		},
 	}
 	consolidateCmd := &cobra.Command{
-		Use:   "consolidate",
-		Short: "Consolider les entrées proches",
+		Use:     "consolidate",
+		Short:   "Consolider les entrées proches",
+		Example: "  asa memory consolidate",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			root, err := os.Getwd()
 			if err != nil {
@@ -213,7 +219,7 @@ func newMemoryCmd() *cobra.Command {
 	listCmd.Flags().StringVar(&scope, "scope", "", "Filtrer par scope")
 	listCmd.Flags().StringVar(&query, "query", "", "Recherche sémantique (embeddings)")
 
-	cmd.AddCommand(listCmd, consolidateCmd)
+	cmd.AddCommand(listCmd, consolidateCmd, newMemoryReindexCmd())
 	return cmd
 }
 

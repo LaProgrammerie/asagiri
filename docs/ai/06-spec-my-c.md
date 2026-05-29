@@ -175,4 +175,4 @@ make build && ./bin/asa docs generate-cli
 
 Traçabilité handoff : matrice C-* dans [`active/handoff.md`](active/handoff.md).
 
-**Reliquats V1 (durcissement)** : IDs **PF-C-01…06** dans [`spec-phase-finale.md`](../../spec-phase-finale.md) §5 (checkpoints, gates config, `enabled`, trust runner, resume, inférence V2).
+**Durcissement phase finale** : **PF-C-01…05** livrés (`2026-05-29`) — voir [`spec-phase-finale.md`](../../spec-phase-finale.md) §5. **PF-C-06** (inférence V2) reporté P2.

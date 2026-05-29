@@ -10,6 +10,9 @@
     "investigation",
     "analysis-layer",
     "trust-engine",
-    "execution-graph"
+    "execution-graph",
+    "multi-agent-coordination",
+    "engineering-knowledge-graph",
+    "replay-engine"
   ]
 }

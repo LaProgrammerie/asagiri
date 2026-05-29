@@ -9,8 +9,9 @@ import (
 
 func newDoctorCmd() *cobra.Command {
 	return &cobra.Command{
-		Use:   "doctor",
-		Short: "Vérifier l'environnement et la configuration",
+		Use:     "doctor",
+		Short:   "Vérifier l'environnement et la configuration",
+		Example: "  asa init\n  asa doctor",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cwd, err := os.Getwd()
 			if err != nil {

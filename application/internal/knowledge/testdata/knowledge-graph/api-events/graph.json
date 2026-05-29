@@ -1,0 +1,23 @@
+{
+  "nodes": [
+    {
+      "id": "event:member.invited",
+      "type": "event",
+      "name": "member.invited",
+      "source": { "kind": "events", "path": "contracts/events.yaml", "extractor": "events" },
+      "confidence": 0.92,
+      "created_at": "2026-05-29T10:00:00Z",
+      "updated_at": "2026-05-29T10:00:00Z"
+    },
+    {
+      "id": "event:workspace.created",
+      "type": "event",
+      "name": "workspace.created",
+      "source": { "kind": "events", "path": "contracts/events.yaml", "extractor": "events" },
+      "confidence": 0.92,
+      "created_at": "2026-05-29T10:00:00Z",
+      "updated_at": "2026-05-29T10:00:00Z"
+    }
+  ],
+  "edges": []
+}

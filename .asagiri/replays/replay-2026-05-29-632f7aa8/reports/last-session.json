@@ -1,0 +1,13 @@
+{
+  "replay_id": "replay-2026-05-29-632f7aa8",
+  "mode": "offline",
+  "offline": true,
+  "artifacts": {
+    "execution_graph": true,
+    "runtime_events": true,
+    "trust_report": true
+  },
+  "warnings": [
+    "offline: no cloud or external API calls"
+  ]
+}

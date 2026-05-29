@@ -17,7 +17,7 @@ func TestRegistryRunAllFourteenChecks(t *testing.T) {
 		ProductID: "minimal-product",
 	})
 	require.NoError(t, err)
-	require.Len(t, out, 14)
+	require.Len(t, out, 15)
 	var blast *BlastRadiusSummary
 	for _, c := range out {
 		if c.Type == typeBlastRadius {

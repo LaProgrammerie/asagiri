@@ -59,6 +59,10 @@ Jeder Plan schreibt unter `.asagiri/graphs/<graph-id>/`:
 
 Defaults in [`execution_graph`](/docs/de/configuration/config-file#execution_graph) in `.asagiri/config.yaml`.
 
+- **`enabled: false`** — deaktiviert `plan graph` und alle `graph`-Unterbefehle.
+- **`gates`** — steuern Trust-Enrichment und Runner (`trust.Engine`).
+- **`--checkpoint-every`** — `node` oder `group` ; nötig für [`asa graph resume`](/docs/de/cli/graph-resume) (Fehler ohne Checkpoint).
+
 ## Code-Layout
 
 ```text

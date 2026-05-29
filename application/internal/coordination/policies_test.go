@@ -45,7 +45,7 @@ func TestPolicyEvaluatorRejectsHighParallelism(t *testing.T) {
 	require.NotEmpty(t, result.Errors)
 }
 
-func TestPolicyEvaluatorSecurityWarning(t *testing.T) {
+func TestPolicyEvaluatorSecurityReviewRequired(t *testing.T) {
 	g := validGraph()
 	g.Flow = "auth-login"
 	eval := coordination.PolicyEvaluator{
@@ -55,6 +55,27 @@ func TestPolicyEvaluatorSecurityWarning(t *testing.T) {
 		},
 	}
 	result := eval.Evaluate(g)
-	require.True(t, result.OK)
-	require.NotEmpty(t, result.Warnings)
+	require.False(t, result.OK)
+	require.NotEmpty(t, result.Errors)
+}
+
+func TestPolicyEvaluatorCrossAgentSelfReview(t *testing.T) {
+	g := validGraph()
+	g.Nodes = []executiongraph.GraphNode{
+		{ID: "impl", Type: executiongraph.NodeTypeImplementation, Agent: "cursor"},
+		{ID: "rev", Type: executiongraph.NodeTypeReview, Agent: "cursor"},
+	}
+	eval := coordination.PolicyEvaluator{
+		Policies: coordination.CoordinationPolicies{
+			RequireIndependentReview: true,
+			AllowSelfReview:          false,
+		},
+	}
+	assignments := []coordination.AgentAssignment{
+		{NodeID: "impl", AgentRef: "cursor", Role: coordination.RoleImplementer},
+		{NodeID: "rev", AgentRef: "cursor", Role: coordination.RoleReviewer},
+	}
+	result := eval.EvaluateWithAssignments(g, assignments)
+	require.False(t, result.OK)
+	require.NotEmpty(t, result.Errors)
 }

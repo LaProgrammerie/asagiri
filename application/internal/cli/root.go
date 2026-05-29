@@ -70,6 +70,9 @@ func newRootCmd() *cobra.Command {
 		newMemoryCmd(),
 		newAnalysisCmd(),
 		newGraphCmd(),
+		newKnowledgeCmd(),
+		newReplayCmd(),
+		newImpactCmd(),
 		newDocsCmd(),
 		&cobra.Command{
 			Use:   "version",
@@ -314,9 +317,10 @@ func newResumeCmd(dryRun *bool) *cobra.Command {
 	var force bool
 	var execute bool
 	cmd := &cobra.Command{
-		Use:   "resume <run-id>",
-		Short: "Reprendre un run interrompu",
-		Args:  cobra.ExactArgs(1),
+		Use:     "resume <run-id>",
+		Short:   "Reprendre un run interrompu",
+		Example: "  asa resume run-2026-05-17-001\n  asa resume run-2026-05-17-001 --execute\n  # Enchaîner les steps jusqu'à fin de run :\n  while asa resume run-2026-05-17-001 --execute; do :; done",
+		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			startDir, err := os.Getwd()
 			if err != nil {
@@ -328,12 +332,26 @@ func newResumeCmd(dryRun *bool) *cobra.Command {
 			}
 			defer ctx.Close()
 			wf := ctx.Workflow()
-			if execute && ctx.DryRun {
-				next, err := wf.ResumeRunDryExecute(cmd.Context(), args[0], force)
+			if execute {
+				var next string
+				var err error
+				if ctx.DryRun {
+					next, err = wf.ResumeRunDryExecute(cmd.Context(), args[0], force)
+					if err != nil {
+						return err
+					}
+					fmt.Fprintf(cmd.OutOrStdout(), "reprise dry-run exécutée: %s\n", next)
+					return nil
+				}
+				next, err = wf.ResumeRunExecute(cmd.Context(), args[0], force)
 				if err != nil {
 					return err
 				}
-				fmt.Fprintf(cmd.OutOrStdout(), "reprise dry-run exécutée: %s\n", next)
+				if next == "" {
+					fmt.Fprintln(cmd.OutOrStdout(), "run terminé: aucun step à reprendre")
+					return nil
+				}
+				fmt.Fprintf(cmd.OutOrStdout(), "step exécuté: %s\n", next)
 				return nil
 			}
 			next, err := wf.ResumeRun(args[0], force)
@@ -349,7 +367,7 @@ func newResumeCmd(dryRun *bool) *cobra.Command {
 		},
 	}
 	cmd.Flags().BoolVar(&force, "force", false, "Relancer une étape déjà réussie")
-	cmd.Flags().BoolVar(&execute, "execute", false, "Exécuter le prochain step (dry-run uniquement)")
+	cmd.Flags().BoolVar(&execute, "execute", false, "Exécuter le prochain step (agents réels hors --dry-run global)")
 	return cmd
 }
 

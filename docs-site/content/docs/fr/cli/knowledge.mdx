@@ -1,0 +1,46 @@
+---
+title: Commande knowledge
+description: Construire, interroger, expliquer et snapshotter le graphe de connaissance.
+---
+
+# `asa knowledge`
+
+Graphe de connaissance ingénierie (`spec-my-E`).
+
+## `build`
+
+```bash
+asa knowledge build \
+  --include-flows \
+  --include-contracts \
+  --include-code \
+  --include-tests \
+  --incremental \
+  --scope product:workspace-saas \
+  --json
+```
+
+Écrit `.asagiri/knowledge/graph.sqlite` et `graph.json`. Affiche un avertissement de staleness si les sources ont changé depuis le dernier build.
+
+## `query`
+
+```bash
+asa knowledge query "what implements invite_member?"
+asa knowledge query --node action:invite_member --json
+```
+
+## `explain`
+
+```bash
+asa knowledge explain onboarding invite_member InvitationService
+```
+
+## `snapshot`
+
+```bash
+asa knowledge snapshot --name before-refactor
+```
+
+Copie les métadonnées de build et `graph.json` vers `.asagiri/knowledge/snapshots/before-refactor/`.
+
+Voir [Graphe de connaissance ingénierie](/docs/fr/concepts/engineering-knowledge-graph).

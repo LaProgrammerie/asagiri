@@ -11,6 +11,7 @@ type GraphPlanRequest struct {
 	IncludeReviews bool
 	IncludeDocs    bool
 	Estimate       bool
+	Gates          TrustGateConfig
 }
 
 // TaskBinding links a graph node to task and flow metadata for inference (spec §10).

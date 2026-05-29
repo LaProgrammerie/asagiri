@@ -1,0 +1,10 @@
+[
+  "",
+  "no-colon",
+  "flow:",
+  ":missing-type",
+  "unknown:node",
+  "flow:has/slash",
+  "flow:has\\backslash",
+  "flow:..segment"
+]

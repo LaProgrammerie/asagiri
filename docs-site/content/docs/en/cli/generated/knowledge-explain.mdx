@@ -1,0 +1,49 @@
+---
+title: Knowledge Explain · Asagiri CLI
+description: Expliquer le lien le plus court entre flow/action et un symbole
+---
+
+CLI path: **`asa knowledge explain`**
+
+## When to use
+
+Orchestration commands coordinate higher-order Asagiri workloads such as ingestion, syncing, backlog triage, investigative passes, hydrated context payloads, coarse estimates, and workspace-specific automation.
+
+> Original CLI synopsis: Expliquer le lien le plus court entre flow/action et un symbole
+
+## Usage
+
+```bash
+asa knowledge explain [flags]
+```
+
+## Options
+
+| Flag | Scope | Default | Description |
+| --- | --- | --- | --- |
+| `--dry-run` | Inherited | `false` | Simuler les exécutions sans lancer d'agent ni commandes externes |
+| `--json` | Local | `false` | Sortie JSON |
+
+## Examples
+
+```bash
+asa knowledge explain
+```
+
+> Wire richer samples through **cobra.Command.Example** when the happy path warrants copy/paste-friendly automation beyond this scaffold.
+
+## What happens internally
+
+- Hydrates contextual services resolved from **$PWD**, coordinating git-bound automation, ingestion pipelines, syncing, backlog triage, investigations, MCP hooks, contextual hydration, coarse estimates, and similar orchestrations for this subtree.
+
+## Failure modes
+
+- Cobra rejects unknown flags or arity mismatches before any repository side effects occur.
+- Asagiri cannot resolve scaffolding when the command is invoked outside an initialised checkout.
+- Downstream automation may fail whenever credentials, network endpoints, or cached prerequisites drift from expectations.
+
+## Related commands
+
+- [Knowledge Build](./knowledge-build.mdx)
+- [Knowledge Query](./knowledge-query.mdx)
+- [Knowledge Snapshot](./knowledge-snapshot.mdx)

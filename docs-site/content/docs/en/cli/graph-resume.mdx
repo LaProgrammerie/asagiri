@@ -18,6 +18,10 @@ asa graph resume graph-2026-05-29-9307e4be --json
 
 Loads `execution-graph.yaml` from `.asagiri/graphs/<graph-id>/`, restores node states from checkpoints, and runs remaining ready nodes. Emits `graph.*` runtime events during resume.
 
+If **no checkpoint** exists on disk, the command fails with an explicit error (`graph resume requires at least one checkpoint`). Run [`asa graph run`](/docs/cli/graph-run) first with `--checkpoint-every node` or `group`.
+
+When `execution_graph.enabled` is `false` in config, graph commands (including resume) return an error.
+
 ## Related
 
 - Check status first: [`asa graph status`](/docs/cli/graph-status)

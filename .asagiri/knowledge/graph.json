@@ -1,0 +1,477 @@
+{
+  "nodes": [
+    {
+      "id": "action:click_get_started",
+      "type": "action",
+      "name": "click_get_started",
+      "path": ".asagiri/products/workspace-saas/flows/workspace-onboarding.flow.yaml",
+      "source": {
+        "kind": "flow",
+        "path": ".asagiri/products/workspace-saas/flows/workspace-onboarding.flow.yaml",
+        "extractor": "flows"
+      },
+      "confidence": 0.95,
+      "created_at": "2026-05-29T11:25:06.372041Z",
+      "updated_at": "2026-05-29T11:25:06.372041Z"
+    },
+    {
+      "id": "action:submit_signup",
+      "type": "action",
+      "name": "submit_signup",
+      "path": ".asagiri/products/workspace-saas/flows/workspace-onboarding.flow.yaml",
+      "source": {
+        "kind": "flow",
+        "path": ".asagiri/products/workspace-saas/flows/workspace-onboarding.flow.yaml",
+        "extractor": "flows"
+      },
+      "confidence": 0.95,
+      "created_at": "2026-05-29T11:25:06.372041Z",
+      "updated_at": "2026-05-29T11:25:06.372041Z"
+    },
+    {
+      "id": "api_operation:POST_api_workspaces",
+      "type": "api_operation",
+      "name": "POST /api/workspaces",
+      "path": ".asagiri/products/workspace-saas/contracts/api.openapi.yaml",
+      "source": {
+        "kind": "contract",
+        "path": ".asagiri/products/workspace-saas/contracts/api.openapi.yaml",
+        "extractor": "contracts"
+      },
+      "confidence": 0.94,
+      "created_at": "2026-05-29T11:25:06.372157Z",
+      "updated_at": "2026-05-29T11:25:06.372157Z"
+    },
+    {
+      "id": "config:.asagiri_config.yaml",
+      "type": "config",
+      "name": "config.yaml",
+      "path": ".asagiri/config.yaml",
+      "source": {
+        "kind": "config",
+        "path": ".asagiri/config.yaml",
+        "extractor": "config"
+      },
+      "confidence": 0.9,
+      "created_at": "2026-05-29T11:25:06.373342Z",
+      "updated_at": "2026-05-29T11:25:06.373342Z"
+    },
+    {
+      "id": "config:.asagiri_config.yaml.example",
+      "type": "config",
+      "name": "config.yaml.example",
+      "path": ".asagiri/config.yaml.example",
+      "source": {
+        "kind": "config",
+        "path": ".asagiri/config.yaml.example",
+        "extractor": "config"
+      },
+      "confidence": 0.9,
+      "created_at": "2026-05-29T11:25:06.373342Z",
+      "updated_at": "2026-05-29T11:25:06.373342Z"
+    },
+    {
+      "id": "file:spec_.kiro_specs_README.md",
+      "type": "file",
+      "name": "README.md",
+      "path": ".kiro/specs/README.md",
+      "properties": {
+        "artefact": "spec",
+        "kind": "kiro_spec"
+      },
+      "source": {
+        "kind": "kiro_spec",
+        "path": ".kiro/specs/README.md",
+        "extractor": "specs"
+      },
+      "confidence": 0.85,
+      "created_at": "2026-05-29T11:25:06.373111Z",
+      "updated_at": "2026-05-29T11:25:06.373111Z"
+    },
+    {
+      "id": "file:spec_.kiro_specs_agentflow-test_requirements.md",
+      "type": "file",
+      "name": "requirements.md",
+      "path": ".kiro/specs/agentflow-test/requirements.md",
+      "properties": {
+        "artefact": "spec",
+        "kind": "kiro_spec"
+      },
+      "source": {
+        "kind": "kiro_spec",
+        "path": ".kiro/specs/agentflow-test/requirements.md",
+        "extractor": "specs"
+      },
+      "confidence": 0.85,
+      "created_at": "2026-05-29T11:25:06.373111Z",
+      "updated_at": "2026-05-29T11:25:06.373111Z"
+    },
+    {
+      "id": "file:spec_.kiro_specs_agentflow-test_tasks.md",
+      "type": "file",
+      "name": "tasks.md",
+      "path": ".kiro/specs/agentflow-test/tasks.md",
+      "properties": {
+        "artefact": "spec",
+        "kind": "kiro_spec"
+      },
+      "source": {
+        "kind": "kiro_spec",
+        "path": ".kiro/specs/agentflow-test/tasks.md",
+        "extractor": "specs"
+      },
+      "confidence": 0.85,
+      "created_at": "2026-05-29T11:25:06.373111Z",
+      "updated_at": "2026-05-29T11:25:06.373111Z"
+    },
+    {
+      "id": "file:spec_.kiro_specs_workspace-saas_design.md",
+      "type": "file",
+      "name": "design.md",
+      "path": ".kiro/specs/workspace-saas/design.md",
+      "properties": {
+        "artefact": "spec",
+        "kind": "kiro_spec"
+      },
+      "source": {
+        "kind": "kiro_spec",
+        "path": ".kiro/specs/workspace-saas/design.md",
+        "extractor": "specs"
+      },
+      "confidence": 0.85,
+      "created_at": "2026-05-29T11:25:06.373111Z",
+      "updated_at": "2026-05-29T11:25:06.373111Z"
+    },
+    {
+      "id": "file:spec_.kiro_specs_workspace-saas_requirements.md",
+      "type": "file",
+      "name": "requirements.md",
+      "path": ".kiro/specs/workspace-saas/requirements.md",
+      "properties": {
+        "artefact": "spec",
+        "kind": "kiro_spec"
+      },
+      "source": {
+        "kind": "kiro_spec",
+        "path": ".kiro/specs/workspace-saas/requirements.md",
+        "extractor": "specs"
+      },
+      "confidence": 0.85,
+      "created_at": "2026-05-29T11:25:06.373111Z",
+      "updated_at": "2026-05-29T11:25:06.373111Z"
+    },
+    {
+      "id": "file:spec_.kiro_specs_workspace-saas_tasks.md",
+      "type": "file",
+      "name": "tasks.md",
+      "path": ".kiro/specs/workspace-saas/tasks.md",
+      "properties": {
+        "artefact": "spec",
+        "kind": "kiro_spec"
+      },
+      "source": {
+        "kind": "kiro_spec",
+        "path": ".kiro/specs/workspace-saas/tasks.md",
+        "extractor": "specs"
+      },
+      "confidence": 0.85,
+      "created_at": "2026-05-29T11:25:06.373111Z",
+      "updated_at": "2026-05-29T11:25:06.373111Z"
+    },
+    {
+      "id": "file:spec_docs_ai_active_current-spec.md",
+      "type": "file",
+      "name": "current-spec.md",
+      "path": "docs/ai/active/current-spec.md",
+      "properties": {
+        "artefact": "spec",
+        "kind": "ai_active"
+      },
+      "source": {
+        "kind": "ai_active",
+        "path": "docs/ai/active/current-spec.md",
+        "extractor": "specs"
+      },
+      "confidence": 0.85,
+      "created_at": "2026-05-29T11:25:06.373111Z",
+      "updated_at": "2026-05-29T11:25:06.373111Z"
+    },
+    {
+      "id": "file:spec_docs_ai_active_handoff.md",
+      "type": "file",
+      "name": "handoff.md",
+      "path": "docs/ai/active/handoff.md",
+      "properties": {
+        "artefact": "spec",
+        "kind": "ai_active"
+      },
+      "source": {
+        "kind": "ai_active",
+        "path": "docs/ai/active/handoff.md",
+        "extractor": "specs"
+      },
+      "confidence": 0.85,
+      "created_at": "2026-05-29T11:25:06.373111Z",
+      "updated_at": "2026-05-29T11:25:06.373111Z"
+    },
+    {
+      "id": "file:task_.asagiri_tasks_workspace-saas_workspace-saas-001.yaml",
+      "type": "file",
+      "name": "workspace-saas-001",
+      "path": ".asagiri/tasks/workspace-saas/workspace-saas-001.yaml",
+      "properties": {
+        "artefact": "task"
+      },
+      "source": {
+        "kind": "task",
+        "path": ".asagiri/tasks/workspace-saas/workspace-saas-001.yaml",
+        "extractor": "tasks"
+      },
+      "confidence": 0.86,
+      "created_at": "2026-05-29T11:25:06.373193Z",
+      "updated_at": "2026-05-29T11:25:06.373193Z"
+    },
+    {
+      "id": "flow:workspace-onboarding",
+      "type": "flow",
+      "name": "Workspace onboarding",
+      "path": ".asagiri/products/workspace-saas/flows/workspace-onboarding.flow.yaml",
+      "properties": {
+        "entry_screen": "landing",
+        "outcome": "workspace_created",
+        "product": "workspace-saas"
+      },
+      "source": {
+        "kind": "flow",
+        "path": ".asagiri/products/workspace-saas/flows/workspace-onboarding.flow.yaml",
+        "extractor": "flows"
+      },
+      "confidence": 0.95,
+      "created_at": "2026-05-29T11:25:06.372041Z",
+      "updated_at": "2026-05-29T11:25:06.372041Z"
+    },
+    {
+      "id": "flow_step:workspace-onboarding_step-1",
+      "type": "flow_step",
+      "name": "step-1",
+      "path": ".asagiri/products/workspace-saas/flows/workspace-onboarding.flow.yaml",
+      "properties": {
+        "next": "signup",
+        "screen": "landing"
+      },
+      "source": {
+        "kind": "flow",
+        "path": ".asagiri/products/workspace-saas/flows/workspace-onboarding.flow.yaml",
+        "extractor": "flows",
+        "evidence": "click_get_started"
+      },
+      "confidence": 0.92,
+      "created_at": "2026-05-29T11:25:06.372041Z",
+      "updated_at": "2026-05-29T11:25:06.372041Z"
+    },
+    {
+      "id": "flow_step:workspace-onboarding_step-2",
+      "type": "flow_step",
+      "name": "step-2",
+      "path": ".asagiri/products/workspace-saas/flows/workspace-onboarding.flow.yaml",
+      "properties": {
+        "next": "dashboard",
+        "screen": "signup"
+      },
+      "source": {
+        "kind": "flow",
+        "path": ".asagiri/products/workspace-saas/flows/workspace-onboarding.flow.yaml",
+        "extractor": "flows",
+        "evidence": "submit_signup"
+      },
+      "confidence": 0.92,
+      "created_at": "2026-05-29T11:25:06.372041Z",
+      "updated_at": "2026-05-29T11:25:06.372041Z"
+    },
+    {
+      "id": "product:workspace-saas",
+      "type": "product",
+      "name": "workspace-saas",
+      "path": ".asagiri/products/workspace-saas",
+      "source": {
+        "kind": "product",
+        "path": ".asagiri/products/workspace-saas",
+        "extractor": "flows"
+      },
+      "confidence": 0.95,
+      "created_at": "2026-05-29T11:25:06.372041Z",
+      "updated_at": "2026-05-29T11:25:06.372041Z"
+    },
+    {
+      "id": "review:trust_trust-2026-05-29-35de044f",
+      "type": "review",
+      "name": "trust-2026-05-29-35de044f",
+      "path": ".asagiri/trust/trust-2026-05-29-35de044f/report.md",
+      "source": {
+        "kind": "trust_report",
+        "path": ".asagiri/trust/trust-2026-05-29-35de044f/report.md",
+        "extractor": "trust_reports"
+      },
+      "confidence": 0.84,
+      "created_at": "2026-05-29T11:25:06.37324Z",
+      "updated_at": "2026-05-29T11:25:06.37324Z"
+    },
+    {
+      "id": "review:trust_trust-2026-05-29-aefcf60d",
+      "type": "review",
+      "name": "trust-2026-05-29-aefcf60d",
+      "path": ".asagiri/trust/trust-2026-05-29-aefcf60d/report.md",
+      "source": {
+        "kind": "trust_report",
+        "path": ".asagiri/trust/trust-2026-05-29-aefcf60d/report.md",
+        "extractor": "trust_reports"
+      },
+      "confidence": 0.84,
+      "created_at": "2026-05-29T11:25:06.37324Z",
+      "updated_at": "2026-05-29T11:25:06.37324Z"
+    },
+    {
+      "id": "review:trust_trust-2026-05-29-f045cd36",
+      "type": "review",
+      "name": "trust-2026-05-29-f045cd36",
+      "path": ".asagiri/trust/trust-2026-05-29-f045cd36/report.md",
+      "source": {
+        "kind": "trust_report",
+        "path": ".asagiri/trust/trust-2026-05-29-f045cd36/report.md",
+        "extractor": "trust_reports"
+      },
+      "confidence": 0.84,
+      "created_at": "2026-05-29T11:25:06.37324Z",
+      "updated_at": "2026-05-29T11:25:06.37324Z"
+    }
+  ],
+  "edges": [
+    {
+      "id": "owns:flow_workspace-onboarding>flow_step_workspace-onboarding_step-1",
+      "from": "flow:workspace-onboarding",
+      "to": "flow_step:workspace-onboarding_step-1",
+      "type": "owns",
+      "source": {
+        "kind": "flow",
+        "path": ".asagiri/products/workspace-saas/flows/workspace-onboarding.flow.yaml",
+        "extractor": "flows"
+      },
+      "confidence": 0.92,
+      "created_at": "2026-05-29T11:25:06.372041Z",
+      "updated_at": "2026-05-29T11:25:06.372041Z"
+    },
+    {
+      "id": "owns:flow_workspace-onboarding>flow_step_workspace-onboarding_step-2",
+      "from": "flow:workspace-onboarding",
+      "to": "flow_step:workspace-onboarding_step-2",
+      "type": "owns",
+      "source": {
+        "kind": "flow",
+        "path": ".asagiri/products/workspace-saas/flows/workspace-onboarding.flow.yaml",
+        "extractor": "flows"
+      },
+      "confidence": 0.92,
+      "created_at": "2026-05-29T11:25:06.372041Z",
+      "updated_at": "2026-05-29T11:25:06.372041Z"
+    },
+    {
+      "id": "owns:product_workspace-saas>api_operation_POST_api_workspaces",
+      "from": "product:workspace-saas",
+      "to": "api_operation:POST_api_workspaces",
+      "type": "owns",
+      "source": {
+        "kind": "contract",
+        "path": ".asagiri/products/workspace-saas/contracts/api.openapi.yaml",
+        "extractor": "contracts"
+      },
+      "confidence": 0.9,
+      "created_at": "2026-05-29T11:25:06.372157Z",
+      "updated_at": "2026-05-29T11:25:06.372157Z"
+    },
+    {
+      "id": "owns:product_workspace-saas>flow_workspace-onboarding",
+      "from": "product:workspace-saas",
+      "to": "flow:workspace-onboarding",
+      "type": "owns",
+      "source": {
+        "kind": "flow",
+        "path": ".asagiri/products/workspace-saas/flows/workspace-onboarding.flow.yaml",
+        "extractor": "flows"
+      },
+      "confidence": 0.92,
+      "created_at": "2026-05-29T11:25:06.372041Z",
+      "updated_at": "2026-05-29T11:25:06.372041Z"
+    },
+    {
+      "id": "requires:action_click_get_started>api_operation_POST_api_workspaces",
+      "from": "action:click_get_started",
+      "to": "api_operation:POST_api_workspaces",
+      "type": "requires",
+      "source": {
+        "kind": "flow",
+        "path": ".asagiri/products/workspace-saas/flows/workspace-onboarding.flow.yaml",
+        "extractor": "flows",
+        "evidence": "POST /api/workspaces"
+      },
+      "confidence": 0.92,
+      "created_at": "2026-05-29T11:25:06.372041Z",
+      "updated_at": "2026-05-29T11:25:06.372041Z"
+    },
+    {
+      "id": "requires:flow_step_workspace-onboarding_step-1>action_click_get_started",
+      "from": "flow_step:workspace-onboarding_step-1",
+      "to": "action:click_get_started",
+      "type": "requires",
+      "source": {
+        "kind": "flow",
+        "path": ".asagiri/products/workspace-saas/flows/workspace-onboarding.flow.yaml",
+        "extractor": "flows"
+      },
+      "confidence": 0.92,
+      "created_at": "2026-05-29T11:25:06.372041Z",
+      "updated_at": "2026-05-29T11:25:06.372041Z"
+    },
+    {
+      "id": "requires:flow_step_workspace-onboarding_step-2>action_submit_signup",
+      "from": "flow_step:workspace-onboarding_step-2",
+      "to": "action:submit_signup",
+      "type": "requires",
+      "source": {
+        "kind": "flow",
+        "path": ".asagiri/products/workspace-saas/flows/workspace-onboarding.flow.yaml",
+        "extractor": "flows"
+      },
+      "confidence": 0.92,
+      "created_at": "2026-05-29T11:25:06.372041Z",
+      "updated_at": "2026-05-29T11:25:06.372041Z"
+    },
+    {
+      "id": "requires:flow_workspace-onboarding>action_click_get_started",
+      "from": "flow:workspace-onboarding",
+      "to": "action:click_get_started",
+      "type": "requires",
+      "source": {
+        "kind": "flow",
+        "path": ".asagiri/products/workspace-saas/flows/workspace-onboarding.flow.yaml",
+        "extractor": "flows"
+      },
+      "confidence": 0.95,
+      "created_at": "2026-05-29T11:25:06.372041Z",
+      "updated_at": "2026-05-29T11:25:06.372041Z"
+    },
+    {
+      "id": "requires:flow_workspace-onboarding>action_submit_signup",
+      "from": "flow:workspace-onboarding",
+      "to": "action:submit_signup",
+      "type": "requires",
+      "source": {
+        "kind": "flow",
+        "path": ".asagiri/products/workspace-saas/flows/workspace-onboarding.flow.yaml",
+        "extractor": "flows"
+      },
+      "confidence": 0.95,
+      "created_at": "2026-05-29T11:25:06.372041Z",
+      "updated_at": "2026-05-29T11:25:06.372041Z"
+    }
+  ]
+}

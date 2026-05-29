@@ -79,15 +79,16 @@ func newPlanGraphCmd() *cobra.Command {
 	)
 
 	cmd := &cobra.Command{
-		Use:   "graph <product>",
-		Short: "Générer un graphe d'exécution sans lancer d'agents",
-		Args:  cobra.ExactArgs(1),
+		Use:     "graph <product>",
+		Short:   "Générer un graphe d'exécution sans lancer d'agents",
+		Example: "  asa plan graph workspace-saas --flow workspace-onboarding",
+		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			repoRoot, cfg, err := loadGraphRepoConfig()
 			if err != nil {
 				return err
 			}
-			if !cfg.ExecutionGraph.Enabled {
+			if !cfg.ExecutionGraph.IsEnabled() {
 				return errGraphNotEnabled
 			}
 			if strings.TrimSpace(flow) == "" {
@@ -152,15 +153,16 @@ func newPlanExplainCmd() *cobra.Command {
 	var flow string
 
 	cmd := &cobra.Command{
-		Use:   "explain <product>",
-		Short: "Expliquer les dépendances, le parallélisme et les risques du plan",
-		Args:  cobra.ExactArgs(1),
+		Use:     "explain <product>",
+		Short:   "Expliquer les dépendances, le parallélisme et les risques du plan",
+		Example: "  asa plan explain workspace-saas --flow workspace-onboarding",
+		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			repoRoot, cfg, err := loadGraphRepoConfig()
 			if err != nil {
 				return err
 			}
-			if !cfg.ExecutionGraph.Enabled {
+			if !cfg.ExecutionGraph.IsEnabled() {
 				return errGraphNotEnabled
 			}
 			if strings.TrimSpace(flow) == "" {
@@ -198,19 +200,23 @@ func newGraphRunCmd() *cobra.Command {
 	)
 
 	cmd := &cobra.Command{
-		Use:   "run <product>",
-		Short: "Planifier et exécuter (ou simuler) un graphe d'exécution",
-		Args:  cobra.ExactArgs(1),
+		Use:     "run <product>",
+		Short:   "Planifier et exécuter (ou simuler) un graphe d'exécution",
+		Example: "  asa graph run workspace-saas --flow workspace-onboarding --dry-run",
+		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			repoRoot, cfg, err := loadGraphRepoConfig()
 			if err != nil {
 				return err
 			}
-			if !cfg.ExecutionGraph.Enabled {
+			if !cfg.ExecutionGraph.IsEnabled() {
 				return errGraphNotEnabled
 			}
 			if strings.TrimSpace(flow) == "" {
 				return errGraphFlowRequired
+			}
+			if err := executiongraph.ValidateCheckpointEvery(checkpointEvery); err != nil {
+				return err
 			}
 
 			result, runResult, err := runGraphRun(cmd.Context(), repoRoot, cfg, graphRunOptions{
@@ -268,7 +274,6 @@ func newGraphRunCmd() *cobra.Command {
 	cmd.Flags().BoolVar(&dryRun, "dry-run", false, "Plan and persist artefacts without executing agents")
 	cmd.Flags().BoolVar(&ci, "ci", false, "CI mode: conservative scheduling and non-zero exit on policy failure")
 	cmd.Flags().BoolVar(&jsonOut, "json", false, "Structured JSON output on stdout")
-	_ = checkpointEvery
 	return cmd
 }
 
@@ -276,13 +281,17 @@ func newGraphStatusCmd() *cobra.Command {
 	var jsonOut bool
 
 	cmd := &cobra.Command{
-		Use:   "status <graph-id>",
-		Short: "Afficher l'état d'un graphe",
-		Args:  cobra.ExactArgs(1),
+		Use:     "status <graph-id>",
+		Short:   "Afficher l'état d'un graphe",
+		Example: "  asa graph status graph-20260529-001",
+		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			repoRoot, _, err := loadGraphRepoConfig()
+			repoRoot, cfg, err := loadGraphRepoConfig()
 			if err != nil {
 				return err
+			}
+			if !cfg.ExecutionGraph.IsEnabled() {
+				return errGraphNotEnabled
 			}
 			repo := executiongraph.NewRepository(repoRoot)
 			graph, err := repo.Load(args[0])
@@ -322,16 +331,25 @@ func newGraphResumeCmd() *cobra.Command {
 	var jsonOut bool
 
 	cmd := &cobra.Command{
-		Use:   "resume <graph-id>",
-		Short: "Reprendre un graphe interrompu",
-		Args:  cobra.ExactArgs(1),
+		Use:     "resume <graph-id>",
+		Short:   "Reprendre un graphe interrompu",
+		Example: "  asa graph resume graph-20260529-001",
+		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			repoRoot, _, err := loadGraphRepoConfig()
+			repoRoot, cfg, err := loadGraphRepoConfig()
+			if err != nil {
+				return err
+			}
+			if !cfg.ExecutionGraph.IsEnabled() {
+				return errGraphNotEnabled
+			}
+			repo := executiongraph.NewRepository(repoRoot)
+			graph, err := repo.Load(args[0])
 			if err != nil {
 				return err
 			}
 			runner := executiongraph.NewRunner(repoRoot)
-			result, err := runner.Resume(cmd.Context(), args[0], executiongraph.RunOptions{})
+			result, err := runner.Resume(cmd.Context(), args[0], graphRunOptionsFromConfig(repoRoot, cfg, graphRunOptionsFromPersisted(graph)))
 			if err != nil {
 				return err
 			}
@@ -358,13 +376,17 @@ func newGraphVisualizeCmd() *cobra.Command {
 	var format string
 
 	cmd := &cobra.Command{
-		Use:   "visualize <graph-id>",
-		Short: "Exporter un graphe (mermaid, json, dot, markdown)",
-		Args:  cobra.ExactArgs(1),
+		Use:     "visualize <graph-id>",
+		Short:   "Exporter un graphe (mermaid, json, dot, markdown)",
+		Example: "  asa graph visualize graph-20260529-001 --format mermaid",
+		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			repoRoot, _, err := loadGraphRepoConfig()
+			repoRoot, cfg, err := loadGraphRepoConfig()
 			if err != nil {
 				return err
+			}
+			if !cfg.ExecutionGraph.IsEnabled() {
+				return errGraphNotEnabled
 			}
 			repo := executiongraph.NewRepository(repoRoot)
 			graph, err := repo.Load(args[0])
@@ -439,6 +461,10 @@ func runPlanGraph(ctx context.Context, repoRoot string, cfg *config.Config, opts
 		IncludeReviews: opts.IncludeReviews,
 		IncludeDocs:    opts.IncludeDocs,
 		Estimate:       opts.Estimate,
+		Gates: executiongraph.TrustGateConfig{
+			TrustRequiredForHighRisk: cfg.ExecutionGraph.Gates.TrustRequiredForHighRisk,
+			HumanApprovalFor:         append([]string(nil), cfg.ExecutionGraph.Gates.HumanApprovalFor...),
+		},
 	})
 	if err != nil {
 		return PlanGraphResult{}, err
@@ -493,14 +519,12 @@ func runGraphRun(ctx context.Context, repoRoot string, cfg *config.Config, opts 
 	})
 
 	graph.Strategy.StrictTrust = opts.StrictTrust
+	if opts.CheckpointEvery != "" {
+		graph.Strategy.CheckpointEvery = opts.CheckpointEvery
+	}
 
 	runner := executiongraph.NewRunner(repoRoot)
-	runOpts := executiongraph.RunOptions{
-		DryRun:      opts.DryRun,
-		CIMode:      opts.CI,
-		StrictTrust: opts.StrictTrust,
-		Gates:       trust.NewGateEvaluator(&cfg.Verification),
-	}
+	runOpts := graphRunOptionsFromConfig(repoRoot, cfg, opts)
 
 	if opts.DryRun {
 		runResult, schedule, artifacts, err := runner.DryRun(ctx, graph, opts.CI)
@@ -538,6 +562,24 @@ type strategyOverrides struct {
 	StopOnRisk  string
 	Budget      float64
 	CI          bool
+}
+
+func graphRunOptionsFromPersisted(graph executiongraph.ExecutionGraph) graphRunOptions {
+	return graphRunOptions{
+		StrictTrust:     graph.Strategy.StrictTrust,
+		CheckpointEvery: graph.Strategy.CheckpointEvery,
+	}
+}
+
+func graphRunOptionsFromConfig(repoRoot string, cfg *config.Config, opts graphRunOptions) executiongraph.RunOptions {
+	return executiongraph.RunOptions{
+		DryRun:          opts.DryRun,
+		CIMode:          opts.CI,
+		StrictTrust:     opts.StrictTrust,
+		CheckpointEvery: opts.CheckpointEvery,
+		Gates:           trust.NewGateEvaluator(&cfg.Verification),
+		TrustEngine:     trust.NewEngineForStrict(repoRoot, cfg),
+	}
 }
 
 func applyGraphStrategy(graph *executiongraph.ExecutionGraph, cfg *config.Config, overrides strategyOverrides) {

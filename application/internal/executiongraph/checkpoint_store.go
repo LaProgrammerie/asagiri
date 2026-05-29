@@ -93,6 +93,26 @@ func (r *Repository) LoadLatestCheckpoint(graphID string) (CheckpointState, bool
 	return latest, found, nil
 }
 
+// CountCheckpoints returns the number of persisted checkpoint files for a graph.
+func (r *Repository) CountCheckpoints(graphID string) (int, error) {
+	dir := r.checkpointDir(graphID)
+	entries, err := os.ReadDir(dir)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return 0, nil
+		}
+		return 0, fmt.Errorf("read checkpoint dir: %w", err)
+	}
+	count := 0
+	for _, e := range entries {
+		if e.IsDir() || !strings.HasSuffix(e.Name(), ".json") {
+			continue
+		}
+		count++
+	}
+	return count, nil
+}
+
 // AppendGraphEvent appends one JSON line to events.jsonl under the graph directory.
 func (r *Repository) AppendGraphEvent(graphID, eventType string, payload map[string]any) error {
 	dir := r.graphDir(graphID)

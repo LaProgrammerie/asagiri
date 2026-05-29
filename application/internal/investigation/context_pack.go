@@ -7,13 +7,19 @@ import (
 	"strings"
 )
 
-// ContextPack is a bounded agent context (spec-my-A §25).
+// ContextPack is a bounded agent context (spec-my-A §25, spec-my-E §15).
 type ContextPack struct {
-	Files          []string `json:"files"`
-	Tests          []string `json:"tests"`
-	Symbols        []string `json:"symbols,omitempty"`
+	Files             []string `json:"files"`
+	Tests             []string `json:"tests"`
+	Symbols           []string `json:"symbols,omitempty"`
+	Contracts         []string `json:"contracts,omitempty"`
+	APIs              []string `json:"apis,omitempty"`
+	Events            []string `json:"events,omitempty"`
+	Metrics           []string `json:"metrics,omitempty"`
+	Flows             []string `json:"flows,omitempty"`
+	Risks             []string `json:"risks,omitempty"`
 	ExcludedSensitive []string `json:"excluded_sensitive,omitempty"`
-	MaxFiles       int      `json:"max_files"`
+	MaxFiles          int      `json:"max_files"`
 }
 
 // BuildContextPack selects minimal files excluding sensitive paths.

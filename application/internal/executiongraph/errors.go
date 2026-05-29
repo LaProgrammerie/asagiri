@@ -13,4 +13,5 @@ var (
 	ErrCycleDetected           = errors.New("dependency cycle detected")
 	ErrMissingRollbackStrategy = errors.New("high-risk node missing rollback strategy")
 	ErrTrustGateBlocked        = errors.New("trust gate blocked execution")
+	ErrNoCheckpoint            = errors.New("graph resume requires at least one checkpoint")
 )

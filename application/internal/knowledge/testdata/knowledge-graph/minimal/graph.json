@@ -1,0 +1,47 @@
+{
+  "nodes": [
+    {
+      "id": "action:invite_member",
+      "type": "action",
+      "name": "invite_member",
+      "source": {
+        "kind": "fixture",
+        "path": "testdata/knowledge-graph/minimal/graph.json",
+        "extractor": "manual"
+      },
+      "confidence": 1,
+      "created_at": "2026-05-29T10:00:00Z",
+      "updated_at": "2026-05-29T10:00:00Z"
+    },
+    {
+      "id": "flow:onboarding",
+      "type": "flow",
+      "name": "onboarding",
+      "path": ".asagiri/products/workspace-saas/flows/onboarding.flow.yaml",
+      "source": {
+        "kind": "fixture",
+        "path": "testdata/knowledge-graph/minimal/graph.json",
+        "extractor": "manual"
+      },
+      "confidence": 1,
+      "created_at": "2026-05-29T10:00:00Z",
+      "updated_at": "2026-05-29T10:00:00Z"
+    }
+  ],
+  "edges": [
+    {
+      "id": "requires:flow_onboarding>action_invite_member",
+      "from": "flow:onboarding",
+      "to": "action:invite_member",
+      "type": "requires",
+      "source": {
+        "kind": "fixture",
+        "path": "testdata/knowledge-graph/minimal/graph.json",
+        "extractor": "manual"
+      },
+      "confidence": 0.95,
+      "created_at": "2026-05-29T10:00:00Z",
+      "updated_at": "2026-05-29T10:00:00Z"
+    }
+  ]
+}

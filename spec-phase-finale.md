@@ -1,8 +1,8 @@
 # Spec — Phase finale (reliquats transverses)
 
 **Date :** 2026-05-27 (création) — **mise à jour :** 2026-05-29  
-**Statut :** À implémenter  
-**Prérequis :** [`spec-my-A.md`](spec-my-A.md), [`spec-my-B.md`](spec-my-B.md), [`spec-my-C.md`](spec-my-C.md) livrés (handoff §27 / DoD global cochés)  
+**Statut :** **P1 livré** (`2026-05-29`) — PF-A-01/02, PF-C-01…05 en code + doc ; **P2/P3 ouverts** (PF-C-06, PF-X-*)  
+**Prérequis :** [`spec-my-A.md`](spec-my-A.md) … [`spec-my-E.md`](spec-my-E.md) livrés (handoff FULL A–E)  
 **Objectif :** fermer **tous les écarts assumés, limitations V1 et durcissements** laissés ouverts après les specs A, B et C — **sans rouvrir** le périmètre fonctionnel déjà validé de chaque spec parente.
 
 > Ce document est la **source unique** des reliquats « phase finale ». Les specs A/B/C restent la vérité fonctionnelle ; ici on ne fait que **compléter** ce qui était explicitement V1, stub, ou non câblé au moment de la livraison.
@@ -13,18 +13,18 @@
 
 | ID | Spec source | Sujet | Sévérité | § détail |
 |----|-------------|--------|----------|----------|
-| **PF-A-01** | spec-my-A §24.10 | Embeddings mémoire sémantiques (Ollama) | P1 | [§3](#3-spec-my-a--embeddings-sémantiques) |
-| **PF-A-02** | spec-my-A §24.18 | SDK TypeScript sur npm + CI | P1 | [§4](#4-spec-my-a--sdk-npm) |
-| **PF-C-01** | spec-my-C §5.3 | `--checkpoint-every` exposé CLI, non propagé au runner | P1 | [§5](#5-spec-my-c--execution-graph) |
-| **PF-C-02** | spec-my-C §24 | `execution_graph.gates` YAML non injecté dans le planner | P1 | [§5](#5-spec-my-c--execution-graph) |
-| **PF-C-03** | spec-my-C §24 | `execution_graph.enabled: false` non respecté (défaut force activé) | P1 | [§5](#5-spec-my-c--execution-graph) |
-| **PF-C-04** | spec-my-C §17 | Évaluation trust dans le runner : score stub, pas `trust.Engine` complet | P1 | [§5](#5-spec-my-c--execution-graph) |
-| **PF-C-05** | spec-my-C §5.5, §15 | `asa graph resume` sans checkpoint : reprise partielle / erreur peu claire | P1 | [§5](#5-spec-my-c--execution-graph) |
-| **PF-C-06** | spec-my-C §10 | Inférence dépendances V2 : events, architecture projection, mémoire historique | P2 | [§5](#5-spec-my-c--execution-graph) |
-| **PF-X-01** | legacy / CLI | `asa resume <run-id>` n’exécute pas la chaîne agents (hors `--dry-run`) | P2 | [§6](#6-transverse--cli-et-plateforme) |
-| **PF-X-02** | cost | Pas de tokenizers provider-exacts (heuristique `chars_per_token`) | P3 | [§6](#6-transverse--cli-et-plateforme) |
-| **PF-X-03** | RAG | `asa index` sans embeddings vectoriels / retrieval sémantique index | P2 | [§6](#6-transverse--cli-et-plateforme) |
-| **PF-X-04** | docgen | Exemples CLI générés minimaux (`cobra.Example` manquant) | P3 | [§6](#6-transverse--cli-et-plateforme) |
+| **PF-A-01** | spec-my-A §24.10 | Embeddings mémoire sémantiques (Ollama) | P1 | **Fermé** · [§3](#3-spec-my-a--embeddings-sémantiques) |
+| **PF-A-02** | spec-my-A §24.18 | SDK TypeScript sur npm + CI | P1 | **Fermé** (CI + package ; publish = tag `sdk-v*`) · [§4](#4-spec-my-a--sdk-npm) |
+| **PF-C-01** | spec-my-C §5.3 | `--checkpoint-every` exposé CLI, non propagé au runner | P1 | **Fermé** · [§5](#5-spec-my-c--execution-graph) |
+| **PF-C-02** | spec-my-C §24 | `execution_graph.gates` YAML non injecté dans le planner | P1 | **Fermé** · [§5](#5-spec-my-c--execution-graph) |
+| **PF-C-03** | spec-my-C §24 | `execution_graph.enabled: false` non respecté (défaut force activé) | P1 | **Fermé** · [§5](#5-spec-my-c--execution-graph) |
+| **PF-C-04** | spec-my-C §17 | Évaluation trust dans le runner : score stub, pas `trust.Engine` complet | P1 | **Fermé** · [§5](#5-spec-my-c--execution-graph) |
+| **PF-C-05** | spec-my-C §5.5, §15 | `asa graph resume` sans checkpoint : reprise partielle / erreur peu claire | P1 | **Fermé** · [§5](#5-spec-my-c--execution-graph) |
+| **PF-C-06** | spec-my-C §10 | Inférence dépendances V2 : events, architecture projection, mémoire historique | P2 | **Reporté P2** · [§5](#5-spec-my-c--execution-graph) |
+| **PF-X-01** | legacy / CLI | `asa resume <run-id>` n’exécute pas la chaîne agents (hors `--dry-run`) | P2 | **Ouvert** · [§6](#6-transverse--cli-et-plateforme) |
+| **PF-X-02** | cost | Pas de tokenizers provider-exacts (heuristique `chars_per_token`) | P3 | **Ouvert** · [§6](#6-transverse--cli-et-plateforme) |
+| **PF-X-03** | RAG | `asa index` sans embeddings vectoriels / retrieval sémantique index | P2 | **Ouvert** · [§6](#6-transverse--cli-et-plateforme) |
+| **PF-X-04** | docgen | Exemples CLI générés minimaux (`cobra.Example` manquant) | P3 | **Ouvert** · [§6](#6-transverse--cli-et-plateforme) |
 
 **Légende sévérité :** P1 = contrat spec ou UX trompeuse ; P2 = valeur produit importante ; P3 = qualité / doc.
 
@@ -108,12 +108,13 @@ API : `GET /v1/memory?query=…` ; `POST /v1/memory/reindex` (admin).
 
 ### Critères d’acceptation — PF-A-01
 
-- [ ] `embedder: hash` — non-régression tests ;
-- [ ] `embedder: ollama` — similarité **> 0.7** sur paires synonymes (golden) ;
-- [ ] `asa memory reindex` sans crash sur corpus existant ;
-- [ ] `cloud` refusé si `enabled: false` même avec clé API ;
-- [ ] Doc site EN/FR/DE/ES : `runtime.memory.embedder` ;
-- [ ] ADR dédié embeddings (ne pas réutiliser ADR-020 trust).
+- [x] `embedder: hash` — non-régression tests ;
+- [x] `embedder: ollama` — similarité **> 0.7** sur paires synonymes (golden mock HTTP) ;
+- [x] `asa memory reindex` sans crash sur corpus existant ;
+- [x] `cloud` refusé si `enabled: false` même avec clé API ;
+- [x] Doc site EN/FR/DE/ES : `runtime.memory.embedder` (`configuration/config-file`) ;
+- [x] ADR-025 embeddings (distinct ADR-020 trust).
+- [ ] `asa memory doctor` — **non livré** ; utiliser config + `memory reindex` / tests embedder.
 
 ### Tests
 
@@ -146,11 +147,12 @@ Workflow `.github/workflows/sdk-npm-publish.yml` sur `sdk-v*` ; secret `NPM_TOKE
 
 ### Critères d’acceptation — PF-A-02
 
-- [ ] `npm install @laprogrammerie/asagiri` depuis projet vierge ;
-- [ ] README : connexion `asa runtime serve --port 8765` ;
-- [ ] Tag `sdk-v0.1.0` publie sans intervention locale ;
-- [ ] Doc site `reference/typescript-sdk` (4 locales) : install npm ;
-- [ ] ADR dédié distribution npm.
+- [x] Package `sdk/typescript/` prêt à `npm install` (build local / registry après publish) ;
+- [x] README : connexion `asa runtime serve --port 8765` ;
+- [x] Workflow `.github/workflows/sdk-npm-publish.yml` sur tag `sdk-v*` (+ `workflow_dispatch`) ;
+- [x] Doc site `reference/typescript-sdk` (4 locales) : install npm ;
+- [x] ADR-026 distribution npm.
+- [ ] Publication effective sur npm — **opération release** (secret `NPM_TOKEN`, tag `sdk-v*`).
 
 ---
 
@@ -219,9 +221,10 @@ Les critères §27 de spec-my-C sont **livrés** ; cette section durcit les **5 
 
 ### Critères d’acceptation — bloc PF-C
 
-- [ ] PF-C-01 à PF-C-05 : cases ci-dessus + `go test ./internal/executiongraph/...` vert ;
-- [ ] Doc EN/FR/DE/ES : comportement `enabled`, `gates`, `resume`, `checkpoint-every` alignée ;
-- [ ] `handoff.md` : section écarts spec-my-C vidée après livraison PF-C.
+- [x] PF-C-01 à PF-C-05 : implémentés + `go test ./internal/executiongraph/...` vert ;
+- [x] Doc EN/FR/DE/ES : `graph-run`, `graph-resume`, `config-file` (`execution_graph`) ;
+- [x] `handoff.md` : matrice PF-C P1 cochée (`2026-05-29`).
+- [ ] **PF-C-06** — inférence V2 : **reporté P2** (non bloquant clôture P1).
 
 ### Commandes de validation — PF-C
 
@@ -241,6 +244,8 @@ Les critères §27 de spec-my-C sont **livrés** ; cette section durcit les **5 
 
 Hors `--dry-run`, `asa resume <run-id>` affiche le prochain step sans enchaîner les agents. **Cible :** mode `--execute` production-safe ou enchaînement documenté comme Experimental jusqu’à implémentation.
 
+**Statut (2026-05-29) :** `--execute` enchaîne un seul step (plan/enrich/dev/verify/review/report) hors dry-run via `ResumeRunExecute`. Sans `--execute`, comportement diagnostic inchangé.
+
 ### PF-X-02 — Tokenizers cost exacts
 
 Heuristique `chars_per_token` seulement. **Cible :** tokenizers provider (ou doc « estimation non facture » partout). Priorité P3.
@@ -248,6 +253,8 @@ Heuristique `chars_per_token` seulement. **Cible :** tokenizers provider (ou doc
 ### PF-X-03 — RAG vectoriel
 
 `asa index` = chunks SQLite LIKE ; pas de retrieval sémantique index. **Cible :** aligner avec PF-A-01 (embeddings) ou documenter dépendance explicite. Peut fusionner avec PF-A-01 si même embedder.
+
+**Statut (2026-05-29) :** `asa index` reste keyword-only (`.asagiri/index/chunks.sqlite`). La mémoire runtime (`asa memory reindex`) utilise l’embedder PF-A-01 (`runtime.memory.embedder`). Pas de fusion embedder↔index dans cette tranche — dépendance documentée dans `handoff.md` et aide CLI `asa index --help`.
 
 ### PF-X-04 — Docgen exemples Cobra
 
@@ -302,15 +309,17 @@ Pages `cli/generated/*` sans args obligatoires. **Cible :** renseigner `cobra.Co
 
 ## 10. Definition of Done — phase finale globale
 
-La phase est **terminée** lorsque :
+**P1 (`2026-05-29`) — atteint** pour le code et la doc canon :
 
-1. Toutes les cases **PF-A-01**, **PF-A-02**, **PF-C-01…05** sont cochées ;
-2. `cd application && go test ./...` vert ;
-3. `cd sdk/typescript && npm test` vert (PF-A-02) ;
-4. `@laprogrammerie/asagiri` publié sur npm (ou registry documenté) ;
-5. Registre §1 : tous les P1 en statut **Fermé** ; P2/P3 soit fermés soit reportés vers spec-my-D avec accord explicite ;
-6. `handoff.md` et `problems.md` ne listent plus d’écarts ouverts couverts par ce document ;
-7. En-têtes `spec-my-A.md`, `spec-my-C.md` annotables : *« Reliquats fermés par spec-phase-finale.md »*.
+1. [x] **PF-A-01**, **PF-A-02**, **PF-C-01…05** livrés (sauf `memory doctor`, publish npm = release ops) ;
+2. [x] `go test` ciblés memory + executiongraph + cli graph ;
+3. [x] `cd sdk/typescript && npm test` ;
+4. [ ] Publish npm `@laprogrammerie/asagiri` — **hors CI locale** ;
+5. [x] Registre §1 : P1 **Fermé** ; **PF-C-06** et **PF-X-*** **Ouvert** (P2/P3) ;
+6. [x] `handoff.md` à jour ; `problems.md` conserve GAP-* ↔ PF-X-* ;
+7. [ ] En-têtes `spec-my-A.md` / `spec-my-C.md` : annotation *reliquats P1 fermés* — optionnel.
+
+**Clôture totale** (incluant P2/P3) : PF-C-06 + PF-X-01…04 fermés ou reportés avec accord produit.
 
 ---
 

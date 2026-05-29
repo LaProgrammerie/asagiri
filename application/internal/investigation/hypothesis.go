@@ -23,7 +23,7 @@ type Evidence struct {
 }
 
 // GenerateHypotheses applies deterministic rules from scope and local findings.
-func GenerateHypotheses(scope ResolvedScope, res InvestigationResult) ([]Hypothesis, []Evidence) {
+func GenerateHypotheses(scope ResolvedScope, res InvestigationResult, graph ContextPack) ([]Hypothesis, []Evidence) {
 	var evidence []Evidence
 	eid := 0
 	nextID := func() string {
@@ -52,6 +52,18 @@ func GenerateHypotheses(scope ResolvedScope, res InvestigationResult) ([]Hypothe
 	}
 	for _, c := range scope.Contracts {
 		addEv("contract", "related contract: "+c, c)
+	}
+	for _, api := range graph.APIs {
+		addEv("contract", "knowledge graph API: "+api, api)
+	}
+	for _, ev := range graph.Events {
+		addEv("flow", "knowledge graph event: "+ev, ev)
+	}
+	for _, m := range graph.Metrics {
+		addEv("config", "knowledge graph metric: "+m, m)
+	}
+	for _, logHint := range LinkLogsToFlowEvents(scope.Instruction, graph.Events) {
+		addEv("flow", logHint, scope.Flow)
 	}
 
 	var hyps []Hypothesis
@@ -90,6 +102,13 @@ func GenerateHypotheses(scope ResolvedScope, res InvestigationResult) ([]Hypothe
 		hyps = append(hyps, Hypothesis{
 			ID: "hyp-partial-discovery", Statement: "Investigation incomplete — some collectors failed",
 			Score: 0.55, EvidenceIDs: []string{id}, Category: "meta",
+		})
+	}
+	if len(graph.Risks) > 0 {
+		evIDs := filterEvidenceIDs(evidence, "contract", "flow", "test")
+		hyps = append(hyps, Hypothesis{
+			ID: "hyp-graph-risk", Statement: "Knowledge graph risk: " + graph.Risks[0],
+			Score: score(0.68, len(graph.APIs) > 0), EvidenceIDs: evIDs, Category: "graph",
 		})
 	}
 	if len(hyps) == 0 && len(res.CandidateFiles) > 0 {

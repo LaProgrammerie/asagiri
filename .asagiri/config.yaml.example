@@ -11,6 +11,16 @@ runtime:
   api:
     port: 8765
     socket: .asagiri/runtime/runtime.sock
+  memory:
+    embedder: hash   # hash | ollama | cloud
+    ollama:
+      base_url: http://127.0.0.1:11434
+      model: nomic-embed-text
+    cloud:
+      enabled: false
+      provider: openai
+      model: text-embedding-3-small
+      token_env: OPENAI_API_KEY
 
 intent:
   enabled: true
@@ -259,3 +269,11 @@ policies:
     - database_migration
     - security_sensitive_change
     - dependency_upgrade
+
+replay:
+  capture_prompts: true
+  capture_runtime_events: true
+  capture_agent_outputs: true
+  redact_secrets: true
+  offline_mode_default: false
+  compress_threshold_bytes: 4096

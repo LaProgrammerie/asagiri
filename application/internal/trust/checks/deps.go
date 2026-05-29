@@ -13,9 +13,14 @@ import (
 
 const productsRel = ".asagiri/products"
 
+// KnowledgeBlastRadiusFunc maps a knowledge graph impact to blast radius when graph.sqlite exists.
+type KnowledgeBlastRadiusFunc func(ctx context.Context, repoRoot, flowID string) (BlastRadiusSummary, bool)
+
 // Dependencies groups injectable collaborators for check runners.
 type Dependencies struct {
 	Config *config.Config
+
+	KnowledgeBlastRadius KnowledgeBlastRadiusFunc
 
 	Investigate      func(ctx context.Context, repoRoot, feature, taskID string, cfg *config.Config) (investigation.InvestigationResult, error)
 	BuildDepGraph    func(repoRoot string, files []string) (analysis.Graph, error)

@@ -21,7 +21,10 @@ asa context [flags]
 
 | Flag | Scope | Default | Description |
 | --- | --- | --- | --- |
+| `--action` | Local | `(empty)` | Action dans le flow |
 | `--dry-run` | Inherited | `false` | Simuler les exécutions sans lancer d'agent ni commandes externes |
+| `--flow` | Local | `(empty)` | ID de flow produit |
+| `--from-graph` | Local | `false` | Enrichir le contexte depuis le graphe de connaissance |
 | `--optimize` | Local | `false` | Afficher le résumé tokens |
 | `--show` | Local | `false` | Afficher le contexte pack |
 | `--task` | Local | `(empty)` | ID de tâche |
@@ -62,11 +65,13 @@ asa context
 - [Flows](./flows.mdx)
 - [Graph](./graph.mdx)
 - [Help](./help.mdx)
+- [Impact](./impact.mdx)
 - [Inbox](./inbox.mdx)
 - [Index](./index.mdx)
 - [Init](./init.mdx)
 - [Inspect](./inspect.mdx)
 - [Investigate](./investigate.mdx)
+- [Knowledge](./knowledge.mdx)
 - [Mcp](./mcp.mdx)
 - [Memory](./memory.mdx)
 - [Next](./next.mdx)
@@ -74,6 +79,7 @@ asa context
 - [Pr](./pr.mdx)
 - [Product](./product.mdx)
 - [Prototype](./prototype.mdx)
+- [Replay](./replay.mdx)
 - [Report](./report.mdx)
 - [Resume](./resume.mdx)
 - [Review](./review.mdx)

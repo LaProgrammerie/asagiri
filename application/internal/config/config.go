@@ -46,6 +46,28 @@ type Config struct {
 	Verification   VerificationConfig    `yaml:"verification"`
 	ExecutionGraph ExecutionGraphConfig  `yaml:"execution_graph"`
 	Coordination   CoordinationConfig    `yaml:"coordination"`
+	Knowledge      KnowledgeConfig       `yaml:"knowledge"`
+	Replay         ReplayConfig          `yaml:"replay"`
+}
+
+// KnowledgeConfig holds engineering knowledge graph defaults (spec-my-E, ADR-024).
+type KnowledgeConfig struct {
+	DefaultIncludeFlows     bool `yaml:"default_include_flows"`
+	DefaultIncludeContracts bool `yaml:"default_include_contracts"`
+	DefaultIncludeCode      bool `yaml:"default_include_code"`
+	DefaultIncludeTests     bool `yaml:"default_include_tests"`
+	IncrementalByDefault    bool `yaml:"incremental_by_default"`
+	WarnOnStale             bool `yaml:"warn_on_stale"`
+}
+
+// ReplayConfig holds replay capture defaults (spec-my-F §22).
+type ReplayConfig struct {
+	CapturePrompts         *bool `yaml:"capture_prompts"`
+	CaptureRuntimeEvents     *bool `yaml:"capture_runtime_events"`
+	CaptureAgentOutputs      *bool `yaml:"capture_agent_outputs"`
+	RedactSecrets            *bool `yaml:"redact_secrets"`
+	OfflineModeDefault       bool  `yaml:"offline_mode_default"`
+	CompressThresholdBytes   int   `yaml:"compress_threshold_bytes"`
 }
 
 // CoordinationConfig holds multi-agent coordination defaults (spec-my-D §11).
@@ -98,7 +120,7 @@ type CoordinationMergeConfig struct {
 
 // ExecutionGraphConfig holds execution graph planner defaults (spec-my-C §24).
 type ExecutionGraphConfig struct {
-	Enabled                  bool                   `yaml:"enabled"`
+	Enabled                  *bool                  `yaml:"enabled"`
 	MaxParallel              int                    `yaml:"max_parallel"`
 	DefaultStrategy          string                 `yaml:"default_strategy"`
 	RequireCheckpoints       bool                   `yaml:"require_checkpoints"`
@@ -107,6 +129,14 @@ type ExecutionGraphConfig struct {
 	RequireIsolatedWorktrees bool                   `yaml:"require_isolated_worktrees"`
 	Gates                    ExecutionGraphGates    `yaml:"gates"`
 	Rollback                 ExecutionGraphRollback `yaml:"rollback"`
+}
+
+// IsEnabled reports whether execution graph commands are allowed (default true when unset).
+func (c ExecutionGraphConfig) IsEnabled() bool {
+	if c.Enabled == nil {
+		return true
+	}
+	return *c.Enabled
 }
 
 // ExecutionGraphGates configures trust and approval gates for graph execution.
@@ -405,6 +435,24 @@ func (c *Config) applyDefaults(repoDirName string) {
 	c.applyV3Defaults()
 	c.applyExecutionGraphDefaults()
 	c.applyCoordinationDefaults()
+	c.applyKnowledgeDefaults()
+	c.applyReplayDefaults()
+}
+
+func (c *Config) applyReplayDefaults() {
+	if c.Replay.CompressThresholdBytes == 0 {
+		c.Replay.CompressThresholdBytes = 4096
+	}
+}
+
+func (c *Config) applyKnowledgeDefaults() {
+	if c.Knowledge == (KnowledgeConfig{}) {
+		c.Knowledge = KnowledgeConfig{
+			DefaultIncludeFlows:     true,
+			DefaultIncludeContracts: true,
+			WarnOnStale:             true,
+		}
+	}
 }
 
 func (c *Config) applyCoordinationDefaults() {
@@ -414,6 +462,10 @@ func (c *Config) applyCoordinationDefaults() {
 	if c.Coordination.DefaultIsolation == "" {
 		c.Coordination.DefaultIsolation = "isolated_worktree"
 	}
+	if !c.Coordination.RequireIndependentReview {
+		c.Coordination.RequireIndependentReview = true
+	}
+	// AllowSelfReview defaults to false (Go zero value; spec-my-D §11).
 	if len(c.Coordination.RequireSecurityReviewFor) == 0 {
 		c.Coordination.RequireSecurityReviewFor = []string{
 			"auth",
@@ -427,9 +479,6 @@ func (c *Config) applyCoordinationDefaults() {
 }
 
 func (c *Config) applyExecutionGraphDefaults() {
-	if !c.ExecutionGraph.Enabled {
-		c.ExecutionGraph.Enabled = true
-	}
 	if c.ExecutionGraph.MaxParallel == 0 {
 		c.ExecutionGraph.MaxParallel = 2
 	}
@@ -439,7 +488,7 @@ func (c *Config) applyExecutionGraphDefaults() {
 	if c.ExecutionGraph.StopOnRisk == "" {
 		c.ExecutionGraph.StopOnRisk = "high"
 	}
-	if len(c.ExecutionGraph.Gates.HumanApprovalFor) == 0 {
+	if c.ExecutionGraph.Gates.HumanApprovalFor == nil {
 		c.ExecutionGraph.Gates.HumanApprovalFor = []string{
 			"migration",
 			"security_sensitive",
@@ -639,6 +688,7 @@ func (c *Config) Validate(repoRoot string) error {
 		{"specs.handoff_path", c.Specs.HandoffPath},
 		{"state.path", c.State.Path},
 		{"worktrees.base_path", c.Worktrees.BasePath},
+		{"coordination.handoffs_path", c.Coordination.HandoffsPath},
 	}
 
 	for _, p := range relPaths {
@@ -703,9 +753,6 @@ func (c *Config) validateCoordination() error {
 				return fmt.Errorf("coordination.profiles[%q].isolation: mode inconnu %q", id, p.Isolation)
 			}
 		}
-	}
-	if co.HandoffsPath != "" {
-		// validated when persisted; path may be created on first handoff
 	}
 	return nil
 }

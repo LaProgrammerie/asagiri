@@ -1,0 +1,68 @@
+---
+title: replay-Befehl
+description: Replay-Pakete erstellen, ausführen, vergleichen, erklären und snapshotten.
+---
+
+# `asa replay`
+
+Replay & deterministische Ausführung (`spec-my-F`). Unterschiedlich zu [`asa trust replay`](/docs/de/cli/trust-replay) (nur Trust-Verifikations-Manifeste).
+
+## `create`
+
+```bash
+asa replay create --from-graph graph-2026-05-29-abc12345 \
+  --include-runtime \
+  --include-prompts \
+  --include-events \
+  --json
+```
+
+Quellen (genau eine erforderlich):
+
+- `--from-run <run-id>`
+- `--from-graph <graph-id>`
+- `--from-investigation <investigation-id>`
+
+Schreibt `.asagiri/replays/replay-YYYY-MM-DD-<suffix>/` mit `replay.yaml` und erfassten Unterbäumen.
+
+## `run`
+
+```bash
+asa replay run replay-2026-05-29-abc12345 --offline --dry-run
+asa replay run replay-2026-05-29-abc12345 --simulation
+asa replay run replay-2026-05-29-abc12345 --strict --compare
+```
+
+| Flag | Wirkung |
+|------|---------|
+| `--dry-run` | Paket validieren ohne erneute Ausführung |
+| `--offline` | Keine Cloud-/Extern-Aufrufe |
+| `--simulation` | Nur Graph/Events |
+| `--strict` | Fehler bei Abweichung |
+| `--compare` | Vergleich zur vorherigen Session |
+
+## `compare`
+
+```bash
+asa replay compare replay-2026-05-29-aaa replay-2026-05-29-bbb --json
+```
+
+Zeigt Kosten-Delta, Trust-Diffs, Graph-Änderungen und Abweichungsliste.
+
+## `explain`
+
+```bash
+asa replay explain replay-2026-05-29-aaa replay-2026-05-29-bbb
+```
+
+Lesbare Aufschlüsselung der Abweichungen.
+
+## `snapshot`
+
+```bash
+asa replay snapshot replay-2026-05-29-abc12345 --name before-review
+```
+
+Kopiert das Paket nach `snapshots/before-review/` im Replay-Verzeichnis.
+
+Siehe [Replay-Engine](/docs/de/concepts/replay-engine).

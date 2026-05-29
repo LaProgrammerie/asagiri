@@ -1,0 +1,362 @@
+{
+  "trust_id": "trust-2026-05-29-35de044f",
+  "generated_at": "2026-05-29T08:20:18.914887Z",
+  "flow": "workspace-onboarding",
+  "repository": "/Users/matt/Developer/Divers/hyper-fast-builder",
+  "checks": [
+    {
+      "id": "static-analysis-trust-2026-05-29-35de044f",
+      "name": "Static analysis",
+      "type": "static-analysis",
+      "status": "failed",
+      "confidence": 0,
+      "findings": [
+        {
+          "severity": "error",
+          "category": "implementation.static",
+          "message": "investigation failed: investigation: config nil"
+        }
+      ],
+      "duration": 6083
+    },
+    {
+      "id": "contracts-trust-2026-05-29-35de044f",
+      "name": "Contracts",
+      "type": "contracts",
+      "status": "warn",
+      "confidence": 0.75,
+      "findings": [
+        {
+          "severity": "warning",
+          "category": "architecture.contract",
+          "message": "unresolved contract_ref on step step-2: TODO:auth.signup",
+          "suggested_fix": "resolve contract reference in OpenAPI or events"
+        }
+      ],
+      "evidence": [
+        {
+          "kind": "file",
+          "source": "/Users/matt/Developer/Divers/hyper-fast-builder/.asagiri/products/workspace-saas/contracts/api.openapi.yaml",
+          "summary": "197 bytes"
+        }
+      ],
+      "duration": 3500000
+    },
+    {
+      "id": "flows-trust-2026-05-29-35de044f",
+      "name": "Flow integrity",
+      "type": "flows",
+      "status": "passed",
+      "confidence": 1,
+      "findings": [
+        {
+          "severity": "info",
+          "category": "flow.observability",
+          "message": "flow observability block is empty"
+        }
+      ],
+      "evidence": [
+        {
+          "kind": "graph",
+          "source": "flow",
+          "summary": "5 flow graph nodes"
+        }
+      ],
+      "duration": 2941792
+    },
+    {
+      "id": "permissions-trust-2026-05-29-35de044f",
+      "name": "Permissions",
+      "type": "permissions",
+      "status": "warn",
+      "confidence": 0.75,
+      "findings": [
+        {
+          "severity": "warning",
+          "category": "permissions.flow",
+          "message": "permissions contract has no roles"
+        },
+        {
+          "severity": "warning",
+          "category": "permissions.flow",
+          "message": "sensitive flow steps without requires_authentication"
+        }
+      ],
+      "duration": 3442042
+    },
+    {
+      "id": "observability-trust-2026-05-29-35de044f",
+      "name": "Observability",
+      "type": "observability",
+      "status": "warn",
+      "confidence": 0.75,
+      "findings": [
+        {
+          "severity": "warning",
+          "category": "observability.contract",
+          "message": "observability contract has no requirements"
+        },
+        {
+          "severity": "warning",
+          "category": "observability.flow",
+          "message": "submit_signup.start trace missing for step step-2"
+        },
+        {
+          "severity": "warning",
+          "category": "observability.flow",
+          "message": "submit_signup failure metric missing"
+        },
+        {
+          "severity": "warning",
+          "category": "observability.flow",
+          "message": "flow observability block is empty"
+        }
+      ],
+      "duration": 2948708
+    },
+    {
+      "id": "analytics-trust-2026-05-29-35de044f",
+      "name": "Analytics",
+      "type": "analytics",
+      "status": "warn",
+      "confidence": 0.75,
+      "findings": [
+        {
+          "severity": "warning",
+          "category": "analytics.contract",
+          "message": "events contract is empty"
+        }
+      ],
+      "duration": 3018083
+    },
+    {
+      "id": "architecture-trust-2026-05-29-35de044f",
+      "name": "Architecture",
+      "type": "architecture",
+      "status": "passed",
+      "confidence": 1,
+      "findings": [
+        {
+          "severity": "info",
+          "category": "architecture.flow",
+          "message": "no architecture_implications documented on flow"
+        }
+      ],
+      "evidence": [
+        {
+          "kind": "graph",
+          "source": "ownership",
+          "summary": "206 nodes"
+        },
+        {
+          "kind": "graph",
+          "source": "symbol",
+          "summary": "864 nodes"
+        },
+        {
+          "kind": "graph",
+          "source": "api",
+          "summary": "2 nodes"
+        },
+        {
+          "kind": "graph",
+          "source": "dependency",
+          "summary": "234 nodes"
+        },
+        {
+          "kind": "graph",
+          "source": "event",
+          "summary": "1 nodes"
+        },
+        {
+          "kind": "graph",
+          "source": "flow",
+          "summary": "5 nodes"
+        },
+        {
+          "kind": "graph",
+          "source": "migration",
+          "summary": "5 nodes"
+        }
+      ],
+      "duration": 2727667
+    },
+    {
+      "id": "security-trust-2026-05-29-35de044f",
+      "name": "Security",
+      "type": "security",
+      "status": "failed",
+      "confidence": 0,
+      "findings": [
+        {
+          "severity": "error",
+          "category": "security.flow",
+          "message": "sensitive step step-2 without auth=[REDACTED]"
+        },
+        {
+          "severity": "warning",
+          "category": "security.contract",
+          "message": "unresolved security-sensitive contract: TODO:auth.signup"
+        }
+      ],
+      "duration": 2974833
+    },
+    {
+      "id": "performance-trust-2026-05-29-35de044f",
+      "name": "Performance",
+      "type": "performance",
+      "status": "failed",
+      "confidence": 0,
+      "findings": [
+        {
+          "severity": "error",
+          "category": "performance.static",
+          "message": "investigation: config nil"
+        }
+      ],
+      "duration": 708
+    },
+    {
+      "id": "cost-trust-2026-05-29-35de044f",
+      "name": "Cost",
+      "type": "cost",
+      "status": "passed",
+      "confidence": 1,
+      "duration": 2906959
+    },
+    {
+      "id": "backward-compatibility-trust-2026-05-29-35de044f",
+      "name": "Backward compatibility",
+      "type": "backward-compatibility",
+      "status": "warn",
+      "confidence": 0.75,
+      "findings": [
+        {
+          "severity": "warning",
+          "category": "compatibility.contract",
+          "message": "unresolved contract_ref may break clients: TODO:auth.signup",
+          "suggested_fix": "resolve OpenAPI operation or event reference"
+        }
+      ],
+      "duration": 3232208
+    },
+    {
+      "id": "migration-safety-trust-2026-05-29-35de044f",
+      "name": "Migration safety",
+      "type": "migration-safety",
+      "status": "failed",
+      "confidence": 0,
+      "findings": [
+        {
+          "severity": "error",
+          "category": "migration.dependency",
+          "message": "migration risk high (127 shared modules)"
+        },
+        {
+          "severity": "warning",
+          "category": "migration.dependency",
+          "message": "unresolved contract refs increase migration risk"
+        }
+      ],
+      "duration": 2846334
+    },
+    {
+      "id": "blast-radius-trust-2026-05-29-35de044f",
+      "name": "Blast radius",
+      "type": "blast-radius",
+      "status": "warn",
+      "confidence": 0.75,
+      "findings": [
+        {
+          "severity": "warning",
+          "category": "blast.radius",
+          "message": "public contract risk is high"
+        },
+        {
+          "severity": "info",
+          "category": "blast.radius",
+          "message": "5 flows in impact surface"
+        }
+      ],
+      "evidence": [
+        {
+          "kind": "blast-radius",
+          "source": "workspace-onboarding",
+          "summary": "flows=5 apis=0 modules=127 migration=high contract=high"
+        }
+      ],
+      "duration": 3006584
+    },
+    {
+      "id": "tests-trust-2026-05-29-35de044f",
+      "name": "Tests",
+      "type": "tests",
+      "status": "warn",
+      "confidence": 0.5,
+      "findings": [
+        {
+          "severity": "warning",
+          "category": "implementation.test",
+          "message": "investigation for test scope: investigation: config nil"
+        }
+      ],
+      "evidence": [
+        {
+          "kind": "tests",
+          "source": "/Users/matt/Developer/Divers/hyper-fast-builder",
+          "summary": "0 related test files"
+        }
+      ],
+      "duration": 1411354541
+    }
+  ],
+  "confidence": {
+    "architecture": 0.56375,
+    "implementation": 0,
+    "flow_integrity": 0.5786206896551724,
+    "observability": 0.3558620689655171,
+    "security": 0,
+    "regression": 0,
+    "overall": 0.24970545977011493,
+    "limits": [
+      "confidence aggregated from verification checks with per-dimension weighting (spec §7, §11)"
+    ]
+  },
+  "blast_radius": {
+    "flows_impacted": 5,
+    "critical_apis": 0,
+    "shared_modules": 127,
+    "migration_risk": "high",
+    "public_contract_risk": "high"
+  },
+  "warnings": [
+    "confidence aggregated from verification checks with per-dimension weighting (spec §7, §11)"
+  ],
+  "residual_risk": "high",
+  "gate": {
+    "status": "not_configured",
+    "reason": "verification gates not configured"
+  },
+  "suggested_reviews": [
+    {
+      "kind": "product",
+      "reason": "overall confidence 25% below 70%"
+    },
+    {
+      "kind": "architecture",
+      "reason": "elevated blast radius on flows or public contracts"
+    },
+    {
+      "kind": "observability",
+      "reason": "observability check: observability contract has no requirements"
+    },
+    {
+      "kind": "security",
+      "reason": "security check: sensitive step step-2 without auth=[REDACTED]"
+    },
+    {
+      "kind": "performance",
+      "reason": "performance check: investigation: config nil"
+    }
+  ]
+}

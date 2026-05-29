@@ -55,7 +55,7 @@ func TestApplyRiskEnrichmentAddsManualApproval(t *testing.T) {
 		Sensitive: true,
 	}}
 
-	updated, edges := ApplyRiskEnrichment(nodes, bindings, nil)
+	updated, edges := ApplyRiskEnrichment(nodes, bindings, nil, nil)
 	require.Len(t, updated, 3)
 	require.Equal(t, NodeTypeManualApproval, updated[2].Type)
 	require.Equal(t, "manual-approval", updated[2].ID)

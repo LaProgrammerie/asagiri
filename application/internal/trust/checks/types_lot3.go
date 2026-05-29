@@ -30,7 +30,7 @@ var Lot3RunnerTypes = []string{
 // AllRegisteredCheckTypes returns lot-2 + lot-3 check type ids in pipeline order.
 func AllRegisteredCheckTypes() []string {
 	out := make([]string, 0, 4+len(Lot3RunnerTypes))
-	out = append(out, typeStaticAnalysis, typeContracts, typeFlows)
+	out = append(out, typeStaticAnalysis, typeContracts, typeFlows, typeKnowledgeGraph)
 	out = append(out, Lot3RunnerTypes...)
 	out = append(out, typeTests)
 	return out

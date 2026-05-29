@@ -1,0 +1,49 @@
+---
+title: Engineering knowledge graph
+description: Local-first structural graph linking product flows, contracts, code, tests, and operations.
+---
+
+# Engineering knowledge graph
+
+`spec-my-E` — builds a **queryable graph** in `.asagiri/knowledge/` so agents reason over relationships, not isolated files.
+
+## Principles
+
+- **Local-first** — SQLite (`graph.sqlite`) plus JSON export (`graph.json`).
+- **Hybrid IDs** — `type:stable_key` (e.g. `flow:onboarding`, `action:invite_member`).
+- **Provenance** — every node and edge records source path, extractor, and confidence.
+- **Incremental** — `asa knowledge build --incremental` skips extractors whose source mtimes are unchanged.
+- **Staleness** — warns when flows, contracts, code, or tests changed after the last build.
+
+## Pipeline
+
+```text
+.asagiri/products (flows, contracts) + repo code/tests
+  → asa knowledge build
+  → graph.sqlite + graph.json
+  → query / impact / explain / snapshot
+  → investigation, trust, execution graph, coordination (--from-graph)
+```
+
+## CLI
+
+| Command | Purpose |
+|---------|---------|
+| `asa knowledge build` | Extract and upsert the graph (`--include-flows`, `--include-code`, `--incremental`, `--json`) |
+| `asa knowledge query` | Phrase or flag-based queries |
+| `asa knowledge explain` | Shortest path between flow/action and a symbol |
+| `asa knowledge snapshot --name` | Named snapshot under `snapshots/<name>/` |
+| `asa impact analyze` | Impact of a file, flow, or action |
+
+## Artefacts
+
+```text
+.asagiri/knowledge/
+  graph.sqlite
+  graph.json
+  snapshots/<name>/
+    metadata.json
+    graph.json
+```
+
+See [Configuration — `knowledge`](/docs/configuration/config-file#knowledge), [`asa knowledge`](/docs/cli/knowledge), and [`asa impact`](/docs/cli/impact).

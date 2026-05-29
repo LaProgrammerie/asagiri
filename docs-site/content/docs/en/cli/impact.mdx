@@ -1,0 +1,19 @@
+---
+title: impact command
+description: Analyze change impact using the knowledge graph.
+---
+
+# `asa impact analyze`
+
+Impact analysis (`spec-my-E` §14).
+
+```bash
+asa impact analyze --file internal/invitation/invitation_service.go
+asa impact analyze --flow onboarding --action invite_member --json
+```
+
+Requires a built knowledge graph (`asa knowledge build` first).
+
+Lists impacted flows, API operations, events, tests, risk level, and recommended checks.
+
+See [Engineering knowledge graph](/docs/concepts/engineering-knowledge-graph).

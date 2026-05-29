@@ -137,6 +137,9 @@ func (a *DefaultAssigner) Assign(_ context.Context, node GraphNode) (AgentAssign
 		return AgentAssignment{}, err
 	}
 	isolation := cfg.DefaultIsolation
+	if isolation == "" {
+		isolation = IsolationIsolatedWorktree
+	}
 	if err := ValidateIsolation(isolation); err != nil {
 		return AgentAssignment{}, err
 	}
@@ -162,6 +165,115 @@ func (a *DefaultAssigner) Assign(_ context.Context, node GraphNode) (AgentAssign
 		}
 	}
 
+	return AgentAssignment{
+		NodeID:    node.ID,
+		AgentRef:  agentRef,
+		Role:      role,
+		Isolation: isolation,
+		ProfileID: profileID,
+	}, nil
+}
+
+// ScoringAssigner picks the best matching profile for a role using multi-criteria scoring.
+type ScoringAssigner struct {
+	Config  AssignerConfig
+	History AssignmentHistory
+}
+
+// Assign scores profiles for the node role and returns the highest-scoring assignment.
+func (a *ScoringAssigner) Assign(ctx context.Context, node GraphNode) (AgentAssignment, error) {
+	if node.ID == "" {
+		return AgentAssignment{}, fmt.Errorf("%w: node id required", ErrInvalidAssignment)
+	}
+	cfg := a.Config
+	role := RoleForNodeType(node.Type)
+	if err := ValidateRole(role); err != nil {
+		return AgentAssignment{}, err
+	}
+
+	candidates := profilesForRole(cfg.Profiles, role)
+	if len(candidates) == 0 {
+		return (&DefaultAssigner{Config: cfg}).Assign(ctx, node)
+	}
+
+	key := assignmentKey(node)
+	bestID := ""
+	bestScore := -1
+	for id, p := range candidates {
+		score := scoreProfile(id, p, node, key, cfg.Assignment, a.History)
+		if score > bestScore {
+			bestScore = score
+			bestID = id
+		}
+	}
+	if bestID == "" {
+		return (&DefaultAssigner{Config: cfg}).Assign(ctx, node)
+	}
+	return assignmentFromProfile(node, role, bestID, candidates[bestID], cfg)
+}
+
+func profilesForRole(profiles map[string]AgentProfile, role AgentRole) map[string]AgentProfile {
+	out := make(map[string]AgentProfile)
+	for id, p := range profiles {
+		if p.Role == role {
+			out[id] = p
+		}
+	}
+	return out
+}
+
+func scoreProfile(profileID string, p AgentProfile, node GraphNode, assignKey string, assignment map[string]string, history AssignmentHistory) int {
+	score := 0
+	if assignKey != "" {
+		if override, ok := assignment[assignKey]; ok && strings.TrimSpace(override) == p.Agent {
+			score += 100
+		}
+	}
+	if history != nil {
+		rate := history.SuccessRate(p.Agent, p.Role)
+		score += int(rate * 25)
+	}
+	if p.MaxContextTokens > 0 {
+		need := estimateTokensFromOutputs(node.Outputs)
+		if need <= p.MaxContextTokens {
+			score += 20
+		} else {
+			score -= 50
+		}
+	}
+	if p.Isolation != "" {
+		score += 5
+	}
+	if profileID != "" {
+		score += 1
+	}
+	switch node.Risk {
+	case executiongraph.RiskLevelHigh, executiongraph.RiskLevelCritical:
+		if strings.Contains(profileID, "high") || strings.Contains(p.Agent, "claude") {
+			score += 15
+		}
+	}
+	return score
+}
+
+func assignmentFromProfile(node GraphNode, role AgentRole, profileID string, p AgentProfile, cfg AssignerConfig) (AgentAssignment, error) {
+	isolation := cfg.DefaultIsolation
+	if isolation == "" {
+		isolation = IsolationIsolatedWorktree
+	}
+	if p.Isolation != "" {
+		if err := ValidateIsolation(p.Isolation); err != nil {
+			return AgentAssignment{}, err
+		}
+		isolation = p.Isolation
+	}
+	if err := ValidateIsolation(isolation); err != nil {
+		return AgentAssignment{}, err
+	}
+	agentRef := p.Agent
+	if agentRef == "" {
+		agentRef = executiongraph.DefaultAgentFor(node, nil)
+	}
 	return AgentAssignment{
 		NodeID:    node.ID,
 		AgentRef:  agentRef,

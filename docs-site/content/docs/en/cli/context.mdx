@@ -1,0 +1,36 @@
+---
+title: context command
+description: Build agent context packs from the engineering knowledge graph.
+---
+
+# `asa context`
+
+Context retrieval for agents (`spec-my-E` §15). Combines local investigation artefacts with the engineering knowledge graph when available.
+
+## `context build`
+
+Build a context pack from the knowledge graph (no `--show` / `--optimize` required):
+
+```bash
+asa context build --from-graph --flow onboarding --action invite_member
+```
+
+Output includes relevant files, symbols, tests, contracts, flows, events, metrics, and graph-derived risks.
+
+## Merge with investigation
+
+```bash
+asa context "invite regression" --show --from-graph --flow onboarding --action invite_member
+```
+
+Runs local investigation, merges graph scope, then prints the markdown context pack.
+
+## Prerequisites
+
+```bash
+asa knowledge build --include-flows --include-contracts --include-code --include-tests
+```
+
+Requires `.asagiri/knowledge/graph.sqlite` (or loads from a prior `knowledge build`).
+
+See [Engineering knowledge graph](/docs/concepts/engineering-knowledge-graph) and [`asa knowledge`](/docs/cli/knowledge).

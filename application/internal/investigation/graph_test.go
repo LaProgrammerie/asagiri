@@ -18,7 +18,10 @@ func TestBuildRootCauseGraph(t *testing.T) {
 		Hypotheses: []investigation.Hypothesis{{ID: "h1", Statement: "email not sent", Score: 0.8}},
 		LocalResult: investigation.InvestigationResult{CandidateFiles: []string{"application/internal/foo.go"}},
 	}
-	g := investigation.BuildRootCauseGraph(rep)
+	g := investigation.BuildRootCauseGraph(rep, investigation.ContextPack{
+		APIs:   []string{"POST /invitations"},
+		Events: []string{"member.invited"},
+	})
 	require.NotEmpty(t, g.Nodes)
 	require.NotEmpty(t, g.Edges)
 }

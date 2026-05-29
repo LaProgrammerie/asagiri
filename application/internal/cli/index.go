@@ -10,8 +10,12 @@ import (
 
 func newIndexCmd(dryRun *bool) *cobra.Command {
 	return &cobra.Command{
-		Use:   "index",
-		Short: "Indexer le dépôt pour le RAG local (spec §10.3)",
+		Use:     "index",
+		Short:   "Indexer le dépôt pour le RAG local par mots-clés (spec §10.3)",
+		Example: "  asa index\n  asa index --dry-run\n  # Recherche sémantique (mémoire runtime, pas l'index RAG) :\n  asa memory list --query \"auth middleware\"",
+		Long: `Indexe le dépôt dans .asagiri/index/chunks.sqlite (recherche LIKE).
+
+Pour la mémoire runtime sémantique (embeddings PF-A-01), utiliser asa memory reindex après runtime.memory.embedder.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			startDir, err := os.Getwd()
 			if err != nil {

@@ -165,7 +165,7 @@ execution_graph:
 	if err != nil {
 		t.Fatalf("Load: %v", err)
 	}
-	if !cfg.ExecutionGraph.Enabled {
+	if !cfg.ExecutionGraph.IsEnabled() {
 		t.Fatal("expected execution graph enabled")
 	}
 	if cfg.ExecutionGraph.MaxParallel != 3 {
@@ -194,8 +194,36 @@ execution_graph:
 	}
 }
 
+func TestExecutionGraphDisabledPreservesFalse(t *testing.T) {
+	repo := t.TempDir()
+	cfgPath := filepath.Join(repo, ".asagiri", "config.yaml")
+	if err := os.MkdirAll(filepath.Dir(cfgPath), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(cfgPath, []byte(`project:
+  name: graph-off
+state:
+  backend: sqlite
+  path: .asagiri/state.sqlite
+execution_graph:
+  enabled: false
+`), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	cfg, err := Load(cfgPath, repo)
+	if err != nil {
+		t.Fatalf("Load: %v", err)
+	}
+	if cfg.ExecutionGraph.IsEnabled() {
+		t.Fatal("expected execution graph disabled")
+	}
+}
+
 func TestExecutionGraphDefaults(t *testing.T) {
 	cfg := NewTestConfig("proj")
+	if !cfg.ExecutionGraph.IsEnabled() {
+		t.Fatal("expected execution graph enabled by default")
+	}
 	if cfg.ExecutionGraph.MaxParallel != 2 {
 		t.Fatalf("default max_parallel: got %d", cfg.ExecutionGraph.MaxParallel)
 	}
@@ -204,6 +232,152 @@ func TestExecutionGraphDefaults(t *testing.T) {
 	}
 	if cfg.ExecutionGraph.StopOnRisk != "high" {
 		t.Fatalf("default stop_on_risk: got %q", cfg.ExecutionGraph.StopOnRisk)
+	}
+}
+
+func TestCoordinationDefaults(t *testing.T) {
+	cfg := NewTestConfig("proj")
+	if cfg.Coordination.MaxParallelAgents != 2 {
+		t.Fatalf("max_parallel_agents: got %d", cfg.Coordination.MaxParallelAgents)
+	}
+	if cfg.Coordination.DefaultIsolation != "isolated_worktree" {
+		t.Fatalf("default_isolation: got %q", cfg.Coordination.DefaultIsolation)
+	}
+	if len(cfg.Coordination.RequireSecurityReviewFor) != 3 {
+		t.Fatalf("require_security_review_for: got %v", cfg.Coordination.RequireSecurityReviewFor)
+	}
+	if !cfg.Coordination.RequireIndependentReview {
+		t.Fatal("expected require_independent_review true by default")
+	}
+	if cfg.Coordination.AllowSelfReview {
+		t.Fatal("expected allow_self_review false by default")
+	}
+}
+
+func TestLoadCoordinationConfig(t *testing.T) {
+	dir := t.TempDir()
+	repo := filepath.Join(dir, "proj")
+	requireDirs(t, repo)
+	cfgPath := filepath.Join(repo, ".asagiri", "config.yaml")
+	if err := os.WriteFile(cfgPath, []byte(`
+project:
+  name: coord-test
+state:
+  backend: sqlite
+  path: .asagiri/state.sqlite
+agents:
+  cursor:
+    command: cursor-agent
+  codex:
+    command: codex
+coordination:
+  max_parallel_agents: 3
+  default_isolation: readonly
+  require_independent_review: true
+  allow_self_review: false
+  assignment:
+    investigation: local
+  profiles:
+    cursor-impl:
+      agent: cursor
+      role: implementer
+`), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	cfg, err := Load(cfgPath, repo)
+	if err != nil {
+		t.Fatalf("Load: %v", err)
+	}
+	if cfg.Coordination.MaxParallelAgents != 3 {
+		t.Fatalf("max_parallel_agents: got %d", cfg.Coordination.MaxParallelAgents)
+	}
+	if cfg.Coordination.DefaultIsolation != "readonly" {
+		t.Fatalf("default_isolation: got %q", cfg.Coordination.DefaultIsolation)
+	}
+	if cfg.Coordination.Assignment["investigation"] != "local" {
+		t.Fatalf("assignment: got %v", cfg.Coordination.Assignment)
+	}
+	if cfg.Coordination.Profiles["cursor-impl"].Agent != "cursor" {
+		t.Fatalf("profile agent: got %q", cfg.Coordination.Profiles["cursor-impl"].Agent)
+	}
+	if !cfg.Coordination.RequireIndependentReview {
+		t.Fatal("expected require_independent_review true")
+	}
+	if cfg.Coordination.AllowSelfReview {
+		t.Fatal("expected allow_self_review false")
+	}
+}
+
+func TestCoordinationInvalidDefaultIsolationRejected(t *testing.T) {
+	dir := t.TempDir()
+	repo := filepath.Join(dir, "proj")
+	requireDirs(t, repo)
+	cfgPath := filepath.Join(repo, ".asagiri", "config.yaml")
+	if err := os.WriteFile(cfgPath, []byte(`
+project:
+  name: coord-bad-isolation
+state:
+  backend: sqlite
+  path: .asagiri/state.sqlite
+coordination:
+  default_isolation: container
+`), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	if _, err := Load(cfgPath, repo); err == nil {
+		t.Fatal("expected validation error for unknown default_isolation")
+	}
+}
+
+func TestCoordinationProfileUnknownAgentRejected(t *testing.T) {
+	dir := t.TempDir()
+	repo := filepath.Join(dir, "proj")
+	requireDirs(t, repo)
+	cfgPath := filepath.Join(repo, ".asagiri", "config.yaml")
+	if err := os.WriteFile(cfgPath, []byte(`
+project:
+  name: coord-bad
+state:
+  backend: sqlite
+  path: .asagiri/state.sqlite
+agents:
+  cursor:
+    command: cursor-agent
+coordination:
+  profiles:
+    ghost:
+      agent: missing-agent
+      role: reviewer
+`), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	if _, err := Load(cfgPath, repo); err == nil {
+		t.Fatal("expected validation error for unknown profile agent")
+	}
+}
+
+func TestCoordinationHandoffsPathTraversalRejected(t *testing.T) {
+	dir := t.TempDir()
+	repo := filepath.Join(dir, "proj")
+	requireDirs(t, repo)
+	cfgPath := filepath.Join(repo, ".asagiri", "config.yaml")
+	if err := os.WriteFile(cfgPath, []byte(`
+project:
+  name: coord-traversal
+state:
+  backend: sqlite
+  path: .asagiri/state.sqlite
+coordination:
+  handoffs_path: ../../../tmp/evil-handoffs
+`), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	if _, err := Load(cfgPath, repo); err == nil {
+		t.Fatal("expected validation error for handoffs_path traversal")
 	}
 }
 
@@ -248,6 +422,20 @@ func requireDirs(t *testing.T, repo string) {
 	t.Helper()
 	if err := os.MkdirAll(filepath.Join(repo, ".asagiri"), 0o755); err != nil {
 		t.Fatal(err)
+	}
+}
+
+func TestApplyKnowledgeDefaults(t *testing.T) {
+	cfg := &Config{}
+	cfg.applyKnowledgeDefaults()
+	if !cfg.Knowledge.DefaultIncludeFlows || !cfg.Knowledge.DefaultIncludeContracts {
+		t.Fatal("expected default include flows and contracts")
+	}
+	if !cfg.Knowledge.WarnOnStale {
+		t.Fatal("expected warn_on_stale default true")
+	}
+	if cfg.Knowledge.DefaultIncludeCode || cfg.Knowledge.IncrementalByDefault {
+		t.Fatal("expected code and incremental defaults false")
 	}
 }
 

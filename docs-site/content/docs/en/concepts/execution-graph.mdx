@@ -59,6 +59,10 @@ Each plan writes under `.asagiri/graphs/<graph-id>/`:
 
 Defaults live in [`execution_graph`](/docs/configuration/config-file#execution_graph) inside `.asagiri/config.yaml`.
 
+- **`enabled: false`** — disables `plan graph` and all `graph` subcommands with a clear error.
+- **`gates`** — `trust_required_for_high_risk`, `human_approval_for` feed planner enrichment and the runner (`trust.Engine`).
+- **`asa graph run --checkpoint-every`** — `node` or `group` persists checkpoints for [`asa graph resume`](/docs/cli/graph-resume) (resume fails if none exist).
+
 ## Code layout
 
 ```text

@@ -35,7 +35,22 @@ workers execute whitelisted asa hooks
 | Cross-run learning | `asa memory list` |
 | Reactive automation | hooks on `session.created`, `flow.completed` |
 
+## Memory embeddings
+
+Scoped memory supports pluggable vector backends (`runtime.memory.embedder`):
+
+| Value | Use case |
+|-------|----------|
+| `hash` | Offline deterministic vectors (default, CI-safe) |
+| `ollama` | Local semantic embeddings via Ollama |
+| `cloud` | OpenAI-compatible API — only when `cloud.enabled: true` |
+
+After changing embedder, run `asa memory reindex`. Query with `asa memory list --query "..."` (cosine similarity on stored vectors).
+
+See [Configuration](/docs/configuration/config-file#runtime) and ADR-025.
+
 ## Related
 
 - [Runtime CLI](/docs/cli/runtime)
 - [Investigation](/docs/concepts/investigation)
+- [TypeScript SDK](/docs/reference/typescript-sdk)

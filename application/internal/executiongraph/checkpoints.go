@@ -1,6 +1,26 @@
 package executiongraph
 
-import "sort"
+import (
+	"fmt"
+	"sort"
+	"strings"
+)
+
+// Checkpoint cadence values for RunOptions.CheckpointEvery (spec §5.3).
+const (
+	CheckpointEveryNode  = "node"
+	CheckpointEveryGroup = "group"
+)
+
+// ValidateCheckpointEvery reports whether a CLI checkpoint-every value is allowed.
+func ValidateCheckpointEvery(value string) error {
+	switch strings.TrimSpace(strings.ToLower(value)) {
+	case "", CheckpointEveryNode, CheckpointEveryGroup:
+		return nil
+	default:
+		return fmt.Errorf("invalid checkpoint-every %q: want %q or %q", value, CheckpointEveryNode, CheckpointEveryGroup)
+	}
+}
 
 // checkpointNodeTypes defines node types that always produce a resumable checkpoint.
 var checkpointNodeTypes = map[NodeType]bool{
@@ -44,6 +64,23 @@ func shouldCheckpoint(node GraphNode) bool {
 		return true
 	}
 	return riskRank(node.Risk) >= riskRank(RiskLevelHigh)
+}
+
+// ShouldPersistCheckpoint decides whether to write a checkpoint after nodeID completes.
+func ShouldPersistCheckpoint(graph ExecutionGraph, nodeID, every string) bool {
+	switch strings.TrimSpace(strings.ToLower(every)) {
+	case CheckpointEveryNode:
+		return true
+	case CheckpointEveryGroup:
+		return false
+	default:
+		return shouldPersistCheckpoint(graph, nodeID)
+	}
+}
+
+// ShouldPersistGroupCheckpoint is true when cadence is per parallel group.
+func ShouldPersistGroupCheckpoint(every string) bool {
+	return strings.TrimSpace(strings.ToLower(every)) == CheckpointEveryGroup
 }
 
 func topologicalNodeOrder(nodes []GraphNode, edges []GraphEdge) []string {

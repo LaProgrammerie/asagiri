@@ -1,0 +1,68 @@
+---
+title: replay command
+description: Create, run, compare, explain, and snapshot engineering replay packages.
+---
+
+# `asa replay`
+
+Replay & deterministic execution (`spec-my-F`). Distinct from [`asa trust replay`](/docs/cli/trust-replay) (trust verification manifests only).
+
+## `create`
+
+```bash
+asa replay create --from-graph graph-2026-05-29-abc12345 \
+  --include-runtime \
+  --include-prompts \
+  --include-events \
+  --json
+```
+
+Sources (exactly one required):
+
+- `--from-run <run-id>`
+- `--from-graph <graph-id>`
+- `--from-investigation <investigation-id>`
+
+Writes `.asagiri/replays/replay-YYYY-MM-DD-<suffix>/` with `replay.yaml` and captured subtrees.
+
+## `run`
+
+```bash
+asa replay run replay-2026-05-29-abc12345 --offline --dry-run
+asa replay run replay-2026-05-29-abc12345 --simulation
+asa replay run replay-2026-05-29-abc12345 --strict --compare
+```
+
+| Flag | Effect |
+|------|--------|
+| `--dry-run` | Validate package without re-execution |
+| `--offline` | No cloud or external calls |
+| `--simulation` | Replay graph/events only (no agents) |
+| `--strict` | Fail on divergence |
+| `--compare` | Attach comparison vs prior session |
+
+## `compare`
+
+```bash
+asa replay compare replay-2026-05-29-aaa replay-2026-05-29-bbb --json
+```
+
+Shows cost delta, trust dimension diffs, graph changes, and divergence list.
+
+## `explain`
+
+```bash
+asa replay explain replay-2026-05-29-aaa replay-2026-05-29-bbb
+```
+
+Human-readable divergence breakdown (same engine as `compare`).
+
+## `snapshot`
+
+```bash
+asa replay snapshot replay-2026-05-29-abc12345 --name before-review
+```
+
+Copies the package under `snapshots/before-review/` inside the replay directory.
+
+See [Replay engine](/docs/concepts/replay-engine).

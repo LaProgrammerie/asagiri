@@ -1,0 +1,46 @@
+id: graph-2026-05-29-61f99ccd
+product: workspace-saas
+flow: workspace-onboarding
+status: planned
+created_at: "2026-05-29T11:24:57Z"
+strategy:
+    max_parallel: 2
+    stop_on_risk: high
+    strict_trust: true
+    budget: 0.5
+nodes:
+    - id: investigate-onboarding
+      type: investigation
+      title: Investigate onboarding flow
+      agent: local
+      risk: low
+      estimated_duration: 30s
+    - id: verify-onboarding-flow
+      type: validation
+      title: Verify onboarding flow integrity
+      agent: local
+      risk: medium
+      estimated_cost: 0.01
+      estimated_duration: 2m
+      required_checks:
+        - flows
+        - observability
+    - id: validate:post__api_workspaces
+      type: validation
+      title: 'Knowledge graph validation: validate:post__api_workspaces'
+      status: pending
+      risk: medium
+      required_checks:
+        - knowledge-graph
+        - tests
+edges:
+    - from: investigate-onboarding
+      to: validate:post__api_workspaces
+      type: validates
+      reason: 'knowledge graph: API without linked test'
+checkpoints:
+    - after: investigate-onboarding
+    - after: verify-onboarding-flow
+rollback:
+    strategy: worktree_reset
+    preserve_reports: true

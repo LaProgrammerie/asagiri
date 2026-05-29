@@ -37,6 +37,30 @@ func FormatContextPackMarkdown(rep Report, pack ContextPack) string {
 			b.WriteString("- `" + t + "`\n")
 		}
 	}
+	if len(pack.APIs) > 0 {
+		b.WriteString("\n## API operations\n\n")
+		for _, api := range pack.APIs {
+			b.WriteString("- " + api + "\n")
+		}
+	}
+	if len(pack.Events) > 0 {
+		b.WriteString("\n## Events\n\n")
+		for _, ev := range pack.Events {
+			b.WriteString("- " + ev + "\n")
+		}
+	}
+	if len(pack.Metrics) > 0 {
+		b.WriteString("\n## Metrics\n\n")
+		for _, m := range pack.Metrics {
+			b.WriteString("- " + m + "\n")
+		}
+	}
+	if len(pack.Risks) > 0 {
+		b.WriteString("\n## Risks\n\n")
+		for _, r := range pack.Risks {
+			b.WriteString("- " + r + "\n")
+		}
+	}
 	if len(rep.Hypotheses) > 0 {
 		b.WriteString("\n## Hypotheses (scored)\n\n")
 		for _, h := range rep.Hypotheses {

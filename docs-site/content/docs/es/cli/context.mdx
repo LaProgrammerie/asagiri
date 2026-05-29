@@ -1,0 +1,36 @@
+---
+title: comando context
+description: Construir paquetes de contexto para agentes desde el grafo de conocimiento.
+---
+
+# `asa context`
+
+Recuperación de contexto para agentes (`spec-my-E` §15). Combina artefactos de investigación local con el grafo de conocimiento de ingeniería cuando está disponible.
+
+## `context build`
+
+Construir un paquete de contexto desde el grafo (sin `--show` / `--optimize`):
+
+```bash
+asa context build --from-graph --flow onboarding --action invite_member
+```
+
+La salida incluye archivos, símbolos, tests, contratos, flows, eventos, métricas y riesgos derivados del grafo.
+
+## Combinar con investigación
+
+```bash
+asa context "regresión invite" --show --from-graph --flow onboarding --action invite_member
+```
+
+Ejecuta la investigación local, fusiona el alcance del grafo e imprime el paquete markdown.
+
+## Requisitos previos
+
+```bash
+asa knowledge build --include-flows --include-contracts --include-code --include-tests
+```
+
+Requiere `.asagiri/knowledge/graph.sqlite` (o un `knowledge build` previo).
+
+Ver [Grafo de conocimiento](/docs/concepts/engineering-knowledge-graph) y [`asa knowledge`](/docs/cli/knowledge).

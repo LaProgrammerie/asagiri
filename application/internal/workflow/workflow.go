@@ -574,10 +574,23 @@ func (s *Service) ResumeRun(runID string, force bool) (string, error) {
 	return next, nil
 }
 
+// ResumeRunExecute runs the next workflow step (agents invoked when not in dry-run).
+func (s *Service) ResumeRunExecute(ctx context.Context, runID string, force bool) (string, error) {
+	run, err := s.store.GetRun(runID)
+	if err != nil {
+		return "", err
+	}
+	step, err := s.ResumeRun(runID, force)
+	if err != nil || step == "" {
+		return step, err
+	}
+	return step, s.executeResumeStep(ctx, run, step, force)
+}
+
 // ResumeRunDryExecute simulates continuing from the next workflow step (dry-run only).
 func (s *Service) ResumeRunDryExecute(ctx context.Context, runID string, force bool) (string, error) {
 	if !s.dryRun {
-		return "", fmt.Errorf("reprise automatique réservée au mode --dry-run pour l'instant")
+		return "", fmt.Errorf("reprise dry-run: service must be constructed with dryRun=true")
 	}
 	run, err := s.store.GetRun(runID)
 	if err != nil {
@@ -587,23 +600,32 @@ func (s *Service) ResumeRunDryExecute(ctx context.Context, runID string, force b
 	if err != nil || step == "" {
 		return step, err
 	}
+	return step, s.executeResumeStep(ctx, run, step, force)
+}
+
+func (s *Service) executeResumeStep(ctx context.Context, run *sqlite.Run, step string, force bool) error {
 	switch step {
 	case "plan":
-		_, _, err = s.PlanFeature(run.Feature)
+		_, _, err := s.PlanFeature(run.Feature)
+		return err
 	case "enrich":
-		_, err = s.EnrichFeature(ctx, run.Feature, "", "ollama", force)
+		_, err := s.EnrichFeature(ctx, run.Feature, "", "ollama", force)
+		return err
 	case "dev":
-		_, err = s.DevFeature(ctx, run.Feature, "", "cursor", force)
+		_, err := s.DevFeature(ctx, run.Feature, "", "cursor", force)
+		return err
 	case "verify":
-		_, err = s.VerifyFeature(ctx, run.Feature, "", force)
+		_, err := s.VerifyFeature(ctx, run.Feature, "", force)
+		return err
 	case "review":
-		_, err = s.ReviewFeature(ctx, run.Feature, "", "codex", force)
+		_, err := s.ReviewFeature(ctx, run.Feature, "", "codex", force)
+		return err
 	case "report":
-		_, _, err = s.GenerateReport(runID)
+		_, _, err := s.GenerateReport(run.ID)
+		return err
 	default:
-		return step, nil
+		return nil
 	}
-	return step, err
 }
 
 func (s *Service) GenerateReport(runID string) (string, string, error) {

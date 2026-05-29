@@ -1,0 +1,20 @@
+{
+  "built_at": "2026-05-29T10:07:36Z",
+  "edges": 7789,
+  "include_adr": false,
+  "include_code": true,
+  "include_contracts": true,
+  "include_flows": true,
+  "include_infra": false,
+  "include_runtime": false,
+  "include_tests": true,
+  "nodes": 2564,
+  "rebuilt": true,
+  "scope": "workspace-saas",
+  "source_mtimes": {
+    "code": 1780049187,
+    "contracts": 1779891584,
+    "flows": 1779891584,
+    "tests": 1780049217
+  }
+}

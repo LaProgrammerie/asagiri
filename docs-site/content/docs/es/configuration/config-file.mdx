@@ -29,7 +29,19 @@ runtime:
   api:
     port: 8765
     socket: .asagiri/runtime/runtime.sock
+  memory:
+    embedder: hash   # hash | ollama | cloud
+    ollama:
+      base_url: http://127.0.0.1:11434
+      model: nomic-embed-text
+    cloud:
+      enabled: false
+      provider: openai
+      model: text-embedding-3-small
+      token_env: OPENAI_API_KEY
 ```
+
+`runtime.memory.embedder` elige el backend de vectores para memoria persistente y `asa memory list --query`. Tras un cambio: `asa memory reindex`. Cloud solo con `cloud.enabled: true`.
 
 Ver [Comandos runtime](/docs/es/cli/runtime) y [runtime serve](/docs/es/cli/runtime-serve).
 
@@ -148,6 +160,116 @@ verification:
 - `required_checks` — ids de checks del registro trust (p. ej. `contracts`, `flows`, `security`)
 
 Ver [Motor de confianza](/docs/es/concepts/trust-engine), [`asa verify trust`](/docs/es/cli/verify-trust) y [`asa trust gates`](/docs/es/cli/trust-gates).
+
+## `coordination`
+
+Valores por defecto de coordinación multiagente (`spec-my-D` §11). Controla agentes en paralelo, políticas de revisión, asignación rol→agente, perfiles y orden del pipeline sobre el grafo de ejecución.
+
+```yaml
+coordination:
+  max_parallel_agents: 2
+  default_isolation: isolated_worktree
+  require_independent_review: true
+  allow_self_review: false
+  require_security_review_for:
+    - auth
+    - permissions
+    - payments
+  assignment:
+    investigation: local
+    architecture_review: claude
+    implementation.medium: cursor
+    implementation.high: claude
+    security_review: codex
+    validation: local
+  profiles:
+    cursor-implementer:
+      agent: cursor
+      role: implementer
+      capabilities:
+        - implementation
+      restrictions:
+        - no_git_push
+      max_context_tokens: 128000
+      isolation: isolated_worktree
+    codex-reviewer:
+      agent: codex
+      role: reviewer
+      capabilities:
+        - architecture_review
+        - flow_review
+        - contract_review
+      restrictions:
+        - no_direct_write
+        - no_git_push
+      max_context_tokens: 32000
+      isolation: readonly
+    claude-architect:
+      agent: claude
+      role: architect
+      capabilities:
+        - architecture_review
+      isolation: isolated_worktree
+  pipeline:
+    - investigator
+    - architect
+    - implementer
+    - reviewer
+    - validator
+```
+
+- `max_parallel_agents` — tope de agentes coordinados en paralelo (alineado con `execution_graph.max_parallel`)
+- `default_isolation` — `shared`, `isolated_worktree`, `readonly` o `sandbox`
+- `require_independent_review` / `allow_self_review` — reglas de validación cruzada implementer/reviewer
+- `require_security_review_for` — subcadenas de id de flow que activan revisión de seguridad
+- `assignment` — overrides categoría de tarea → clave `agents`
+- `profiles` — rol, capacidades, restricciones, aislamiento; `profiles.*.agent` debe existir en `agents`
+- `pipeline` — orden de roles para UX terminal y reejecución
+
+Ver [Coordinación multiagente](/docs/es/concepts/multi-agent-coordination).
+
+## `knowledge`
+
+Valores por defecto del grafo de conocimiento de ingeniería (`spec-my-E`). Controla extractores sugeridos y build incremental. El grafo se guarda en `.asagiri/knowledge/` tras `asa knowledge build`.
+
+```yaml
+knowledge:
+  default_include_flows: true
+  default_include_contracts: true
+  default_include_code: false
+  default_include_tests: false
+  incremental_by_default: false
+  warn_on_stale: true
+```
+
+- `default_include_*` — flags sugeridos para `asa knowledge build` (los flags CLI prevalecen por ejecución)
+- `incremental_by_default` — aplicar `--incremental` cuando no se pasan flags explícitos
+- `warn_on_stale` — aviso de antigüedad §21 antes del build si las fuentes cambiaron
+
+Ver [Grafo de conocimiento de ingeniería](/docs/es/concepts/engineering-knowledge-graph), [`asa knowledge`](/docs/es/cli/knowledge) y [`asa impact`](/docs/es/cli/impact).
+
+## `replay`
+
+Valores por defecto de captura replay (`spec-my-F` §22). Los paquetes se guardan en `.asagiri/replays/<replay-id>/` tras `asa replay create`.
+
+```yaml
+replay:
+  capture_prompts: true
+  capture_runtime_events: true
+  capture_agent_outputs: true
+  redact_secrets: true
+  offline_mode_default: false
+  compress_threshold_bytes: 4096
+```
+
+- `capture_prompts` — incluir prompts de agentes si las policies lo permiten
+- `capture_runtime_events` — copiar eventos runtime / graph al paquete
+- `capture_agent_outputs` — persistir salidas de agentes
+- `redact_secrets` — enmascarar tokens, cabeceras bearer y líneas `.env` sensibles antes de escribir
+- `offline_mode_default` — `asa replay run` en `--offline` por defecto (sin cloud ni APIs externas)
+- `compress_threshold_bytes` — comprimir gzip de textos por encima de este umbral (defecto 4096)
+
+Ver [Motor de replay](/docs/es/concepts/replay-engine) y [`asa replay`](/docs/es/cli/replay). Solo verificación trust: [`asa trust replay`](/docs/es/cli/trust-replay) y bloque `verification:`.
 
 ## `execution_graph`
 

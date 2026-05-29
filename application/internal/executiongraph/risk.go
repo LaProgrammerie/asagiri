@@ -34,7 +34,7 @@ func AssessNodeRisk(node GraphNode, binding *TaskBinding, edges []GraphEdge) Ris
 	level = elevateRisk(level, reasons, binding)
 
 	checks := requiredChecksFor(node, binding)
-	approval := requiresHumanApproval(level, node.Type, binding)
+	approval := requiresHumanApproval(level, node.Type, binding, nil)
 
 	return RiskAssessment{
 		Level:                 level,
@@ -46,7 +46,7 @@ func AssessNodeRisk(node GraphNode, binding *TaskBinding, edges []GraphEdge) Ris
 }
 
 // ApplyRiskEnrichment updates node risk fields and returns optional approval nodes/edges.
-func ApplyRiskEnrichment(nodes []GraphNode, bindings []TaskBinding, edges []GraphEdge) ([]GraphNode, []GraphEdge) {
+func ApplyRiskEnrichment(nodes []GraphNode, bindings []TaskBinding, edges []GraphEdge, humanApprovalFor []string) ([]GraphNode, []GraphEdge) {
 	bindingByNode := bindingIndex(bindings)
 	out := make([]GraphNode, 0, len(nodes)+1)
 	for _, n := range nodes {
@@ -54,7 +54,7 @@ func ApplyRiskEnrichment(nodes []GraphNode, bindings []TaskBinding, edges []Grap
 		if b, ok := bindingByNode[n.ID]; ok {
 			binding = &b
 		}
-		assessment := AssessNodeRisk(n, binding, edges)
+		assessment := assessNodeRiskWithRules(n, binding, edges, humanApprovalFor)
 		n.Risk = assessment.Level
 		n.BlastRadius = assessment.BlastRadius
 		n.RequiredChecks = assessment.RequiredChecks
@@ -165,7 +165,15 @@ func requiredChecksFor(node GraphNode, binding *TaskBinding) []string {
 	return checks
 }
 
-func requiresHumanApproval(level RiskLevel, nodeType NodeType, binding *TaskBinding) bool {
+func assessNodeRiskWithRules(node GraphNode, binding *TaskBinding, edges []GraphEdge, humanApprovalFor []string) RiskAssessment {
+	assessment := AssessNodeRisk(node, binding, edges)
+	if requiresHumanApproval(assessment.Level, node.Type, binding, humanApprovalFor) {
+		assessment.RequiresHumanApproval = true
+	}
+	return assessment
+}
+
+func requiresHumanApproval(level RiskLevel, nodeType NodeType, binding *TaskBinding, humanApprovalFor []string) bool {
 	if nodeType == NodeTypeManualApproval {
 		return true
 	}
@@ -178,7 +186,29 @@ func requiresHumanApproval(level RiskLevel, nodeType NodeType, binding *TaskBind
 	if binding != nil && strings.Contains(strings.ToLower(binding.Action), "migration") {
 		return true
 	}
+	for _, rule := range humanApprovalFor {
+		switch strings.TrimSpace(strings.ToLower(rule)) {
+		case "migration":
+			if binding != nil && (strings.Contains(strings.ToLower(binding.Action), "migration") ||
+				strings.Contains(strings.ToLower(binding.NodeID), "migration")) {
+				return true
+			}
+		case "security_sensitive":
+			if binding != nil && binding.Sensitive {
+				return true
+			}
+		case "public_contract_change":
+			if binding != nil && isPublicContractRef(binding.ContractRef) {
+				return true
+			}
+		}
+	}
 	return false
+}
+
+func isPublicContractRef(ref string) bool {
+	ref = strings.TrimSpace(ref)
+	return ref != "" && !strings.HasPrefix(ref, "TODO:")
 }
 
 func computeBlastRadius(nodeID string, edges []GraphEdge) int {

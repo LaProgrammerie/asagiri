@@ -1,0 +1,42 @@
+---
+title: Motor de replay
+description: Capturar, reejecutar, comparar y auditar flujos de ingeniería con contexto fijado.
+---
+
+# Motor de replay
+
+`spec-my-F` — construye **paquetes replay** en `.asagiri/replays/` para auditar workflows de agentes, reproducir fallos y comparar ejecuciones sin determinismo LLM perfecto.
+
+## Principios
+
+- **Determinismo práctico** — fija commit Git, config, estado del grafo y artefactos; no garantiza salidas LLM idénticas.
+- **Local-first** — paquetes en el repo bajo `.asagiri/replays/<replay-id>/`.
+- **Secretos** — `redact_secrets` y exclusiones de rutas; sin tokens en bruto ni `.env` completos.
+- **Distinto de trust replay** — `asa trust replay` reejecuta una **verificación** desde `.asagiri/trust/<id>/` ; `asa replay` captura **workflows** completos.
+
+## Pipeline
+
+```text
+run / execution graph / investigation
+  → asa replay create
+  → replay.yaml + graph/ trust/ investigations/ runtime/ …
+  → asa replay run (--offline | --simulation | --strict)
+  → compare / explain (divergencias)
+  → snapshot --name
+```
+
+## Modos
+
+| Modo | CLI | Comportamiento |
+|------|-----|----------------|
+| Full | `replay run` por defecto | Reejecuta el workflow (agentes salvo offline) |
+| Simulation | `--simulation` | Reproduce grafo/eventos/salidas sin agentes |
+| Offline | `--offline` o config | Bloquea cloud y APIs externas |
+| Compare | `replay compare` o `run --compare` | Diff estructurado |
+| Audit | validación | Integridad del paquete y provenance |
+
+## Divergencias
+
+`replay compare` y `replay explain` reportan deltas trust, validaciones faltantes, cambios de nodos, artefactos ausentes y avisos knowledge stale.
+
+Ver [Configuración — `replay`](/docs/es/configuration/config-file#replay) y [`asa replay`](/docs/es/cli/replay).

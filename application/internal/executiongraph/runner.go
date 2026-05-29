@@ -7,23 +7,28 @@ import (
 
 	"github.com/LaProgrammerie/asagiri/application/internal/runtime"
 	"github.com/LaProgrammerie/asagiri/application/internal/trust"
-	"github.com/LaProgrammerie/asagiri/application/internal/trust/confidence"
 )
 
 // RunOptions configures graph execution (spec §5.3, §19).
 type RunOptions struct {
-	DryRun      bool
-	CIMode      bool
-	StrictTrust bool
-	Scheduler   GraphScheduler
-	Gates       trust.GateEvaluator
+	DryRun          bool
+	CIMode          bool
+	StrictTrust     bool
+	CheckpointEvery string
+	Scheduler       GraphScheduler
+	Gates           trust.GateEvaluator
+	TrustEngine     *trust.Engine
+	Coordinator     GraphCoordinator
+	NodeExecutor    NodeExecutor
 }
 
 // DefaultRunner performs graph execution with runtime events and checkpoints (spec §19–20).
 type DefaultRunner struct {
-	Repo     *Repository
-	RepoRoot string
-	Events   *runtime.GraphEmitter
+	Repo          *Repository
+	RepoRoot      string
+	Events        *runtime.GraphEmitter
+	Coordinator   GraphCoordinator
+	NodeExecutor  NodeExecutor
 }
 
 // NewRunner returns a runner backed by repoRoot storage.
@@ -41,7 +46,16 @@ func NewRunner(repoRoot string) *DefaultRunner {
 }
 
 // DryRun plans, schedules, persists artefacts, and marks the graph ready without agent execution.
-func (r *DefaultRunner) DryRun(ctx context.Context, graph ExecutionGraph, ciMode bool) (GraphRunResult, ExecutionSchedule, GraphArtifacts, error) {
+func (r *DefaultRunner) DryRun(ctx context.Context, graph ExecutionGraph, ciMode bool, opts ...RunOptions) (GraphRunResult, ExecutionSchedule, GraphArtifacts, error) {
+	var runOpts RunOptions
+	if len(opts) > 0 {
+		runOpts = opts[0]
+	}
+	graph, _, err := r.coordinate(ctx, graph, runOpts)
+	if err != nil {
+		return GraphRunResult{}, ExecutionSchedule{}, GraphArtifacts{}, err
+	}
+
 	sched := r.scheduler()
 	schedule, err := sched.Schedule(ctx, ScheduleRequest{Graph: graph, CIMode: ciMode})
 	if err != nil {
@@ -68,7 +82,7 @@ func (r *DefaultRunner) DryRun(ctx context.Context, graph ExecutionGraph, ciMode
 // Run executes or simulates graph nodes according to options (spec §19).
 func (r *DefaultRunner) Run(ctx context.Context, graph ExecutionGraph, schedule ExecutionSchedule, opts RunOptions) (GraphRunResult, error) {
 	if opts.DryRun {
-		result, _, _, err := r.DryRun(ctx, graph, opts.CIMode)
+		result, _, _, err := r.DryRun(ctx, graph, opts.CIMode, opts)
 		return result, err
 	}
 	return r.execute(ctx, graph, schedule, opts, false)
@@ -107,11 +121,7 @@ func (r *DefaultRunner) Resume(ctx context.Context, graphID string, opts RunOpti
 	}
 
 	if !hasCheckpoint {
-		if _, _, err := r.Repo.Save(graph); err != nil {
-			return GraphRunResult{}, err
-		}
-		r.emit(runtime.EventGraphStarted, graph, "", map[string]any{"resumed": true})
-		return GraphRunResult{GraphID: graph.ID, Status: graph.Status}, nil
+		return GraphRunResult{}, fmt.Errorf("%w: graph %s has no checkpoint to resume from", ErrNoCheckpoint, graphID)
 	}
 
 	sched := r.scheduler()
@@ -127,8 +137,14 @@ func (r *DefaultRunner) Resume(ctx context.Context, graphID string, opts RunOpti
 }
 
 func (r *DefaultRunner) execute(ctx context.Context, graph ExecutionGraph, schedule ExecutionSchedule, opts RunOptions, resumed bool) (GraphRunResult, error) {
-	_ = ctx
 	strict := opts.StrictTrust
+
+	coordinated := opts.Coordinator != nil
+	graph, coordAssignments, err := r.coordinate(ctx, graph, opts)
+	if err != nil {
+		return GraphRunResult{}, err
+	}
+	asgByNode := assignmentIndex(coordAssignments)
 
 	if graph.Status == GraphStatusPlanned {
 		if err := TransitionGraph(graph.Status, GraphStatusReady, false); err != nil {
@@ -153,6 +169,8 @@ func (r *DefaultRunner) execute(ctx context.Context, graph ExecutionGraph, sched
 
 nodeLoop:
 	for _, group := range schedule.ParallelGroups {
+		var lastExecutedNode string
+		groupHadExecution := false
 		for _, nodeID := range group {
 			idx := nodeIndex(graph.Nodes, nodeID)
 			if idx < 0 {
@@ -176,11 +194,40 @@ nodeLoop:
 				"agent":     node.Agent,
 			})
 
-			if blocked, reason := r.evaluateTrustGate(node, strict, opts); blocked {
+			nodeExec := opts.NodeExecutor
+			if nodeExec == nil {
+				nodeExec = r.NodeExecutor
+			}
+			if nodeExec != nil {
+				asg := asgByNode[node.ID]
+				if err := nodeExec(ctx, graph, node, asg); err != nil {
+					if err := r.transitionNode(&graph, idx, NodeStatusFailed); err != nil {
+						return GraphRunResult{}, err
+					}
+					reason := err.Error()
+					r.emit(runtime.EventGraphNodeFailed, graph, node.ID, map[string]any{"reason": reason})
+					if coordinated {
+						r.emitAgentFailed(graph, node, asgByNode, reason)
+					}
+					if err := TransitionGraph(graph.Status, GraphStatusFailed, false); err != nil {
+						return GraphRunResult{}, err
+					}
+					graph.Status = GraphStatusFailed
+					if _, _, err := r.Repo.Save(graph); err != nil {
+						return GraphRunResult{}, err
+					}
+					return GraphRunResult{GraphID: graph.ID, Status: graph.Status}, err
+				}
+			}
+
+			if blocked, reason := r.evaluateTrustGate(ctx, graph, node, strict, opts); blocked {
 				if err := r.transitionNode(&graph, idx, NodeStatusFailed); err != nil {
 					return GraphRunResult{}, err
 				}
 				r.emit(runtime.EventGraphNodeFailed, graph, node.ID, map[string]any{"reason": reason})
+				if coordinated {
+					r.emitAgentFailed(graph, node, asgByNode, reason)
+				}
 				if err := TransitionGraph(graph.Status, GraphStatusBlocked, false); err != nil {
 					return GraphRunResult{}, err
 				}
@@ -204,27 +251,25 @@ nodeLoop:
 			r.emit(runtime.EventGraphNodeCompleted, graph, node.ID, map[string]any{
 				"estimated_cost": node.EstimatedCost,
 			})
+			if coordinated {
+				r.emitAgentCompleted(graph, node, asgByNode)
+			}
 
-			if shouldPersistCheckpoint(graph, node.ID) {
-				gitRef, gitDirty := CaptureGitState(r.RepoRoot)
-				state := CheckpointState{
-					AfterNode:    node.ID,
-					GitRef:       gitRef,
-					GitDirty:     gitDirty,
-					Outputs:      append([]string(nil), node.Outputs...),
-					Validations:  append([]string(nil), node.RequiredChecks...),
-					CostConsumed: costConsumed,
-					Duration:     time.Since(started).Truncate(time.Second).String(),
-				}
-				path, err := r.Repo.SaveCheckpoint(graph.ID, state)
-				if err != nil {
+			lastExecutedNode = node.ID
+			groupHadExecution = true
+
+			if ShouldPersistCheckpoint(graph, node.ID, opts.CheckpointEvery) {
+				if err := r.persistCheckpoint(graph, node, costConsumed, time.Since(started)); err != nil {
 					return GraphRunResult{}, err
 				}
-				r.emit(runtime.EventGraphCheckpointCreated, graph, node.ID, map[string]any{
-					"checkpoint_path": path,
-					"git_ref":         gitRef,
-					"cost_consumed":   costConsumed,
-				})
+			}
+		}
+		if ShouldPersistGroupCheckpoint(opts.CheckpointEvery) && groupHadExecution && lastExecutedNode != "" {
+			idx := nodeIndex(graph.Nodes, lastExecutedNode)
+			if idx >= 0 {
+				if err := r.persistCheckpoint(graph, graph.Nodes[idx], costConsumed, time.Since(started)); err != nil {
+					return GraphRunResult{}, err
+				}
 			}
 		}
 	}
@@ -247,7 +292,7 @@ nodeLoop:
 	return GraphRunResult{GraphID: graph.ID, Status: graph.Status}, nil
 }
 
-func (r *DefaultRunner) evaluateTrustGate(node GraphNode, strict bool, opts RunOptions) (blocked bool, reason string) {
+func (r *DefaultRunner) evaluateTrustGate(ctx context.Context, graph ExecutionGraph, node GraphNode, strict bool, opts RunOptions) (blocked bool, reason string) {
 	if node.Type != NodeTypeTrustVerification {
 		return false, ""
 	}
@@ -257,15 +302,60 @@ func (r *DefaultRunner) evaluateTrustGate(node GraphNode, strict bool, opts RunO
 	if !strict {
 		return false, ""
 	}
-	eval := opts.Gates
-	if !eval.Configured() {
+
+	eng := opts.TrustEngine
+	if eng == nil {
+		eng = trust.NewEngine(r.RepoRoot)
+		if opts.Gates.Configured() {
+			eng.Gates = opts.Gates
+		}
+	}
+
+	verifyResult, err := eng.Verify(ctx, trust.VerificationRequest{
+		Flow:    graph.Flow,
+		Product: graph.Product,
+		Strict:  true,
+	})
+	if err != nil {
+		return true, fmt.Sprintf("trust verification failed: %v", err)
+	}
+	if verifyResult.Report.Gate.Status == trust.GateStatusNotConfigured && !opts.Gates.Configured() {
 		return true, "strict trust enabled but verification gates not configured"
 	}
-	result := eval.Evaluate(context.Background(), confidence.Report{Overall: 0.9}, nil)
-	if result.Status == trust.GateStatusBlocked {
-		return true, result.Reason
+	if verifyResult.Report.Gate.Status == trust.GateStatusBlocked {
+		return true, verifyResult.Report.Gate.Reason
+	}
+	if trust.CIShouldFail(verifyResult.Report, true) {
+		reason := verifyResult.Report.Gate.Reason
+		if reason == "" {
+			reason = "trust checks failed under strict mode"
+		}
+		return true, reason
 	}
 	return false, ""
+}
+
+func (r *DefaultRunner) persistCheckpoint(graph ExecutionGraph, node GraphNode, costConsumed float64, elapsed time.Duration) error {
+	gitRef, gitDirty := CaptureGitState(r.RepoRoot)
+	state := CheckpointState{
+		AfterNode:    node.ID,
+		GitRef:       gitRef,
+		GitDirty:     gitDirty,
+		Outputs:      append([]string(nil), node.Outputs...),
+		Validations:  append([]string(nil), node.RequiredChecks...),
+		CostConsumed: costConsumed,
+		Duration:     elapsed.Truncate(time.Second).String(),
+	}
+	path, err := r.Repo.SaveCheckpoint(graph.ID, state)
+	if err != nil {
+		return err
+	}
+	r.emit(runtime.EventGraphCheckpointCreated, graph, node.ID, map[string]any{
+		"checkpoint_path": path,
+		"git_ref":         gitRef,
+		"cost_consumed":   costConsumed,
+	})
+	return nil
 }
 
 func (r *DefaultRunner) transitionNode(graph *ExecutionGraph, idx int, to NodeStatus) error {
@@ -299,6 +389,73 @@ func (r *DefaultRunner) scheduler() GraphScheduler {
 		return DefaultScheduler{}
 	}
 	return DefaultScheduler{}
+}
+
+func (r *DefaultRunner) coordinate(ctx context.Context, graph ExecutionGraph, opts RunOptions) (ExecutionGraph, []CoordinationAssignment, error) {
+	coord := opts.Coordinator
+	if coord == nil && r != nil {
+		coord = r.Coordinator
+	}
+	if coord == nil {
+		return graph, nil, nil
+	}
+	result, err := coord(ctx, graph)
+	if err != nil {
+		return graph, nil, err
+	}
+	return result.Graph, result.Assignments, nil
+}
+
+func assignmentIndex(assignments []CoordinationAssignment) map[string]CoordinationAssignment {
+	out := make(map[string]CoordinationAssignment, len(assignments))
+	for _, a := range assignments {
+		out[a.NodeID] = a
+	}
+	return out
+}
+
+func (r *DefaultRunner) emitAgentCompleted(graph ExecutionGraph, node GraphNode, asgByNode map[string]CoordinationAssignment) {
+	if len(asgByNode) == 0 || r.Events == nil {
+		return
+	}
+	asg, ok := asgByNode[node.ID]
+	if !ok {
+		asg = CoordinationAssignment{
+			NodeID:   node.ID,
+			AgentRef: node.Agent,
+			Role:     RoleForNodeType(node.Type),
+		}
+	}
+	emitter := &runtime.AgentEmitter{Store: r.Events.Store}
+	_ = emitter.Emit(runtime.EventAgentCompleted, graph.ID, graph.Flow, agentAssignmentPayload(asg))
+}
+
+func (r *DefaultRunner) emitAgentFailed(graph ExecutionGraph, node GraphNode, asgByNode map[string]CoordinationAssignment, reason string) {
+	if len(asgByNode) == 0 || r.Events == nil {
+		return
+	}
+	asg, ok := asgByNode[node.ID]
+	if !ok {
+		asg = CoordinationAssignment{
+			NodeID:   node.ID,
+			AgentRef: node.Agent,
+			Role:     RoleForNodeType(node.Type),
+		}
+	}
+	payload := agentAssignmentPayload(asg)
+	payload["reason"] = reason
+	emitter := &runtime.AgentEmitter{Store: r.Events.Store}
+	_ = emitter.Emit(runtime.EventAgentFailed, graph.ID, graph.Flow, payload)
+}
+
+func agentAssignmentPayload(asg CoordinationAssignment) map[string]any {
+	return map[string]any{
+		"node_id":    asg.NodeID,
+		"agent_ref":  asg.AgentRef,
+		"role":       asg.Role,
+		"isolation":  asg.Isolation,
+		"profile_id": asg.ProfileID,
+	}
 }
 
 func nodeIndex(nodes []GraphNode, id string) int {

@@ -1,0 +1,69 @@
+---
+title: Multi-Agenten-Koordination
+description: Explizite Agentenrollen, Handoffs, Review-Richtlinien und Runtime-Events über dem Ausführungsgraphen.
+---
+
+# Multi-Agenten-Koordination
+
+`spec-my-D` — steuert **wer** **welchen** Graphknoten ausführt, **wie** isoliert wird und **wie** Arbeit zwischen spezialisierten Agenten übergeben wird.
+
+## Prinzipien
+
+- **Explizite Rollen** — investigator, architect, implementer, reviewer, validator u. a. aus Knotentypen des Graphen abgeleitet.
+- **Strukturierte Handoffs** — Artefakte unter `.asagiri/handoffs/<id>/handoff.yaml` (Summary, Dateien, Constraints, Confidence).
+- **Unabhängiges Review** — Policies können denselben Agenten als Implementer und Reviewer verbieten (`allow_self_review: false`).
+- **Isolation standardmäßig** — `isolated_worktree` hält Schreibzugriffe außerhalb des Haupt-Workspaces, wenn konfiguriert.
+- **Inspectierbare Runtime** — `agent.*`-Events ergänzen `graph.*` vom [Ausführungsgraphen](/docs/de/concepts/execution-graph).
+
+## Pipeline
+
+```text
+Ausführungsgraph-Plan
+  → Coordinator weist Rolle + Agent-Ref + Isolation pro Knoten zu
+  → Agenten laufen (Worktrees / readonly / sandbox je Profil)
+  → Handoffs zwischen Rollen → Quervalidierung → Trust-Gates → Merge oder Block
+```
+
+Die Rollenreihenfolge steht in `coordination.pipeline` (z. B. investigator → architect → implementer → reviewer → validator).
+
+## Handoff-Artefakt
+
+Jeder Transfer schreibt:
+
+| Feld | Zweck |
+|------|--------|
+| `from` / `to` | Koordinationsrollen |
+| `summary` | Kontext für den nächsten Agenten |
+| `files` | Pfade im Scope |
+| `constraints` | Regeln (kein Push, readonly, …) |
+| `confidence` | Übertragungs-Confidence (0–1) |
+
+## Terminal-UX
+
+Während eines koordinierten Laufs kann Asagiri einen §19-Snapshot via `FormatMultiAgentRuntime` rendern:
+
+```text
+Asagiri Multi-Agent Runtime
+═══════════════════════════
+Pipeline … Agents … Costs … Warnings
+```
+
+Symbole: `✓` abgeschlossen, `⠋` läuft, `○` ausstehend.
+
+## Konfiguration
+
+Defaults in [`coordination`](/docs/de/configuration/config-file#coordination) in `.asagiri/config.yaml`. Profile verweisen auf Schlüssel unter [`agents`](/docs/de/configuration/agents).
+
+## Code
+
+```text
+internal/coordination/
+  coordinator.go
+  assignment.go
+  handoff.go
+  policies.go
+  runtime.go
+  display.go
+```
+
+Nutzt `internal/executiongraph/` und Trust-Gates der [Trust-Engine](/docs/de/concepts/trust-engine).

@@ -1,6 +1,6 @@
 ---
 title: Prototype Run · Asagiri CLI
-description: Préparer l'exécution locale du prototype
+description: Lancer le serveur dev du prototype (npm run dev)
 ---
 
 CLI path: **`asa prototype run`**
@@ -9,7 +9,7 @@ CLI path: **`asa prototype run`**
 
 Orchestration commands coordinate higher-order Asagiri workloads such as ingestion, syncing, backlog triage, investigative passes, hydrated context payloads, coarse estimates, and workspace-specific automation.
 
-> Original CLI synopsis: Préparer l'exécution locale du prototype
+> Original CLI synopsis: Lancer le serveur dev du prototype (npm run dev)
 
 ## Usage
 
@@ -26,10 +26,8 @@ asa prototype run [flags]
 ## Examples
 
 ```bash
-asa prototype run
+asa prototype run workspace-saas
 ```
-
-> Wire richer samples through **cobra.Command.Example** when the happy path warrants copy/paste-friendly automation beyond this scaffold.
 
 ## What happens internally
 

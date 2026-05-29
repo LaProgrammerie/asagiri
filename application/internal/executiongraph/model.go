@@ -90,10 +90,11 @@ const (
 
 // Strategy holds execution constraints for the graph (spec §7).
 type Strategy struct {
-	MaxParallel int       `yaml:"max_parallel" json:"max_parallel"`
-	StopOnRisk  RiskLevel `yaml:"stop_on_risk,omitempty" json:"stop_on_risk,omitempty"`
-	StrictTrust bool      `yaml:"strict_trust,omitempty" json:"strict_trust,omitempty"`
-	Budget      float64   `yaml:"budget,omitempty" json:"budget,omitempty"`
+	MaxParallel     int       `yaml:"max_parallel" json:"max_parallel"`
+	StopOnRisk      RiskLevel `yaml:"stop_on_risk,omitempty" json:"stop_on_risk,omitempty"`
+	StrictTrust     bool      `yaml:"strict_trust,omitempty" json:"strict_trust,omitempty"`
+	CheckpointEvery string    `yaml:"checkpoint_every,omitempty" json:"checkpoint_every,omitempty"`
+	Budget          float64   `yaml:"budget,omitempty" json:"budget,omitempty"`
 }
 
 // GraphNode is one executable unit in the graph.
@@ -163,6 +164,11 @@ func (g ExecutionGraph) Validate() error {
 	}
 	if g.Strategy.StopOnRisk != "" && !isRiskLevel(g.Strategy.StopOnRisk) {
 		return fmt.Errorf("%w: invalid stop_on_risk %q", ErrInvalidGraph, g.Strategy.StopOnRisk)
+	}
+	if g.Strategy.CheckpointEvery != "" {
+		if err := ValidateCheckpointEvery(g.Strategy.CheckpointEvery); err != nil {
+			return fmt.Errorf("%w: %v", ErrInvalidGraph, err)
+		}
 	}
 	if g.Rollback != nil && !isRollbackStrategy(g.Rollback.Strategy) {
 		return fmt.Errorf("%w: invalid rollback strategy %q", ErrInvalidGraph, g.Rollback.Strategy)

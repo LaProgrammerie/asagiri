@@ -39,6 +39,7 @@ func NewDefaultRegistry(deps Dependencies) *Registry {
 		StaticAnalysisRunner{},
 		ContractsRunner{},
 		FlowsRunner{},
+		KnowledgeGraphRunner{},
 		PermissionsRunner{},
 		ObservabilityRunner{},
 		AnalyticsRunner{},

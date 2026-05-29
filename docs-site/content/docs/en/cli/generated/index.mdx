@@ -1,6 +1,6 @@
 ---
 title: Index · Asagiri CLI
-description: Indexer le dépôt pour le RAG local (spec §10.3)
+description: Indexe le dépôt dans .asagiri/index/chunks.sqlite (recherche LIKE).
 ---
 
 CLI path: **`asa index`**
@@ -9,7 +9,7 @@ CLI path: **`asa index`**
 
 Indexing keeps embedded search artefacts aligned whenever significant repository reorganisation threatens stale lookup tables.
 
-> Original CLI synopsis: Indexer le dépôt pour le RAG local (spec §10.3)
+> Original CLI synopsis: Indexer le dépôt pour le RAG local par mots-clés (spec §10.3)
 
 ## Usage
 
@@ -27,9 +27,8 @@ asa index [flags]
 
 ```bash
 asa index
+  asa index --dry-run
 ```
-
-> Wire richer samples through **cobra.Command.Example** when the happy path warrants copy/paste-friendly automation beyond this scaffold.
 
 ## What happens internally
 
@@ -60,10 +59,12 @@ asa index
 - [Flows](./flows.mdx)
 - [Graph](./graph.mdx)
 - [Help](./help.mdx)
+- [Impact](./impact.mdx)
 - [Inbox](./inbox.mdx)
 - [Init](./init.mdx)
 - [Inspect](./inspect.mdx)
 - [Investigate](./investigate.mdx)
+- [Knowledge](./knowledge.mdx)
 - [Mcp](./mcp.mdx)
 - [Memory](./memory.mdx)
 - [Next](./next.mdx)
@@ -71,6 +72,7 @@ asa index
 - [Pr](./pr.mdx)
 - [Product](./product.mdx)
 - [Prototype](./prototype.mdx)
+- [Replay](./replay.mdx)
 - [Report](./report.mdx)
 - [Resume](./resume.mdx)
 - [Review](./review.mdx)

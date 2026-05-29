@@ -1,0 +1,32 @@
+id: replay-2026-05-29-632f7aa8
+created_at: 2026-05-29T12:27:36.546587Z
+source:
+    graph: graph-2026-05-29-0daefa15
+repo:
+    commit: f12bafe
+    branch: main
+runtime:
+    asagiri_version: dev
+    runtime_mode: guided
+agents:
+    implementer: cursor
+    reviewer: codex
+    validator: local
+policies:
+    max_parallel: 2
+    strict_trust: false
+artifacts:
+    - graph/execution-graph.yaml
+    - graph/execution-graph.json
+    - graph/events.jsonl
+    - graph/timeline.jsonl
+    - graph/metrics.json
+    - graph/plan.md
+    - runtime/events.jsonl
+    - runtime/timeline.jsonl
+    - runtime/metrics.json
+    - prompts/plan.md
+    - runtime/events.jsonl
+    - trust/trust-2026-05-29-35de044f/report.md
+    - trust/trust-2026-05-29-35de044f/report.json
+    - trust/trust-2026-05-29-35de044f/replay.yaml

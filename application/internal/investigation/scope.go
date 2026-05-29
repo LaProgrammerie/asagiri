@@ -27,6 +27,7 @@ func ResolveScope(req Request) ResolvedScope {
 	scope := ResolvedScope{
 		Instruction: req.Symptom,
 		Flow:        req.Flow,
+		Action:      req.Action,
 		TaskID:      req.TaskID,
 		RunID:       req.RunID,
 	}

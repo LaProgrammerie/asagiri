@@ -8,11 +8,12 @@ import (
 
 	"github.com/LaProgrammerie/asagiri/application/internal/config"
 	"github.com/LaProgrammerie/asagiri/application/internal/trust"
+	"github.com/LaProgrammerie/asagiri/application/internal/trust/checks"
 )
 
 func TestTrustGateDryRunSimulatesPass(t *testing.T) {
 	runner := &DefaultRunner{}
-	blocked, reason := runner.evaluateTrustGate(GraphNode{
+	blocked, reason := runner.evaluateTrustGate(context.Background(), ExecutionGraph{Flow: "f", Product: "p"}, GraphNode{
 		ID:   "trust-gate",
 		Type: NodeTypeTrustVerification,
 	}, true, RunOptions{DryRun: true})
@@ -21,8 +22,8 @@ func TestTrustGateDryRunSimulatesPass(t *testing.T) {
 }
 
 func TestTrustGateStrictWithoutConfigBlocks(t *testing.T) {
-	runner := &DefaultRunner{}
-	blocked, reason := runner.evaluateTrustGate(GraphNode{
+	runner := &DefaultRunner{RepoRoot: t.TempDir()}
+	blocked, reason := runner.evaluateTrustGate(context.Background(), ExecutionGraph{Flow: "f", Product: "p"}, GraphNode{
 		ID:   "trust-gate",
 		Type: NodeTypeTrustVerification,
 	}, true, RunOptions{StrictTrust: true})
@@ -31,16 +32,19 @@ func TestTrustGateStrictWithoutConfigBlocks(t *testing.T) {
 }
 
 func TestTrustGateStrictWithPassingEvaluator(t *testing.T) {
-	runner := &DefaultRunner{}
+	repo := writeMinimalPlanningFixture(t)
+	runner := &DefaultRunner{RepoRoot: repo}
 	gates := trust.NewGateEvaluator(&config.VerificationConfig{
 		Gates: map[string]config.GateProfile{
-			"production": {MinConfidence: map[string]float64{"overall": 0.5}},
+			"production": {},
 		},
 	})
-	blocked, reason := runner.evaluateTrustGate(GraphNode{
+	eng := trust.NewEngineWithChecks(repo, checks.NewRegistry())
+	eng.Gates = gates
+	blocked, reason := runner.evaluateTrustGate(context.Background(), ExecutionGraph{Flow: "workspace-onboarding", Product: "minimal-product"}, GraphNode{
 		ID:   "trust-gate",
 		Type: NodeTypeTrustVerification,
-	}, true, RunOptions{StrictTrust: true, Gates: gates})
+	}, true, RunOptions{StrictTrust: true, Gates: gates, TrustEngine: eng})
 	require.False(t, blocked)
 	require.Empty(t, reason)
 }
@@ -52,7 +56,7 @@ func TestTrustGateNonStrictSkipsEvaluation(t *testing.T) {
 			"production": {RequiredChecks: []string{"contracts"}},
 		},
 	})
-	blocked, _ := runner.evaluateTrustGate(GraphNode{
+	blocked, _ := runner.evaluateTrustGate(context.Background(), ExecutionGraph{Flow: "f", Product: "p"}, GraphNode{
 		ID:   "trust-gate",
 		Type: NodeTypeTrustVerification,
 	}, false, RunOptions{Gates: gates})

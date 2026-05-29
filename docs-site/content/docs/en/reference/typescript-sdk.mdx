@@ -9,6 +9,14 @@ Package source: `sdk/typescript/` in the Asagiri repository.
 
 ## Install
 
+From npm (released on `sdk-v*` tags):
+
+```bash
+npm install @laprogrammerie/asagiri
+```
+
+From the repository:
+
 ```bash
 cd sdk/typescript && npm install && npm run build
 ```
@@ -24,6 +32,10 @@ const session = await runtime.startSession("onboarding-redesign", "workspace-saa
 await runtime.runFlow(session.id, "onboarding");
 ```
 
-Start the API with `asa runtime serve` first.
+Start the API with `asa runtime serve --port 8765` first.
+
+## Publishing
+
+CI publishes to npm when a `sdk-v*` tag is pushed (workflow `sdk-npm-publish.yml`). Repository secret: `NPM_TOKEN`.
 
 See also: [runtime serve](../cli/runtime-serve).

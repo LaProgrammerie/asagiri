@@ -17,6 +17,7 @@ type Request struct {
 	Symptom          string
 	Feature          string
 	Flow             string
+	Action           string
 	TaskID           string
 	RunID            string
 	FromFailedTests  bool

@@ -1,0 +1,131 @@
+{
+  "replay_id": "replay-2026-05-29-0427558f",
+  "records": [
+    {
+      "id": "graph/execution-graph.yaml",
+      "produced_by": "execution-graph",
+      "graph_node": "graph-2026-05-29-61f99ccd",
+      "source_commit": "f12bafe",
+      "replay": "replay-2026-05-29-0427558f",
+      "source_path": "/Users/matt/Developer/Divers/hyper-fast-builder/.asagiri/graphs/graph-2026-05-29-61f99ccd/execution-graph.yaml",
+      "captured_at": "2026-05-29T12:27:40.024508Z"
+    },
+    {
+      "id": "graph/execution-graph.json",
+      "produced_by": "execution-graph",
+      "graph_node": "graph-2026-05-29-61f99ccd",
+      "source_commit": "f12bafe",
+      "replay": "replay-2026-05-29-0427558f",
+      "source_path": "/Users/matt/Developer/Divers/hyper-fast-builder/.asagiri/graphs/graph-2026-05-29-61f99ccd/execution-graph.json",
+      "captured_at": "2026-05-29T12:27:40.024777Z"
+    },
+    {
+      "id": "graph/events.jsonl",
+      "produced_by": "execution-graph",
+      "graph_node": "graph-2026-05-29-61f99ccd",
+      "source_commit": "f12bafe",
+      "replay": "replay-2026-05-29-0427558f",
+      "source_path": "/Users/matt/Developer/Divers/hyper-fast-builder/.asagiri/graphs/graph-2026-05-29-61f99ccd/events.jsonl",
+      "captured_at": "2026-05-29T12:27:40.024883Z"
+    },
+    {
+      "id": "graph/timeline.jsonl",
+      "produced_by": "execution-graph",
+      "graph_node": "graph-2026-05-29-61f99ccd",
+      "source_commit": "f12bafe",
+      "replay": "replay-2026-05-29-0427558f",
+      "source_path": "/Users/matt/Developer/Divers/hyper-fast-builder/.asagiri/graphs/graph-2026-05-29-61f99ccd/timeline.jsonl",
+      "captured_at": "2026-05-29T12:27:40.024949Z"
+    },
+    {
+      "id": "graph/metrics.json",
+      "produced_by": "execution-graph",
+      "graph_node": "graph-2026-05-29-61f99ccd",
+      "source_commit": "f12bafe",
+      "replay": "replay-2026-05-29-0427558f",
+      "source_path": "/Users/matt/Developer/Divers/hyper-fast-builder/.asagiri/graphs/graph-2026-05-29-61f99ccd/metrics.json",
+      "captured_at": "2026-05-29T12:27:40.02524Z"
+    },
+    {
+      "id": "graph/plan.md",
+      "produced_by": "execution-graph",
+      "graph_node": "graph-2026-05-29-61f99ccd",
+      "source_commit": "f12bafe",
+      "replay": "replay-2026-05-29-0427558f",
+      "source_path": "/Users/matt/Developer/Divers/hyper-fast-builder/.asagiri/graphs/graph-2026-05-29-61f99ccd/plan.md",
+      "captured_at": "2026-05-29T12:27:40.025369Z"
+    },
+    {
+      "id": "runtime/events.jsonl",
+      "produced_by": "runtime",
+      "graph_node": "graph-2026-05-29-61f99ccd",
+      "source_commit": "f12bafe",
+      "replay": "replay-2026-05-29-0427558f",
+      "source_path": "/Users/matt/Developer/Divers/hyper-fast-builder/.asagiri/graphs/graph-2026-05-29-61f99ccd/events.jsonl",
+      "captured_at": "2026-05-29T12:27:40.02544Z"
+    },
+    {
+      "id": "runtime/timeline.jsonl",
+      "produced_by": "runtime",
+      "graph_node": "graph-2026-05-29-61f99ccd",
+      "source_commit": "f12bafe",
+      "replay": "replay-2026-05-29-0427558f",
+      "source_path": "/Users/matt/Developer/Divers/hyper-fast-builder/.asagiri/graphs/graph-2026-05-29-61f99ccd/timeline.jsonl",
+      "captured_at": "2026-05-29T12:27:40.025493Z"
+    },
+    {
+      "id": "runtime/metrics.json",
+      "produced_by": "runtime",
+      "graph_node": "graph-2026-05-29-61f99ccd",
+      "source_commit": "f12bafe",
+      "replay": "replay-2026-05-29-0427558f",
+      "source_path": "/Users/matt/Developer/Divers/hyper-fast-builder/.asagiri/graphs/graph-2026-05-29-61f99ccd/metrics.json",
+      "captured_at": "2026-05-29T12:27:40.025576Z"
+    },
+    {
+      "id": "prompts/plan.md",
+      "produced_by": "execution-graph",
+      "graph_node": "graph-2026-05-29-61f99ccd",
+      "source_commit": "f12bafe",
+      "replay": "replay-2026-05-29-0427558f",
+      "source_path": "/Users/matt/Developer/Divers/hyper-fast-builder/.asagiri/graphs/graph-2026-05-29-61f99ccd/plan.md",
+      "captured_at": "2026-05-29T12:27:40.02565Z"
+    },
+    {
+      "id": "runtime/events.jsonl",
+      "produced_by": "runtime",
+      "graph_node": "graph-2026-05-29-61f99ccd",
+      "source_commit": "f12bafe",
+      "replay": "replay-2026-05-29-0427558f",
+      "source_path": "/Users/matt/Developer/Divers/hyper-fast-builder/.asagiri/graphs/graph-2026-05-29-61f99ccd/events.jsonl",
+      "captured_at": "2026-05-29T12:27:40.025682Z"
+    },
+    {
+      "id": "trust/trust-2026-05-29-35de044f/report.md",
+      "produced_by": "trust-engine",
+      "graph_node": "trust-2026-05-29-35de044f",
+      "source_commit": "f12bafe",
+      "replay": "replay-2026-05-29-0427558f",
+      "source_path": "/Users/matt/Developer/Divers/hyper-fast-builder/.asagiri/trust/trust-2026-05-29-35de044f/report.md",
+      "captured_at": "2026-05-29T12:27:40.025876Z"
+    },
+    {
+      "id": "trust/trust-2026-05-29-35de044f/report.json",
+      "produced_by": "trust-engine",
+      "graph_node": "trust-2026-05-29-35de044f",
+      "source_commit": "f12bafe",
+      "replay": "replay-2026-05-29-0427558f",
+      "source_path": "/Users/matt/Developer/Divers/hyper-fast-builder/.asagiri/trust/trust-2026-05-29-35de044f/report.json",
+      "captured_at": "2026-05-29T12:27:40.026042Z"
+    },
+    {
+      "id": "trust/trust-2026-05-29-35de044f/replay.yaml",
+      "produced_by": "trust-engine",
+      "graph_node": "trust-2026-05-29-35de044f",
+      "source_commit": "f12bafe",
+      "replay": "replay-2026-05-29-0427558f",
+      "source_path": "/Users/matt/Developer/Divers/hyper-fast-builder/.asagiri/trust/trust-2026-05-29-35de044f/replay.yaml",
+      "captured_at": "2026-05-29T12:27:40.026107Z"
+    }
+  ]
+}

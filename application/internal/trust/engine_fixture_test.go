@@ -52,10 +52,11 @@ func TestEngineVerifyMinimalProductFixture(t *testing.T) {
 		Product: "minimal-product",
 	})
 	require.NoError(t, err)
-	require.Len(t, result.Report.Checks, 14)
+	require.Len(t, result.Report.Checks, 15)
 	require.Equal(t, CheckStaticAnalysis, result.Report.Checks[0].Type)
-	require.Equal(t, CheckBlastRadius, result.Report.Checks[12].Type)
-	require.Equal(t, CheckType("tests"), result.Report.Checks[13].Type)
+	require.Equal(t, CheckType("knowledge-graph"), result.Report.Checks[3].Type)
+	require.Equal(t, CheckBlastRadius, result.Report.Checks[13].Type)
+	require.Equal(t, CheckType("tests"), result.Report.Checks[14].Type)
 
 	conf := result.Report.Confidence
 	require.Greater(t, conf.Overall, 0.0)
@@ -73,7 +74,7 @@ func TestEngineVerifyMinimalProductFixture(t *testing.T) {
 	require.NoError(t, err)
 	var decoded TrustReport
 	require.NoError(t, json.Unmarshal(body, &decoded))
-	require.Len(t, decoded.Checks, 14)
+	require.Len(t, decoded.Checks, 15)
 	require.NotNil(t, decoded.BlastRadius)
 
 	mdBody, err := os.ReadFile(result.MDPath)

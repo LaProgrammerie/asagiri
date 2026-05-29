@@ -1,0 +1,54 @@
+---
+title: Replay Run · Asagiri CLI
+description: Rejouer un workflow capturé
+---
+
+CLI path: **`asa replay run`**
+
+## When to use
+
+Orchestration commands coordinate higher-order Asagiri workloads such as ingestion, syncing, backlog triage, investigative passes, hydrated context payloads, coarse estimates, and workspace-specific automation.
+
+> Original CLI synopsis: Rejouer un workflow capturé
+
+## Usage
+
+```bash
+asa replay run [flags]
+```
+
+## Options
+
+| Flag | Scope | Default | Description |
+| --- | --- | --- | --- |
+| `--compare` | Local | `false` | Préparer une comparaison avec la session précédente |
+| `--dry-run` | Local | `false` | Valider le package sans réexécution |
+| `--json` | Local | `false` | Sortie JSON |
+| `--offline` | Local | `false` | Mode offline (pas d'appels cloud) |
+| `--simulation` | Local | `false` | Rejouer graph/events sans agents |
+| `--strict` | Local | `false` | Échouer si divergence détectée |
+
+## Examples
+
+```bash
+asa replay run
+```
+
+> Wire richer samples through **cobra.Command.Example** when the happy path warrants copy/paste-friendly automation beyond this scaffold.
+
+## What happens internally
+
+- Hydrates contextual services resolved from **$PWD**, coordinating git-bound automation, ingestion pipelines, syncing, backlog triage, investigations, MCP hooks, contextual hydration, coarse estimates, and similar orchestrations for this subtree.
+
+## Failure modes
+
+- Cobra rejects unknown flags or arity mismatches before any repository side effects occur.
+- Asagiri cannot resolve scaffolding when the command is invoked outside an initialised checkout.
+- Downstream automation may fail whenever credentials, network endpoints, or cached prerequisites drift from expectations.
+
+## Related commands
+
+- [Replay Compare](./replay-compare.mdx)
+- [Replay Create](./replay-create.mdx)
+- [Replay Explain](./replay-explain.mdx)
+- [Replay Snapshot](./replay-snapshot.mdx)

@@ -1,6 +1,7 @@
 package runtime
 
 import (
+	"context"
 	"database/sql"
 	"embed"
 	"encoding/json"
@@ -12,12 +13,17 @@ import (
 	"time"
 
 	"github.com/LaProgrammerie/asagiri/application/internal/embedutil"
+	"github.com/LaProgrammerie/asagiri/application/internal/memory/embedder"
 	"github.com/google/uuid"
 	_ "modernc.org/sqlite"
 )
 
-func memoryEmbedJSON(summary string) string {
-	return embedutil.ToJSON(embedutil.Vector(summary))
+func memoryEmbedJSON(summary string) (string, error) {
+	v, err := embedder.EmbedText(context.Background(), summary)
+	if err != nil {
+		return "", err
+	}
+	return embedutil.ToJSON(v), nil
 }
 
 //go:embed migrations/*.sql
@@ -336,7 +342,11 @@ func (s *Store) UpsertMemory(e MemoryEntry) error {
 	flows, _ := json.Marshal(e.LinkedFlows)
 	emb := e.EmbeddingJSON
 	if emb == "" && e.Summary != "" {
-		emb = memoryEmbedJSON(e.Summary)
+		var err error
+		emb, err = memoryEmbedJSON(e.Summary)
+		if err != nil {
+			return err
+		}
 	}
 	_, err := s.db.Exec(`INSERT INTO memory_entries(id, scope, entry_type, summary, source, relevance, tags_json, linked_flows_json, embedding_json, created_at, last_used_at)
 		VALUES(?,?,?,?,?,?,?,?,?,?,?)

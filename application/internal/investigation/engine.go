@@ -43,7 +43,14 @@ func RunInvestigation(ctx context.Context, req Request, cfg *config.Config) (Rep
 		return Report{}, err
 	}
 
-	hyps, evidence := GenerateHypotheses(scope, local)
+	var graphPack ContextPack
+	usedKnowledgeGraph := false
+	if gp, ok := EnrichFromKnowledgeGraph(ctx, req.RepoRoot, &scope, &local); ok {
+		graphPack = gp
+		usedKnowledgeGraph = true
+	}
+
+	hyps, evidence := GenerateHypotheses(scope, local, graphPack)
 	sort.Slice(hyps, func(i, j int) bool { return hyps[i].Score > hyps[j].Score })
 
 	var candidates []Hypothesis
@@ -97,6 +104,9 @@ func RunInvestigation(ctx context.Context, req Request, cfg *config.Config) (Rep
 	if err != nil {
 		return rep, err
 	}
+	if usedKnowledgeGraph {
+		pack = MergeGraphScope(pack, graphPack)
+	}
 	dir := filepath.Join(req.RepoRoot, ".asagiri", "investigations", rep.ID)
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		return rep, err
@@ -116,7 +126,7 @@ func RunInvestigation(ctx context.Context, req Request, cfg *config.Config) (Rep
 	if err != nil {
 		return rep, err
 	}
-	_, _ = WriteGraph(req.RepoRoot, rep)
+	_, _ = WriteGraph(req.RepoRoot, rep, pack)
 	return rep, nil
 }
 

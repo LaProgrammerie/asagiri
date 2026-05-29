@@ -24,7 +24,14 @@ runtime:
   mode: guided  # guided | interactive | headless | ci | review | exploration
 ```
 
+## Memory-Embeddings
+
+Scoped Memory mit `runtime.memory.embedder`: `hash` (Standard), `ollama`, `cloud` (nur bei `cloud.enabled: true`). Nach Wechsel: `asa memory reindex`.
+
+Siehe [Konfiguration](/docs/de/configuration/config-file#runtime).
+
 ## Siehe auch
 
 - [Runtime-Befehle](/docs/de/cli/runtime)
 - [Investigation](/docs/de/concepts/investigation)
+- [TypeScript-SDK](/docs/de/reference/typescript-sdk)

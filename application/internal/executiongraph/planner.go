@@ -74,6 +74,11 @@ func (p *Planner) Build(ctx context.Context, req GraphPlanRequest) (ExecutionGra
 		return ExecutionGraph{}, err
 	}
 	edges = append(edges, baseContextEdges(nodes)...)
+	if extra, err := AppendKnowledgeDependencyEdges(ctx, p.RepoRoot, flowID, nodes, edges); err != nil {
+		return ExecutionGraph{}, err
+	} else if len(extra) > 0 {
+		edges = append(edges, extra...)
+	}
 
 	if err := DetectCycles(nodes, edges); err != nil {
 		return ExecutionGraph{}, err
@@ -97,15 +102,19 @@ func (p *Planner) Build(ctx context.Context, req GraphPlanRequest) (ExecutionGra
 	if err := graph.Validate(); err != nil {
 		return ExecutionGraph{}, err
 	}
-	return p.EnrichGraph(graph, bindings, flow, TrustEnrichmentInput{})
+	trustInput := TrustEnrichmentInput{
+		Gates:                    req.Gates,
+		TrustRequiredForHighRisk: req.Gates.TrustRequiredForHighRisk,
+	}
+	return p.EnrichGraph(ctx, graph, bindings, flow, trustInput)
 }
 
 // EnrichGraph applies agent assignment, risk, trust, investigation, estimates, checkpoints, and rollback (spec §12–18).
-func (p *Planner) EnrichGraph(graph ExecutionGraph, bindings []TaskBinding, flow product.Flow, trustInput TrustEnrichmentInput) (ExecutionGraph, error) {
+func (p *Planner) EnrichGraph(ctx context.Context, graph ExecutionGraph, bindings []TaskBinding, flow product.Flow, trustInput TrustEnrichmentInput) (ExecutionGraph, error) {
 	trustInput.Flow = flow
 	graph.Nodes = AssignAgents(graph.Nodes, bindings)
 	extraEdges := make([]GraphEdge, 0)
-	graph.Nodes, extraEdges = ApplyRiskEnrichment(graph.Nodes, bindings, graph.Edges)
+	graph.Nodes, extraEdges = ApplyRiskEnrichment(graph.Nodes, bindings, graph.Edges, trustInput.Gates.HumanApprovalFor)
 	if len(extraEdges) > 0 {
 		graph.Edges = dedupeEdges(append(graph.Edges, extraEdges...))
 	}
@@ -121,6 +130,9 @@ func (p *Planner) EnrichGraph(graph ExecutionGraph, bindings []TaskBinding, flow
 	graph.Nodes = ApplyEstimates(graph.Nodes)
 	graph.Checkpoints = GenerateCheckpoints(graph)
 	ApplyRollbackEnrichment(&graph, bindings)
+	if err := ApplyKnowledgeGraphEnrichment(ctx, p.RepoRoot, &graph); err != nil {
+		return ExecutionGraph{}, err
+	}
 	if err := graph.Validate(); err != nil {
 		return ExecutionGraph{}, err
 	}

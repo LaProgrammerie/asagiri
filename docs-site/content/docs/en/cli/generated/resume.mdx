@@ -22,16 +22,15 @@ asa resume [flags]
 | Flag | Scope | Default | Description |
 | --- | --- | --- | --- |
 | `--dry-run` | Inherited | `false` | Simuler les exécutions sans lancer d'agent ni commandes externes |
-| `--execute` | Local | `false` | Exécuter le prochain step (dry-run uniquement) |
+| `--execute` | Local | `false` | Exécuter le prochain step (agents réels hors --dry-run global) |
 | `--force` | Local | `false` | Relancer une étape déjà réussie |
 
 ## Examples
 
 ```bash
-asa resume
+asa resume run-2026-05-17-001
+  asa resume run-2026-05-17-001 --execute
 ```
-
-> Wire richer samples through **cobra.Command.Example** when the happy path warrants copy/paste-friendly automation beyond this scaffold.
 
 ## What happens internally
 
@@ -62,11 +61,13 @@ asa resume
 - [Flows](./flows.mdx)
 - [Graph](./graph.mdx)
 - [Help](./help.mdx)
+- [Impact](./impact.mdx)
 - [Inbox](./inbox.mdx)
 - [Index](./index.mdx)
 - [Init](./init.mdx)
 - [Inspect](./inspect.mdx)
 - [Investigate](./investigate.mdx)
+- [Knowledge](./knowledge.mdx)
 - [Mcp](./mcp.mdx)
 - [Memory](./memory.mdx)
 - [Next](./next.mdx)
@@ -74,6 +75,7 @@ asa resume
 - [Pr](./pr.mdx)
 - [Product](./product.mdx)
 - [Prototype](./prototype.mdx)
+- [Replay](./replay.mdx)
 - [Report](./report.mdx)
 - [Review](./review.mdx)
 - [Runtime](./runtime.mdx)

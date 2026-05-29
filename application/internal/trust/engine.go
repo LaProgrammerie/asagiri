@@ -2,15 +2,18 @@ package trust
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
 	"gopkg.in/yaml.v3"
 
 	"github.com/LaProgrammerie/asagiri/application/internal/config"
+	"github.com/LaProgrammerie/asagiri/application/internal/knowledge"
 	"github.com/LaProgrammerie/asagiri/application/internal/runtime"
 	"github.com/LaProgrammerie/asagiri/application/internal/trust/checks"
 	"github.com/LaProgrammerie/asagiri/application/internal/trust/confidence"
@@ -106,7 +109,26 @@ func (a realConfidenceAggregator) Aggregate(ctx context.Context, checks []Verifi
 
 // NewEngine returns an engine with default lot-2 checks and real confidence when checks run.
 func NewEngine(repoRoot string) *Engine {
-	return NewEngineWithChecks(repoRoot, checks.NewDefaultRegistry(checks.DefaultDependencies()))
+	deps := checks.DefaultDependencies()
+	deps.KnowledgeBlastRadius = knowledgeBlastRadiusFromGraph
+	return NewEngineWithChecks(repoRoot, checks.NewDefaultRegistry(deps))
+}
+
+func knowledgeBlastRadiusFromGraph(ctx context.Context, repoRoot, flowID string) (checks.BlastRadiusSummary, bool) {
+	if strings.TrimSpace(repoRoot) == "" {
+		return checks.BlastRadiusSummary{}, false
+	}
+	if _, err := os.Stat(knowledge.DBPath(repoRoot)); err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			return checks.BlastRadiusSummary{}, false
+		}
+		return checks.BlastRadiusSummary{}, false
+	}
+	_, result, err := BlastRadiusFromGraph(ctx, repoRoot, knowledge.ImpactRequest{Flow: flowID})
+	if err != nil {
+		return checks.BlastRadiusSummary{}, false
+	}
+	return checks.BlastRadiusSummaryFromImpact(result, flowID), true
 }
 
 // NewEngineWithChecks wires a custom registry (empty registry keeps stub confidence).

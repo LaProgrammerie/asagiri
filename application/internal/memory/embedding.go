@@ -1,17 +1,25 @@
 package memory
 
 import (
+	"context"
 	"encoding/json"
 	"math"
 	"sort"
 
 	"github.com/LaProgrammerie/asagiri/application/internal/embedutil"
+	"github.com/LaProgrammerie/asagiri/application/internal/memory/embedder"
 	"github.com/LaProgrammerie/asagiri/application/internal/runtime"
 )
 
-// Embed builds a deterministic bag-of-words vector (spec-my-A §24.10).
+// Embed builds a vector using the configured embedder (hash by default).
 func Embed(text string) []float32 {
-	return embedutil.Vector(text)
+	v, err := embedder.EmbedText(context.Background(), text)
+	if err != nil {
+		h := embedder.NewHash()
+		out, _ := h.Embed(context.Background(), text)
+		return out
+	}
+	return v
 }
 
 // CosineSimilarity returns similarity in [0,1].
@@ -47,14 +55,17 @@ func UnmarshalEmbedding(raw string) []float32 {
 }
 
 // RetrieveByQuery ranks memory entries by embedding similarity.
-func (e *Engine) RetrieveByQuery(query string, limit int) ([]runtime.MemoryEntry, error) {
+func (e *Engine) RetrieveByQuery(ctx context.Context, query string, limit int) ([]runtime.MemoryEntry, error) {
 	if e == nil || e.store == nil {
 		return nil, nil
 	}
 	if query == "" {
 		return e.Retrieve("", nil, limit)
 	}
-	qv := Embed(query)
+	qv, err := e.embedQuery(ctx, query)
+	if err != nil {
+		return nil, err
+	}
 	entries, err := e.store.ListMemory("", 0)
 	if err != nil {
 		return nil, err

@@ -50,9 +50,10 @@ func newPrototypeCmd(dryRun *bool) *cobra.Command {
 	createCmd.Flags().StringVar(&style, "style", "minimal", "Style prototype")
 
 	runCmd := &cobra.Command{
-		Use:   "run <product>",
-		Short: "Préparer l'exécution locale du prototype",
-		Args:  cobra.ExactArgs(1),
+		Use:     "run <product>",
+		Short:   "Lancer le serveur dev du prototype (npm run dev)",
+		Example: "  asa prototype run workspace-saas",
+		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			startDir, err := os.Getwd()
 			if err != nil {
@@ -63,8 +64,19 @@ func newPrototypeCmd(dryRun *bool) *cobra.Command {
 				return err
 			}
 			defer actx.Close()
-			url := "http://localhost:5173"
-			fmt.Fprintf(cmd.OutOrStdout(), "prototype %s prêt (%s). Lancez: cd .asagiri/products/%s/prototype && npm run dev\n", args[0], url, product.Slug(args[0]))
+			svc := product.NewService(actx.RepoRoot)
+			result, err := svc.RunPrototype(product.PrototypeRunOptions{
+				Product: args[0],
+				DryRun:  actx.DryRun || *dryRun,
+			})
+			if err != nil {
+				return err
+			}
+			if actx.DryRun || *dryRun {
+				fmt.Fprintf(cmd.OutOrStdout(), "prototype %s prêt (%s). cd %s && npm run dev\n", result.Product, result.URL, result.Dir)
+				return nil
+			}
+			fmt.Fprintf(cmd.OutOrStdout(), "prototype %s démarré (%s) pid=%d dir=%s\n", result.Product, result.URL, result.PID, result.Dir)
 			return nil
 		},
 	}
@@ -146,6 +158,45 @@ func newFlowsCmd(dryRun *bool) *cobra.Command {
 			return nil
 		},
 	}
+	e2eCmd := &cobra.Command{
+		Use:     "e2e <product>",
+		Short:   "Générer un squelette de test E2E depuis un flow YAML",
+		Example: "  asa flows e2e workspace-saas --flow workspace-onboarding",
+		Args:    cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			startDir, err := os.Getwd()
+			if err != nil {
+				return err
+			}
+			actx, err := loadContext(startDir, *dryRun)
+			if err != nil {
+				return err
+			}
+			defer actx.Close()
+			flowID, _ := cmd.Flags().GetString("flow")
+			runner, _ := cmd.Flags().GetString("runner")
+			svc := product.NewService(actx.RepoRoot)
+			result, err := svc.GenerateE2ETest(product.E2EGeneratorOptions{
+				Product: args[0],
+				FlowID:  flowID,
+				Runner:  runner,
+				DryRun:  actx.DryRun || *dryRun,
+			})
+			if err != nil {
+				return err
+			}
+			if actx.DryRun || *dryRun {
+				fmt.Fprintf(cmd.OutOrStdout(), "e2e skeleton (%s): %s (%d steps)\n", result.Runner, result.Path, result.StepCount)
+				return nil
+			}
+			fmt.Fprintf(cmd.OutOrStdout(), "e2e généré: %s (%s, %d steps)\n", result.Path, result.Runner, result.StepCount)
+			return nil
+		},
+	}
+	e2eCmd.Flags().String("flow", "", "Flow id (fichier .asagiri/products/<product>/flows/<id>.flow.yaml)")
+	e2eCmd.Flags().String("runner", "playwright", "Runner cible: playwright ou cypress")
+	_ = e2eCmd.MarkFlagRequired("flow")
+
 	reviewCmd := &cobra.Command{
 		Use:   "review <product>",
 		Short: "Analyser les gaps métier/metrics/observabilité des flows",
@@ -169,7 +220,7 @@ func newFlowsCmd(dryRun *bool) *cobra.Command {
 			return nil
 		},
 	}
-	cmd.AddCommand(extractCmd, inspectCmd, reviewCmd)
+	cmd.AddCommand(extractCmd, inspectCmd, reviewCmd, e2eCmd)
 	return cmd
 }
 

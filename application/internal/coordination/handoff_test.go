@@ -42,6 +42,22 @@ func TestDefaultHandoffBuilderPersistsYAML(t *testing.T) {
 	require.InDelta(t, 0.78, loaded.Confidence, 0.001)
 }
 
+func TestDefaultHandoffBuilderRejectsPathTraversal(t *testing.T) {
+	repo := t.TempDir()
+	builder := &coordination.DefaultHandoffBuilder{
+		RepoRoot:     repo,
+		HandoffsPath: "../../../tmp/evil-handoffs",
+	}
+	_, err := builder.Build(context.Background(), coordination.AgentResult{
+		NodeID:     "node-1",
+		Role:       coordination.RoleInvestigator,
+		TargetRole: coordination.RoleImplementer,
+		Summary:    "summary",
+	})
+	require.Error(t, err)
+	require.ErrorIs(t, err, coordination.ErrHandoffPersist)
+}
+
 func TestDefaultHandoffBuilderRequiresSummary(t *testing.T) {
 	builder := &coordination.DefaultHandoffBuilder{RepoRoot: t.TempDir()}
 	_, err := builder.Build(context.Background(), coordination.AgentResult{

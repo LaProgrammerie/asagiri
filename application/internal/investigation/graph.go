@@ -1,6 +1,7 @@
 package investigation
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -28,8 +29,8 @@ type RootCauseGraph struct {
 	Edges []GraphEdge `json:"edges"`
 }
 
-// BuildRootCauseGraph constructs a graph from a report.
-func BuildRootCauseGraph(rep Report) RootCauseGraph {
+// BuildRootCauseGraph constructs a graph from a report and optional knowledge context pack.
+func BuildRootCauseGraph(rep Report, pack ContextPack) RootCauseGraph {
 	var g RootCauseGraph
 	symptomID := "symptom:0"
 	g.Nodes = append(g.Nodes, GraphNode{ID: symptomID, Kind: "symptom", Label: rep.Request.Symptom})
@@ -37,6 +38,20 @@ func BuildRootCauseGraph(rep Report) RootCauseGraph {
 		fid := "flow:" + rep.Scope.Flow
 		g.Nodes = append(g.Nodes, GraphNode{ID: fid, Kind: "flow", Label: rep.Scope.Flow})
 		g.Edges = append(g.Edges, GraphEdge{From: symptomID, To: fid, Relation: "fails_at"})
+	}
+	for i, api := range pack.APIs {
+		nid := fmt.Sprintf("api:%d", i)
+		g.Nodes = append(g.Nodes, GraphNode{ID: nid, Kind: "api", Label: api})
+		if rep.Scope.Flow != "" {
+			g.Edges = append(g.Edges, GraphEdge{From: "flow:" + rep.Scope.Flow, To: nid, Relation: "requires"})
+		}
+	}
+	for i, ev := range pack.Events {
+		nid := fmt.Sprintf("event:%d", i)
+		g.Nodes = append(g.Nodes, GraphNode{ID: nid, Kind: "event", Label: ev})
+		if rep.Scope.Flow != "" {
+			g.Edges = append(g.Edges, GraphEdge{From: "flow:" + rep.Scope.Flow, To: nid, Relation: "emits"})
+		}
 	}
 	for i, e := range rep.Evidence {
 		nid := "evidence:" + e.ID
@@ -63,12 +78,15 @@ func BuildRootCauseGraph(rep Report) RootCauseGraph {
 }
 
 // WriteGraph persists graph.json under the investigation directory.
-func WriteGraph(repoRoot string, rep Report) (string, error) {
+func WriteGraph(repoRoot string, rep Report, pack ContextPack) (string, error) {
 	dir := filepath.Join(repoRoot, ".asagiri", "investigations", rep.ID)
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		return "", err
 	}
-	g := BuildRootCauseGraph(rep)
+	g, err := BuildRootCauseGraphWithKnowledge(context.Background(), repoRoot, rep, pack)
+	if err != nil {
+		g = BuildRootCauseGraph(rep, pack)
+	}
 	raw, err := json.MarshalIndent(g, "", "  ")
 	if err != nil {
 		return "", err

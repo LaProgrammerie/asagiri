@@ -25,7 +25,10 @@ func (BlastRadiusRunner) Run(ctx context.Context, scope Scope, deps Dependencies
 	}
 
 	findings := make([]Finding, 0)
-	br := computeBlastRadius(pctx.flow, pctx.bundle, pctx.bundleErr)
+	br, usedGraph := tryKnowledgeBlastRadius(ctx, scope, scope.Flow, deps)
+	if !usedGraph {
+		br = computeBlastRadius(pctx.flow, pctx.bundle, pctx.bundleErr)
+	}
 
 	if pctx.bundleErr != nil {
 		findings = append(findings, Finding{

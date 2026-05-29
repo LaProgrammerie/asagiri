@@ -80,7 +80,10 @@ func (b *DefaultHandoffBuilder) Build(_ context.Context, result AgentResult) (Ha
 		CreatedAt:   time.Now().UTC().Format(time.RFC3339),
 	}
 
-	base := b.handoffsBase()
+	base, err := b.handoffsBase()
+	if err != nil {
+		return Handoff{}, err
+	}
 	dir := filepath.Join(base, id)
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		return Handoff{}, fmt.Errorf("%w: %v", ErrHandoffPersist, err)
@@ -96,12 +99,24 @@ func (b *DefaultHandoffBuilder) Build(_ context.Context, result AgentResult) (Ha
 	return h, nil
 }
 
-func (b *DefaultHandoffBuilder) handoffsBase() string {
+func (b *DefaultHandoffBuilder) handoffsBase() (string, error) {
 	rel := strings.TrimSpace(b.HandoffsPath)
 	if rel == "" {
 		rel = DefaultHandoffsRel
 	}
-	return filepath.Join(b.RepoRoot, filepath.Clean(rel))
+	if filepath.IsAbs(rel) {
+		return "", fmt.Errorf("%w: handoffs path must be relative to repo", ErrHandoffPersist)
+	}
+	clean := filepath.Clean(rel)
+	if clean == ".." || strings.HasPrefix(clean, ".."+string(filepath.Separator)) {
+		return "", fmt.Errorf("%w: handoffs path must not escape repo", ErrHandoffPersist)
+	}
+	base := filepath.Join(b.RepoRoot, clean)
+	relToRepo, err := filepath.Rel(b.RepoRoot, base)
+	if err != nil || strings.HasPrefix(relToRepo, "..") {
+		return "", fmt.Errorf("%w: handoffs path must not escape repo", ErrHandoffPersist)
+	}
+	return base, nil
 }
 
 func handoffID(nodeID string) string {

@@ -1,14 +1,15 @@
 # Asagiri — écarts doc / code / spec
 
 > **Registre maître phase finale :** [`spec-phase-finale.md`](spec-phase-finale.md) §1 (IDs **PF-***).  
-> Ce fichier garde la traçabilité historique **GAP-*** ; à synchroniser avec le registre PF lors des clôtures.
+> **P1 (`2026-05-29`) :** PF-A-01/02, PF-C-01…05 fermés en code — voir [`handoff.md`](docs/ai/active/handoff.md).  
+> Ce fichier garde la traçabilité **GAP-*** ↔ **PF-X-*** (P2/P3 encore ouverts).
 
 | ID | Zone | Problème | Sévérité | Statut |
 | --- | --- | --- | --- | --- |
-| GAP-001 | CLI `resume` | Hors `--dry-run`, `asa resume <run-id>` affiche seulement le prochain step (`plan`, `dev`, …) et **n’exécute pas** les agents. L’enchaînement automatique existe uniquement via `resume --execute` avec `--dry-run` (`ResumeRunDryExecute` retourne une erreur sinon). | Moyenne | → **PF-X-01** dans [`spec-phase-finale.md`](spec-phase-finale.md) |
+| GAP-001 | CLI `resume` | Sans `--execute`, affiche le prochain step seulement. Avec `--execute`, exécute un step (agents réels hors dry-run global). | Moyenne | **Clôturé** — PF-X-01 (`2026-05-29`) |
 | GAP-002 | Cost | Pas de tokenizers provider-exacts : estimation par heuristique `chars_per_token` uniquement (`cost/token_counter.go`). La roadmap P0 le prévoit ; la doc ne doit pas présenter les montants comme factures. | Faible | → **PF-X-02** |
-| GAP-003 | RAG | `asa index` indexe des chunks SQLite ; pas d’embeddings vectoriels ni retrieval sémantique malgré `embedding_model` dans l’exemple config. | Faible | → **PF-X-03** (lien **PF-A-01**) |
-| GAP-004 | Docgen | Les pages CLI générées utilisent un exemple minimal `asa <cmd>` sans args obligatoires (ex. `work` sans instruction) tant que `cobra.Command.Example` n’est pas renseigné. | Faible | → **PF-X-04** |
+| GAP-003 | RAG | `asa index` = chunks keyword (LIKE) ; embeddings sémantiques via `memory reindex` + PF-A-01 embedder. | Faible | **Clôturé (doc)** — PF-X-03 (`2026-05-29`) |
+| GAP-004 | Docgen | Pages CLI sans args obligatoires tant que `cobra.Example` absent. | Faible | **Clôturé** — PF-X-04 (`2026-05-29`) |
 
 ## Aucun écart bloquant identifié le 2026-05-17
 

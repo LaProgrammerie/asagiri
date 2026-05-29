@@ -17,6 +17,7 @@ type TrustEnrichmentInput struct {
 // TrustGateConfig mirrors execution_graph.gates for planner hooks.
 type TrustGateConfig struct {
 	TrustRequiredForHighRisk bool
+	HumanApprovalFor         []string
 }
 
 // ApplyTrustEnrichment inserts trust verification nodes and required checks (spec §17).
@@ -45,7 +46,7 @@ func ApplyTrustEnrichment(nodes []GraphNode, bindings []TaskBinding, edges []Gra
 			}
 		case NodeTypeImplementation:
 			binding := bindingForNode(bindings, nodes[i].ID)
-			if binding != nil && isPublicContract(binding.ContractRef) {
+			if binding != nil && isPublicContractRef(binding.ContractRef) {
 				nodes[i].RequiredChecks = appendUnique(nodes[i].RequiredChecks, "backward_compatibility", "trust")
 			}
 			if binding != nil && binding.Sensitive {
@@ -55,7 +56,7 @@ func ApplyTrustEnrichment(nodes []GraphNode, bindings []TaskBinding, edges []Gra
 	}
 
 	for _, b := range bindings {
-		needsGate := isPublicContract(b.ContractRef) || (trustRequired && (b.Sensitive || riskForBinding(b) == RiskLevelHigh))
+		needsGate := isPublicContractRef(b.ContractRef) || (trustRequired && (b.Sensitive || riskForBinding(b) == RiskLevelHigh))
 		if !needsGate {
 			continue
 		}
@@ -91,11 +92,6 @@ func ApplyTrustEnrichment(nodes []GraphNode, bindings []TaskBinding, edges []Gra
 	}
 
 	return nodes, edges
-}
-
-func isPublicContract(ref string) bool {
-	ref = strings.TrimSpace(ref)
-	return ref != "" && !strings.HasPrefix(ref, "TODO:")
 }
 
 func trustGateID(action string) string {
