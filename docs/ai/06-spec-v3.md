@@ -1,6 +1,6 @@
 # Spec V3 — Cost, Performance & Token Optimization (Asagiri)
 
-**Source :** [`specv3.md`](../../specv3.md) (racine) — branding **Asagiri** / CLI **`asa`** (pas `agentflow`).
+**Source :** [`specv3.md`](../archives/specs/specv3.md) (racine) — branding **Asagiri** / CLI **`asa`** (pas `agentflow`).
 
 ## Objectif
 

@@ -79,7 +79,7 @@ See [`examples/quickstart/`](examples/quickstart/) for a longer walkthrough.
 ./bin/asa report <run-id>
 ```
 
-Primitive pipeline (Kiro → plan → dev → verify): [`spec.md`](spec.md) · Intent layer: [`specv2.md`](specv2.md) · Cost/perf: [`specv3.md`](specv3.md)
+Primitive pipeline (Kiro → plan → dev → verify): [`spec.md`](docs/ai/archives/specs/spec.md) · Intent layer: [`specv2.md`](docs/ai/archives/specs/specv2.md) · Cost/perf: [`specv3.md`](docs/ai/archives/specs/specv3.md)
 
 ## Documentation
 
@@ -98,7 +98,7 @@ cd docs-site && corepack enable && pnpm install && pnpm run docs:check
 ## Status
 
 - V1 primitives, V2 intent layer, V3 cost/perf: implemented
-- Consolidation & OSS readiness: in progress ([`spec-postv123.md`](spec-postv123.md))
+- Consolidation & OSS readiness: in progress ([`spec-postv123.md`](docs/ai/archives/specs/spec-postv123.md))
 - **Experimental:** MCP server, Notion sync, confidence scoring — see docs
 
 ## Contributing

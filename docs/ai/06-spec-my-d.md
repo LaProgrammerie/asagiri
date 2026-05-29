@@ -1,7 +1,7 @@
 # Spec-my-D — Multi-Agent Coordination (canon `docs/ai`)
 
 **Statut :** livré — fondation + UX terminal + **D-FULL** (worktrees git réels, exécution nœuds via `NodeExecutor`, scoring avec historique) ; budget/conflict/escalation : trackers mémoire (lot 4)  
-**Spec racine :** [`spec-my-D.md`](../../spec-my-D.md)  
+**Spec racine :** [`spec-my-D.md`](../archives/specs/spec-my-D.md)  
 **Handoff :** [`active/handoff.md`](active/handoff.md)  
 **Prérequis :** [`06-spec-my-c.md`](06-spec-my-c.md) (execution graph)
 

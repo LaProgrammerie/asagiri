@@ -2,7 +2,7 @@
 
 **Date :** 2026-05-29  
 **Status :** accepted  
-**Spec :** [`spec-phase-finale.md`](../../spec-phase-finale.md) PF-A-02
+**Spec :** [`spec-phase-finale.md`](../ai/archives/specs/spec-phase-finale.md) PF-A-02
 
 ## Context
 

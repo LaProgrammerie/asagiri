@@ -1,11 +1,11 @@
 # Current spec — specv3 livrée
 
-**Phase :** [`specv3.md`](../../../specv3.md) — **livrée** (`2026-05-29`)  
+**Phase :** [`specv3.md`](../archives/specs/specv3.md) — **livrée** (`2026-05-29`)  
 **Handoff :** [`handoff.md`](handoff.md) — tranche specv3, matrice 100 %
 
 ## Spec active
 
-- **Registre :** [`specv3.md`](../../../specv3.md) — Cost, Performance & Token Optimization
+- **Registre :** [`specv3.md`](../archives/specs/specv3.md) — Cost, Performance & Token Optimization
 - **Canon :** [`06-spec-v3.md`](../06-spec-v3.md)
 - **Handoff :** [`handoff.md`](handoff.md)
 

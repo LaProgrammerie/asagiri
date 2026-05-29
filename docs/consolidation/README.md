@@ -24,5 +24,5 @@ Index des livrables de la mission consolidation / open source readiness.
 
 ## Specs
 
-- Mission : [`spec-postv123.md`](../../spec-postv123.md)
+- Mission : [`spec-postv123.md`](../ai/archives/specs/spec-postv123.md)
 - Historique : `spec.md`, `specv2.md`, `specv3.md`

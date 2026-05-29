@@ -1,6 +1,6 @@
 # Asagiri — écarts doc / code / spec
 
-> **Registre maître phase finale :** [`spec-phase-finale.md`](spec-phase-finale.md) §1 (IDs **PF-***, statut **Fermé**).  
+> **Registre maître phase finale :** [`spec-phase-finale.md`](docs/ai/archives/specs/spec-phase-finale.md) §1 (IDs **PF-***, statut **Fermé**).  
 > **Clôture (`2026-05-29`) :** tous les GAP-* et PF-* synchronisés — voir [`handoff.md`](docs/ai/active/handoff.md) archive phase finale.
 
 | ID | Zone | Problème | Sévérité | Statut |

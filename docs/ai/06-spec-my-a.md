@@ -1,9 +1,9 @@
 # Spec-my-A — couche produit exécutable (canon `docs/ai`)
 
 **Statut :** livré — **FULL** avec PF-A P1 (`2026-05-29`)  
-**Spec racine :** [`spec-my-A.md`](../../spec-my-A.md)  
+**Spec racine :** [`spec-my-A.md`](../archives/specs/spec-my-A.md)  
 **Handoff :** [`active/handoff.md`](active/handoff.md)  
-**Reliquats P1 fermés :** [`spec-phase-finale.md`](../../spec-phase-finale.md) PF-A-01 (ADR-025), PF-A-02 (ADR-026)
+**Reliquats P1 fermés :** [`spec-phase-finale.md`](../archives/specs/spec-phase-finale.md) PF-A-01 (ADR-025), PF-A-02 (ADR-026)
 
 ---
 

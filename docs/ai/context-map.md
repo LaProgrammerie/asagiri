@@ -6,7 +6,7 @@ Complements `AGENTS.md`: **where things live**, **who consumes what**, and **how
 
 | Topic | Where it lives |
 |-------|----------------|
-| **Phase finale — livrée** | [`spec-phase-finale.md`](../../spec-phase-finale.md) §1 (registre PF-* **Fermé**) ; [`handoff.md`](active/handoff.md) archive PF-* 100 % ; [`problems.md`](../../problems.md) GAP-* clôturés |
+| **Phase finale — livrée** | [`spec-phase-finale.md`](../archives/specs/spec-phase-finale.md) §1 (registre PF-* **Fermé**) ; [`handoff.md`](active/handoff.md) archive PF-* 100 % ; [`problems.md`](../../problems.md) GAP-* clôturés |
 | **Executable Product Layer (spec-my-A, FULL)** | `spec-my-A.md`, `docs/ai/06-spec-my-a.md`, ADR-018/019, **ADR-025/026** ; `internal/memory/embedder/` ; docs-site `en|fr|de|es` : `cli/runtime`, `runtime-serve`, `concepts/runtime`, `reference/typescript-sdk`, `configuration/config-file` (`runtime.memory.embedder`) |
 | **Trust & Verification Engine (spec-my-B, livré)** | `spec-my-B.md`, `docs/ai/06-spec-my-b.md`, `docs/ai/active/handoff.md`, ADR-020/021 ; code `application/internal/trust/`, `.asagiri/trust/<id>/` ; docs-site `en|fr|de|es` : `concepts/trust-engine`, `cli/verify-trust`, `cli/trust-gates`, `cli/trust-replay`, `configuration/config-file` (bloc `verification`) ; CLI généré `en/cli/generated/verify-trust`, `trust`, `trust-gates`, `trust-replay` |
 | **Execution Graph Planner (spec-my-C, FULL)** | `spec-my-C.md`, `docs/ai/06-spec-my-c.md`, ADR-022 ; `internal/executiongraph/` (checkpoints, gates, `trust.Engine`, inférence V2 PF-C-06) ; docs-site `en|fr|de|es` : `graph-run`, `graph-resume`, `execution_graph` config |
@@ -14,12 +14,13 @@ Complements `AGENTS.md`: **where things live**, **who consumes what**, and **how
 | **Engineering Knowledge Graph (spec-my-E, livré)** | `spec-my-E.md`, `docs/ai/06-spec-my-e.md`, ADR-024 ; `internal/knowledge/` + extractors (**analytics** : `contracts/analytics.yaml`) ; docs-site `en|fr|de|es` : `engineering-knowledge-graph`, `cli/knowledge`, `cli/impact`, `cli/context` |
 | **Replay & Deterministic Execution (spec-my-F, livré)** | `spec-my-F.md`, `docs/ai/06-spec-my-f.md`, `docs/ai/active/handoff.md` ; `internal/replay/` (≠ `internal/trust/replay/`) ; `.asagiri/replays/<replay-id>/` ; docs-site `en|fr|de|es` : `concepts/replay-engine`, `cli/replay`, `configuration/config-file` (bloc `replay`) ; CLI généré `en/cli/generated/replay*` |
 | **Asagiri rebrand (spec-rename)** | `spec-rename.md`, `docs/ai/active/handoff.md`, ADR-016, `docs/migration/github-rename-asagiri.md` |
-| **Consolidation OSS / fiabilisation** | `spec-consolidation-now.md` (actif), `spec-postv123.md` (historique), `docs/consolidation/` |
-| **Public documentation site** | `spec-doc.md`, `spec-deploy-doc.md`, `docs-site/` (Fumadocs → **Cloudflare Pages**, projet **`asagiri-docs`**) ; contenu `content/docs/{en,fr,de,es}/` — **en** défaut/fallback, référence CLI générée sous `en/cli/generated/` ; CI `.github/workflows/docs-cloudflare-pages.yml` |
+| **Consolidation OSS / fiabilisation** | [`spec-postv123.md`](archives/specs/spec-postv123.md), `docs/consolidation/` |
+| **Public documentation site** | [`spec-doc.md`](archives/specs/spec-doc.md), [`spec-deploy-doc.md`](archives/specs/spec-deploy-doc.md), `docs-site/` (Fumadocs → **Cloudflare Pages**, projet **`asagiri-docs`**) ; contenu `content/docs/{en,fr,de,es}/` — **en** défaut/fallback, référence CLI générée sous `en/cli/generated/` ; CI `.github/workflows/docs-cloudflare-pages.yml` |
 | **Doc / code / spec drift tracker** | `problems.md` (repo root) |
-| **Asagiri cost/perf (V3, livré)** | `specv3.md`, `docs/ai/06-spec-v3.md`, ADR-010 ; `internal/cost/`, `contextopt/`, `pipeline/` ; docs-site `cost-performance/`, `concepts/cost-aware-workflows` |
-| **Intent layer** | `specv2.md` (repo root) |
-| **V1 spec (historique, noms AgentFlow)** | `spec.md` (repo root) |
+| **Archives specs longues** | [`docs/ai/archives/specs/`](archives/specs/README.md) — index de toutes les `spec*.md` |
+| **Asagiri cost/perf (V3, livré)** | [`specv3.md`](archives/specs/specv3.md), `docs/ai/06-spec-v3.md`, ADR-010 ; `internal/cost/`, `contextopt/`, `pipeline/` ; docs-site `cost-performance/`, `concepts/cost-aware-workflows` |
+| **Intent layer** | [`specv2.md`](archives/specs/specv2.md) |
+| **V1 spec (historique, noms AgentFlow)** | [`spec.md`](archives/specs/spec.md) |
 | Short cross-tool index | `AGENTS.md` (root) |
 | Stack locale (Go, Docker, Makefile) | `docs/ai/02-architecture.md`, `docs/ai/03-standards.md`, `Makefile` |
 | Decisions / architecture / standards (detail) | `docs/ai/*.md` |

@@ -13,7 +13,7 @@
 ```
 go.mod
 Makefile
-spec-rename.md
+docs/ai/archives/specs/
 .asagiri/config.yaml.example
 application/cmd/asa/
 application/internal/{cli,config,bootstrap,env,agent,worktree,workflow,validation,policy,rag,spec,plan,report,store/sqlite,version}

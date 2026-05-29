@@ -6,7 +6,7 @@
 
 ## Objectif
 
-Livrer intégralement [`specv3.md`](../../../specv3.md) (§17 critères, phases 1–7, §16 CLI) sous branding **Asagiri** / **`asa`**.
+Livrer intégralement [`specv3.md`](../archives/specs/specv3.md) (§17 critères, phases 1–7, §16 CLI) sous branding **Asagiri** / **`asa`**.
 
 ---
 
@@ -100,7 +100,7 @@ make build && ./bin/asa docs generate-cli
 
 ## Références
 
-- [`specv3.md`](../../../specv3.md), [`06-spec-v3.md`](../06-spec-v3.md)
+- [`specv3.md`](../archives/specs/specv3.md), [`06-spec-v3.md`](../06-spec-v3.md)
 - Stacks A–F : [`06-spec-my-f.md`](../06-spec-my-f.md)
 
 **Audit :** `2026-05-29` — specv3 alignée code ; prochaine spec au choix produit.

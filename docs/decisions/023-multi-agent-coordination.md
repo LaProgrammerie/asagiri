@@ -2,7 +2,7 @@
 
 **Date :** 2026-05-29  
 **Status :** accepted  
-**Spec :** [`spec-my-D.md`](../../spec-my-D.md)
+**Spec :** [`spec-my-D.md`](../ai/archives/specs/spec-my-D.md)
 
 ## Context
 

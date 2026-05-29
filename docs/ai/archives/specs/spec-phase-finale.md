@@ -158,7 +158,7 @@ Workflow `.github/workflows/sdk-npm-publish.yml` sur `sdk-v*` ; secret `NPM_TOKE
 
 ## 5. Spec-my-C — Execution graph
 
-**Réf.** [`spec-my-C.md`](spec-my-C.md) · [`06-spec-my-c.md`](docs/ai/06-spec-my-c.md) · **IDs** PF-C-01…06
+**Réf.** [`spec-my-C.md`](spec-my-C.md) · [`06-spec-my-c.md`](../../06-spec-my-c.md) · **IDs** PF-C-01…06
 
 Les critères §27 de spec-my-C sont **livrés** ; cette section durcit les **5 écarts P1** identifiés à la clôture (2026-05-29) plus l’inférence V2.
 

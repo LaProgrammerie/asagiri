@@ -4,9 +4,9 @@
 
 **Asagiri** industrialise les workflows de développement assistés par agents : spec → tâches → worktree → implémentation → validation → review → rapport, de façon déterministe et traçable en local. La commande CLI officielle est **`asa`**.
 
-**Rebrand (courant) :** [`spec-rename.md`](../../spec-rename.md).  
-**Canon produit (évolution intent) :** [`specv2.md`](../../specv2.md) — intent layer, sources, Notion.  
-**Historique V1 :** [`spec.md`](../../spec.md). Ce fichier résume ; ne pas dupliquer la spec complète ici.
+**Rebrand (courant) :** [`spec-rename.md`](../archives/specs/spec-rename.md).  
+**Canon produit (évolution intent) :** [`specv2.md`](../archives/specs/specv2.md) — intent layer, sources, Notion.  
+**Historique V1 :** [`spec.md`](../archives/specs/spec.md). Ce fichier résume ; ne pas dupliquer la spec complète ici.
 
 ## Utilisateurs / contexte
 

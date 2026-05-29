@@ -5,7 +5,7 @@ Merci de votre intérêt pour Asagiri (dépôt `Asagiri`).
 ## Avant de coder
 
 1. Lire [`AGENTS.md`](AGENTS.md) et [`docs/ai/context-map.md`](docs/ai/context-map.md).
-2. Pour une feature : aligner avec [`spec-postv123.md`](spec-postv123.md) ou la spec active (`docs/ai/active/handoff.md`).
+2. Pour une feature : aligner avec [`spec-postv123.md`](docs/ai/archives/specs/spec-postv123.md) ou la spec active (`docs/ai/active/handoff.md`).
 3. Ne pas committer de secrets (`.env`, tokens Notion, clés API).
 
 ## Environnement

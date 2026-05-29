@@ -1,7 +1,7 @@
 # Spec-my-C — Execution Graph Planner (canon `docs/ai`)
 
 **Statut :** livré (`2026-05-29`)  
-**Spec racine :** [`spec-my-C.md`](../../spec-my-C.md)  
+**Spec racine :** [`spec-my-C.md`](../archives/specs/spec-my-C.md)  
 **Handoff :** [`active/handoff.md`](active/handoff.md)  
 **Prérequis :** [`06-spec-my-a.md`](06-spec-my-a.md), [`06-spec-my-b.md`](06-spec-my-b.md)
 
@@ -175,4 +175,4 @@ make build && ./bin/asa docs generate-cli
 
 Traçabilité handoff : matrice C-* dans [`active/handoff.md`](active/handoff.md).
 
-**Durcissement phase finale** : **PF-C-01…06** livrés (`2026-05-29`) — voir [`spec-phase-finale.md`](../../spec-phase-finale.md) §5.
+**Durcissement phase finale** : **PF-C-01…06** livrés (`2026-05-29`) — voir [`spec-phase-finale.md`](../archives/specs/spec-phase-finale.md) §5.

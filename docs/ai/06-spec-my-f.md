@@ -1,7 +1,7 @@
 # Spec-my-F — Replay & Deterministic Execution (canon `docs/ai`)
 
 **Statut :** livrée (`2026-05-29`)  
-**Spec racine :** [`spec-my-F.md`](../../spec-my-F.md)  
+**Spec racine :** [`spec-my-F.md`](../archives/specs/spec-my-F.md)  
 **Handoff :** [`active/handoff.md`](active/handoff.md)  
 **Prérequis :** [`06-spec-my-e.md`](06-spec-my-e.md) (knowledge graph) ; stacks A–E livrées
 

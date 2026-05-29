@@ -2,7 +2,7 @@
 
 **Date :** 2026-05-29  
 **Status :** accepted  
-**Spec :** [`spec-phase-finale.md`](../../spec-phase-finale.md) PF-A-01
+**Spec :** [`spec-phase-finale.md`](../ai/archives/specs/spec-phase-finale.md) PF-A-01
 
 ## Context
 
@@ -24,5 +24,5 @@ Runtime memory used deterministic bag-of-words vectors (`internal/embedutil`). S
 
 ## Related
 
-- [`spec-my-A.md`](../../spec-my-A.md) §24.10
+- [`spec-my-A.md`](../ai/archives/specs/spec-my-A.md) §24.10
 - Config: [`docs-site` runtime.memory](../site) (EN/FR/DE/ES config-file)

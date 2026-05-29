@@ -1,7 +1,7 @@
 # Spec-my-B — Trust & Verification Engine (canon `docs/ai`)
 
 **Statut :** livré (`2026-05-29`)  
-**Spec racine :** [`spec-my-B.md`](../../spec-my-B.md)  
+**Spec racine :** [`spec-my-B.md`](../archives/specs/spec-my-B.md)  
 **Handoff :** [`active/handoff.md`](active/handoff.md)  
 **Prérequis :** [`06-spec-my-a.md`](06-spec-my-a.md) (product, runtime, analysis, investigation)
 

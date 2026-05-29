@@ -1,7 +1,7 @@
 # Spec-my-E — Engineering Knowledge Graph (canon `docs/ai`)
 
 **Statut :** livrée (`2026-05-29`)  
-**Spec racine :** [`spec-my-E.md`](../../spec-my-E.md)  
+**Spec racine :** [`spec-my-E.md`](../archives/specs/spec-my-E.md)  
 **Handoff :** [`active/handoff.md`](active/handoff.md)  
 **Prérequis :** [`06-spec-my-d.md`](06-spec-my-d.md) (multi-agent coordination)
 
