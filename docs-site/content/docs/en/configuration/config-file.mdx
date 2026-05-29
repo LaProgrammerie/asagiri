@@ -123,6 +123,32 @@ validation:
       required: true
 ```
 
+## `verification`
+
+Trust & verification gates (`spec-my-B` §19). Profiles define minimum confidence per dimension and checks that must pass before delivery or CI promotion.
+
+```yaml
+verification:
+  default_profile: production
+  gates:
+    production:
+      min_confidence:
+        architecture: 0.8
+        implementation: 0.75
+        security: 0.85
+      required_checks:
+        - contracts
+        - flows
+        - observability
+        - security
+```
+
+- `default_profile` — gate set used by `asa trust gates` and `asa verify trust --ci`
+- `min_confidence` — blocking thresholds on aggregated dimension scores (0.0–1.0)
+- `required_checks` — check type ids from the trust registry (e.g. `contracts`, `flows`, `security`)
+
+See [Trust engine](/docs/concepts/trust-engine), [`asa verify trust`](/docs/cli/verify-trust), and [`asa trust gates`](/docs/cli/trust-gates).
+
 ## `models`
 
 `models` holds logical profiles for routing and cost (`specv3`). Keys are arbitrary ids; each entry ties a provider, cost class, model name, and which step classes may use it.

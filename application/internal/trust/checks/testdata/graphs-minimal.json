@@ -1,0 +1,38 @@
+{
+  "product": "minimal-product",
+  "graphs": {
+    "api": {
+      "kind": "api",
+      "nodes": [
+        {
+          "id": "route:POST /api/workspaces",
+          "kind": "route",
+          "name": "POST /api/workspaces"
+        }
+      ],
+      "edges": []
+    },
+    "flow": {
+      "kind": "flow",
+      "nodes": [
+        {
+          "id": "flow:workspace-onboarding",
+          "kind": "flow",
+          "name": "workspace-onboarding"
+        }
+      ],
+      "edges": []
+    },
+    "dependency": {
+      "kind": "dependency",
+      "nodes": [
+        {
+          "id": "pkg:trust",
+          "kind": "package",
+          "name": "internal/trust"
+        }
+      ],
+      "edges": []
+    }
+  }
+}

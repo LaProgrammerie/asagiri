@@ -1,0 +1,22 @@
+trust_id: trust-2026-05-29-f045cd36
+checks:
+    - static-analysis
+    - contracts
+    - flows
+    - permissions
+    - observability
+    - analytics
+    - architecture
+    - security
+    - performance
+    - cost
+    - backward-compatibility
+    - migration-safety
+    - blast-radius
+    - tests
+repo_commit: bef75b8
+flow: workspace-onboarding
+commands:
+    - go test ./...
+    - go vet ./...
+    - golangci-lint run

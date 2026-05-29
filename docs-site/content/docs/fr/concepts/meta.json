@@ -8,6 +8,7 @@
     "prototype-as-spec",
     "runtime",
     "investigation",
-    "analysis-layer"
+    "analysis-layer",
+    "trust-engine"
   ]
 }

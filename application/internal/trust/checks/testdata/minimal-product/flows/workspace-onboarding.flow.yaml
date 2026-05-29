@@ -1,0 +1,31 @@
+id: workspace-onboarding
+title: Workspace onboarding
+entry_screen: landing
+steps:
+  - id: step-1
+    screen: landing
+    action: click_get_started
+    next: signup
+    contract_ref: POST /api/workspaces
+    errors:
+      - email_taken
+  - id: step-2
+    screen: signup
+    action: invite_member
+    next: dashboard
+    contract_ref: TODO:auth.signup
+    sensitive: true
+    errors:
+      - weak_password
+outcome: workspace_created
+business:
+  criticality: high
+security:
+  requires_authentication: true
+metrics:
+  - onboarding_completion_rate
+observability:
+  traces:
+    - onboarding.start
+  metrics:
+    - onboarding_step_duration

@@ -42,7 +42,20 @@ type Config struct {
 	Routing    RoutingConfig        `yaml:"routing"`
 	UI         UIConfig             `yaml:"ui"`
 	MCP        MCPConfig            `yaml:"mcp"`
-	Runtime    RuntimeConfig        `yaml:"runtime"`
+	Runtime      RuntimeConfig        `yaml:"runtime"`
+	Verification VerificationConfig   `yaml:"verification"`
+}
+
+// VerificationConfig holds trust verification gates (spec-my-B §19).
+type VerificationConfig struct {
+	DefaultProfile string                  `yaml:"default_profile"`
+	Gates          map[string]GateProfile  `yaml:"gates"`
+}
+
+// GateProfile defines blocking thresholds for a named gate set.
+type GateProfile struct {
+	MinConfidence  map[string]float64 `yaml:"min_confidence"`
+	RequiredChecks []string           `yaml:"required_checks"`
 }
 
 // ModelsConfig maps logical model/agent profile ids (specv3 §3.1).

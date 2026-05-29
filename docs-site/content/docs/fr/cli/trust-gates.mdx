@@ -1,0 +1,42 @@
+---
+title: trust gates
+description: Inspecter les profils de gates de vérification et les seuils bloquants.
+---
+
+# `asa trust gates`
+
+Affiche le profil `verification` actif depuis `.asagiri/config.yaml` et si les scores de confiance et checks requis passeraient (`spec-my-B` §19).
+
+## Usage
+
+```bash
+asa trust gates
+```
+
+## Configuration
+
+Les gates sont définies sous `verification.gates.<profil>` :
+
+```yaml
+verification:
+  default_profile: production
+  gates:
+    production:
+      min_confidence:
+        architecture: 0.8
+        implementation: 0.75
+        security: 0.85
+      required_checks:
+        - contracts
+        - flows
+        - observability
+        - security
+```
+
+Chaque clé `min_confidence` correspond à une [dimension de confiance](/docs/fr/concepts/trust-engine#six-dimensions-de-confiance). Les `required_checks` doivent réussir avant validation du gate.
+
+## Voir aussi
+
+- Exécuter les checks : [`asa verify trust`](/docs/fr/cli/verify-trust)
+- Replay : [`asa trust replay`](/docs/fr/cli/trust-replay)
+- Référence config : [`verification`](/docs/fr/configuration/config-file#verification)

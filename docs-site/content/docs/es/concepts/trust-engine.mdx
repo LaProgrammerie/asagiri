@@ -1,0 +1,70 @@
+---
+title: Motor de confianza y verificación
+description: Puntuación de confianza local, comprobaciones estructuradas y gates bloqueantes antes de entregar.
+---
+
+# Motor de confianza y verificación
+
+`spec-my-B` — capa de validación determinista entre la implementación del agente y una entrega lista para merge.
+
+## Principios
+
+- **Sin confianza implícita** — cada puntuación se basa en checks, contratos, flows o evidencias.
+- **Confianza ≠ corrección** — puntuaciones altas indican cobertura, no garantía (ADR-021).
+- **Checks componibles** — runners especializados agregados en seis dimensiones.
+- **Riesgo visible** — blast radius, riesgo residual y huecos en los informes.
+
+## Pipeline
+
+```text
+implementación
+  → checks de verificación (internal/trust/checks/)
+  → puntuación de confianza (6 dimensiones)
+  → gates de verificación (config verification:)
+  → revisión / continuación del work
+```
+
+## Seis dimensiones de confianza
+
+| Dimensión | Mide |
+|-----------|------|
+| Arquitectura | Contratos, capas, dependencias, blast radius |
+| Implementación | Tests, calidad del diff, estabilidad estimada |
+| Integridad de flows | Estados, transiciones, permisos, acciones |
+| Observabilidad | Logs, métricas, trazas, dashboards |
+| Seguridad | Auth, permisos, secretos, rutas destructivas |
+| Regresión | Flows impactados, cobertura, deps críticas |
+
+## Artefactos
+
+Cada ejecución escribe en `.asagiri/trust/<trust-id>/`:
+
+- `report.md` / `report.json` — resumen humano y máquina
+- `replay.yaml` — manifiesto para `asa trust replay <id>`
+
+## CLI
+
+| Comando | Propósito |
+|---------|-----------|
+| [`asa verify trust`](/docs/es/cli/verify-trust) | Pipeline completo sobre un flow de producto |
+| [`asa trust gates`](/docs/es/cli/trust-gates) | Perfil de gates activo y pass/fail |
+| [`asa trust replay`](/docs/es/cli/trust-replay) | Reejecutar desde manifiesto guardado |
+| `asa work --strict-trust` | Bloquear work si fallan los gates tras implementar |
+
+## Configuración
+
+Umbrales en [`verification`](/docs/es/configuration/config-file#verification) dentro de `.asagiri/config.yaml`.
+
+## Código
+
+```text
+internal/trust/
+  engine.go
+  report.go
+  gates.go
+  checks/
+  confidence/
+  replay/
+```
+
+Usa assets de producto (flows, contracts) y grafos de análisis cuando existen.

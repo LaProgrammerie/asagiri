@@ -1,29 +1,52 @@
-# Current spec — Asagiri Executable Product Layer (spec-my-A)
+# Current spec — Asagiri Trust & Verification Engine (spec-my-B)
 
-**Phase :** `spec-my-A` — **livrée**  
-**Date :** 2026-05-27
+**Phase :** `spec-my-B` — **livrée** (`2026-05-29`)  
+**Audit clôture :** [`handoff.md`](handoff.md) — lots 1–6 [x], DoD global §26 [x], validation 2026-05-29
 
-## Spec active
+## Spec active (clôturée)
 
-- **Mission :** [`spec-my-A.md`](../../../spec-my-A.md) (§1–26)
-- **Handoff :** [`handoff.md`](handoff.md)
-- **Suite optionnelle :** [`spec-phase-finale.md`](../../../spec-phase-finale.md) (embeddings sémantiques Ollama + publish npm)
+- **Mission :** [`spec-my-B.md`](../../../spec-my-B.md) (§1–29, critères §26)
+- **Canon :** [`06-spec-my-b.md`](../06-spec-my-b.md), ADR-020, ADR-021
+- **Handoff :** [`handoff.md`](handoff.md) — tous lots [x]
 
-## Résumé livré
+## Résumé spec-my-B
 
-1. **Executable Product Layer** — `asa prototype`, `asa flows`, `asa contracts`, `asa spec generate-from-product`, compatibilité `asa work`
-2. **Business Intent** — `business.yaml`, `asa flows review`, `asa architecture derive`, tasks flow-first
-3. **Runtime persistant** — daemon/worker, sessions, branches, hooks, memory, skills, API HTTP + Unix socket, SDK Go/TS
-4. **Analysis layer** — `asa analysis build` → 7 graphes sous `.asagiri/analysis/<product>/`
-5. **Investigation** — rapport, `context-pack.md`, graph, `asa investigate impact`, intégration work/verify
+Couche **Trust & Verification** local-first :
+
+```text
+implementation → trust checks → confidence (6 dimensions) → gates → review
+```
+
+| Lot | Focus | Statut |
+|-----|--------|--------|
+| **1** | Modèles, TrustEngine, rapports `.asagiri/trust/<id>/` | livré |
+| **2** | Pipeline Verify, checks de base, confidence | livré |
+| **3** | Checks avancés, blast radius | livré |
+| **4** | CLI, gates YAML, UX terminal | livré |
+| **5** | Runtime events, replay, `--strict-trust` | livré |
+| **6** | Canon + site EN/FR/DE/ES | livré |
+
+**CLI :** `asa verify trust`, `asa trust gates`, `asa trust replay`, `asa work --strict-trust`  
+**Docs site :** `concepts/trust-engine`, `cli/verify-trust`, `cli/trust-gates`, `cli/trust-replay`, config `verification` ; EN `cli/generated/trust`, `verify-trust`, `trust-gates`, `trust-replay`
 
 Branding : **Asagiri** / **`asa`** / `github.com/LaProgrammerie/asagiri`.
 
-## Documentation
+## Suite possible
 
-- **Site docs** (EN / FR / DE / ES) : `cli/runtime`, `cli/runtime-serve`, `cli/investigate`, `cli/analysis`, `concepts/runtime`, `concepts/investigation`, `concepts/analysis-layer`, `reference/typescript-sdk`, bloc `runtime` dans `configuration/config-file`, CLI `generated/` regénéré
-- **Canon IA** : [`06-spec-my-a.md`](../06-spec-my-a.md), handoff audité, [`context-map.md`](../context-map.md)
-- ADR : 018 (spec-my-A), 019 (API + analysis)
+- [`spec-phase-finale.md`](../../../spec-phase-finale.md) (embeddings Ollama + npm) — hors scope spec-my-B
+
+## Prérequis livré — spec-my-A
+
+**Phase :** `spec-my-A` — **livrée** (`2026-05-27`)
+
+1. **Executable Product Layer** — `asa prototype`, `asa flows`, `asa contracts`, `asa spec generate-from-product`
+2. **Business Intent** — `business.yaml`, `asa flows review`, `asa architecture derive`
+3. **Runtime persistant** — daemon/worker, sessions, API, SDK Go/TS
+4. **Analysis layer** — `asa analysis build` → graphes sous `.asagiri/analysis/<product>/`
+5. **Investigation** — rapport, `context-pack.md`, `asa investigate impact`
+
+- **Spec :** [`spec-my-A.md`](../../../spec-my-A.md)
+- **Canon :** [`06-spec-my-a.md`](../06-spec-my-a.md), ADR-018, ADR-019
 
 ## Previous phases
 

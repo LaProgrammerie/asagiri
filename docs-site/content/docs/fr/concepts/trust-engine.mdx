@@ -1,0 +1,70 @@
+---
+title: Moteur de confiance et vérification
+description: Scoring de confiance local, contrôles structurés et gates bloquants avant livraison.
+---
+
+# Moteur de confiance et vérification
+
+`spec-my-B` — couche de validation déterministe entre l’implémentation agentique et une livraison prête à merger.
+
+## Principes
+
+- **Pas de confiance implicite** — chaque score s’appuie sur des checks, contrats, flows ou preuves.
+- **Confiance ≠ correction** — un score élevé indique une couverture, pas une garantie (ADR-021).
+- **Checks composables** — runners spécialisés agrégés en six dimensions.
+- **Risque visible** — blast radius, risque résiduel et zones non couvertes dans les rapports.
+
+## Pipeline
+
+```text
+implémentation
+  → checks de vérification (internal/trust/checks/)
+  → scoring de confiance (6 dimensions)
+  → gates de vérification (config verification:)
+  → review / poursuite du work
+```
+
+## Six dimensions de confiance
+
+| Dimension | Mesure |
+|-----------|--------|
+| Architecture | Contrats, layering, dépendances, blast radius |
+| Implémentation | Tests, qualité du diff, stabilité estimée |
+| Intégrité des flows | États, transitions, permissions, actions |
+| Observabilité | Logs, métriques, traces, dashboards |
+| Sécurité | Auth, permissions, secrets, actions destructives |
+| Régression | Flows impactés, couverture, dépendances critiques |
+
+## Artefacts
+
+Chaque exécution écrit sous `.asagiri/trust/<trust-id>/` :
+
+- `report.md` / `report.json` — synthèse lisible et machine
+- `replay.yaml` — manifeste pour `asa trust replay <id>`
+
+## CLI
+
+| Commande | Rôle |
+|----------|------|
+| [`asa verify trust`](/docs/fr/cli/verify-trust) | Pipeline complet sur un flow produit |
+| [`asa trust gates`](/docs/fr/cli/trust-gates) | Profil de gates actif et état pass/fail |
+| [`asa trust replay`](/docs/fr/cli/trust-replay) | Rejouer depuis un manifeste sauvegardé |
+| `asa work --strict-trust` | Bloquer le work si les gates échouent après implémentation |
+
+## Configuration
+
+Les seuils sont dans [`verification`](/docs/fr/configuration/config-file#verification) dans `.asagiri/config.yaml`.
+
+## Code
+
+```text
+internal/trust/
+  engine.go
+  report.go
+  gates.go
+  checks/
+  confidence/
+  replay/
+```
+
+S’appuie sur le produit (flows, contracts) et les graphes d’analyse lorsqu’ils existent.

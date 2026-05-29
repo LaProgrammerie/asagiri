@@ -38,6 +38,11 @@ application/
     analysis/              # spec-my-A : graphes structuraux
     investigation/         # spec-my-A : pipeline investigation
     embedutil/
+    trust/                 # spec-my-B : moteur confiance & vérification
+    trust/checks/
+    trust/confidence/
+    trust/replay/
+    trust/safeid/
 .asagiri/                # créé par asa init
   config.yaml
   state.sqlite           # gitignored
@@ -47,6 +52,7 @@ application/
   analysis/<product>/
   investigations/
   skills/
+  trust/<trust-id>/      # spec-my-B : report.md, report.json, replay.yaml
 ```
 
 ## Packages clés
@@ -123,8 +129,12 @@ spec/plan → enrich → dev (worktree + agent) → verify → review → report
 | `internal/skills/` | `.asagiri/skills/*.yaml` |
 | `internal/analysis/` | `asa analysis build` → graphs.json |
 | `internal/investigation/` | Rapport, graph, impact, context-pack |
+| `internal/trust/` | `TrustEngine`, rapports `.asagiri/trust/<id>/`, gates, replay |
+| `internal/trust/checks/` | Runners de vérification (contracts, flows, blast-radius, …) |
+| `internal/trust/confidence/` | Agrégation 6 dimensions §7 spec-my-B |
 
-Détail spec-my-A : [`06-spec-my-a.md`](06-spec-my-a.md).
+Détail spec-my-A : [`06-spec-my-a.md`](06-spec-my-a.md).  
+Détail spec-my-B : [`06-spec-my-b.md`](06-spec-my-b.md).
 
 Interfaces §11.2 : `WorkflowEngine`, `TaskStore`, `WorktreeManager`, `Validator` déclarées dans `internal/workflow/interfaces.go` ; implémentations = `Service`, `sqlite.Store`, `worktree.Manager`, `validation.Runner`.
 

@@ -123,6 +123,32 @@ validation:
       required: true
 ```
 
+## `verification`
+
+Gates de confianza y verificación (`spec-my-B` §19). Cada perfil define confianza mínima por dimensión y checks obligatorios antes de entregar o promover en CI.
+
+```yaml
+verification:
+  default_profile: production
+  gates:
+    production:
+      min_confidence:
+        architecture: 0.8
+        implementation: 0.75
+        security: 0.85
+      required_checks:
+        - contracts
+        - flows
+        - observability
+        - security
+```
+
+- `default_profile` — conjunto de gates para `asa trust gates` y `asa verify trust --ci`
+- `min_confidence` — umbrales bloqueantes en puntuaciones agregadas (0.0–1.0)
+- `required_checks` — ids de checks del registro trust (p. ej. `contracts`, `flows`, `security`)
+
+Ver [Motor de confianza](/docs/es/concepts/trust-engine), [`asa verify trust`](/docs/es/cli/verify-trust) y [`asa trust gates`](/docs/es/cli/trust-gates).
+
 ## `models`
 
 `models` aloja perfiles lógicos para enrutado y coste (`specv3`). Las claves son ids arbitrarias; cada entrada enlaza proveedor, clase de coste, nombre de modelo y clases de paso autorizadas.

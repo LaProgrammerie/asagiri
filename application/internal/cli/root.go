@@ -39,6 +39,7 @@ func newRootCmd() *cobra.Command {
 		newEnrichCmd(&dryRun),
 		newDevCmd(&dryRun),
 		newVerifyCmd(&dryRun),
+		newTrustCmd(),
 		newReviewCmd(&dryRun),
 		newStatusCmd(&dryRun),
 		newResumeCmd(&dryRun),
@@ -244,6 +245,7 @@ func newVerifyCmd(dryRun *bool) *cobra.Command {
 	cmd.Flags().StringVar(&taskID, "task", "", "ID de tâche à vérifier")
 	cmd.Flags().BoolVar(&force, "force", false, "Relancer une étape déjà réussie")
 	cmd.Flags().BoolVar(&investigateOnFailure, "investigate-on-failure", false, "Lancer une investigation locale si la vérification échoue")
+	cmd.AddCommand(newVerifyTrustCmd())
 	return cmd
 }
 

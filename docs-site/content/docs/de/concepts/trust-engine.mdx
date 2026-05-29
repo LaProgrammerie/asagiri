@@ -1,0 +1,70 @@
+---
+title: Trust- und Verifizierungs-Engine
+description: Local-first Confidence-Scoring, strukturierte Checks und blockierende Gates vor der Auslieferung.
+---
+
+# Trust- und Verifizierungs-Engine
+
+`spec-my-B` — deterministische Validierungsschicht zwischen Agenten-Implementierung und merge-fertiger Auslieferung.
+
+## Prinzipien
+
+- **Kein implizites Vertrauen** — jeder Score basiert auf Checks, Verträgen, Flows oder Belegen.
+- **Confidence ≠ Korrektheit** — hohe Werte zeigen Abdeckung, keinen Beweis (ADR-021).
+- **Komponierbare Checks** — spezialisierte Runner aggregieren zu sechs Dimensionen.
+- **Sichtbares Risiko** — Blast Radius, Restrisiko und Lücken erscheinen in Reports.
+
+## Pipeline
+
+```text
+Implementierung
+  → Verifizierungs-Checks (internal/trust/checks/)
+  → Confidence-Scoring (6 Dimensionen)
+  → Verifizierungs-Gates (config verification:)
+  → Review / Work-Fortsetzung
+```
+
+## Sechs Confidence-Dimensionen
+
+| Dimension | Misst |
+|-----------|--------|
+| Architektur | Verträge, Layering, Abhängigkeiten, Blast Radius |
+| Implementierung | Tests, Diff-Qualität, Stabilitätsschätzungen |
+| Flow-Integrität | Zustände, Übergänge, Berechtigungen, Aktionen |
+| Observability | Logs, Metriken, Traces, Dashboards |
+| Sicherheit | Auth, Permissions, Secrets, destruktive Pfade |
+| Regression | Betroffene Flows, Abdeckung, kritische Deps |
+
+## Artefakte
+
+Jeder Lauf schreibt unter `.asagiri/trust/<trust-id>/`:
+
+- `report.md` / `report.json` — menschlich und maschinenlesbar
+- `replay.yaml` — Manifest für `asa trust replay <id>`
+
+## CLI
+
+| Befehl | Zweck |
+|--------|-------|
+| [`asa verify trust`](/docs/de/cli/verify-trust) | Vollständige Pipeline auf einem Produkt-Flow |
+| [`asa trust gates`](/docs/de/cli/trust-gates) | Aktives Gate-Profil und Pass/Fail |
+| [`asa trust replay`](/docs/de/cli/trust-replay) | Aus gespeichertem Manifest erneut ausführen |
+| `asa work --strict-trust` | Work blockieren, wenn Gates nach Implementierung scheitern |
+
+## Konfiguration
+
+Schwellenwerte unter [`verification`](/docs/de/configuration/config-file#verification) in `.asagiri/config.yaml`.
+
+## Code
+
+```text
+internal/trust/
+  engine.go
+  report.go
+  gates.go
+  checks/
+  confidence/
+  replay/
+```
+
+Nutzt Produkt-Assets (flows, contracts) und Analyse-Graphen, sofern vorhanden.

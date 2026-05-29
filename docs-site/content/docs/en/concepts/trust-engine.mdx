@@ -1,0 +1,70 @@
+---
+title: Trust & verification engine
+description: Local-first confidence scoring, structured checks, and blocking gates before delivery.
+---
+
+# Trust & verification engine
+
+`spec-my-B` — deterministic validation layer between agent implementation and merge-ready delivery.
+
+## Principles
+
+- **No implicit trust** — every score ties to checks, contracts, flows, tests, or evidence.
+- **Confidence ≠ correctness** — high scores show coverage, not proof (ADR-021).
+- **Composable checks** — specialized runners aggregate into six dimensions.
+- **Visible risk** — blast radius, residual risk, and uncovered areas appear in reports.
+
+## Pipeline
+
+```text
+implementation
+  → verification checks (internal/trust/checks/)
+  → confidence scoring (6 dimensions)
+  → verification gates (config verification:)
+  → review / work continuation
+```
+
+## Six confidence dimensions
+
+| Dimension | Measures |
+|-----------|----------|
+| Architecture | Contracts, layering, dependencies, blast radius |
+| Implementation | Tests, diff quality, stability estimates |
+| Flow integrity | States, transitions, permissions, actions |
+| Observability | Logs, metrics, traces, dashboards |
+| Security | Auth, permissions, secrets, destructive paths |
+| Regression | Impacted flows, coverage, critical deps |
+
+## Artefacts
+
+Each run writes under `.asagiri/trust/<trust-id>/`:
+
+- `report.md` / `report.json` — human and machine-readable summary
+- `replay.yaml` — manifest for `asa trust replay <id>`
+
+## CLI
+
+| Command | Purpose |
+|---------|---------|
+| [`asa verify trust`](/docs/cli/verify-trust) | Run full pipeline on a product flow |
+| [`asa trust gates`](/docs/cli/trust-gates) | Show active gate profile and pass/fail |
+| [`asa trust replay`](/docs/cli/trust-replay) | Re-run checks from a prior manifest |
+| `asa work --strict-trust` | Block work when gates fail after implementation |
+
+## Configuration
+
+Gate thresholds live in [`verification`](/docs/configuration/config-file#verification) inside `.asagiri/config.yaml`.
+
+## Code layout
+
+```text
+internal/trust/
+  engine.go
+  report.go
+  gates.go
+  checks/
+  confidence/
+  replay/
+```
+
+Uses product assets (`.asagiri/products/<id>/flows`, `contracts/`) and analysis graphs when available.

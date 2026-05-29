@@ -1,0 +1,38 @@
+{
+  "trust_id": "trust-2026-05-29-golden",
+  "generated_at": "2026-05-29T12:00:00Z",
+  "flow": "onboarding-flow",
+  "branch": "main",
+  "repository": "/tmp/repo",
+  "checks": [],
+  "confidence": {
+    "architecture": 0,
+    "implementation": 0,
+    "flow_integrity": 0,
+    "observability": 0,
+    "security": 0,
+    "regression": 0,
+    "overall": 0,
+    "limits": [
+      "lot 1 skeleton: confidence derived from zero executed checks",
+      "no scorer, weighting, or normalization pipeline active yet"
+    ],
+    "uncovered_zones": [
+      "architecture: no evidence (checks not run)",
+      "implementation: no evidence (checks not run)",
+      "flow_integrity: no evidence (checks not run)",
+      "observability: no evidence (checks not run)",
+      "security: no evidence (checks not run)",
+      "regression: no evidence (checks not run)"
+    ]
+  },
+  "warnings": [
+    "lot 1 skeleton: confidence derived from zero executed checks",
+    "no scorer, weighting, or normalization pipeline active yet"
+  ],
+  "residual_risk": "unknown",
+  "gate": {
+    "status": "not_configured",
+    "reason": "verification gates not configured"
+  }
+}

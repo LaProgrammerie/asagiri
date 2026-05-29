@@ -12,6 +12,8 @@ import (
 	"github.com/LaProgrammerie/asagiri/application/internal/intent"
 	"github.com/LaProgrammerie/asagiri/application/internal/investigation"
 	"github.com/LaProgrammerie/asagiri/application/internal/pipeline"
+	"github.com/LaProgrammerie/asagiri/application/internal/runtime"
+	"github.com/LaProgrammerie/asagiri/application/internal/trust"
 	"github.com/spf13/cobra"
 )
 
@@ -40,6 +42,8 @@ func newWorkCmd(dryRun *bool) *cobra.Command {
 		investigateFirst       bool
 		investigateOnFailure   bool
 		investigationDepth     string
+		strictTrust            bool
+		trustFlow              string
 	)
 
 	cmd := &cobra.Command{
@@ -187,6 +191,25 @@ func newWorkCmd(dryRun *bool) *cobra.Command {
 
 			intent.PrintWorkReport(cmd.OutOrStdout(), resolved, plan, v3res.Exec)
 			printWorkSummary(cmd.OutOrStdout(), instruction, v3res.Estimate, v3res.Exec)
+
+			if strictTrust && !opts.DryRun {
+				flow, product, err := resolveWorkStrictTrust(actx.RepoRoot, trustFlow, resolved.Feature)
+				if err != nil {
+					return err
+				}
+				eng := trust.NewEngineForStrict(actx.RepoRoot, actx.Config)
+				if store, err := runtime.Open(actx.RepoRoot); err == nil {
+					defer store.Close()
+					eng.Emitter = trust.NewRuntimeEmitter(store)
+				}
+				eng.Config = actx.Config
+				result, err := trust.RunStrictTrust(cmd.Context(), eng, flow, "", product)
+				if err != nil {
+					return err
+				}
+				fmt.Fprint(cmd.OutOrStdout(), trust.FormatTerminalSummary(result.Report))
+				fmt.Fprintf(cmd.OutOrStdout(), "\nstrict-trust: passed (trust id %s)\n", result.TrustID)
+			}
 			return nil
 		},
 	}
@@ -212,6 +235,8 @@ func newWorkCmd(dryRun *bool) *cobra.Command {
 	cmd.Flags().BoolVar(&investigateFirst, "investigate-first", false, "Lancer une investigation avant le plan")
 	cmd.Flags().BoolVar(&investigateOnFailure, "investigate-on-failure", false, "Investigation locale si l'exécution échoue")
 	cmd.Flags().StringVar(&investigationDepth, "investigation-depth", "standard", "Profondeur investigation: quick|standard|deep|ci")
+	cmd.Flags().BoolVar(&strictTrust, "strict-trust", false, "Après implémentation, enchaîner verify trust + gates")
+	cmd.Flags().StringVar(&trustFlow, "trust-flow", "", "Flow produit pour --strict-trust (défaut: feature résolue)")
 	return cmd
 }
 

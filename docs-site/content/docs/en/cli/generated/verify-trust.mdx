@@ -1,0 +1,54 @@
+---
+title: Verify Trust · Asagiri CLI
+description: Exécuter le moteur de confiance sur un flow produit
+---
+
+CLI path: **`asa verify trust`**
+
+## When to use
+
+Workflow commands advance tracked features across spec → plan → implementation → verification → reporting guardrails before opening a merge request.
+
+> Original CLI synopsis: Exécuter le moteur de confiance sur un flow produit
+
+## Usage
+
+```bash
+asa verify trust [flags]
+```
+
+## Options
+
+| Flag | Scope | Default | Description |
+| --- | --- | --- | --- |
+| `--branch` | Local | `(empty)` | Branche git ciblée |
+| `--ci` | Local | `false` | Code de sortie non nul si gate bloqué ou checks en échec |
+| `--dry-run` | Inherited | `false` | Simuler les exécutions sans lancer d'agent ni commandes externes |
+| `--flow` | Local | `(empty)` | ID de flow (remplace l'argument positionnel) |
+| `--json` | Local | `false` | Sortie JSON du trust report sur stdout |
+| `--product` | Local | `(empty)` | ID produit sous .asagiri/products/ |
+| `--strict` | Local | `false` | Traiter les checks en warn comme des échecs en mode CI |
+| `--task` | Local | `(empty)` | ID de tâche associée |
+
+## Examples
+
+```bash
+asa verify trust
+```
+
+> Wire richer samples through **cobra.Command.Example** when the happy path warrants copy/paste-friendly automation beyond this scaffold.
+
+## What happens internally
+
+- Validates CLI arity, honours the global **--dry-run** switch, resolves repository metadata, hydrates SQLite-backed bookkeeping, then calls façade orchestration wrappers for the requested lifecycle stage.
+- Persists deterministic run identifiers so **status** and **resume** can continue automation deterministically afterward.
+
+## Failure modes
+
+- Cobra rejects unknown flags or arity mismatches before any repository side effects occur.
+- Asagiri cannot resolve scaffolding when the command is invoked outside an initialised checkout.
+- Delegated subprocesses (**git**, MCP hosts, editor agents, etc.) can exit non-zero and bubble errors verbatim.
+
+## Related commands
+
+_No sibling commands at this depth (Verify Trust)._

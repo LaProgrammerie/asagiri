@@ -43,6 +43,8 @@ asa work [flags]
 | `--show-context-plan` | Local | `false` | Afficher chemin context pack |
 | `--source` | Local | `(empty)` | Source externe (notion\|local) |
 | `--stop-after` | Local | `(empty)` | Arrêter après une étape (verify, dev, …) |
+| `--strict-trust` | Local | `false` | Après implémentation, enchaîner verify trust + gates |
+| `--trust-flow` | Local | `(empty)` | Flow produit pour --strict-trust (défaut: feature résolue) |
 | `--yes` | Local | `false` | Mode auto sans confirmation |
 
 ## Examples
@@ -102,5 +104,6 @@ asa work
 - [Spec](./spec.mdx)
 - [Status](./status.mdx)
 - [Sync](./sync.mdx)
+- [Trust](./trust.mdx)
 - [Verify](./verify.mdx)
 - [Version](./version.mdx)

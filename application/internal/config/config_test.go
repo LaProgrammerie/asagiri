@@ -6,6 +6,49 @@ import (
 	"testing"
 )
 
+func TestLoadVerificationGates(t *testing.T) {
+	dir := t.TempDir()
+	repo := filepath.Join(dir, "proj")
+	if err := os.MkdirAll(repo, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	cfgPath := filepath.Join(repo, ".asagiri", "config.yaml")
+	if err := os.MkdirAll(filepath.Dir(cfgPath), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(cfgPath, []byte(`
+project:
+  name: test-proj
+state:
+  backend: sqlite
+  path: .asagiri/state.sqlite
+verification:
+  default_profile: production
+  gates:
+    production:
+      min_confidence:
+        security: 0.85
+      required_checks:
+        - contracts
+`), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	cfg, err := Load(cfgPath, repo)
+	if err != nil {
+		t.Fatalf("Load: %v", err)
+	}
+	if cfg.Verification.DefaultProfile != "production" {
+		t.Fatalf("default_profile: got %q", cfg.Verification.DefaultProfile)
+	}
+	if cfg.Verification.Gates["production"].MinConfidence["security"] != 0.85 {
+		t.Fatalf("security min: got %v", cfg.Verification.Gates["production"].MinConfidence["security"])
+	}
+	if len(cfg.Verification.Gates["production"].RequiredChecks) != 1 || cfg.Verification.Gates["production"].RequiredChecks[0] != "contracts" {
+		t.Fatalf("required_checks: got %v", cfg.Verification.Gates["production"].RequiredChecks)
+	}
+}
+
 func TestLoadValid(t *testing.T) {
 	dir := t.TempDir()
 	repo := filepath.Join(dir, "proj")
