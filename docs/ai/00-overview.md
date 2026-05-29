@@ -15,7 +15,7 @@ Pour les **sources de vérité**, Kiro vs Cursor vs Copilot, et specs vs `docs/a
 | Chemin | Rôle |
 |--------|------|
 | `spec-my-A.md` | Spec livrée — Executable Product Layer (§1–26) |
-| `spec-phase-finale.md` | P1 livré (embeddings, npm CI, graph hardening) ; P2/P3 ouverts |
+| `spec-phase-finale.md` | Phase finale livrée (`2026-05-29`) — registre PF-* 100 % |
 | `spec-rename.md` | Rebranding Asagiri / `asa` (historique) |
 | `spec.md` | Spec produit & technique V1 (historique) |
 | `AGENTS.md` | Routeur court (toujours inclus par Kiro) |

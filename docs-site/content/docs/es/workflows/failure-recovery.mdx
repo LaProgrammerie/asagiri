@@ -54,7 +54,7 @@ asa continue "resume billing-v2"
 ```
 
 <Callout type="experimental">
-`asa resume <run-id> --execute` sólo concatena dentro global **`--dry-run`**; fuera ejecute manual siguiente instrucción o `continue`.
+`asa resume <run-id> --execute` encadena los steps restantes (agentes reales sin `--dry-run` global). Sin `--execute`, ejecute el step impreso o `continue`. Ver [resume CLI](/docs/es/cli/resume).
 </Callout>
 
 ### Worktrees viejas

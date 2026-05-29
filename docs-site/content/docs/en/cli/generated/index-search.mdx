@@ -1,0 +1,47 @@
+---
+title: Index Search · Asagiri CLI
+description: Rechercher des chemins dans l’index RAG
+---
+
+CLI path: **`asa index search`**
+
+## When to use
+
+Indexing keeps embedded search artefacts aligned whenever significant repository reorganisation threatens stale lookup tables.
+
+> Original CLI synopsis: Rechercher des chemins dans l’index RAG
+
+## Usage
+
+```bash
+asa index search [flags]
+```
+
+## Options
+
+| Flag | Scope | Default | Description |
+| --- | --- | --- | --- |
+| `--dry-run` | Inherited | `false` | Simuler les exécutions sans lancer d'agent ni commandes externes |
+| `--keyword` | Local | `false` | Recherche LIKE par mots-clés (sans similarité cosinus) |
+| `--limit` | Local | `8` | Nombre maximal de chemins distincts |
+
+## Examples
+
+```bash
+asa index search "graph checkpoint resume"
+  asa index search "login" --keyword
+```
+
+## What happens internally
+
+- Crawls repositories to refresh Asagiri ingestion indexes referenced by tooling that depends on deterministic filesystem snapshots.
+
+## Failure modes
+
+- Cobra rejects unknown flags or arity mismatches before any repository side effects occur.
+- Asagiri cannot resolve scaffolding when the command is invoked outside an initialised checkout.
+- Delegated subprocesses (**git**, MCP hosts, editor agents, etc.) can exit non-zero and bubble errors verbatim.
+
+## Related commands
+
+_No sibling commands at this depth (Index Search)._

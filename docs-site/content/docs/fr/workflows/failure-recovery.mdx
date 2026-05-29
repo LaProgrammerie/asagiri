@@ -54,7 +54,7 @@ asa continue "resume billing-v2"   # continuation intentionnelle
 ```
 
 <Callout type="experimental">
-`asa resume <run-id> --execute` enchaîne sous global **`dry-run`** seulement — hors celui-ci aucune relance automatique agents : exécutez manuellement imprimées ou passez via `continue`.
+`asa resume <run-id> --execute` enchaîne les steps restants (agents réels hors `--dry-run` global). Sans `--execute`, exécutez le step affiché ou `continue`. Voir [resume CLI](/docs/fr/cli/resume).
 </Callout>
 
 ### Nettoyage worktrees

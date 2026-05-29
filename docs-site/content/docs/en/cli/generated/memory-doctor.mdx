@@ -1,20 +1,20 @@
 ---
-title: Memory Consolidate · Asagiri CLI
-description: Consolider les entrées proches
+title: Memory Doctor · Asagiri CLI
+description: Vérifier Ollama, dimensions des embeddings et entrées orphelines
 ---
 
-CLI path: **`asa memory consolidate`**
+CLI path: **`asa memory doctor`**
 
 ## When to use
 
 Orchestration commands coordinate higher-order Asagiri workloads such as ingestion, syncing, backlog triage, investigative passes, hydrated context payloads, coarse estimates, and workspace-specific automation.
 
-> Original CLI synopsis: Consolider les entrées proches
+> Original CLI synopsis: Vérifier Ollama, dimensions des embeddings et entrées orphelines
 
 ## Usage
 
 ```bash
-asa memory consolidate [flags]
+asa memory doctor [flags]
 ```
 
 ## Options
@@ -26,7 +26,7 @@ asa memory consolidate [flags]
 ## Examples
 
 ```bash
-asa memory consolidate
+asa memory doctor
 ```
 
 ## What happens internally
@@ -41,6 +41,6 @@ asa memory consolidate
 
 ## Related commands
 
-- [Memory Doctor](./memory-doctor.mdx)
+- [Memory Consolidate](./memory-consolidate.mdx)
 - [Memory List](./memory-list.mdx)
 - [Memory Reindex](./memory-reindex.mdx)

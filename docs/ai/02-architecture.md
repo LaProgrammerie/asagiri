@@ -267,10 +267,10 @@ Config : bloc `replay:` (`capture_*`, `redact_secrets`, `offline_mode_default`, 
 ## Limites connues
 
 - Commandes §6.2 restantes : `bench`, `search`, `export`.
-- **Mémoire runtime** : embedder pluggable (ADR-025) ; **`asa index` RAG** reste LIKE/SQLite sans vecteurs (PF-X-03).
-- **`asa resume`** (workflow V1) : hors `--dry-run`, diagnostic seul — pas d’enchaînement agents (PF-X-01).
-- **`resume --execute`** : dry-run uniquement.
-- **Execution graph** : inférence dépendances V2 (events, arch projection, mémoire historique) — PF-C-06 P2.
+- **Mémoire runtime** : embedder pluggable (ADR-025) ; **`asa memory doctor`** vérifie Ollama, dimensions, orphelins.
+- **Index RAG** : `asa index` persiste des embeddings (`runtime.memory.embedder`) ; `index search` cosinus par défaut, `--keyword` pour LIKE.
+- **`asa resume --execute`** : enchaîne les steps restants (agents réels hors `--dry-run` global) ; sans `--execute`, diagnostic du prochain step.
+- **Execution graph** : inférence dépendances V2 (events, projection architecture, mémoire historique) — `dependency_v2.go`.
 - Agents externes requis hors mode dry-run.
 
 ## Extension

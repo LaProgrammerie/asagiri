@@ -1,6 +1,6 @@
 ---
 title: Index · Asagiri CLI
-description: Indexe le dépôt dans .asagiri/index/chunks.sqlite (recherche LIKE).
+description: Indexe le dépôt dans .asagiri/index/chunks.sqlite.
 ---
 
 CLI path: **`asa index`**
@@ -9,7 +9,7 @@ CLI path: **`asa index`**
 
 Indexing keeps embedded search artefacts aligned whenever significant repository reorganisation threatens stale lookup tables.
 
-> Original CLI synopsis: Indexer le dépôt pour le RAG local par mots-clés (spec §10.3)
+> Original CLI synopsis: Indexer le dépôt pour le RAG local (sémantique + mots-clés, spec §10.3)
 
 ## Usage
 
@@ -22,12 +22,14 @@ asa index [flags]
 | Flag | Scope | Default | Description |
 | --- | --- | --- | --- |
 | `--dry-run` | Inherited | `false` | Simuler les exécutions sans lancer d'agent ni commandes externes |
+| `--skip-embeddings` | Local | `false` | Indexer sans vecteurs (recherche LIKE uniquement) |
 
 ## Examples
 
 ```bash
 asa index
   asa index --dry-run
+  asa index search "authentication middleware"
 ```
 
 ## What happens internally

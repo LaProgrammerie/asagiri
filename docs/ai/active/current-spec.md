@@ -26,17 +26,15 @@
 |------|--------|
 | A + PF-A | Livré |
 | B | Livré |
-| C + PF-C P1 | Livré |
+| C + PF-C | Livré |
 | D + D-FULL | Livré |
 | E | Livré |
 | **F** | **Livré** |
 
 Canon : [`06-spec-my-a.md`](../06-spec-my-a.md) … [`06-spec-my-f.md`](../06-spec-my-f.md).
 
-## Reliquats ouverts (hors F)
+## Phase finale
 
-- **PF-C-06** — inférence dépendances V2 (P2)
-- **PF-X-02** — tokenizers cost exacts (P3)
-- Voir [`problems.md`](../../../problems.md) (GAP ↔ PF-X)
+[`spec-phase-finale.md`](../../../spec-phase-finale.md) — **livrée** (`2026-05-29`) ; registre PF-* 100 % ; [`problems.md`](../../../problems.md) GAP-* clôturés.
 
 Branding : **Asagiri** / **`asa`** / `github.com/LaProgrammerie/asagiri`.

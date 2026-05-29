@@ -55,7 +55,7 @@ asa continue "resume billing-v2"
 ```
 
 <Callout type="experimental">
-`asa resume <run-id> --execute` verketten Schritte nur zusammen mit globalem **`--dry-run`**. Ohne Dry-Auto werden Agenten nicht automatisch erneut gestartet — den ausgegebenen Schritt manuell ausführen oder `continue` verwenden.
+`asa resume <run-id> --execute` verkettet verbleibende Steps (echte Agenten ohne globales `--dry-run`). Ohne `--execute` den angezeigten Step manuell ausführen oder `continue`. Siehe [resume CLI](/docs/de/cli/resume).
 </Callout>
 
 ### Veraltete Worktrees entfernen

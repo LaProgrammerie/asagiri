@@ -1,0 +1,33 @@
+---
+title: resume
+description: Reprendre un run interrompu ; enchaîner les steps avec --execute.
+---
+
+# `asa resume`
+
+Reprend un run workflow dans `.asagiri/state.sqlite` (PF-X-01).
+
+## Usage
+
+```bash
+asa resume <run-id>                    # affiche le prochain step
+asa resume <run-id> --execute          # enchaîne les steps restants (agents réels)
+asa resume <run-id> --execute --max-steps 10
+asa resume <run-id> --force --execute  # relance un step déjà réussi
+```
+
+## Comportement
+
+| Mode | Effet |
+| --- | --- |
+| Défaut | Affiche `prochain step: plan\|enrich\|dev\|…` |
+| `--execute` | Exécute jusqu'à fin, gate ou `--max-steps` |
+| `--dry-run` global | Avec `--execute`, simulation sans agents externes |
+
+Sans `--execute`, exécutez le step affiché manuellement ou utilisez **`asa continue`**.
+
+## Voir aussi
+
+- [Référence générée](/docs/cli/generated/resume)
+- [Reprise après échec](/docs/fr/workflows/failure-recovery)
+- [Premier workflow](/docs/fr/getting-started/first-workflow)

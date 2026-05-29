@@ -28,10 +28,9 @@ asa memory list [flags]
 ## Examples
 
 ```bash
-asa memory list
+asa memory list --scope session
+  asa memory list --query "payment webhook"
 ```
-
-> Wire richer samples through **cobra.Command.Example** when the happy path warrants copy/paste-friendly automation beyond this scaffold.
 
 ## What happens internally
 
@@ -46,4 +45,5 @@ asa memory list
 ## Related commands
 
 - [Memory Consolidate](./memory-consolidate.mdx)
+- [Memory Doctor](./memory-doctor.mdx)
 - [Memory Reindex](./memory-reindex.mdx)

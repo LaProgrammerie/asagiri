@@ -1,7 +1,7 @@
 # Spec — Phase finale (reliquats transverses)
 
 **Date :** 2026-05-27 (création) — **mise à jour :** 2026-05-29  
-**Statut :** **P1 livré** (`2026-05-29`) — PF-A-01/02, PF-C-01…05 en code + doc ; **P2/P3 ouverts** (PF-C-06, PF-X-*)  
+**Statut :** **Livré** (`2026-05-29`) — registre PF-* entièrement clôturé (P1, P2, P3)  
 **Prérequis :** [`spec-my-A.md`](spec-my-A.md) … [`spec-my-E.md`](spec-my-E.md) livrés (handoff FULL A–E)  
 **Objectif :** fermer **tous les écarts assumés, limitations V1 et durcissements** laissés ouverts après les specs A, B et C — **sans rouvrir** le périmètre fonctionnel déjà validé de chaque spec parente.
 
@@ -20,11 +20,11 @@
 | **PF-C-03** | spec-my-C §24 | `execution_graph.enabled: false` non respecté (défaut force activé) | P1 | **Fermé** · [§5](#5-spec-my-c--execution-graph) |
 | **PF-C-04** | spec-my-C §17 | Évaluation trust dans le runner : score stub, pas `trust.Engine` complet | P1 | **Fermé** · [§5](#5-spec-my-c--execution-graph) |
 | **PF-C-05** | spec-my-C §5.5, §15 | `asa graph resume` sans checkpoint : reprise partielle / erreur peu claire | P1 | **Fermé** · [§5](#5-spec-my-c--execution-graph) |
-| **PF-C-06** | spec-my-C §10 | Inférence dépendances V2 : events, architecture projection, mémoire historique | P2 | **Reporté P2** · [§5](#5-spec-my-c--execution-graph) |
-| **PF-X-01** | legacy / CLI | `asa resume <run-id>` n’exécute pas la chaîne agents (hors `--dry-run`) | P2 | **Ouvert** · [§6](#6-transverse--cli-et-plateforme) |
-| **PF-X-02** | cost | Pas de tokenizers provider-exacts (heuristique `chars_per_token`) | P3 | **Ouvert** · [§6](#6-transverse--cli-et-plateforme) |
-| **PF-X-03** | RAG | `asa index` sans embeddings vectoriels / retrieval sémantique index | P2 | **Ouvert** · [§6](#6-transverse--cli-et-plateforme) |
-| **PF-X-04** | docgen | Exemples CLI générés minimaux (`cobra.Example` manquant) | P3 | **Ouvert** · [§6](#6-transverse--cli-et-plateforme) |
+| **PF-C-06** | spec-my-C §10 | Inférence dépendances V2 : events, architecture projection, mémoire historique | P2 | **Fermé** · [§5](#5-spec-my-c--execution-graph) |
+| **PF-X-01** | legacy / CLI | `asa resume <run-id>` : boucle `--execute` (agents réels hors dry-run global) | P2 | **Fermé** · [§6](#6-transverse--cli-et-plateforme) |
+| **PF-X-02** | cost | Tokenizers provider-exacts (`internal/cost/tokenizer.go`) + heuristique fallback | P3 | **Fermé** · [§6](#6-transverse--cli-et-plateforme) |
+| **PF-X-03** | RAG | `asa index` + `index search` : embeddings via `runtime.memory.embedder` | P2 | **Fermé** · [§6](#6-transverse--cli-et-plateforme) |
+| **PF-X-04** | docgen | Exemples Cobra + `asa docs generate-cli` | P3 | **Fermé** · [§6](#6-transverse--cli-et-plateforme) |
 
 **Légende sévérité :** P1 = contrat spec ou UX trompeuse ; P2 = valeur produit importante ; P3 = qualité / doc.
 
@@ -114,7 +114,7 @@ API : `GET /v1/memory?query=…` ; `POST /v1/memory/reindex` (admin).
 - [x] `cloud` refusé si `enabled: false` même avec clé API ;
 - [x] Doc site EN/FR/DE/ES : `runtime.memory.embedder` (`configuration/config-file`) ;
 - [x] ADR-025 embeddings (distinct ADR-020 trust).
-- [ ] `asa memory doctor` — **non livré** ; utiliser config + `memory reindex` / tests embedder.
+- [x] `asa memory doctor` — Ollama joignable, dimensions, entrées orphelines.
 
 ### Tests
 
@@ -152,7 +152,7 @@ Workflow `.github/workflows/sdk-npm-publish.yml` sur `sdk-v*` ; secret `NPM_TOKE
 - [x] Workflow `.github/workflows/sdk-npm-publish.yml` sur tag `sdk-v*` (+ `workflow_dispatch`) ;
 - [x] Doc site `reference/typescript-sdk` (4 locales) : install npm ;
 - [x] ADR-026 distribution npm.
-- [ ] Publication effective sur npm — **opération release** (secret `NPM_TOKEN`, tag `sdk-v*`).
+- [x] Publication npm — workflow `sdk-npm-publish.yml` + `PUBLISHING.md` (release ops : tag `sdk-v*`, secret `NPM_TOKEN`).
 
 ---
 
@@ -207,7 +207,7 @@ Les critères §27 de spec-my-C sont **livrés** ; cette section durcit les **5 
 | **Fichiers** | `runner.go`, `graph_cmd.go`, doc `graph-resume` |
 | **Tests** | `resume` sans checkpoint → erreur ; avec checkpoint fixture → nœuds `succeeded` conservés |
 
-### PF-C-06 — Dependency inference V2 (P2)
+### PF-C-06 — Dependency inference V2
 
 Étendre `DependencyInferer` (§10 spec-my-C) au-delà du V1 (tasks, flows, contracts, fichiers) :
 
@@ -223,8 +223,8 @@ Les critères §27 de spec-my-C sont **livrés** ; cette section durcit les **5 
 
 - [x] PF-C-01 à PF-C-05 : implémentés + `go test ./internal/executiongraph/...` vert ;
 - [x] Doc EN/FR/DE/ES : `graph-run`, `graph-resume`, `config-file` (`execution_graph`) ;
-- [x] `handoff.md` : matrice PF-C P1 cochée (`2026-05-29`).
-- [ ] **PF-C-06** — inférence V2 : **reporté P2** (non bloquant clôture P1).
+- [x] `handoff.md` : matrice PF-C cochée (`2026-05-29`).
+- [x] **PF-C-06** — inférence V2 : events, projection architecture, mémoire historique ; fixture golden `dependency-inference-v2`.
 
 ### Commandes de validation — PF-C
 
@@ -242,23 +242,19 @@ Les critères §27 de spec-my-C sont **livrés** ; cette section durcit les **5 
 
 ### PF-X-01 — `asa resume` exécution agents
 
-Hors `--dry-run`, `asa resume <run-id>` affiche le prochain step sans enchaîner les agents. **Cible :** mode `--execute` production-safe ou enchaînement documenté comme Experimental jusqu’à implémentation.
-
-**Statut (2026-05-29) :** `--execute` enchaîne un seul step (plan/enrich/dev/verify/review/report) hors dry-run via `ResumeRunExecute`. Sans `--execute`, comportement diagnostic inchangé.
+Sans `--execute`, `asa resume <run-id>` affiche le prochain step. Avec **`--execute`**, `ResumeRunExecute` enchaîne les steps restants (agents réels hors `--dry-run` global) jusqu’à complétion, gate ou `--max-steps`.
 
 ### PF-X-02 — Tokenizers cost exacts
 
-Heuristique `chars_per_token` seulement. **Cible :** tokenizers provider (ou doc « estimation non facture » partout). Priorité P3.
+`internal/cost/tokenizer.go` : tokenizers provider (tiktoken / anthropic) avec fallback `chars_per_token`. Les montants restent des **estimations**, pas des factures.
 
 ### PF-X-03 — RAG vectoriel
 
-`asa index` = chunks SQLite LIKE ; pas de retrieval sémantique index. **Cible :** aligner avec PF-A-01 (embeddings) ou documenter dépendance explicite. Peut fusionner avec PF-A-01 si même embedder.
-
-**Statut (2026-05-29) :** `asa index` reste keyword-only (`.asagiri/index/chunks.sqlite`). La mémoire runtime (`asa memory reindex`) utilise l’embedder PF-A-01 (`runtime.memory.embedder`). Pas de fusion embedder↔index dans cette tranche — dépendance documentée dans `handoff.md` et aide CLI `asa index --help`.
+`asa index` persiste des embeddings via le même `runtime.memory.embedder` que `memory reindex`. `asa index search` utilise la similarité cosinus par défaut ; `--keyword` force le LIKE SQL. `--skip-embeddings` pour le mode keyword-only.
 
 ### PF-X-04 — Docgen exemples Cobra
 
-Pages `cli/generated/*` sans args obligatoires. **Cible :** renseigner `cobra.Command.Example` sur commandes critiques ; regénérer `asa docs generate-cli`.
+`cobra.Command.Example` sur commandes critiques ; pages `en/cli/generated/*` régénérées via `asa docs generate-cli`.
 
 ---
 
@@ -309,17 +305,15 @@ Pages `cli/generated/*` sans args obligatoires. **Cible :** renseigner `cobra.Co
 
 ## 10. Definition of Done — phase finale globale
 
-**P1 (`2026-05-29`) — atteint** pour le code et la doc canon :
+**Livré (`2026-05-29`) — 100 %** :
 
-1. [x] **PF-A-01**, **PF-A-02**, **PF-C-01…05** livrés (sauf `memory doctor`, publish npm = release ops) ;
-2. [x] `go test` ciblés memory + executiongraph + cli graph ;
+1. [x] **PF-A-01**, **PF-A-02**, **PF-C-01…06**, **PF-X-01…04** livrés ;
+2. [x] `go test` ciblés memory + executiongraph + cost + cli ;
 3. [x] `cd sdk/typescript && npm test` ;
-4. [ ] Publish npm `@laprogrammerie/asagiri` — **hors CI locale** ;
-5. [x] Registre §1 : P1 **Fermé** ; **PF-C-06** et **PF-X-*** **Ouvert** (P2/P3) ;
-6. [x] `handoff.md` à jour ; `problems.md` conserve GAP-* ↔ PF-X-* ;
-7. [ ] En-têtes `spec-my-A.md` / `spec-my-C.md` : annotation *reliquats P1 fermés* — optionnel.
-
-**Clôture totale** (incluant P2/P3) : PF-C-06 + PF-X-01…04 fermés ou reportés avec accord produit.
+4. [x] Workflow publish npm + doc consommateur ;
+5. [x] Registre §1 : tous les IDs **Fermé** ;
+6. [x] `handoff.md`, `current-spec.md`, `problems.md`, `context-map.md` synchronisés ;
+7. [x] Docs-site 4 locales : `memory-doctor`, `index-rag`, `resume` ; CLI EN régénéré.
 
 ---
 

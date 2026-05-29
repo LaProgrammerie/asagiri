@@ -51,13 +51,13 @@ asa review billing-v2 --agent codex --force
 
 ```bash
 asa status
-asa resume <run-id>          # prints next step: plan|enrich|dev|verify|review
-asa continue "resume billing-v2"   # intent-based continuation
+asa resume <run-id>                    # prints next step
+asa resume <run-id> --execute          # chain remaining steps (real agents)
+asa resume <run-id> --execute --max-steps 10
+asa continue "resume billing-v2"         # intent-based continuation
 ```
 
-<Callout type="experimental">
-`asa resume <run-id> --execute` chains steps only with global **`--dry-run`**. Non-dry-run resume does not auto-invoke agents — run the printed step manually or use `continue`.
-</Callout>
+See [resume CLI](/docs/cli/resume).
 
 ### Clean stale worktrees
 

@@ -1,0 +1,28 @@
+---
+title: memory doctor
+description: Vérifier Ollama, les dimensions d'embeddings et les entrées orphelines.
+---
+
+# `asa memory doctor`
+
+Exécute les contrôles santé mémoire (phase finale **PF-A-01**) : joignabilité de l'embedder, cohérence des dimensions, entrées orphelines.
+
+## Usage
+
+```bash
+asa memory doctor
+```
+
+## Contrôles
+
+| Contrôle | Quand |
+| --- | --- |
+| **ollama** | `runtime.memory.embedder: ollama` — API joignable |
+| **dimensions** | Vecteurs stockés = taille de sortie de l'embedder |
+| **orphelins** | Entrées sans métadonnées d'embedding valides |
+
+## Voir aussi
+
+- [Référence générée](/docs/cli/generated/memory-doctor)
+- [memory reindex](/docs/cli/generated/memory-reindex)
+- [Mémoire runtime](/docs/fr/configuration/config-file) — `runtime.memory.embedder`

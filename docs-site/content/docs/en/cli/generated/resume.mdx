@@ -22,8 +22,9 @@ asa resume [flags]
 | Flag | Scope | Default | Description |
 | --- | --- | --- | --- |
 | `--dry-run` | Inherited | `false` | Simuler les exécutions sans lancer d'agent ni commandes externes |
-| `--execute` | Local | `false` | Exécuter le prochain step (agents réels hors --dry-run global) |
+| `--execute` | Local | `false` | Enchaîner les steps restants (agents réels hors --dry-run global) |
 | `--force` | Local | `false` | Relancer une étape déjà réussie |
+| `--max-steps` | Local | `20` | Nombre maximum de steps à enchaîner avec --execute |
 
 ## Examples
 
@@ -34,7 +35,7 @@ asa resume run-2026-05-17-001
 
 ## What happens internally
 
-- Reloads checkpoints for the requested run identifier, obeying **--force** / **--execute** semantics layered with persistent **--dry-run** rehearsals.
+- Reloads workflow state for the run identifier; **--execute** chains remaining steps (dry-run rehearsal when global **--dry-run** is set, real agents otherwise); **--force** may re-run a succeeded step.
 
 ## Failure modes
 

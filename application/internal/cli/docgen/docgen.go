@@ -606,7 +606,7 @@ func englishInternals(rel string) string {
 `)
 		case "resume":
 			return strings.TrimSpace(`
-- Reloads checkpoints for the requested run identifier, obeying **--force** / **--execute** semantics layered with persistent **--dry-run** rehearsals.
+- Reloads workflow state for the run identifier; **--execute** chains remaining steps (dry-run rehearsal when global **--dry-run** is set, real agents otherwise); **--force** may re-run a succeeded step.
 `)
 		default:
 			return strings.TrimSpace(`

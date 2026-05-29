@@ -75,11 +75,9 @@ Ejecuciones exitosas dejan **estado SQLite** en `.asagiri/state.sqlite`, **artef
 asa resume <run-id>
 ```
 
-Sin `--dry-run`, **`resume` solo imprime el siguiente paso**; no relanza agentes automáticamente. Use `continue` o vuelva a ejecutar lo sugerido (`plan`, `enrich`, `dev`, …). El encadenado automático existe sólo como **`asa resume <run-id> --execute` más `--dry-run` global**.
+Sin `--execute`, **`resume` solo imprime el siguiente step** — ejecútelo manualmente o use `continue`. Con **`asa resume <run-id> --execute`**, los steps restantes se encadenan hasta fin, gate o `--max-steps` (agentes reales sin `--dry-run` global).
 
-<Callout type="experimental">
-Reanudación automática fuera del dry-run completo no existe. Prefiera `asa continue` para continuar por intención.
-</Callout>
+Ver [resume CLI](/docs/es/cli/resume) y [Recuperación de fallos](/docs/es/workflows/failure-recovery).
 
 ## Workflows relacionados
 

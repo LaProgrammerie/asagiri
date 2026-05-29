@@ -1,0 +1,37 @@
+---
+title: index (RAG)
+description: Index the repository with semantic embeddings and keyword search.
+---
+
+# `asa index`
+
+Builds `.asagiri/index/chunks.sqlite` with optional vector embeddings via the same **`runtime.memory.embedder`** as `asa memory reindex` (PF-X-03).
+
+## Usage
+
+```bash
+asa index
+asa index --skip-embeddings
+asa index search "authentication middleware"
+asa index search "login" --keyword
+```
+
+## Flags
+
+| Flag | Description |
+| --- | --- |
+| `--skip-embeddings` | Keyword-only index (SQL LIKE search) |
+| `index search --keyword` | Force LIKE instead of cosine similarity |
+| `index search --limit` | Max distinct paths returned (default `8`) |
+
+## Behavior
+
+- Default index run embeds chunks when an embedder is configured.
+- Re-run **`asa index`** after changing `runtime.memory.embedder` (ollama, cloud, hash).
+- Semantic search: **`asa index search <query>`** (cosine). Use **`--keyword`** for legacy LIKE mode.
+
+## See also
+
+- [Generated reference](/docs/cli/generated/index)
+- [index search](/docs/cli/generated/index-search)
+- [memory reindex](/docs/cli/generated/memory-reindex)

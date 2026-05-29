@@ -2,6 +2,7 @@
 
 > **Contrat d'exécution** Cursor / Copilot / humain.  
 > **Tranche :** **spec-my-F** — livrée (`2026-05-29`).  
+> **Clôture reliquats :** phase finale PF-* — **livrée** (`2026-05-29`, lot 7 doc).  
 > **Précédent :** phase finale P1 + stack FULL A–E ; [`spec-my-E`](#tranche-spec-my-e--livrée) livrée `2026-05-29`.
 
 ## Objectif
@@ -16,7 +17,7 @@ Livrer le **Replay & Deterministic Execution System** ([`spec-my-F.md`](../../..
 |------|--------|-------|
 | **A** + PF-A | Livré | Product, runtime, embedder, SDK npm |
 | **B** | Livré | Trust engine ; `trust replay` ≠ `asa replay` |
-| **C** + PF-C P1 | Livré | Execution graph, checkpoints, trust runner |
+| **C** + PF-C | Livré | Execution graph, checkpoints, trust runner, inférence V2 |
 | **D** + D-FULL | Livré | Coordination, worktrees, `NodeExecutor` |
 | **E** | Livré | Knowledge graph |
 | **F** | **Livré** | Replay packages, compare, snapshots, redaction |
@@ -120,22 +121,33 @@ make build && ./bin/asa docs generate-cli
 
 ---
 
-## Archive — phase finale P1
+## Archive — phase finale (clôture reliquats)
 
 | ID | Livrable | Statut |
 |----|----------|--------|
-| PF-A-01 … PF-A-02 | Embedder + SDK npm | [x] |
+| PF-A-01 | Embedder + `memory doctor` | [x] |
+| PF-A-02 | SDK npm | [x] |
 | PF-C-01 … PF-C-05 | Graph durcissement | [x] |
-| PF-C-06 | Inférence dépendances V2 | [ ] P2 |
-| PF-X-01 … PF-X-04 | Reliquats | partiel — voir [`problems.md`](../../../problems.md) |
+| PF-C-06 | Inférence dépendances V2 | [x] |
+| PF-X-01 | `resume --execute` boucle complète | [x] |
+| PF-X-02 | Tokenizers cost | [x] |
+| PF-X-03 | Index RAG sémantique | [x] |
+| PF-X-04 | Docgen Cobra | [x] |
 | D-WT-1 … D-RUN-1 | D-FULL | [x] |
+
+**Couverture PF-* :** 12/12 (100 %).
 
 Validation archive :
 
 ```bash
-cd application && go test ./internal/memory/... ./internal/executiongraph/... -count=1
+cd application && go test ./internal/memory/... ./internal/executiongraph/... ./internal/cost/... -count=1
+./bin/asa memory doctor
 ./bin/asa memory reindex
+./bin/asa index
+./bin/asa index search "checkpoint resume"
+./bin/asa resume <run-id> --execute --max-steps 20
 ./bin/asa graph run minimal-product --flow workspace-onboarding --checkpoint-every node --dry-run
+make build && ./bin/asa docs generate-cli
 ```
 
 ---

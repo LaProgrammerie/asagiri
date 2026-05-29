@@ -1,0 +1,28 @@
+---
+title: memory doctor
+description: Check Ollama reachability, embedding dimensions, and orphan memory entries.
+---
+
+# `asa memory doctor`
+
+Runs memory health checks (phase finale **PF-A-01**): embedder reachability, dimension consistency, orphan entries.
+
+## Usage
+
+```bash
+asa memory doctor
+```
+
+## What it checks
+
+| Check | When |
+| --- | --- |
+| **ollama** | `runtime.memory.embedder: ollama` — API reachable |
+| **dimensions** | Stored vectors match embedder output size |
+| **orphans** | Entries without valid embedding metadata |
+
+## See also
+
+- [Generated reference](/docs/cli/generated/memory-doctor) — flags
+- [memory reindex](/docs/cli/generated/memory-reindex)
+- [Runtime memory](/docs/configuration/config-file) — `runtime.memory.embedder`

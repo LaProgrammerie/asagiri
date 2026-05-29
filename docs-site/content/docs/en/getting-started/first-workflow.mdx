@@ -75,11 +75,9 @@ Successful runs leave **SQLite state** at `.asagiri/state.sqlite`, **per-run art
 asa resume <run-id>
 ```
 
-Without `--dry-run`, **`resume` prints the next step name only**; it does not automatically re-invoke agents. Use `continue` or re-run the suggested command (`plan`, `enrich`, `dev`, …). Automatic step chaining exists only as **`asa resume <run-id> --execute` with global `--dry-run`**.
+Without `--execute`, **`resume` prints the next step only** — run that step manually or use `continue`. With **`asa resume <run-id> --execute`**, remaining steps chain until completion, a gate blocks, or `--max-steps` is reached (real agents when global `--dry-run` is off).
 
-<Callout type="experimental">
-Full non-dry-run auto-resume is not implemented. Prefer `asa continue` for intent-based continuation.
-</Callout>
+See [resume CLI](/docs/cli/resume) and [Failure recovery](/docs/workflows/failure-recovery).
 
 ## Related workflows
 

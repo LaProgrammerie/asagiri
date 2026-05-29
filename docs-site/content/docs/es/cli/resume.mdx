@@ -1,0 +1,33 @@
+---
+title: resume
+description: Reanudar un run interrumpido; encadenar steps con --execute.
+---
+
+# `asa resume`
+
+Reanuda un run de workflow en `.asagiri/state.sqlite` (PF-X-01).
+
+## Uso
+
+```bash
+asa resume <run-id>                    # muestra el siguiente step
+asa resume <run-id> --execute          # encadena steps restantes (agentes reales)
+asa resume <run-id> --execute --max-steps 10
+asa resume <run-id> --force --execute  # relanza un step ya exitoso
+```
+
+## Comportamiento
+
+| Modo | Efecto |
+| --- | --- |
+| Por defecto | Imprime `prochain step: plan\|enrich\|dev\|…` |
+| `--execute` | Ejecuta hasta fin, gate o `--max-steps` |
+| `--dry-run` global | Con `--execute`, simulación sin agentes externos |
+
+Sin `--execute`, ejecute el step impreso manualmente o use **`asa continue`**.
+
+## Ver también
+
+- [Referencia generada](/docs/cli/generated/resume)
+- [Recuperación de fallos](/docs/es/workflows/failure-recovery)
+- [Primer workflow](/docs/es/getting-started/first-workflow)

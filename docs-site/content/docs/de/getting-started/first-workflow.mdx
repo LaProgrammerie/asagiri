@@ -75,11 +75,9 @@ Erfolgreiche Runs hinterlassen **SQLite-State** unter `.asagiri/state.sqlite`, *
 asa resume <run-id>
 ```
 
-Ohne `--dry-run` gibt **`resume` nur den nächsten Schritt aus**; Agenten werden nicht automatisch erneut gestartet. Nutzen Sie `continue` oder führen Sie den ausgegebenen Schritt manuell erneut aus (`plan`, `enrich`, `dev`, …). Automatisches Verketten von Schritten existiert nur als **`asa resume <run-id> --execute` zusammen mit globalem `--dry-run`**.
+Ohne `--execute` gibt **`resume` nur den nächsten Schritt aus** — manuell ausführen oder `continue` nutzen. Mit **`asa resume <run-id> --execute`** werden verbleibende Steps verkettet bis Ende, Gate oder `--max-steps` (echte Agenten ohne globales `--dry-run`).
 
-<Callout type="experimental">
-Vollautomatisches Resume ohne Dry-Run ist nicht implementiert. Für intent-basierte Fortsetzung eher `asa continue` verwenden.
-</Callout>
+Siehe [resume CLI](/docs/de/cli/resume) und [Fehlerbehebung](/docs/de/workflows/failure-recovery).
 
 ## Verwandte Workflows
 
