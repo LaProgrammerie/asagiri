@@ -7,6 +7,11 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
+// Card renders a titled body without double panel framing.
+func Card(title, body string, th theme.Theme) string {
+	return Panel(title, body, th)
+}
+
 // MetricCard renders one compact metric.
 func MetricCard(label string, value any, th theme.Theme) string {
 	l := lipgloss.NewStyle().

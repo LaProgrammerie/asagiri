@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/LaProgrammerie/asagiri/application/internal/ui/bus"
+	"github.com/LaProgrammerie/asagiri/application/internal/ui/components"
 	"github.com/stretchr/testify/require"
 )
 
@@ -26,6 +27,7 @@ func TestRenderGolden(t *testing.T) {
 		Now:          fixed,
 	}
 
+	vm.EventFeed = components.EventFeedViewModel{Filter: "all", Search: "(none)"}
 	got := Render(vm)
 	golden := filepath.Join("testdata", "mission_control.txt")
 
@@ -75,7 +77,8 @@ func TestRenderHeaderShowsWorkspaceBranchSession(t *testing.T) {
 
 	require.Contains(t, got, "Workspace: workspace-saas")
 	require.Contains(t, got, "Branch: onboarding-v2")
-	require.Contains(t, got, "Runtime: running")
+	require.Contains(t, got, "Runtime:")
+	require.Contains(t, got, "running")
 	require.Contains(t, got, "Session: active")
 }
 
@@ -112,7 +115,8 @@ func TestRenderActiveFlowShowsStepsWithGlyphs(t *testing.T) {
 
 	require.Contains(t, got, "onboarding")
 	require.Contains(t, got, "✓ create_workspace")
-	require.Contains(t, got, "⠋ invite_member")
+	require.Contains(t, got, "invite_member")
+	require.Contains(t, got, "⠋")
 	require.Contains(t, got, "○ accept_invite")
 }
 
@@ -125,7 +129,9 @@ func TestRenderAgentTheatreShowsAgents(t *testing.T) {
 	})
 
 	require.Contains(t, got, "investigator ✓ codex")
-	require.Contains(t, got, "implementer ⠋ cursor")
+	require.Contains(t, got, "implementer")
+	require.Contains(t, got, "cursor")
+	require.Contains(t, got, "⠋")
 }
 
 func TestRenderEventsLimitedToFive(t *testing.T) {
@@ -164,6 +170,17 @@ func TestRenderRuntimeShowsCostsAndRuns(t *testing.T) {
 	require.Contains(t, got, "Cost today: €0.42")
 	require.Contains(t, got, "Cost month: €6.10")
 	require.Contains(t, got, "run-1  spec-ui  running")
+}
+
+func TestRenderRecommendedActionsPane(t *testing.T) {
+	got := RenderRecommendedActionsPane(ViewModel{
+		Recommended: []bus.RecommendedAction{
+			{Title: "Verify trust", Description: "Overall trust is 68%", CLIEquivalent: "asa verify trust onboarding"},
+		},
+	})
+	require.Contains(t, got, "Recommended actions")
+	require.Contains(t, got, "Verify trust")
+	require.Contains(t, got, "asa verify trust onboarding")
 }
 
 func TestRenderRuntimeUsesQueuedEventsNotEventCount(t *testing.T) {

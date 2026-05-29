@@ -26,6 +26,7 @@ func TestRenderGolden(t *testing.T) {
 				{Time: now.Add(4 * time.Minute), Type: "implementation.started"},
 			},
 		},
+		Model:   NewModel(),
 		ShowCLI: true,
 	})
 

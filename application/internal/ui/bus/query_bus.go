@@ -38,6 +38,8 @@ func (b *queryBus) Query(ctx context.Context, query Query) (QueryResult, error) 
 		return b.handleGetTrustExplorer(ctx, q)
 	case GetExplainQuery:
 		return b.handleGetExplain(ctx, q)
+	case GetRecommendedActionsQuery:
+		return b.handleGetRecommendedActions(ctx, q)
 	case GetAgentTheatreQuery:
 		return b.handleGetAgentTheatre(ctx, q)
 	case GetReplayPackageQuery:
@@ -46,6 +48,24 @@ func (b *queryBus) Query(ctx context.Context, query Query) (QueryResult, error) 
 		return b.handleGetPrototypePipeline(ctx, q)
 	case GetMissionControlSnapshotQuery:
 		return b.handleGetMissionControlSnapshot(ctx, q)
+	case GetGraphRollbackImpactQuery:
+		return b.handleGetGraphRollbackImpact(ctx, q)
+	case GetPaletteEntriesQuery:
+		return b.handleGetPaletteEntries(ctx, q)
+	case GetGraphViewQuery:
+		return b.handleGetGraphView(ctx, q)
+	case GetGraphNodeDetailQuery:
+		return b.handleGetGraphNodeDetail(ctx, q)
+	case GetFlowStepDetailQuery:
+		return b.handleGetFlowStepDetail(ctx, q)
+	case GetKnowledgeMatchDetailQuery:
+		return b.handleGetKnowledgeMatchDetail(ctx, q)
+	case GetTrustDimensionDetailQuery:
+		return b.handleGetTrustDimensionDetail(ctx, q)
+	case GetReplayEventDetailQuery:
+		return b.handleGetReplayEventDetail(ctx, q)
+	case GetReplayCompareQuery:
+		return b.handleGetReplayCompare(ctx, q)
 	default:
 		return nil, fmt.Errorf("ui query not supported: %T", query)
 	}

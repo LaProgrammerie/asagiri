@@ -1,9 +1,11 @@
 package app
 
 import (
+	"context"
 	"testing"
 
 	"github.com/LaProgrammerie/asagiri/application/internal/config"
+	"github.com/LaProgrammerie/asagiri/application/internal/ui/bus"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/stretchr/testify/require"
 )
@@ -16,6 +18,7 @@ func TestPaletteFilterMatchesExplorerEntries(t *testing.T) {
 		InitialScreen: ScreenMission,
 	})
 	m.showPalette = true
+	m.refreshPaletteEntries()
 
 	cases := []struct {
 		query string
@@ -45,6 +48,7 @@ func TestPaletteFilterMatchesTitleAndCLI(t *testing.T) {
 		InitialScreen: ScreenMission,
 	})
 	m.showPalette = true
+	m.refreshPaletteEntries()
 
 	m.paletteQuery = "verify trust"
 	require.Len(t, m.filteredPaletteEntries(), 1)
@@ -63,6 +67,7 @@ func TestPaletteFilterNoResults(t *testing.T) {
 		InitialScreen: ScreenMission,
 	})
 	m.showPalette = true
+	m.refreshPaletteEntries()
 	m.paletteQuery = "zzzz-not-found"
 
 	require.Empty(t, m.filteredPaletteEntries())
@@ -77,6 +82,7 @@ func TestPaletteCursorWraps(t *testing.T) {
 		InitialScreen: ScreenMission,
 	})
 	m.showPalette = true
+	m.refreshPaletteEntries()
 	m.paletteQuery = "nav"
 	entries := m.filteredPaletteEntries()
 	require.Greater(t, len(entries), 1)
@@ -138,12 +144,23 @@ func TestSafetyConfirmationSkipsWhenDisabled(t *testing.T) {
 		InitialScreen: ScreenMission,
 	})
 
+	m.commandBus = bus.NewCommandBus(bus.Deps{
+		RepoRoot: t.TempDir(),
+		GraphRollback: func(_ context.Context, _ bus.Deps, cmd bus.GraphRollbackCommand) (bus.CommandResult, error) {
+			return bus.CommandResult{
+				Accepted:      true,
+				Message:       "graph graph-001 rolled back (1 nodes)",
+				CLIEquivalent: cmd.CLIEquivalent(),
+			}, nil
+		},
+	})
+
 	m = updateWithKey(t, m, tea.KeyCtrlP)
 	m = updateWithRunes(t, m, "rollback")
 	m = applyUpdate(t, m, tea.KeyMsg{Type: tea.KeyEnter})
 
 	require.Nil(t, m.confirmation)
-	require.Equal(t, "graph rollback stub confirmed", m.lastCommandResult)
+	require.Contains(t, m.lastCommandResult, "rolled back")
 }
 
 func TestViewShowsSafetyConfirmationDetails(t *testing.T) {

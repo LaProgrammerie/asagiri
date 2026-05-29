@@ -1,6 +1,6 @@
 ---
 title: Mission Control
-description: Pantalla principal para entender el estado del workspace en segundos.
+description: Pantalla cockpit por defecto para entender el estado del workspace en menos de diez segundos.
 ---
 
 # Mission Control
@@ -13,13 +13,15 @@ asa
 asa mission
 ```
 
-## Información mostrada
+## Contenido principal
 
-- workspace y rama;
-- estado de runtime y sesión;
-- progreso del flujo activo;
-- agentes activos;
-- dimensiones de trust y warnings;
-- eventos recientes.
+- workspace y rama
+- estado runtime y sesión
+- pasos del flow activo con glifos de progreso
+- resumen Agent Theatre
+- dimensiones trust y puntuación global
+- **coste día / mes** (derivado de eventos runtime)
+- eventos recientes (feed en vivo)
+- **acciones recomendadas** — siguientes pasos priorizados con equivalente CLI (`GetRecommendedActionsQuery`)
 
-Mission Control es el punto de entrada antes de abrir un explorer específico.
+Usar acciones recomendadas o **Ctrl+P** para work, verify trust, reanudar graph bloqueado o avanzar el pipeline prototype.

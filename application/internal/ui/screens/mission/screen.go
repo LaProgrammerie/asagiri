@@ -26,8 +26,11 @@ type ViewModel struct {
 	CostMonthEUR      float64
 	Warnings          []string
 	Warning           string
+	Recommended       []bus.RecommendedAction
 	Now               time.Time
 	DisableAnimations bool
+	AnimFrame         int
+	EventFeed         components.EventFeedViewModel
 }
 
 // Render returns Mission Control textual content.
@@ -44,6 +47,8 @@ func Render(vm ViewModel) string {
 	b.WriteString(RenderActiveFlowPane(vm))
 	b.WriteString("\n\n")
 	b.WriteString(RenderAgentTheatrePane(vm))
+	b.WriteString("\n\n")
+	b.WriteString(RenderRecommendedActionsPane(vm))
 	b.WriteString("\n\n")
 	b.WriteString(RenderEventsPane(vm))
 	return b.String()
@@ -65,7 +70,11 @@ func RenderHeader(vm ViewModel) string {
 		session = "inactive"
 	}
 	b.WriteString(fmt.Sprintf("Workspace: %s  Branch: %s\n", workspace, branch))
-	b.WriteString(fmt.Sprintf("Runtime: %s  Session: %s", vm.RuntimeStatus, session))
+	runtimePrefix := ""
+	if vm.RuntimeStatus == "running" && !vm.DisableAnimations {
+		runtimePrefix = components.ShimmerPrefix(true, vm.AnimFrame)
+	}
+	b.WriteString(fmt.Sprintf("Runtime: %s%s  Session: %s", runtimePrefix, vm.RuntimeStatus, session))
 	return b.String()
 }
 
@@ -135,7 +144,7 @@ func RenderActiveFlowPane(vm ViewModel) string {
 		return b.String()
 	}
 	for _, step := range vm.Flow.Steps {
-		b.WriteString(fmt.Sprintf("%s %s  ", flowStatusGlyph(step.Status, !vm.DisableAnimations), stepLabel(step)))
+		b.WriteString(fmt.Sprintf("%s %s  ", flowStatusGlyph(step.Status, !vm.DisableAnimations, vm.AnimFrame), stepLabel(step)))
 	}
 	return strings.TrimRight(b.String(), " ")
 }
@@ -157,7 +166,27 @@ func RenderAgentTheatrePane(vm ViewModel) string {
 		if agentRef == "" {
 			agentRef = "-"
 		}
-		b.WriteString(fmt.Sprintf("- %s %s %s\n", role, statusGlyph(ag.Status, !vm.DisableAnimations), agentRef))
+		b.WriteString(fmt.Sprintf("- %s %s %s\n", role, statusGlyph(ag.Status, !vm.DisableAnimations, vm.AnimFrame), agentRef))
+	}
+	return strings.TrimRight(b.String(), "\n")
+}
+
+// RenderRecommendedActionsPane renders contextual next steps.
+func RenderRecommendedActionsPane(vm ViewModel) string {
+	var b strings.Builder
+	b.WriteString("Recommended actions\n")
+	if len(vm.Recommended) == 0 {
+		b.WriteString("- none\n")
+		return b.String()
+	}
+	for i, action := range vm.Recommended {
+		if i >= 6 {
+			break
+		}
+		b.WriteString(fmt.Sprintf("- %s: %s\n", action.Title, action.Description))
+		if strings.TrimSpace(action.CLIEquivalent) != "" {
+			b.WriteString(fmt.Sprintf("  CLI: %s\n", action.CLIEquivalent))
+		}
 	}
 	return strings.TrimRight(b.String(), "\n")
 }
@@ -166,10 +195,12 @@ func RenderAgentTheatrePane(vm ViewModel) string {
 func RenderEventsPane(vm ViewModel) string {
 	var b strings.Builder
 	b.WriteString("Recent events\n")
-	b.WriteString(components.RenderEventFeed(components.EventFeedViewModel{
-		Events: vm.Events,
-		Limit:  5,
-	}))
+	feed := vm.EventFeed
+	feed.Events = vm.Events
+	if feed.Limit <= 0 {
+		feed.Limit = 5
+	}
+	b.WriteString(components.RenderEventFeed(feed))
 	return b.String()
 }
 
@@ -188,13 +219,13 @@ func meter(v float64) string {
 	return strings.Repeat("█", filled) + strings.Repeat("░", width-filled)
 }
 
-func statusGlyph(status string, animated bool) string {
+func statusGlyph(status string, animated bool, frame int) string {
 	switch status {
 	case "running":
 		if !animated {
 			return "•"
 		}
-		return "⠋"
+		return components.ShimmerPrefix(true, frame) + "⠋"
 	case "done":
 		return "✓"
 	case "failed":
@@ -206,7 +237,7 @@ func statusGlyph(status string, animated bool) string {
 	}
 }
 
-func flowStatusGlyph(status string, animated bool) string {
+func flowStatusGlyph(status string, animated bool, frame int) string {
 	switch status {
 	case "succeeded", "completed", "done":
 		return "✓"
@@ -214,7 +245,7 @@ func flowStatusGlyph(status string, animated bool) string {
 		if !animated {
 			return "•"
 		}
-		return "⠋"
+		return components.ShimmerPrefix(true, frame) + "⠋"
 	case "failed":
 		return "✕"
 	default:

@@ -9,13 +9,15 @@ Artifacts
 - runtime/events.jsonl
 
 Timeline
-- 08:12:00 investigation.started
-- 08:14:00 graph.generated artifact=graph/execution-graph.json
-- 08:16:00 implementation.started
-
+> 08:12:00 investigation.started
+  08:14:00 graph.generated artifact=graph/execution-graph.json
+  08:16:00 implementation.started
 Actions
-- jump to event (stub)
-- inspect artifact (stub)
-- compare run: asa replay compare <replay-a> <replay-b>
-- replay offline: asa replay run replay-001 --offline
+- jump to event: j
+- inspect artifact: a
+- compare run: m
+- replay offline: O
+- explain divergence: D
 - open replay: asa replay open replay-001
+- compare: asa replay compare <replay-a> <replay-b>
+- explain: asa replay explain <replay-a> <replay-b>

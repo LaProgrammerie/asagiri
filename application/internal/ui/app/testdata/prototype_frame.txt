@@ -21,6 +21,7 @@
  │ │   contract=POST /api/workspaces trust=pending metric=onboarding_completion_rate   │ │ 
  │ │                                                                                   │ │ 
  │ │ Pipeline actions                                                                  │ │ 
+ │ │ Keys: 1 create  2 flows extract  3 contracts extract  4 spec generate             │ │ 
  │ │ - asa contracts extract workspace-saas                                            │ │ 
  │ │ - asa architecture derive workspace-saas                                          │ │ 
  │ │ - open prototype: asa prototype                                                   │ │ 

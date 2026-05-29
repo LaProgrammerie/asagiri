@@ -6,6 +6,7 @@ import (
 
 	"github.com/LaProgrammerie/asagiri/application/internal/runtime"
 	"github.com/LaProgrammerie/asagiri/application/internal/ui/bus"
+	"github.com/LaProgrammerie/asagiri/application/internal/ui/components"
 	"github.com/stretchr/testify/require"
 )
 
@@ -19,7 +20,7 @@ func TestRuntimeWidgetShowsStatus(t *testing.T) {
 				QueuedEvents: 2,
 			},
 		},
-	}, true)
+	}, true, 0)
 
 	require.Equal(t, "Runtime", w.Title())
 	require.Equal(t, Size{Width: 32, Height: 5}, w.MinSize())
@@ -31,7 +32,7 @@ func TestRuntimeWidgetShowsStatus(t *testing.T) {
 }
 
 func TestAgentWidgetEmptyState(t *testing.T) {
-	w := AgentWidget(bus.MissionControlSnapshotResult{}, true)
+	w := AgentWidget(bus.MissionControlSnapshotResult{}, true, 0)
 	require.Equal(t, "No active agents", w.View())
 }
 
@@ -58,19 +59,20 @@ func TestFlowWidgetShowsSteps(t *testing.T) {
 				{Label: "invite_member", Status: "running"},
 			},
 		},
-	}, true)
+	}, true, 0)
 	view := w.View()
 	require.Contains(t, view, "✓ create_workspace")
-	require.Contains(t, view, "⠋ invite_member")
+	require.Contains(t, view, "invite_member")
+	require.Contains(t, view, "⠋")
 }
 
 func TestFlowWidgetEmptyState(t *testing.T) {
-	w := FlowWidget(bus.MissionControlSnapshotResult{}, true)
+	w := FlowWidget(bus.MissionControlSnapshotResult{}, true, 0)
 	require.Equal(t, "No active flow", w.View())
 }
 
 func TestEventWidgetEmptyState(t *testing.T) {
-	w := EventWidget(bus.MissionControlSnapshotResult{}, true)
+	w := EventWidget(bus.MissionControlSnapshotResult{}, components.EventFeedViewModel{Filter: "all"}, true)
 	require.Equal(t, "No events", w.View())
 }
 
@@ -81,7 +83,7 @@ func TestEventWidgetShowsRecentEvents(t *testing.T) {
 			{Type: "investigation.completed", CreatedAt: now},
 			{Type: "graph.generated", CreatedAt: now.Add(time.Minute)},
 		},
-	}, true)
+	}, components.EventFeedViewModel{Filter: "all", Search: "(none)"}, true)
 	view := w.View()
 	require.Contains(t, view, "08:14:00  investigation.completed")
 	require.Contains(t, view, "08:15:00  graph.generated")
@@ -102,4 +104,42 @@ func TestProgressWidgetCompletedRatio(t *testing.T) {
 func TestProgressWidgetEmptyState(t *testing.T) {
 	w := ProgressWidget(bus.MissionControlSnapshotResult{}, true)
 	require.Equal(t, "No runs", w.View())
+}
+
+func TestRiskWidgetShowsResidual(t *testing.T) {
+	w := RiskWidget(bus.MissionControlSnapshotResult{
+		TrustExplorer: bus.TrustExplorerResult{ResidualRisk: "high"},
+	}, true)
+	require.Contains(t, w.View(), "Residual: high")
+}
+
+func TestKnowledgeWidgetEmptyState(t *testing.T) {
+	w := KnowledgeWidget(bus.MissionControlSnapshotResult{}, true)
+	require.Equal(t, "No knowledge hits", w.View())
+}
+
+func TestReplayWidgetShowsID(t *testing.T) {
+	w := ReplayWidget(bus.MissionControlSnapshotResult{
+		Replay: bus.ReplayPackageResult{ReplayID: "rep-1", Mode: "offline"},
+	}, true)
+	view := w.View()
+	require.Contains(t, view, "rep-1")
+	require.Contains(t, view, "offline")
+}
+
+func TestPerformanceWidgetSparkline(t *testing.T) {
+	w := PerformanceWidget(bus.MissionControlSnapshotResult{
+		Events: []bus.EventSummary{{Type: "a"}, {Type: "b"}},
+		Runs:   []bus.RunSummary{{Status: "completed"}, {Status: "running"}},
+	}, true)
+	require.Contains(t, w.View(), "Throughput:")
+}
+
+func TestSessionsWidgetActiveCount(t *testing.T) {
+	w := SessionsWidget(bus.MissionControlSnapshotResult{
+		Runtime: bus.RuntimeStatusResult{
+			Status: runtime.DaemonStatus{Sessions: 3},
+		},
+	}, true)
+	require.Contains(t, w.View(), "Active: 3")
 }

@@ -421,6 +421,16 @@ func TestSafetyConfirmationOnDestructivePaletteAction(t *testing.T) {
 			ConfirmDestructiveActions: true,
 		},
 		InitialScreen: ScreenMission,
+		CommandBus: bus.NewCommandBus(bus.Deps{
+			RepoRoot: t.TempDir(),
+			GraphRollback: func(_ context.Context, _ bus.Deps, cmd bus.GraphRollbackCommand) (bus.CommandResult, error) {
+				return bus.CommandResult{
+					Accepted:      true,
+					Message:       "graph rolled back",
+					CLIEquivalent: cmd.CLIEquivalent(),
+				}, nil
+			},
+		}),
 	})
 
 	m = updateWithKey(t, m, tea.KeyCtrlP)
@@ -430,7 +440,7 @@ func TestSafetyConfirmationOnDestructivePaletteAction(t *testing.T) {
 
 	m = updateWithRunes(t, m, "y")
 	require.Nil(t, m.confirmation)
-	require.Contains(t, m.lastCommandResult, "confirmed")
+	require.Contains(t, m.lastCommandResult, "rolled back")
 }
 
 func TestSafetyConfirmationEnterDoesNotConfirm(t *testing.T) {

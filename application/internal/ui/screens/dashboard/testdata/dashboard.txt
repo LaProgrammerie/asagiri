@@ -1,26 +1,41 @@
-╭─────────────────╮╭──────────────────────╮
-│ Runtime         ││ Agents               │
-│ Status: running ││ ✓ investigator codex │
-│ Sessions: 3     ││ ⠋ implementer cursor │
-│ Flows: 1        │╰──────────────────────╯
-│ Queue: 2        │                        
-╰─────────────────╯                        
-╭───────────────────╮╭──────────────╮
-│ Trust             ││ Costs        │
-│ Architecture  82% ││ Today: €0.42 │
-│ Security      71% ││ Month: €6.10 │
-│ Observability 63% │╰──────────────╯
-│ Regression    78% │                
-│ Overall       76% │                
-╰───────────────────╯                
-╭────────────────────────────────────────────────────────╮╭─────────────────────────────────────╮
-│ Flow                                                   ││ Events                              │
-│ ✓ create_workspace   ⠋ invite_member   ○ accept_invite ││ Filter: all (stub)  Search: (none)  │
-╰────────────────────────────────────────────────────────╯│ - 12:32:56  investigation.completed │
-                                                          │ - 12:33:56  graph.generated         │
-                                                          ╰─────────────────────────────────────╯
-╭──────────────────────────╮
-│ Progress                 │
-│ Completed: 1/2           │
-│ Progress: █████░░░░░ 50% │
-╰──────────────────────────╯
+╭─────────────────────╮╭───────────────╮
+│ Runtime             ││ Sessions      │
+│ ░ ⠋ Status: running ││ Active: 3     │
+│ Sessions: 3         ││ State: active │
+│ Flows: 1            │╰───────────────╯
+│ Queue: 2            │                 
+╰─────────────────────╯                 
+╭─────────────────╮╭────────────────────────╮
+│ Queue           ││ Agents                 │
+│ Depth: 2        ││ ✓ investigator codex   │
+│ Trend: ▄▄▄▄████ ││ ░ ⠋ implementer cursor │
+╰─────────────────╯╰────────────────────────╯
+╭──────────────────────────────╮╭──────────────╮
+│ Trust                        ││ Costs        │
+│ Architecture  ████████░░ 82% ││ Today: €0.42 │
+│ Security      ███████░░░ 71% ││ Month: €6.10 │
+│ Observability ██████░░░░ 63% │╰──────────────╯
+│ Regression    ███████░░░ 78% │                
+│ Overall       ███████░░░ 76% │                
+╰──────────────────────────────╯                
+╭────────────────────────────────────────────────────────────╮╭────────────────────╮
+│ Flow                                                       ││ Risk               │
+│ ✓ create_workspace   ░ ⠋ invite_member   ░ ○ accept_invite ││ Residual: unknown  │
+╰────────────────────────────────────────────────────────────╯│ No high-risk nodes │
+                                                              ╰────────────────────╯
+╭───────────────────╮╭───────────────────╮
+│ Knowledge         ││ Replay            │
+│ No knowledge hits ││ No replay package │
+╰───────────────────╯╰───────────────────╯
+╭─────────────────────────────────────╮╭──────────────────────────╮
+│ Events                              ││ Progress                 │
+│ Filter: all  Search: (none)  [live] ││ Completed: 1/2           │
+│   12:32:56  investigation.completed ││ Progress: █████░░░░░ 50% │
+│   12:33:56  graph.generated         │╰──────────────────────────╯
+╰─────────────────────────────────────╯                            
+╭────────────────────────╮
+│ Performance            │
+│ Events: 2              │
+│ Throughput: ▅▅▅▅▅█████ │
+│ Runs done: █████░░░░░  │
+╰────────────────────────╯

@@ -12,8 +12,10 @@ import (
 func TestRenderGolden(t *testing.T) {
 	got := Render(ViewModel{
 		Explain: bus.ExplainResult{
-			Subject:       "Why is this node blocked?",
-			Reasons:       []string{"Dependency investigate is not completed"},
+			Subject:            "Why is this node blocked?",
+			Question:           "Why is this node blocked?",
+			SupportedQuestions: []string{"Why is this node blocked?"},
+			Reasons:            []string{"Dependency investigate is not completed"},
 			Evidence:      []string{"Node implement blocked by investigate"},
 			Source:        "query-bus read-only",
 			Alternatives:  []string{"asa graph", "asa trust"},

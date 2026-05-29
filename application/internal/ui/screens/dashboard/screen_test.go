@@ -8,6 +8,7 @@ import (
 
 	"github.com/LaProgrammerie/asagiri/application/internal/runtime"
 	"github.com/LaProgrammerie/asagiri/application/internal/ui/bus"
+	"github.com/LaProgrammerie/asagiri/application/internal/ui/components"
 	"github.com/LaProgrammerie/asagiri/application/internal/ui/theme"
 	"github.com/stretchr/testify/require"
 )
@@ -15,13 +16,19 @@ import (
 func TestWidgetsRender(t *testing.T) {
 	snapshot := fixtureSnapshot()
 	widgets := []Widget{
-		RuntimeWidget(snapshot, true),
-		AgentWidget(snapshot, true),
+		RuntimeWidget(snapshot, true, 0),
+		AgentWidget(snapshot, true, 0),
 		TrustWidget(snapshot, true),
 		CostWidget(snapshot, true),
-		FlowWidget(snapshot, true),
-		EventWidget(snapshot, true),
+		FlowWidget(snapshot, true, 0),
+		EventWidget(snapshot, components.EventFeedViewModel{Filter: "all", Search: "(none)"}, true),
 		ProgressWidget(snapshot, true),
+		RiskWidget(snapshot, true),
+		KnowledgeWidget(snapshot, true),
+		ReplayWidget(snapshot, true),
+		PerformanceWidget(snapshot, true),
+		SessionsWidget(snapshot, true),
+		QueueWidget(snapshot, true),
 	}
 	for _, widget := range widgets {
 		require.NotEmpty(t, widget.Title())
@@ -39,6 +46,7 @@ func TestRenderCompactLayout(t *testing.T) {
 	got := Render(vm)
 	require.NotContains(t, got, "╮╭", "compact layout must stack panels vertically")
 	require.Contains(t, got, "Runtime")
+	require.Contains(t, got, "Knowledge")
 	require.NotContains(t, got, "Agents")
 }
 

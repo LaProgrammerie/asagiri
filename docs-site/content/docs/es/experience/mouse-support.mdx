@@ -1,6 +1,6 @@
 ---
 title: Soporte de ratón
-description: Interacciones opcionales de ratón para navegación y resize básico.
+description: Interacciones opcionales con ratón para selección, menús contextuales y resize.
 ---
 
 # Soporte de ratón
@@ -12,10 +12,12 @@ ui:
   mouse: true
 ```
 
-## Interacciones actuales
+## Interacciones (lote 7D)
 
-- eventos de puntero en terminales compatibles;
-- resize de split con rueda (básico);
-- drag del divisor para resize de paneles (básico).
+- **Clic izquierdo** — seleccionar fila (explorers, acciones recomendadas en Mission Control)
+- **Doble clic** — abrir detalle de nodo/paso o saltar desde eventos
+- **Clic derecho** — menú contextual (explain, reanudar graph, pipeline prototype, verify trust…)
+- **Hover** — resaltar fila si el terminal soporta cell motion
+- **Rueda / arrastrar divisor** — redimensionar paneles split
 
-Todas las acciones críticas siguen disponibles por teclado.
+El teclado sigue siendo obligatorio: cada acción también está en atajos y **Ctrl+P**.

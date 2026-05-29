@@ -10,6 +10,7 @@ import (
 
 type paletteEntry struct {
 	ID          string
+	ActionID    string
 	Title       string
 	Description string
 	CLI         string
@@ -22,6 +23,7 @@ type safetyConfirmation struct {
 	CLIEquivalent  string
 	RollbackPolicy string
 	ActionID       string
+	GraphID        string
 }
 
 type paletteActionMsg struct {
@@ -35,31 +37,69 @@ type commandDispatchMsg struct {
 	err    error
 }
 
-func defaultPaletteEntries() []paletteEntry {
+func fallbackPaletteEntries() []paletteEntry {
 	return []paletteEntry{
-		{ID: "nav.dashboard", Title: "Open dashboard", Description: "Navigate to dashboard live view", CLI: "asa dashboard", Keywords: []string{"screen", "dashboard", "nav"}},
-		{ID: "nav.mission", Title: "Open mission control", Description: "Navigate to mission control", CLI: "asa mission", Keywords: []string{"screen", "mission", "nav"}},
-		{ID: "nav.agents", Title: "Open agent theatre", Description: "Navigate to live agent cards", CLI: "asa agents watch", Keywords: []string{"screen", "agents", "watch", "nav"}},
-		{ID: "nav.graph", Title: "Open graph explorer", Description: "Navigate to graph explorer", CLI: "asa graph", Keywords: []string{"screen", "graph", "nav"}},
-		{ID: "nav.flow", Title: "Open flow explorer", Description: "Navigate to flow explorer", CLI: "asa flow", Keywords: []string{"screen", "flow", "nav"}},
-		{ID: "nav.logs", Title: "Open logs", Description: "Navigate to logs placeholder", CLI: "asa logs", Keywords: []string{"screen", "logs", "nav"}},
-		{ID: "nav.explain", Title: "Open explain panel", Description: "Navigate to explainability panel", CLI: "asa explain", Keywords: []string{"screen", "explain", "nav"}},
-		{ID: "nav.replay", Title: "Open replay", Description: "Navigate to replay explorer", CLI: "asa replay open <replay-id>", Keywords: []string{"screen", "replay", "nav"}},
-		{ID: "nav.prototype", Title: "Open prototype mode", Description: "Navigate to prototype split view", CLI: "asa prototype", Keywords: []string{"screen", "prototype", "nav"}},
-		{ID: "nav.knowledge", Title: "Open knowledge", Description: "Navigate to knowledge explorer", CLI: "asa knowledge", Keywords: []string{"screen", "knowledge", "nav"}},
-		{ID: "nav.trust", Title: "Open trust explorer", Description: "Navigate to trust explorer", CLI: "asa trust", Keywords: []string{"screen", "trust", "nav"}},
-		{ID: "flow.open-onboarding", Title: "Open flow onboarding", Description: "Open onboarding flow details", CLI: "asa flow open onboarding", Keywords: []string{"flow", "open", "onboarding"}},
-		{ID: "cmd.start-work", Title: "Start work", Description: "Run workflow orchestration from intent", CLI: `asa work "add workspace invitations"`, Keywords: []string{"work", "implement", "dev"}},
-		{ID: "cmd.run-investigation", Title: "Run investigation", Description: "Investigate onboarding failures", CLI: `asa investigate "onboarding fails"`, Keywords: []string{"investigate", "debug", "root cause"}},
-		{ID: "cmd.verify-trust", Title: "Verify trust", Description: "Run trust verification for onboarding flow", CLI: "asa verify trust onboarding", Keywords: []string{"trust", "verify", "quality"}},
-		{ID: "safe.graph-rollback", Title: "Rollback graph (stub)", Description: "Destructive action requiring explicit confirmation", CLI: "asa graph rollback graph-001", Keywords: []string{"graph", "rollback", "destructive", "safety"}},
+		{ID: "nav.dashboard", ActionID: "nav.dashboard", Title: "Open dashboard", Description: "Navigate to dashboard live view", CLI: "asa dashboard", Keywords: []string{"screen", "dashboard", "nav"}},
+		{ID: "nav.mission", ActionID: "nav.mission", Title: "Open mission control", Description: "Navigate to mission control", CLI: "asa mission", Keywords: []string{"screen", "mission", "nav"}},
+		{ID: "nav.graph", ActionID: "nav.graph", Title: "Open graph explorer", Description: "Navigate to graph explorer", CLI: "asa graph", Keywords: []string{"screen", "graph", "nav"}},
+		{ID: "nav.flow", ActionID: "nav.flow", Title: "Open flow explorer", Description: "Navigate to flow explorer", CLI: "asa flow", Keywords: []string{"screen", "flow", "nav"}},
+		{ID: "nav.knowledge", ActionID: "nav.knowledge", Title: "Open knowledge", Description: "Navigate to knowledge explorer", CLI: "asa knowledge", Keywords: []string{"screen", "knowledge", "nav"}},
+		{ID: "nav.trust", ActionID: "nav.trust", Title: "Open trust explorer", Description: "Navigate to trust explorer", CLI: "asa trust", Keywords: []string{"screen", "trust", "nav"}},
+		{ID: "nav.explain", ActionID: "nav.explain", Title: "Open explain panel", Description: "Navigate to explainability panel", CLI: "asa explain", Keywords: []string{"screen", "explain", "nav"}},
+		{ID: "flow.open-onboarding", ActionID: "flow.open-onboarding", Title: "Open flow onboarding", Description: "Open onboarding flow details", CLI: "asa flow open onboarding", Keywords: []string{"flow", "open", "onboarding"}},
+		{ID: "cmd.verify-trust", ActionID: "cmd.verify-trust", Title: "Verify trust", Description: "Run trust verification for onboarding flow", CLI: "asa verify trust onboarding", Keywords: []string{"trust", "verify", "quality"}},
+		{ID: "safe.graph-rollback", ActionID: "safe.graph-rollback", Title: "Rollback graph", Description: "Destructive action requiring explicit confirmation", CLI: "asa graph rollback <graph-id>", Keywords: []string{"graph", "rollback", "destructive", "safety"}},
 	}
+}
+
+func (m *model) refreshPaletteEntries() {
+	if m.queryBus == nil {
+		m.paletteEntries = fallbackPaletteEntries()
+		return
+	}
+	res, err := m.queryBus.Query(m.ctx, bus.GetPaletteEntriesQuery{
+		Screen: m.router.Current(),
+		Limit:  96,
+	})
+	if err != nil {
+		m.paletteEntries = fallbackPaletteEntries()
+		return
+	}
+	typed, ok := res.(bus.PaletteEntriesResult)
+	if !ok {
+		m.paletteEntries = fallbackPaletteEntries()
+		return
+	}
+	m.paletteEntries = toPaletteEntries(typed.Entries)
+}
+
+func toPaletteEntries(rows []bus.PaletteEntry) []paletteEntry {
+	if len(rows) == 0 {
+		return fallbackPaletteEntries()
+	}
+	out := make([]paletteEntry, 0, len(rows))
+	for _, row := range rows {
+		actionID := row.ActionID
+		if actionID == "" {
+			actionID = row.ID
+		}
+		out = append(out, paletteEntry{
+			ID:          row.ID,
+			ActionID:    actionID,
+			Title:       row.Title,
+			Description: row.Description,
+			CLI:         row.CLI,
+			Keywords:    row.Keywords,
+		})
+	}
+	return out
 }
 
 func (m *model) openPalette() {
 	m.showPalette = true
 	m.paletteQuery = ""
 	m.paletteCursor = 0
+	m.refreshPaletteEntries()
 }
 
 func (m *model) closePalette() {
@@ -122,7 +162,11 @@ func (m model) paletteSelectCmd() tea.Cmd {
 		idx = 0
 	}
 	entry := entries[idx]
-	return m.paletteActionCmd(entry.ID, entry.CLI, false)
+	actionID := entry.ActionID
+	if actionID == "" {
+		actionID = entry.ID
+	}
+	return m.paletteActionCmd(actionID, entry.CLI, false)
 }
 
 func (m model) paletteActionCmd(actionID, cliEquivalent string, skipSafetyPrompt bool) tea.Cmd {
@@ -135,23 +179,68 @@ func (m model) paletteActionCmd(actionID, cliEquivalent string, skipSafetyPrompt
 	}
 }
 
+func (m *model) graphIDForRollback() string {
+	if id := strings.TrimSpace(m.snapshot.GraphExplorer.GraphID); id != "" {
+		return id
+	}
+	return ""
+}
+
+func (m *model) loadRollbackConfirmation(cliEquivalent string) {
+	graphID := m.graphIDForRollback()
+	if graphID == "" {
+		graphID = "graph-001"
+	}
+	if m.queryBus == nil {
+		m.confirmation = &safetyConfirmation{
+			Title:          fmt.Sprintf("You are about to rollback %s.", graphID),
+			Impact:         []string{"Impact details unavailable without query bus."},
+			CLIEquivalent:  cliEquivalent,
+			RollbackPolicy: "Rollback can be replayed manually after confirmation.",
+			ActionID:       "safe.graph-rollback",
+			GraphID:        graphID,
+		}
+		return
+	}
+	res, err := m.queryBus.Query(m.ctx, bus.GetGraphRollbackImpactQuery{GraphID: graphID})
+	if err != nil {
+		m.confirmation = &safetyConfirmation{
+			Title:          fmt.Sprintf("You are about to rollback %s.", graphID),
+			Impact:         []string{err.Error()},
+			CLIEquivalent:  cliEquivalent,
+			RollbackPolicy: "Rollback unavailable.",
+			ActionID:       "safe.graph-rollback",
+			GraphID:        graphID,
+		}
+		return
+	}
+	impact, ok := res.(bus.GraphRollbackImpactResult)
+	if !ok {
+		return
+	}
+	if strings.TrimSpace(impact.GraphID) != "" {
+		graphID = impact.GraphID
+	}
+	if strings.TrimSpace(impact.CLIEquivalent) != "" {
+		cliEquivalent = impact.CLIEquivalent
+	}
+	m.confirmation = &safetyConfirmation{
+		Title:          impact.Title,
+		Impact:         impact.ImpactLines,
+		CLIEquivalent:  cliEquivalent,
+		RollbackPolicy: impact.RollbackPolicy,
+		ActionID:       "safe.graph-rollback",
+		GraphID:        graphID,
+	}
+}
+
 func (m model) handlePaletteAction(v paletteActionMsg) (tea.Model, tea.Cmd) {
 	if v.actionID == "safe.graph-rollback" && m.cfg.ConfirmDestructiveActions && !v.skipSafetyPrompt {
-		m.closePalette()
-		m.confirmation = &safetyConfirmation{
-			Title: "You are about to rollback graph-001.",
-			Impact: []string{
-				"2 worktrees will be impacted",
-				"4 generated reports may become stale",
-				"1 active session will require a manual refresh",
-			},
-			CLIEquivalent:  v.cliEquivalent,
-			RollbackPolicy: "Rollback can be replayed manually after confirmation.",
-			ActionID:       v.actionID,
-		}
+		(&m).closePalette()
+		(&m).loadRollbackConfirmation(v.cliEquivalent)
 		return m, nil
 	}
-	m.closePalette()
+	(&m).closePalette()
 	return m.runPaletteAction(v.actionID, v.cliEquivalent)
 }
 
@@ -176,7 +265,7 @@ func (m model) runPaletteAction(actionID string, cliEquivalent string) (tea.Mode
 		(&m).navigateTo(ScreenLogs, "asa logs")
 		return m, nil
 	case "nav.explain":
-		(&m).navigateTo(ScreenExplain, "asa explain")
+		m.openExplainForFocus(bus.FocusKindDecision, m.explainSubject(), m.router.Current())
 		return m, nil
 	case "nav.replay":
 		(&m).navigateTo(ScreenReplay, "asa replay open <replay-id>")
@@ -190,19 +279,95 @@ func (m model) runPaletteAction(actionID string, cliEquivalent string) (tea.Mode
 	case "nav.trust":
 		(&m).navigateTo(ScreenTrust, "asa trust")
 		return m, nil
-	case "flow.open-onboarding":
-		(&m).navigateTo(ScreenFlow, "asa flow open onboarding")
-		return m, nil
-	case "safe.graph-rollback":
-		m.lastCommandResult = "graph rollback stub confirmed"
-		return m, nil
 	case "cmd.start-work":
 		return m, m.dispatchCommand(bus.StartWorkCommand{Intent: "add workspace invitations"}, cliEquivalent)
 	case "cmd.run-investigation":
 		return m, m.dispatchCommand(bus.RunInvestigationCommand{Symptom: "onboarding fails"}, cliEquivalent)
 	case "cmd.verify-trust":
 		return m, m.dispatchCommand(bus.VerifyTrustCommand{Target: "onboarding"}, cliEquivalent)
+	case "cmd.build-knowledge", "ctx.knowledge-build":
+		return m, m.dispatchCommand(bus.BuildKnowledgeGraphCommand{}, cliEquivalent)
+	case "cmd.prototype-create":
+		return m, m.dispatchCommand(bus.PrototypeCreateCommand{
+			Intent:  "workspace onboarding prototype",
+			Product: strings.TrimSpace(m.snapshot.Prototype.Product),
+		}, cliEquivalent)
+	case "cmd.flows-extract":
+		product := strings.TrimSpace(m.snapshot.Prototype.Product)
+		if product == "" {
+			product = strings.TrimSpace(m.prototypeProduct)
+		}
+		return m, m.dispatchCommand(bus.FlowsExtractCommand{Product: product}, cliEquivalent)
+	case "cmd.contracts-extract":
+		product := strings.TrimSpace(m.snapshot.Prototype.Product)
+		if product == "" {
+			product = strings.TrimSpace(m.prototypeProduct)
+		}
+		return m, m.dispatchCommand(bus.ContractsExtractCommand{Product: product}, cliEquivalent)
+	case "cmd.spec-generate":
+		product := strings.TrimSpace(m.snapshot.Prototype.Product)
+		if product == "" {
+			product = strings.TrimSpace(m.prototypeProduct)
+		}
+		return m, m.dispatchCommand(bus.SpecGenerateFromProductCommand{Product: product}, cliEquivalent)
+	case "cmd.prototype-pipeline", "rec.prototype-next":
+		if len(m.snapshot.Prototype.SuggestedActions) == 0 {
+			return m, m.dispatchPrototypePipelineAction(cliEquivalent)
+		}
+		return m, m.dispatchPrototypePipelineAction(m.snapshot.Prototype.SuggestedActions[0])
+	case "rec.start-work":
+		return m, m.dispatchCommand(bus.StartWorkCommand{Intent: "add workspace invitations"}, cliEquivalent)
+	case "rec.investigate-flow":
+		return m, m.dispatchCommand(bus.RunInvestigationCommand{Symptom: "onboarding fails"}, cliEquivalent)
+	case "rec.verify-trust":
+		return m, m.dispatchCommand(bus.VerifyTrustCommand{Target: "onboarding"}, cliEquivalent)
+	case "rec.explain-security", "rec.explain-blocked":
+		m.openExplainForFocus(bus.FocusKindTrustDimension, "Security", "")
+		return m, nil
+	case "rec.graph-resume":
+		return m, m.dispatchCommand(bus.GraphResumeCommand{GraphID: m.snapshot.GraphExplorer.GraphID}, cliEquivalent)
+	case "rec.export-events", "cmd.export-events":
+		return m, m.dispatchCommand(bus.ExportEventsCommand{}, cliEquivalent)
+	case "rec.dashboard":
+		(&m).navigateTo(ScreenDashboard, "asa dashboard")
+		return m, nil
+	case "rec.prototype-create":
+		return m, m.dispatchCommand(bus.PrototypeCreateCommand{Intent: "workspace onboarding prototype"}, cliEquivalent)
+	case "ctx.graph-resume":
+		graphID := m.snapshot.GraphExplorer.GraphID
+		return m, m.dispatchCommand(bus.GraphResumeCommand{GraphID: graphID}, cliEquivalent)
+	case "ctx.graph-export":
+		graphID := m.snapshot.GraphExplorer.GraphID
+		return m, m.dispatchCommand(bus.ExportGraphCommand{GraphID: graphID, Format: "mermaid"}, cliEquivalent)
+	case "safe.graph-rollback":
+		graphID := m.graphIDForRollback()
+		if m.confirmation != nil && strings.TrimSpace(m.confirmation.GraphID) != "" {
+			graphID = m.confirmation.GraphID
+		}
+		if graphID == "" {
+			graphID = "graph-001"
+		}
+		return m, m.dispatchCommand(bus.GraphRollbackCommand{GraphID: graphID}, cliEquivalent)
 	default:
+		if strings.HasPrefix(actionID, "flow.open.") {
+			flowID := strings.TrimPrefix(actionID, "flow.open.")
+			m.flowID = flowID
+			(&m).navigateTo(ScreenFlow, "asa flow open "+flowID)
+			return m, nil
+		}
+		if strings.HasPrefix(actionID, "replay.open.") {
+			replayID := strings.TrimPrefix(actionID, "replay.open.")
+			m.replayID = replayID
+			(&m).navigateTo(ScreenReplay, "asa replay open "+replayID)
+			return m, nil
+		}
+		if strings.HasPrefix(actionID, "replay.run.") {
+			replayID := strings.TrimPrefix(actionID, "replay.run.")
+			return m, m.dispatchCommand(bus.ReplayRunCommand{RunID: replayID}, cliEquivalent)
+		}
+		if actionID == "ctx.replay-run" && strings.TrimSpace(m.replayID) != "" {
+			return m, m.dispatchCommand(bus.ReplayRunCommand{RunID: m.replayID}, cliEquivalent)
+		}
 		m.lastCommandResult = fmt.Sprintf("palette action not supported: %s", actionID)
 		return m, nil
 	}

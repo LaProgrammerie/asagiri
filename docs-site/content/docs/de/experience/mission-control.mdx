@@ -1,11 +1,11 @@
 ---
 title: Mission Control
-description: Standard-Cockpit fuer einen schnellen Ueberblick ueber den Workspace.
+description: Standard-Cockpit, um den Workspace-Status in unter zehn Sekunden zu erfassen.
 ---
 
 # Mission Control
 
-Mission Control starten:
+Mission Control öffnen:
 
 ```bash
 asa
@@ -13,13 +13,15 @@ asa
 asa mission
 ```
 
-## Inhalt
+## Hauptinhalt
 
-- Workspace und Branch;
-- Runtime- und Session-Status;
-- Fortschritt des aktiven Flows;
-- aktive Agenten;
-- Trust-Dimensionen und Warnungen;
-- aktuelle Events.
+- Workspace und Branch
+- Runtime- und Session-Status
+- aktive Flow-Schritte mit Fortschritts-Glyphen
+- Agent-Theatre-Kurzüberblick
+- Trust-Dimensionen und Gesamtscore
+- **Kosten heute / Monat** (aus Runtime-Events)
+- letzte Events (Live-Feed)
+- **empfohlene Aktionen** — priorisierte nächste Schritte mit CLI-Äquivalent (`GetRecommendedActionsQuery`)
 
-Mission Control ist der Startpunkt, bevor du in einen spezialisierten Explorer wechselst.
+Empfohlene Aktionen oder **Strg+P** für Work, Trust-Verify, Graph-Resume oder Prototype-Pipeline.

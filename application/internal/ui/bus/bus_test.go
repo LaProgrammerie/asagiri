@@ -57,7 +57,7 @@ func TestQueryBusReadOnlyHandlers(t *testing.T) {
 	require.NotEmpty(t, events.Events)
 }
 
-func TestCommandBusStubsExposeCLIEquivalent(t *testing.T) {
+func TestCommandBusStartWorkExposeCLIEquivalent(t *testing.T) {
 	called := false
 	cb := NewCommandBus(Deps{
 		StartWork: func(_ context.Context, _ Deps, cmd StartWorkCommand) (CommandResult, error) {

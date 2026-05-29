@@ -331,10 +331,10 @@ func (b *queryBus) handleSearchKnowledge(ctx context.Context, q SearchKnowledgeQ
 		}, nil
 	}
 	query := strings.ToLower(strings.TrimSpace(q.Query))
-	if query == "" {
-		query = "onboarding"
-	}
 	matches := make([]KnowledgeMatch, 0, limit)
+	if query == "" {
+		return KnowledgeSearchResult{Query: q.Query, Matches: matches}, nil
+	}
 	for _, node := range graph.Nodes {
 		if len(matches) >= limit {
 			break
@@ -419,46 +419,326 @@ func (b *queryBus) handleGetTrustExplorer(_ context.Context, _ GetTrustExplorerQ
 }
 
 func (b *queryBus) handleGetExplain(ctx context.Context, q GetExplainQuery) (QueryResult, error) {
+	question := explainQuestionForContext(q.Context, q.Subject)
 	subject := strings.TrimSpace(q.Subject)
+	if subject == "" {
+		subject = strings.TrimSpace(q.Context.Focus.Subject)
+	}
 	if subject == "" {
 		subject = "current decision"
 	}
-	graphAny, _ := b.handleGetGraphExplorer(ctx, GetGraphExplorerQuery{})
+
+	graphAny, _ := b.handleGetGraphExplorer(ctx, GetGraphExplorerQuery{FlowID: q.Context.Focus.Detail})
 	graphRes, _ := graphAny.(GraphExplorerResult)
 	trustAny, _ := b.handleGetTrustExplorer(ctx, GetTrustExplorerQuery{})
 	trustRes, _ := trustAny.(TrustExplorerResult)
 	knowledgeAny, _ := b.handleSearchKnowledge(ctx, SearchKnowledgeQuery{Query: subject, Limit: 3})
 	knowledgeRes, _ := knowledgeAny.(KnowledgeSearchResult)
 
-	reasons := []string{
-		fmt.Sprintf("Graph status is %s for flow %s", emptyFallback(graphRes.Status, "unknown"), emptyFallback(graphRes.FlowID, "-")),
-		fmt.Sprintf("Trust overall is %.0f%%", trustRes.Overall*100),
+	reasons := explainReasonsForQuestion(question, graphRes, trustRes, q.Context)
+	evidence := explainEvidenceForQuestion(question, graphRes, trustRes, knowledgeRes, q.Context)
+	alternatives := explainAlternativesForQuestion(question, q.Context)
+
+	return ExplainResult{
+		Subject:            subject,
+		Question:           question,
+		SupportedQuestions: explainSupportedQuestions(),
+		Reasons:            reasons,
+		Evidence:           evidence,
+		Source:             explainSourceForContext(q.Context),
+		Alternatives:       alternatives,
+		CLIEquivalent:      fmt.Sprintf(`asa explain --subject "%s"`, question),
+	}, nil
+}
+
+func (b *queryBus) handleGetRecommendedActions(ctx context.Context, q GetRecommendedActionsQuery) (QueryResult, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
 	}
-	if len(knowledgeRes.Matches) > 0 {
-		reasons = append(reasons, fmt.Sprintf("Knowledge has %d related nodes", len(knowledgeRes.Matches)))
+	runtimeAny, _ := b.handleGetRuntimeStatus(ctx, GetRuntimeStatusQuery{})
+	runtimeRes, _ := runtimeAny.(RuntimeStatusResult)
+	trustAny, _ := b.handleGetTrustSummary(ctx, GetTrustSummaryQuery{})
+	trustRes, _ := trustAny.(TrustSummaryResult)
+	graphAny, _ := b.handleGetGraphExplorer(ctx, GetGraphExplorerQuery{FlowID: q.FlowID})
+	graphRes, _ := graphAny.(GraphExplorerResult)
+	flowAny, _ := b.handleGetFlowGraph(ctx, GetFlowGraphQuery{FlowID: q.FlowID})
+	flowRes, _ := flowAny.(FlowGraphResult)
+	prototypeAny, _ := b.handleGetPrototypePipeline(ctx, GetPrototypePipelineQuery{Limit: 1})
+	prototypeRes, _ := prototypeAny.(PrototypePipelineResult)
+
+	actions := make([]RecommendedAction, 0, 8)
+	if !runtimeRes.Status.Running {
+		actions = append(actions, RecommendedAction{
+			ID:            "rec.start-work",
+			Title:         "Start work",
+			Description:   "Runtime is stopped — dispatch a new workflow run",
+			Priority:      1,
+			CLIEquivalent: `asa work "<intent>"`,
+			ActionID:      "cmd.start-work",
+		})
 	}
-	evidence := []string{}
-	if len(graphRes.Nodes) > 0 {
-		evidence = append(evidence, "Node: "+emptyFallback(graphRes.Nodes[0].Title, graphRes.Nodes[0].ID))
+	if runtimeRes.Status.QueuedEvents >= 3 {
+		actions = append(actions, RecommendedAction{
+			ID:            "rec.export-events",
+			Title:         "Export queued events",
+			Description:   fmt.Sprintf("Queue has %d pending events", runtimeRes.Status.QueuedEvents),
+			Priority:      2,
+			CLIEquivalent: "asa runtime events --export",
+			ActionID:      "cmd.export-events",
+		})
+	}
+	if trustRes.Overall > 0 && trustRes.Overall < 0.75 {
+		target := emptyFallback(flowRes.FlowID, "onboarding")
+		actions = append(actions, RecommendedAction{
+			ID:            "rec.verify-trust",
+			Title:         "Verify trust",
+			Description:   fmt.Sprintf("Overall trust is %.0f%% — run verification", trustRes.Overall*100),
+			Priority:      2,
+			CLIEquivalent: "asa verify trust " + target,
+			ActionID:      "cmd.verify-trust",
+		})
 	}
 	for _, dim := range trustRes.Dimensions {
-		if len(dim.Findings) == 0 {
+		if strings.EqualFold(dim.Label, "Security") && dim.Score > 0 && dim.Score < 0.75 {
+			actions = append(actions, RecommendedAction{
+				ID:            "rec.explain-security",
+				Title:         "Explain security confidence",
+				Description:   fmt.Sprintf("Security confidence is %.0f%%", dim.Score*100),
+				Priority:      2,
+				CLIEquivalent: `asa explain --subject "Why is security confidence low?"`,
+				ActionID:      "nav.explain",
+			})
+			break
+		}
+	}
+	for _, node := range graphRes.Nodes {
+		if node.Status == "blocked" || len(node.BlockedBy) > 0 {
+			actions = append(actions, RecommendedAction{
+				ID:            "rec.graph-resume",
+				Title:         "Resume blocked graph",
+				Description:   fmt.Sprintf("Node %s is blocked", emptyFallback(node.Title, node.ID)),
+				Priority:      1,
+				CLIEquivalent: "asa graph resume " + emptyFallback(graphRes.GraphID, "<graph-id>"),
+				ActionID:      "ctx.graph-resume",
+			})
+			actions = append(actions, RecommendedAction{
+				ID:            "rec.explain-blocked",
+				Title:         "Explain blocked node",
+				Description:   "Review why execution is waiting on dependencies",
+				Priority:      3,
+				CLIEquivalent: `asa explain --subject "Why is this node blocked?"`,
+				ActionID:      "nav.explain",
+			})
+			break
+		}
+	}
+	for _, step := range flowRes.Steps {
+		if step.Status == "failed" || step.Status == "blocked" {
+			actions = append(actions, RecommendedAction{
+				ID:            "rec.investigate-flow",
+				Title:         "Investigate flow failure",
+				Description:   fmt.Sprintf("Step %s is %s", emptyFallback(step.Label, step.ID), step.Status),
+				Priority:      1,
+				CLIEquivalent: `asa investigate "` + emptyFallback(step.Label, step.ID) + `"`,
+				ActionID:      "cmd.run-investigation",
+			})
+			break
+		}
+	}
+	if prototypeRes.Product == "" {
+		actions = append(actions, RecommendedAction{
+			ID:            "rec.prototype-create",
+			Title:         "Create prototype",
+			Description:   "No product prototype found — start product pipeline",
+			Priority:      4,
+			CLIEquivalent: `asa prototype create "<intent>"`,
+			ActionID:      "cmd.prototype-create",
+		})
+	} else if len(prototypeRes.SuggestedActions) > 0 {
+		actions = append(actions, RecommendedAction{
+			ID:            "rec.prototype-next",
+			Title:         "Advance prototype pipeline",
+			Description:   prototypeRes.SuggestedActions[0],
+			Priority:      3,
+			CLIEquivalent: prototypeRes.SuggestedActions[0],
+			ActionID:      "cmd.prototype-pipeline",
+		})
+	}
+	if len(actions) == 0 {
+		actions = append(actions, RecommendedAction{
+			ID:            "rec.dashboard",
+			Title:         "Open dashboard",
+			Description:   "Review live widgets for runtime, trust, and costs",
+			Priority:      5,
+			CLIEquivalent: "asa dashboard",
+			ActionID:      "nav.dashboard",
+		})
+	}
+	sort.Slice(actions, func(i, j int) bool {
+		if actions[i].Priority != actions[j].Priority {
+			return actions[i].Priority < actions[j].Priority
+		}
+		return actions[i].Title < actions[j].Title
+	})
+	if len(actions) > 6 {
+		actions = actions[:6]
+	}
+	return RecommendedActionsResult{Actions: actions}, nil
+}
+
+func explainSupportedQuestions() []string {
+	return []string{
+		"Why was review required?",
+		"Why is this node blocked?",
+		"Why is security confidence low?",
+		"Why was this agent selected?",
+		"Why is this flow high risk?",
+		"Why did Asagiri insert investigation?",
+	}
+}
+
+func explainQuestionForContext(ctx ExplainContext, subject string) string {
+	if q := strings.TrimSpace(ctx.Question); q != "" {
+		return q
+	}
+	switch ctx.Focus.Kind {
+	case FocusKindGraphNode:
+		return "Why is this node blocked?"
+	case FocusKindFlowStep:
+		return "Why is this flow high risk?"
+	case FocusKindTrustDimension:
+		label := strings.TrimSpace(ctx.Focus.Subject)
+		if strings.EqualFold(label, "Security") {
+			return "Why is security confidence low?"
+		}
+		if label != "" {
+			return "Why is " + strings.ToLower(label) + " confidence low?"
+		}
+		return "Why is security confidence low?"
+	case FocusKindAgent:
+		return "Why was this agent selected?"
+	case FocusKindReplayEvent:
+		return "Why did Asagiri insert investigation?"
+	default:
+		if s := strings.TrimSpace(subject); s != "" && strings.Contains(strings.ToLower(s), "review") {
+			return "Why was review required?"
+		}
+		return "Why was review required?"
+	}
+}
+
+func explainReasonsForQuestion(question string, graph GraphExplorerResult, trust TrustExplorerResult, ctx ExplainContext) []string {
+	q := strings.ToLower(question)
+	reasons := make([]string, 0, 4)
+	switch {
+	case strings.Contains(q, "blocked"):
+		for _, node := range graph.Nodes {
+			if node.Status == "blocked" || len(node.BlockedBy) > 0 {
+				reasons = append(reasons, fmt.Sprintf("Node %s is blocked by %s", emptyFallback(node.Title, node.ID), strings.Join(node.BlockedBy, ", ")))
+				break
+			}
+		}
+		if len(reasons) == 0 {
+			reasons = append(reasons, fmt.Sprintf("Graph status is %s for flow %s", emptyFallback(graph.Status, "unknown"), emptyFallback(graph.FlowID, "-")))
+		}
+	case strings.Contains(q, "security"):
+		for _, dim := range trust.Dimensions {
+			if strings.EqualFold(dim.Label, "Security") {
+				reasons = append(reasons, fmt.Sprintf("Security confidence is %.0f%%", dim.Score*100))
+				if len(dim.Findings) > 0 {
+					reasons = append(reasons, dim.Findings[0])
+				}
+				break
+			}
+		}
+	case strings.Contains(q, "agent"):
+		if ctx.Focus.Subject != "" {
+			reasons = append(reasons, "Agent "+ctx.Focus.Subject+" matched routing policy for the active step")
+		} else {
+			reasons = append(reasons, "Agent selection follows coordination policy and role assignment")
+		}
+	case strings.Contains(q, "investigation"):
+		reasons = append(reasons, "Investigation inserted when trust or dependency gates require more evidence")
+	case strings.Contains(q, "risk"):
+		reasons = append(reasons, "Flow risk aggregates sensitive steps, unresolved contracts, and trust findings")
+	default:
+		reasons = append(reasons, fmt.Sprintf("Graph status is %s for flow %s", emptyFallback(graph.Status, "unknown"), emptyFallback(graph.FlowID, "-")))
+		reasons = append(reasons, fmt.Sprintf("Trust overall is %.0f%%", trust.Overall*100))
+	}
+	if len(reasons) == 0 {
+		reasons = append(reasons, "Decision driven by runtime state, trust gates, and graph dependencies")
+	}
+	return reasons
+}
+
+func explainEvidenceForQuestion(question string, graph GraphExplorerResult, trust TrustExplorerResult, knowledge KnowledgeSearchResult, ctx ExplainContext) []string {
+	q := strings.ToLower(question)
+	evidence := make([]string, 0, 4)
+	if ctx.Focus.Subject != "" {
+		evidence = append(evidence, "Focus: "+string(ctx.Focus.Kind)+" "+ctx.Focus.Subject)
+	}
+	if strings.Contains(q, "blocked") {
+		for _, node := range graph.Nodes {
+			if node.Status == "blocked" || len(node.BlockedBy) > 0 {
+				evidence = append(evidence, "Node: "+emptyFallback(node.Title, node.ID))
+				if len(node.BlockedBy) > 0 {
+					evidence = append(evidence, "Blocked by: "+strings.Join(node.BlockedBy, ", "))
+				}
+				break
+			}
+		}
+	}
+	for _, dim := range trust.Dimensions {
+		if len(dim.Evidence) == 0 && len(dim.Findings) == 0 {
 			continue
 		}
-		evidence = append(evidence, dim.Label+": "+dim.Findings[0])
-		break
+		if strings.Contains(q, "security") && !strings.EqualFold(dim.Label, "Security") {
+			continue
+		}
+		if len(dim.Evidence) > 0 {
+			evidence = append(evidence, dim.Label+": "+dim.Evidence[0])
+		} else if len(dim.Findings) > 0 {
+			evidence = append(evidence, dim.Label+": "+dim.Findings[0])
+		}
+		if len(evidence) >= 3 {
+			break
+		}
+	}
+	if len(graph.Nodes) > 0 && len(evidence) < 3 {
+		evidence = append(evidence, "Node: "+emptyFallback(graph.Nodes[0].Title, graph.Nodes[0].ID))
+	}
+	if len(knowledge.Matches) > 0 {
+		evidence = append(evidence, "Knowledge: "+knowledge.Matches[0].Name)
 	}
 	if len(evidence) == 0 {
 		evidence = append(evidence, "No additional evidence found")
 	}
-	return ExplainResult{
-		Subject:       subject,
-		Reasons:       reasons,
-		Evidence:      evidence,
-		Source:        "query-bus read-only",
-		Alternatives:  []string{"asa graph", "asa trust", "asa knowledge query"},
-		CLIEquivalent: fmt.Sprintf(`asa explain --subject "%s"`, subject),
-	}, nil
+	return evidence
+}
+
+func explainAlternativesForQuestion(question string, ctx ExplainContext) []string {
+	q := strings.ToLower(question)
+	switch {
+	case strings.Contains(q, "blocked"):
+		return []string{"asa graph", "asa graph resume <graph-id>", "asa logs"}
+	case strings.Contains(q, "security"), strings.Contains(q, "confidence"):
+		return []string{"asa trust", "asa verify trust <flow>", "asa knowledge query"}
+	case strings.Contains(q, "agent"):
+		return []string{"asa agents watch", "asa coordination status"}
+	case strings.Contains(q, "investigation"):
+		return []string{"asa investigate", "asa replay open <replay-id>"}
+	case strings.Contains(q, "risk"):
+		return []string{"asa flow", "asa impact analyze"}
+	default:
+		return []string{"asa graph", "asa trust", "asa knowledge query"}
+	}
+}
+
+func explainSourceForContext(ctx ExplainContext) string {
+	if ctx.Focus.Kind != "" {
+		return "query-bus read-only (" + string(ctx.Focus.Kind) + ")"
+	}
+	return "query-bus read-only"
 }
 
 func (b *queryBus) handleGetAgentTheatre(ctx context.Context, q GetAgentTheatreQuery) (QueryResult, error) {
@@ -722,7 +1002,7 @@ func (b *queryBus) handleGetMissionControlSnapshot(ctx context.Context, q GetMis
 	}
 	graphExplorerRes, _ := graphExplorerAny.(GraphExplorerResult)
 	knowledgeAny, err := b.handleSearchKnowledge(ctx, SearchKnowledgeQuery{
-		Query: firstNonEmptyString(q.Knowledge, flowID, "onboarding"),
+		Query: firstNonEmptyString(q.Knowledge, flowID),
 		Limit: 6,
 	})
 	if err != nil {
@@ -734,7 +1014,10 @@ func (b *queryBus) handleGetMissionControlSnapshot(ctx context.Context, q GetMis
 		return nil, err
 	}
 	trustExplorerRes, _ := trustExplorerAny.(TrustExplorerResult)
-	explainAny, err := b.handleGetExplain(ctx, GetExplainQuery{Subject: q.ExplainFor})
+	explainAny, err := b.handleGetExplain(ctx, GetExplainQuery{
+		Subject: q.ExplainFor,
+		Context: q.ExplainContext,
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -757,6 +1040,12 @@ func (b *queryBus) handleGetMissionControlSnapshot(ctx context.Context, q GetMis
 		return nil, err
 	}
 	prototypeRes, _ := prototypeAny.(PrototypePipelineResult)
+
+	recommendedAny, err := b.handleGetRecommendedActions(ctx, GetRecommendedActionsQuery{FlowID: flowID})
+	if err != nil {
+		return nil, err
+	}
+	recommendedRes, _ := recommendedAny.(RecommendedActionsResult)
 
 	warnings := compactWarnings(
 		runtimeRes.Warning,
@@ -800,11 +1089,12 @@ func (b *queryBus) handleGetMissionControlSnapshot(ctx context.Context, q GetMis
 		Explain:       explainRes,
 		AgentTheatre:  agentTheatreRes,
 		Replay:        replayRes,
-		Prototype:     prototypeRes,
-		CostTodayEUR:  costToday,
-		CostMonthEUR:  costMonth,
-		UpdatedAt:     time.Now().UTC(),
-		Warnings:      warnings,
+		Prototype:          prototypeRes,
+		CostTodayEUR:       costToday,
+		CostMonthEUR:       costMonth,
+		RecommendedActions: recommendedRes.Actions,
+		UpdatedAt:          time.Now().UTC(),
+		Warnings:           warnings,
 	}, nil
 }
 
@@ -1233,7 +1523,7 @@ func loadPrototypeFlowSteps(productRoot string, limit int) ([]PrototypeFlowStep,
 				Action:    step.Action,
 				Screen:    step.Screen,
 				Next:      step.Next,
-				Contract:  step.ContractRef,
+				Contract:  FormatContractRef(step.ContractRef),
 				Trust:     trust,
 				Metric:    metric,
 				Sensitive: step.Sensitive,

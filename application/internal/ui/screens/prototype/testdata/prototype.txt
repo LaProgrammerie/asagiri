@@ -14,9 +14,10 @@ Flow extraction
 - workspace-onboarding/step-1 action=click_get_started screen=landing next=signup
   contract=POST /api/workspaces trust=pending metric=onboarding_completion_rate
 - workspace-onboarding/step-2 action=invite_member screen=signup next=dashboard
-  contract=TODO:auth.signup trust=review-required metric=invitation_delivery_success_rate
+  contract=auth.signup trust=review-required metric=invitation_delivery_success_rate
 
 Pipeline actions
+Keys: 1 create  2 flows extract  3 contracts extract  4 spec generate
 - asa contracts extract workspace-saas
 - asa architecture derive workspace-saas
 - open prototype: asa prototype

@@ -22,10 +22,20 @@ func TestRenderGolden(t *testing.T) {
 				{ID: "implement", Title: "implement", Status: "blocked", Risk: "high", BlockedBy: []string{"investigate"}, CLIEquivalent: "asa graph status graph-001"},
 			},
 		},
+		View: bus.GraphViewResult{
+			GraphID: "graph-001",
+			FlowID:  "onboarding",
+			View:    bus.GraphViewTimeline,
+			Nodes: []bus.GraphNodeSummary{
+				{ID: "investigate", Title: "investigate", Status: "succeeded", Risk: "low"},
+				{ID: "implement", Title: "implement", Status: "blocked", Risk: "high", BlockedBy: []string{"investigate"}},
+			},
+		},
 		Events: []bus.EventSummary{
 			{Type: "graph.generated", CreatedAt: now},
 			{Type: "graph.blocked", CreatedAt: now.Add(time.Minute)},
 		},
+		Model:   NewModel(),
 		ShowCLI: true,
 	})
 
@@ -40,6 +50,7 @@ func TestRenderGolden(t *testing.T) {
 	}
 	require.NoError(t, err)
 	require.Equal(t, string(want), got)
+	require.NotContains(t, got, "(stub)")
 }
 
 func TestRenderEmptyGraphWithWarning(t *testing.T) {

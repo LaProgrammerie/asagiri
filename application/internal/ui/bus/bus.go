@@ -201,16 +201,61 @@ type TrustExplorerResult struct {
 	Warning      string
 }
 
+// FocusContextKind identifies the UI focus subject for explainability.
+type FocusContextKind string
+
+const (
+	FocusKindGraphNode      FocusContextKind = "graph-node"
+	FocusKindFlowStep       FocusContextKind = "flow-step"
+	FocusKindTrustDimension FocusContextKind = "trust-dimension"
+	FocusKindAgent          FocusContextKind = "agent"
+	FocusKindReplayEvent    FocusContextKind = "replay-event"
+	FocusKindDecision       FocusContextKind = "decision"
+)
+
+// FocusContext captures the current drill-down target passed to QueryBus.
+type FocusContext struct {
+	Kind    FocusContextKind
+	Subject string
+	Detail  string
+	Screen  string
+}
+
+// ExplainContext enriches explain queries with focus and typed questions.
+type ExplainContext struct {
+	Focus    FocusContext
+	Question string
+}
+
 // ExplainResult contains read-only explainability content.
 type ExplainResult struct {
-	Subject       string
-	Reasons       []string
-	Evidence      []string
-	Source        string
-	Alternatives  []string
-	CLIEquivalent string
-	Warning       string
+	Subject              string
+	Question             string
+	SupportedQuestions   []string
+	Reasons              []string
+	Evidence             []string
+	Source               string
+	Alternatives         []string
+	CLIEquivalent        string
+	Warning              string
 }
+
+// RecommendedAction is one contextual next step for Mission Control.
+type RecommendedAction struct {
+	ID            string
+	Title         string
+	Description   string
+	Priority      int
+	CLIEquivalent string
+	ActionID      string
+}
+
+// RecommendedActionsResult lists ranked actions for Mission Control.
+type RecommendedActionsResult struct {
+	Actions []RecommendedAction
+}
+
+func (RecommendedActionsResult) isQueryResult() {}
 
 // AgentCard contains one live agent theatre card.
 type AgentCard struct {
@@ -303,10 +348,11 @@ type MissionControlSnapshotResult struct {
 	AgentTheatre  AgentTheatreResult
 	Replay        ReplayPackageResult
 	Prototype     PrototypePipelineResult
-	CostTodayEUR  float64
-	CostMonthEUR  float64
-	UpdatedAt     time.Time
-	Warnings      []string
+	CostTodayEUR       float64
+	CostMonthEUR       float64
+	RecommendedActions []RecommendedAction
+	UpdatedAt          time.Time
+	Warnings           []string
 }
 
 func (RuntimeStatusResult) isQueryResult()          {}
@@ -394,9 +440,17 @@ func (GetTrustExplorerQuery) Name() string { return "GetTrustExplorer" }
 // GetExplainQuery returns explainability content for a subject.
 type GetExplainQuery struct {
 	Subject string
+	Context ExplainContext
 }
 
 func (GetExplainQuery) Name() string { return "GetExplain" }
+
+// GetRecommendedActionsQuery returns contextual next steps for Mission Control.
+type GetRecommendedActionsQuery struct {
+	FlowID string
+}
+
+func (GetRecommendedActionsQuery) Name() string { return "GetRecommendedActions" }
 
 // GetAgentTheatreQuery returns live, enriched agent cards.
 type GetAgentTheatreQuery struct {
@@ -428,6 +482,7 @@ type GetMissionControlSnapshotQuery struct {
 	AgentsLimit        int
 	Knowledge          string
 	ExplainFor         string
+	ExplainContext     ExplainContext
 	FlowID             string
 	ReplayID           string
 	PrototypeProduct   string
@@ -478,16 +533,427 @@ func (c VerifyTrustCommand) CLIEquivalent() string {
 	return "asa verify trust " + target
 }
 
-// BuildKnowledgeGraphCommand is a command stub for lot 1.
-type BuildKnowledgeGraphCommand struct{}
-
-func (BuildKnowledgeGraphCommand) Name() string          { return "BuildKnowledgeGraph" }
-func (BuildKnowledgeGraphCommand) CLIEquivalent() string { return "asa knowledge build" }
-
-// ReplayRunCommand is a command stub for lot 1.
-type ReplayRunCommand struct {
-	RunID string
+// BuildKnowledgeGraphCommand rebuilds the knowledge graph.
+type BuildKnowledgeGraphCommand struct {
+	Incremental bool
 }
 
-func (ReplayRunCommand) Name() string          { return "ReplayRun" }
-func (ReplayRunCommand) CLIEquivalent() string { return "asa replay run <replay-id>" }
+func (BuildKnowledgeGraphCommand) Name() string { return "BuildKnowledgeGraph" }
+func (BuildKnowledgeGraphCommand) CLIEquivalent() string {
+	return "asa knowledge build"
+}
+
+// ReplayRunCommand replays a captured workflow package.
+type ReplayRunCommand struct {
+	RunID      string
+	Offline    bool
+	Simulation bool
+}
+
+func (ReplayRunCommand) Name() string { return "ReplayRun" }
+func (c ReplayRunCommand) CLIEquivalent() string {
+	id := "<replay-id>"
+	if trimmed := strings.TrimSpace(c.RunID); trimmed != "" {
+		id = trimmed
+	}
+	return "asa replay run " + id
+}
+
+// GraphRollbackCommand rolls back an execution graph by id.
+type GraphRollbackCommand struct {
+	GraphID string
+}
+
+func (GraphRollbackCommand) Name() string { return "GraphRollback" }
+func (c GraphRollbackCommand) CLIEquivalent() string {
+	id := "<graph-id>"
+	if trimmed := strings.TrimSpace(c.GraphID); trimmed != "" {
+		id = trimmed
+	}
+	return "asa graph rollback " + id
+}
+
+// ExportEventsCommand exports filtered runtime events to disk.
+type ExportEventsCommand struct {
+	TypeFilter string
+	Search     string
+	OutputPath string
+}
+
+func (ExportEventsCommand) Name() string { return "ExportEvents" }
+func (c ExportEventsCommand) CLIEquivalent() string {
+	filter := strings.TrimSpace(c.TypeFilter)
+	if filter == "" {
+		filter = "<filter>"
+	}
+	search := strings.TrimSpace(c.Search)
+	if search == "" {
+		search = "<query>"
+	}
+	return "asa runtime events --type " + filter + " --search " + search + " --export"
+}
+
+// GraphRollbackImpactResult is safety UX data for destructive graph rollback.
+type GraphRollbackImpactResult struct {
+	GraphID        string
+	Title          string
+	ImpactLines    []string
+	RollbackPolicy string
+	CLIEquivalent  string
+	CanRollback    bool
+}
+
+func (GraphRollbackImpactResult) isQueryResult() {}
+
+// GetGraphRollbackImpactQuery loads rollback impact for a graph id.
+type GetGraphRollbackImpactQuery struct {
+	GraphID string
+}
+
+func (GetGraphRollbackImpactQuery) Name() string { return "GetGraphRollbackImpact" }
+
+// PaletteEntry is one command palette row.
+type PaletteEntry struct {
+	ID          string
+	Title       string
+	Description string
+	CLI         string
+	Keywords    []string
+	ActionID    string
+}
+
+// PaletteEntriesResult lists palette rows for the current screen and query.
+type PaletteEntriesResult struct {
+	Entries []PaletteEntry
+}
+
+func (PaletteEntriesResult) isQueryResult() {}
+
+// GetPaletteEntriesQuery returns static and dynamic palette entries.
+type GetPaletteEntriesQuery struct {
+	Screen string
+	Query  string
+	Limit  int
+}
+
+func (GetPaletteEntriesQuery) Name() string { return "GetPaletteEntries" }
+
+// GraphViewMode selects one graph explorer projection.
+type GraphViewMode string
+
+const (
+	GraphViewTimeline       GraphViewMode = "timeline"
+	GraphViewDependency     GraphViewMode = "dependency"
+	GraphViewCriticalPath   GraphViewMode = "critical-path"
+	GraphViewParallelGroups GraphViewMode = "parallel-groups"
+	GraphViewBlocked        GraphViewMode = "blocked"
+)
+
+// GraphViewModes lists switchable graph explorer views.
+var GraphViewModes = []GraphViewMode{
+	GraphViewTimeline,
+	GraphViewDependency,
+	GraphViewCriticalPath,
+	GraphViewParallelGroups,
+	GraphViewBlocked,
+}
+
+// GraphNodeDetail contains drill-down data for one graph node.
+type GraphNodeDetail struct {
+	GraphID       string
+	NodeID        string
+	Title         string
+	Status        string
+	Risk          string
+	Type          string
+	Dependencies  []string
+	Dependents    []string
+	BlockedBy     []string
+	LogsHint      string
+	CLIEquivalent string
+}
+
+// GraphViewResult contains nodes for one graph view mode.
+type GraphViewResult struct {
+	GraphID string
+	FlowID  string
+	View    GraphViewMode
+	Nodes   []GraphNodeSummary
+	Groups  []string
+	Warning string
+}
+
+func (GraphViewResult) isQueryResult()      {}
+func (GraphNodeDetail) isQueryResult()      {}
+func (FlowStepDetailResult) isQueryResult() {}
+func (KnowledgeMatchDetail) isQueryResult() {}
+func (TrustDimensionDetail) isQueryResult() {}
+func (ReplayEventDetail) isQueryResult()    {}
+func (ReplayCompareResult) isQueryResult()  {}
+
+// GetGraphViewQuery returns graph nodes filtered by view mode.
+type GetGraphViewQuery struct {
+	FlowID  string
+	GraphID string
+	View    GraphViewMode
+}
+
+func (GetGraphViewQuery) Name() string { return "GetGraphView" }
+
+// GetGraphNodeDetailQuery returns dependency and status details for one node.
+type GetGraphNodeDetailQuery struct {
+	GraphID string
+	NodeID  string
+}
+
+func (GetGraphNodeDetailQuery) Name() string { return "GetGraphNodeDetail" }
+
+// FlowStepDetailResult wraps one selected flow step.
+type FlowStepDetailResult struct {
+	FlowID string
+	Step   FlowStepDetail
+}
+
+// GetFlowStepDetailQuery returns one enriched flow step.
+type GetFlowStepDetailQuery struct {
+	FlowID string
+	StepID string
+}
+
+func (GetFlowStepDetailQuery) Name() string { return "GetFlowStepDetail" }
+
+// KnowledgeMatchDetail contains drill-down data for one knowledge match.
+type KnowledgeMatchDetail struct {
+	MatchID       string
+	Name          string
+	Type          string
+	Path          string
+	RelatedFlows  []string
+	RelatedAPIs   []string
+	RelatedTests  []string
+	RelatedEvents []string
+	CLIEquivalent string
+}
+
+// GetKnowledgeMatchDetailQuery returns related entities for one knowledge node.
+type GetKnowledgeMatchDetailQuery struct {
+	MatchID string
+}
+
+func (GetKnowledgeMatchDetailQuery) Name() string { return "GetKnowledgeMatchDetail" }
+
+// TrustDimensionDetail contains drill-down trust evidence.
+type TrustDimensionDetail struct {
+	Label         string
+	Score         float64
+	Findings      []string
+	Evidence      []string
+	Checks        []string
+	GateStatus    string
+	GateReason    string
+	ResidualRisk  string
+	CLIEquivalent string
+}
+
+// GetTrustDimensionDetailQuery returns trust drill-down for one dimension label.
+type GetTrustDimensionDetailQuery struct {
+	Label string
+}
+
+func (GetTrustDimensionDetailQuery) Name() string { return "GetTrustDimensionDetail" }
+
+// ReplayEventDetail contains one replay timeline event with artifact hints.
+type ReplayEventDetail struct {
+	ReplayID      string
+	Index         int
+	Type          string
+	Time          time.Time
+	Artifact      string
+	ArtifactPath  string
+	CLIEquivalent string
+}
+
+// GetReplayEventDetailQuery returns one replay timeline event.
+type GetReplayEventDetailQuery struct {
+	ReplayID string
+	Index    int
+}
+
+func (GetReplayEventDetailQuery) Name() string { return "GetReplayEventDetail" }
+
+// ReplayCompareResult contains replay comparison summary lines.
+type ReplayCompareResult struct {
+	ReplayA       string
+	ReplayB       string
+	Summary       []string
+	Divergences   []string
+	CLIEquivalent string
+	Warning       string
+}
+
+// GetReplayCompareQuery compares two replay packages read-only.
+type GetReplayCompareQuery struct {
+	ReplayA string
+	ReplayB string
+}
+
+func (GetReplayCompareQuery) Name() string { return "GetReplayCompare" }
+
+// ExportGraphCommand exports a graph to disk (mermaid/json).
+type ExportGraphCommand struct {
+	GraphID string
+	Format  string
+}
+
+func (ExportGraphCommand) Name() string { return "ExportGraph" }
+func (c ExportGraphCommand) CLIEquivalent() string {
+	id := "<graph-id>"
+	if trimmed := strings.TrimSpace(c.GraphID); trimmed != "" {
+		id = trimmed
+	}
+	format := strings.TrimSpace(c.Format)
+	if format == "" {
+		format = "mermaid"
+	}
+	return "asa graph visualize " + id + " --format " + format
+}
+
+// GraphResumeCommand resumes a paused execution graph.
+type GraphResumeCommand struct {
+	GraphID string
+}
+
+func (GraphResumeCommand) Name() string { return "GraphResume" }
+func (c GraphResumeCommand) CLIEquivalent() string {
+	id := "<graph-id>"
+	if trimmed := strings.TrimSpace(c.GraphID); trimmed != "" {
+		id = trimmed
+	}
+	return "asa graph resume " + id
+}
+
+// AnalyzeKnowledgeImpactCommand runs knowledge impact analysis.
+type AnalyzeKnowledgeImpactCommand struct {
+	Flow   string
+	Action string
+	File   string
+}
+
+func (AnalyzeKnowledgeImpactCommand) Name() string { return "AnalyzeKnowledgeImpact" }
+func (c AnalyzeKnowledgeImpactCommand) CLIEquivalent() string {
+	if strings.TrimSpace(c.File) != "" {
+		return "asa impact analyze --file " + strings.TrimSpace(c.File)
+	}
+	flow := emptyCLIArg(c.Flow, "<flow>")
+	action := emptyCLIArg(c.Action, "<action>")
+	return "asa impact analyze --flow " + flow + " --action " + action
+}
+
+// BuildKnowledgeContextCommand builds a context pack around a knowledge node.
+type BuildKnowledgeContextCommand struct {
+	NodeID string
+}
+
+func (BuildKnowledgeContextCommand) Name() string { return "BuildKnowledgeContext" }
+func (c BuildKnowledgeContextCommand) CLIEquivalent() string {
+	node := emptyCLIArg(c.NodeID, "<node-id>")
+	return `asa knowledge query --start ` + node + " --max-depth 2"
+}
+
+// CompareReplayCommand compares two replay packages.
+type CompareReplayCommand struct {
+	ReplayA string
+	ReplayB string
+}
+
+func (CompareReplayCommand) Name() string { return "CompareReplay" }
+func (c CompareReplayCommand) CLIEquivalent() string {
+	a := emptyCLIArg(c.ReplayA, "<replay-a>")
+	b := emptyCLIArg(c.ReplayB, "<replay-b>")
+	return "asa replay compare " + a + " " + b
+}
+
+// ExplainReplayDivergenceCommand explains divergences between two replays.
+type ExplainReplayDivergenceCommand struct {
+	ReplayA string
+	ReplayB string
+}
+
+func (ExplainReplayDivergenceCommand) Name() string { return "ExplainReplayDivergence" }
+func (c ExplainReplayDivergenceCommand) CLIEquivalent() string {
+	a := emptyCLIArg(c.ReplayA, "<replay-a>")
+	b := emptyCLIArg(c.ReplayB, "<replay-b>")
+	return "asa replay explain " + a + " " + b
+}
+
+func emptyCLIArg(value, fallback string) string {
+	if strings.TrimSpace(value) == "" {
+		return fallback
+	}
+	return strings.TrimSpace(value)
+}
+
+// PrototypeCreateCommand runs asa prototype create from the UI.
+type PrototypeCreateCommand struct {
+	Intent  string
+	Product string
+	Stack   string
+	Style   string
+}
+
+func (PrototypeCreateCommand) Name() string { return "PrototypeCreate" }
+func (c PrototypeCreateCommand) CLIEquivalent() string {
+	intent := emptyCLIArg(c.Intent, "<intent>")
+	cmd := `asa prototype create "` + intent + `"`
+	if product := strings.TrimSpace(c.Product); product != "" {
+		cmd += " --product " + product
+	}
+	return cmd
+}
+
+// FlowsExtractCommand runs asa flows extract from the UI.
+type FlowsExtractCommand struct {
+	Product string
+}
+
+func (FlowsExtractCommand) Name() string { return "FlowsExtract" }
+func (c FlowsExtractCommand) CLIEquivalent() string {
+	return "asa flows extract " + emptyCLIArg(c.Product, "<product>")
+}
+
+// ContractsExtractCommand runs asa contracts extract from the UI.
+type ContractsExtractCommand struct {
+	Product string
+}
+
+func (ContractsExtractCommand) Name() string { return "ContractsExtract" }
+func (c ContractsExtractCommand) CLIEquivalent() string {
+	return "asa contracts extract " + emptyCLIArg(c.Product, "<product>")
+}
+
+// SpecGenerateFromProductCommand runs asa spec generate-from-product from the UI.
+type SpecGenerateFromProductCommand struct {
+	Product string
+}
+
+func (SpecGenerateFromProductCommand) Name() string { return "SpecGenerateFromProduct" }
+func (c SpecGenerateFromProductCommand) CLIEquivalent() string {
+	return "asa spec generate-from-product " + emptyCLIArg(c.Product, "<product>")
+}
+
+// FormatContractRef renders a product contract reference for TUI display.
+func FormatContractRef(ref string) string {
+	ref = strings.TrimSpace(ref)
+	if ref == "" {
+		return "none"
+	}
+	upper := strings.ToUpper(ref)
+	if strings.HasPrefix(upper, "TODO:") {
+		name := strings.TrimSpace(ref[len("TODO:"):])
+		if name == "" {
+			return "pending contract"
+		}
+		return "pending: " + name
+	}
+	return ref
+}

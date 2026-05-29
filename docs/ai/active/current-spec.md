@@ -1,7 +1,7 @@
-# Current spec — spec-ui livrée
+# Current spec — spec-ui FULL FEATURE
 
-**Phase :** [`spec-ui.md`](../../../spec-ui.md) — Asagiri Experience Platform — **livrée** (`2026-05-29`)  
-**Handoff :** [`handoff.md`](handoff.md) — tranche spec-ui, matrice 100 %
+**Phase :** [`spec-ui.md`](../../../spec-ui.md) — Asagiri Experience Platform — **FULL FEATURE livré** (`2026-05-29`, audit reviewer)  
+**Handoff :** [`handoff.md`](handoff.md) — lots 7A–7D clôturés ; réserves P1/P2 documentées dans l'audit
 
 ## Spec active
 
@@ -9,32 +9,29 @@
 - **Canon :** [`06-spec-ui.md`](../06-spec-ui.md)
 - **Handoff :** [`handoff.md`](handoff.md)
 
-## Résumé — lots spec-ui
+## Lot 7D livré
 
-| Lot | Contenu |
-|-----|---------|
-| **1 — Foundation** | Bubble Tea app, router, layout, theme, CommandBus/QueryBus, config `ui:` étendu, `internal/ui/` Charm |
-| **2 — Mission Control** | `asa` / `asa mission`, `asa dashboard`, widgets V1, event feed, live updates |
-| **3 — Palette & nav** | Command Palette Ctrl+P, navigation raccourcis, safety UX confirmations |
-| **4 — Explorers** | Graph, Flow, Knowledge, Trust, Explain, event feed intégré |
-| **5 — Theatre & replay** | Agent Theatre (`asa agents watch`), Replay Explorer, Prototype Mode split view |
-| **6 — Polish & doc** | Mouse resize panels (basic), no-animation mode, high-contrast usage, responsive compact/wide, écran d’aide accessibilité, canon `06-spec-ui.md`, docs-site `experience/` EN/FR/DE/ES, critères §33 |
+| Domaine | Contenu |
+|---------|---------|
+| **Mission Control §11** | Actions recommandées (runtime/trust/queue), coût jour/mois, flows critiques |
+| **Prototype §19** | Pipeline TUI : `prototype create`, `flows extract`, `contracts extract`, `spec generate-from-product` |
+| **Explain §21** | Questions typées, `FocusContext` → QueryBus, drill-down depuis explorers |
+| **Souris §10.2** | Double-clic, hover, menu contextuel, sélection, resize |
+| **Tests §32** | Intégration TTY `integration_test.go` |
+| **Docs §31** | `experience/` 4 locales + `06-spec-ui.md` |
 
-## Principes clés
+## Validation
 
-- **`asa`** (TTY) → Mission Control ; commandes CLI directes conservées
-- TUI = **client du moteur** — aucune logique métier dans `internal/ui`
-- Coexistence avec `internal/tui` (specv3 rich/plain/json)
-- Toute action TUI expose son équivalent CLI (§3.1)
+```bash
+cd application && go test ./... -count=1
+make build
+make build && ./bin/asa docs generate-cli
+cd docs-site && pnpm docs:check  # si pnpm dispo
+```
 
-## Livraison
+## Précédent
 
-- **Spec-ui :** livré de bout en bout, y compris docs canon + docs-site 4 locales + clôture critères §33
-- **Validation attendue dans handoff :** `go test ./... -count=1`, `make build`, `make build && ./bin/asa docs generate-cli`, `pnpm docs:check` (si disponible)
-
-## Précédent livré
-
-- **specv3** — Cost, Performance & Token Optimization — [`06-spec-v3.md`](../06-spec-v3.md) — livrée `2026-05-29`
-- Stacks A–F + PF — voir [`context-map.md`](../context-map.md)
+- **V1 lots 1–6** — shell + navigation + golden tests — livré `2026-05-29`
+- **specv3** — [`06-spec-v3.md`](../06-spec-v3.md) — livrée `2026-05-29`
 
 Branding : **Asagiri** / **`asa`** / `github.com/LaProgrammerie/asagiri`.

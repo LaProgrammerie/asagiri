@@ -1,6 +1,6 @@
 # Spec-ui — Asagiri Experience Platform (canon `docs/ai`)
 
-**Statut :** livrée (`2026-05-29`)  
+**Statut :** FULL FEATURE livré (`2026-05-29`, audit reviewer) — réserves P1/P2 : voir [`active/handoff.md`](active/handoff.md#audit-reviewer-2026-05-29)  
 **Spec racine :** [`spec-ui.md`](../../spec-ui.md)  
 **Handoff :** [`active/handoff.md`](active/handoff.md)
 
@@ -101,6 +101,20 @@ Pages : `index`, `mission-control`, `dashboard`, `command-palette`, `keyboard-sh
 
 ---
 
+## 8. Lot 7D — Mission / Prototype / Explain / souris / intégration
+
+Livré :
+
+- **Mission Control §11** : panneau *Recommended actions* (`GetRecommendedActionsQuery`) basé runtime/trust/queue/graph ;
+- **Prototype Mode §19** : commandes `PrototypeCreate`, `FlowsExtract`, `ContractsExtract`, `SpecGenerateFromProduct` via CommandBus ; touches `1–4` dans l’écran prototype ;
+- **Explain §21** : `FocusContext` + `ExplainContext` sur `GetExplainQuery` ; questions typées ; accessible depuis graph/flow/trust/knowledge (touche `e`) ;
+- **Souris §10.2** : double-clic (ouvrir détail), hover/sélection, menu contextuel (clic droit), resize panneaux ;
+- **Tests intégration §32** : `application/internal/ui/app/integration_test.go` (mission → dashboard → palette → commande → CLI equivalent).
+
+Contrats produit : affichage `pending: <ref>` au lieu de `TODO:*` dans le rendu TUI.
+
+---
+
 ## 7. Validation et clôture §33
 
 Validation exécutée :
@@ -112,5 +126,4 @@ make build && ./bin/asa docs generate-cli
 cd docs-site && pnpm docs:check
 ```
 
-Matrice handoff : **24/24 (100 %)**.  
-Critères d’acceptation §33 : **clôturés**.
+**FULL FEATURE** : matrice handoff 100 % `[x]` ; `go test ./...` vert ; revue §33 signée `2026-05-29` (COMMENT — durcissement shimmer/tabs/test binaire optionnel).

@@ -28,6 +28,19 @@ func TestRenderGolden(t *testing.T) {
 				},
 			},
 		},
+		Step: bus.FlowStepDetail{
+			ID:         "invite_member",
+			Label:      "invite_member",
+			Status:     "running",
+			API:        "POST /invitations",
+			Service:    "InvitationService",
+			Event:      "member.invited",
+			Tests:      []string{"InvitationServiceTest"},
+			Metrics:    []string{"invitation_success_rate"},
+			TrustScore: 0.71,
+			Risk:       "medium",
+		},
+		Model:   NewModel(),
 		ShowCLI: true,
 	})
 

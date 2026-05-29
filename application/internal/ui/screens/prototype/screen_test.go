@@ -35,7 +35,7 @@ func TestRenderGolden(t *testing.T) {
 					Action:    "invite_member",
 					Screen:    "signup",
 					Next:      "dashboard",
-					Contract:  "TODO:auth.signup",
+					Contract:  "auth.signup",
 					Trust:     "review-required",
 					Metric:    "invitation_delivery_success_rate",
 					Sensitive: true,

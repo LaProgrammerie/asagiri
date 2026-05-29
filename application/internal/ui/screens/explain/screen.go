@@ -16,9 +16,18 @@ type ViewModel struct {
 func Render(vm ViewModel) string {
 	var b strings.Builder
 	b.WriteString("Explain\n")
+	b.WriteString("Question: " + value(vm.Explain.Question, value(vm.Explain.Subject, "current decision")) + "\n")
 	b.WriteString("Subject: " + value(vm.Explain.Subject, "current decision") + "\n")
 	if vm.Explain.Warning != "" {
 		b.WriteString("Warning: " + vm.Explain.Warning + "\n")
+	}
+	b.WriteString("\nSupported questions\n")
+	if len(vm.Explain.SupportedQuestions) == 0 {
+		b.WriteString("- none\n")
+	} else {
+		for _, question := range vm.Explain.SupportedQuestions {
+			b.WriteString("- " + question + "\n")
+		}
 	}
 	b.WriteString("\nReasons\n")
 	if len(vm.Explain.Reasons) == 0 {

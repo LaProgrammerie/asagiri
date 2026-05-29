@@ -16,7 +16,10 @@ const (
 	keySettings  = input.KeySettings
 	keyHelp      = input.KeyHelp
 	keyPalette   = input.KeyPalette
-	keyNextPane  = input.KeyNextPane
-	keyPrevPane  = input.KeyPrevPane
-	keyClose     = input.KeyClose
+	keyNextPane        = input.KeyNextPane
+	keyPrevPane        = input.KeyPrevPane
+	keyClose           = input.KeyClose
+	keyCycleLayout     = input.KeyCycleLayout
+	keyToggleCollapse  = input.KeyToggleCollapse
+	keyFullscreen      = input.KeyFullscreen
 )

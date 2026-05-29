@@ -24,6 +24,7 @@ func TestRenderGolden(t *testing.T) {
 				},
 			},
 		},
+		Model:   NewModel(),
 		ShowCLI: true,
 	})
 

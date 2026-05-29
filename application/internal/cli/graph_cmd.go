@@ -62,6 +62,7 @@ func newGraphCmd(dryRun *bool) *cobra.Command {
 		newGraphRunCmd(),
 		newGraphStatusCmd(),
 		newGraphResumeCmd(),
+		newGraphRollbackCmd(dryRun),
 		newGraphVisualizeCmd(),
 	)
 	return cmd
@@ -322,6 +323,50 @@ func newGraphStatusCmd() *cobra.Command {
 			fmt.Fprintf(out, "Checkpoints: %d\n", len(graph.Checkpoints))
 			fmt.Fprintf(out, "Estimated cost: €%.2f\n", est.EstimatedCost)
 			fmt.Fprintf(out, "Highest risk: %s\n", est.HighestRisk)
+			return nil
+		},
+	}
+	cmd.Flags().BoolVar(&jsonOut, "json", false, "Structured JSON output on stdout")
+	return cmd
+}
+
+func newGraphRollbackCmd(dryRun *bool) *cobra.Command {
+	var jsonOut bool
+	cmd := &cobra.Command{
+		Use:     "rollback <graph-id>",
+		Short:   "Marquer un graphe et ses nœuds actifs comme rolled back",
+		Example: "  asa graph rollback graph-2026-05-29-abcdef01",
+		Args:    cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			repoRoot, cfg, err := loadGraphRepoConfig()
+			if err != nil {
+				return err
+			}
+			if !cfg.ExecutionGraph.IsEnabled() {
+				return errGraphNotEnabled
+			}
+			impact, err := executiongraph.AssessRollbackImpact(repoRoot, args[0])
+			if err != nil {
+				return err
+			}
+			result, err := executiongraph.ExecuteGraphRollback(cmd.Context(), repoRoot, args[0], dryRun != nil && *dryRun)
+			if err != nil {
+				return err
+			}
+			out := cmd.OutOrStdout()
+			if jsonOut {
+				enc := json.NewEncoder(out)
+				enc.SetIndent("", "  ")
+				return enc.Encode(struct {
+					executiongraph.RollbackImpact
+					Result executiongraph.GraphRollbackResult `json:"result"`
+				}{impact, result})
+			}
+			fmt.Fprintf(out, "%s\n", impact.Title)
+			for _, line := range impact.ImpactLines {
+				fmt.Fprintf(out, "- %s\n", line)
+			}
+			fmt.Fprintf(out, "Graph %s: status=%s nodes_rolled_back=%d dry_run=%t\n", result.GraphID, result.Status, result.NodesRolledBack, result.DryRun)
 			return nil
 		},
 	}

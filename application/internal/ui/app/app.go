@@ -11,6 +11,7 @@ import (
 	"github.com/LaProgrammerie/asagiri/application/internal/config"
 	"github.com/LaProgrammerie/asagiri/application/internal/ui/bus"
 	"github.com/LaProgrammerie/asagiri/application/internal/ui/components"
+	"github.com/LaProgrammerie/asagiri/application/internal/ui/input"
 	"github.com/LaProgrammerie/asagiri/application/internal/ui/layout"
 	"github.com/LaProgrammerie/asagiri/application/internal/ui/screens/agents"
 	"github.com/LaProgrammerie/asagiri/application/internal/ui/screens/dashboard"
@@ -97,6 +98,14 @@ type model struct {
 	paletteQuery      string
 	paletteCursor     int
 	paletteEntries    []paletteEntry
+	eventFeed         components.EventFeedModel
+	eventFeedFocused  bool
+	graphExplorer     graph.Model
+	flowExplorer      flows.Model
+	flowStep          bus.FlowStepDetail
+	knowledgeExplorer knowledge.Model
+	trustExplorer     trust.Model
+	replayExplorer    replay.Model
 	confirmation      *safetyConfirmation
 	refreshEvery      time.Duration
 	refreshThrottle   time.Duration
@@ -104,9 +113,12 @@ type model struct {
 	verticalSplit     float64
 	horizontalSplit   float64
 	mouseResizing     bool
+	mouse             input.MouseState
+	animFrame         int
 }
 
 const (
+	mouseListTopY        = 8
 	defaultSplitRatio    = 0.50
 	minSplitRatio        = 0.20
 	maxSplitRatio        = 0.80
@@ -130,12 +142,13 @@ func newModel(ctx context.Context, opts Options) model {
 	if refreshMs <= 0 {
 		refreshMs = 500
 	}
+	uiState := state.New(firstNonEmpty(opts.InitialScreen, opts.Config.DefaultScreen, ScreenMission))
 	return model{
 		ctx:              ctx,
 		now:              time.Now,
 		cfg:              opts.Config,
 		router:           newRouter(firstNonEmpty(opts.InitialScreen, opts.Config.DefaultScreen, ScreenMission)),
-		state:            state.New(firstNonEmpty(opts.InitialScreen, opts.Config.DefaultScreen, ScreenMission)),
+		state:            uiState,
 		theme:            th,
 		layout:           layout.NewEngine(opts.Config.CompactThreshold),
 		queryBus:         opts.QueryBus,
@@ -144,14 +157,20 @@ func newModel(ctx context.Context, opts Options) model {
 		replayID:         strings.TrimSpace(opts.ReplayID),
 		prototypeProduct: strings.TrimSpace(opts.PrototypeProduct),
 		lastError:        lastErr,
-		paletteEntries:   defaultPaletteEntries(),
-		refreshEvery:     time.Duration(refreshMs) * time.Millisecond,
+		eventFeed:        components.NewEventFeedModel(),
+		graphExplorer:    graph.NewModel(),
+		flowExplorer:     flows.NewModel(),
+		knowledgeExplorer: knowledge.NewModel(),
+		trustExplorer:    trust.NewModel(),
+		replayExplorer:   replay.NewModel(),
+		refreshEvery: time.Duration(refreshMs) * time.Millisecond,
 		refreshThrottle: maxDuration(
 			200*time.Millisecond,
 			time.Duration(refreshMs/2)*time.Millisecond,
 		),
-		verticalSplit:   defaultSplitRatio,
-		horizontalSplit: defaultSplitRatio,
+		verticalSplit:   uiState.Panels.SizeRatio(layout.PaneMain, defaultSplitRatio),
+		horizontalSplit: uiState.Panels.SizeRatio(layout.PaneSide, defaultSplitRatio),
+		mouse:           input.NewMouseState(),
 	}
 }
 
@@ -167,12 +186,16 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.WindowSizeMsg:
 		m.width = v.Width
 		m.height = v.Height
+		m.syncScreenTabs()
 		return m, nil
 	case tea.KeyMsg:
 		return m.updateKey(v)
 	case tea.MouseMsg:
 		return m.updateMouse(v)
 	case tickMsg:
+		if m.cfg.Animations {
+			m.animFrame++
+		}
 		cmds := []tea.Cmd{m.tickCmd()}
 		if m.canRefresh(time.Time(v)) {
 			cmds = append(cmds, m.snapshotQueryCmd())
@@ -213,6 +236,26 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m model) updateKey(v tea.KeyMsg) (tea.Model, tea.Cmd) {
 	key := v.String()
+	if m.mouse.ContextMenu != nil {
+		switch key {
+		case "up":
+			input.MoveContextMenuSelection(m.mouse.ContextMenu, -1)
+			return m, nil
+		case "down":
+			input.MoveContextMenuSelection(m.mouse.ContextMenu, 1)
+			return m, nil
+		case "enter":
+			if item := input.SelectedMenuItem(m.mouse.ContextMenu); item != nil {
+				m.mouse.ClearContextMenu()
+				return m.runContextMenuItem(*item)
+			}
+			return m, nil
+		case keyClose:
+			m.mouse.ClearContextMenu()
+			return m, nil
+		}
+	}
+
 	if m.confirmation != nil {
 		switch key {
 		case keyClose, "n", "N":
@@ -290,12 +333,30 @@ func (m model) updateKey(v tea.KeyMsg) (tea.Model, tea.Cmd) {
 			m.showPalette = false
 			m.confirmation = nil
 		}
+	case keyCycleLayout:
+		m.cycleLayoutMode()
+	case keyToggleCollapse:
+		m.togglePaneCollapse()
+	case keyFullscreen:
+		m.toggleFullscreen()
+	case "ctrl+]":
+		m.nextScreenTab()
+	case "ctrl+[":
+		m.prevScreenTab()
 	case keyNextPane:
-		current := m.layout.Compute(m.currentLayout(), maxInt(1, m.width), maxInt(1, m.height))
+		current := m.computeLayout()
 		m.state.Focus = layout.NextFocus(current, m.state.Focus)
 	case keyPrevPane:
-		current := m.layout.Compute(m.currentLayout(), maxInt(1, m.width), maxInt(1, m.height))
+		current := m.computeLayout()
 		m.state.Focus = layout.PrevFocus(current, m.state.Focus)
+	default:
+		if m.prototypeInputActive() {
+			return m.updatePrototypeKey(v)
+		}
+		if m.explorerInputActive() {
+			return m.updateExplorerKey(v)
+		}
+		return m.updateEventFeedKey(v)
 	}
 	return m, nil
 }
@@ -303,6 +364,7 @@ func (m model) updateKey(v tea.KeyMsg) (tea.Model, tea.Cmd) {
 func (m *model) navigateTo(screen string, cli string) {
 	m.router.Set(screen)
 	m.state.SetScreen(screen)
+	m.syncScreenTabs()
 	if m.cfg.ShowCLIEquivalents && strings.TrimSpace(cli) != "" {
 		m.lastCommandResult = "open " + screen + " | CLI: " + cli
 	}
@@ -334,6 +396,9 @@ func (m model) View() string {
 	if m.confirmation != nil {
 		body += "\n\n" + m.renderSafetyConfirmation()
 	}
+	if menu := m.renderContextMenu(); menu != "" {
+		body += "\n\n" + menu
+	}
 	footer := "Screen: " + m.router.Current()
 	if m.cfg.ShowCLIEquivalents {
 		footer += "  |  CLI: asa " + m.router.Current()
@@ -355,10 +420,15 @@ func (m model) renderScreen() string {
 	switch m.router.Current() {
 	case ScreenDashboard:
 		return dashboard.Render(dashboard.ViewModel{
-			Snapshot: m.snapshot,
-			Theme:    m.theme,
-			Width:    m.width,
-			Animated: m.cfg.Animations,
+			Snapshot:  m.snapshot,
+			EventFeed: m.eventFeedViewModel(4),
+			Theme:     m.theme,
+			Width:     m.width,
+			Animated:  m.cfg.Animations,
+			AnimFrame: m.animFrame,
+			TabIndex:  m.activeScreenTab(),
+			TabLabels: m.screenTabLabels(),
+			Compact:   m.layout.CompactThreshold,
 		})
 	case ScreenAgents:
 		content := agents.Render(agents.ViewModel{
@@ -368,19 +438,28 @@ func (m model) renderScreen() string {
 		return components.Panel("Agent Theatre", content, m.theme)
 	case ScreenGraph:
 		content := graph.Render(graph.ViewModel{
-			Graph:   m.snapshot.GraphExplorer,
-			Events:  m.snapshot.Events,
-			ShowCLI: m.cfg.ShowCLIEquivalents,
+			Graph:      m.snapshot.GraphExplorer,
+			View:       m.refreshGraphView(),
+			Events:     m.snapshot.Events,
+			NodeDetail: m.graphExplorer.Detail,
+			Model:      m.graphExplorer,
+			ShowCLI:    m.cfg.ShowCLIEquivalents,
 		})
 		return components.Panel("Graph Explorer", content, m.theme)
 	case ScreenFlow:
+		step := m.flowStep
+		if step.ID == "" {
+			step = m.queryFlowStepDetail(m.snapshot.FlowExplorer.FlowID, m.flowExplorer.SelectedStepID(m.snapshot.FlowExplorer))
+		}
 		content := flows.Render(flows.ViewModel{
 			Flow:    m.snapshot.FlowExplorer,
+			Step:    step,
+			Model:   m.flowExplorer,
 			ShowCLI: m.cfg.ShowCLIEquivalents,
 		})
 		return components.Panel("Flow Explorer", content, m.theme)
 	case ScreenLogs:
-		return components.Panel("Logs", "Logs panel placeholder.\nUse Command Palette to trigger actions.\nCLI: asa logs", m.theme)
+		return components.Panel("Logs", m.renderLogs(), m.theme)
 	case ScreenExplain:
 		content := explain.Render(explain.ViewModel{
 			Explain: m.snapshot.Explain,
@@ -390,6 +469,9 @@ func (m model) renderScreen() string {
 	case ScreenReplay:
 		content := replay.Render(replay.ViewModel{
 			Replay:  m.snapshot.Replay,
+			Detail:  m.replayExplorer.Detail,
+			Compare: m.replayExplorer.Compare,
+			Model:   m.replayExplorer,
 			ShowCLI: m.cfg.ShowCLIEquivalents,
 		})
 		return components.Panel("Replay Explorer", content, m.theme)
@@ -402,12 +484,16 @@ func (m model) renderScreen() string {
 	case ScreenKnowledge:
 		content := knowledge.Render(knowledge.ViewModel{
 			Search:  m.snapshot.Knowledge,
+			Detail:  m.knowledgeExplorer.Detail,
+			Model:   m.knowledgeExplorer,
 			ShowCLI: m.cfg.ShowCLIEquivalents,
 		})
 		return components.Panel("Knowledge Explorer", content, m.theme)
 	case ScreenTrust:
 		content := trust.Render(trust.ViewModel{
 			Trust:   m.snapshot.TrustExplorer,
+			Detail:  m.trustExplorer.Detail,
+			Model:   m.trustExplorer,
 			ShowCLI: m.cfg.ShowCLIEquivalents,
 		})
 		return components.Panel("Trust Explorer", content, m.theme)
@@ -430,15 +516,18 @@ func (m model) renderScreen() string {
 			Flow:              m.snapshot.Flow,
 			Runs:              m.snapshot.Runs,
 			Events:            m.snapshot.Events,
+			EventFeed:         m.eventFeedViewModel(5),
 			QueuedEvents:      m.snapshot.Runtime.Status.QueuedEvents,
 			CostTodayEUR:      m.snapshot.CostTodayEUR,
 			CostMonthEUR:      m.snapshot.CostMonthEUR,
 			Warnings:          m.snapshot.Warnings,
 			Warning:           m.snapshot.Runtime.Warning,
+			Recommended:       m.snapshot.RecommendedActions,
 			Now:               fallbackTime(m.snapshot.UpdatedAt, m.now().UTC()),
 			DisableAnimations: !m.cfg.Animations,
+			AnimFrame:         m.animFrame,
 		}
-		return m.renderMission(vm)
+		return m.renderMissionWithTabs(vm)
 	}
 }
 
@@ -494,8 +583,9 @@ func (m model) snapshotQueryCmd() tea.Cmd {
 			RunsLimit:          8,
 			EventsLimit:        12,
 			AgentsLimit:        200,
-			Knowledge:          m.snapshot.Flow.FlowID,
-			ExplainFor:         m.router.Current(),
+			Knowledge:          firstNonEmpty(m.knowledgeExplorer.Query, m.snapshot.Flow.FlowID),
+			ExplainFor:         m.explainSubject(),
+			ExplainContext:     m.explainContext(),
 			FlowID:             m.flowID,
 			ReplayID:           m.replayID,
 			PrototypeProduct:   m.prototypeProduct,
@@ -516,14 +606,13 @@ func (m model) tickCmd() tea.Cmd {
 	return tea.Tick(m.refreshEvery, func(t time.Time) tea.Msg { return tickMsg(t) })
 }
 
-func (m model) currentLayout() layout.Kind {
-	if m.router.Current() == ScreenSettings {
-		return layout.Single
-	}
-	if m.width > m.layout.CompactThreshold {
-		return layout.SplitVertical
-	}
-	return layout.SplitHorizontal
+func (m model) renderLogs() string {
+	lines := logLinesFromEvents(m.snapshot.Events)
+	return components.RenderLogView(components.LogViewModel{
+		Lines:  lines,
+		Cursor: m.mouse.HoverRow,
+		Limit:  maxInt(8, m.height-6),
+	})
 }
 
 func (m model) runtimeStatusLabel() string {
@@ -531,31 +620,6 @@ func (m model) runtimeStatusLabel() string {
 		return "running"
 	}
 	return "stopped"
-}
-
-func (m model) renderMission(vm mission.ViewModel) string {
-	headerPanel := components.Panel("ASAGIRI", mission.RenderHeader(vm), m.theme)
-	runtimePanel := components.Panel("Runtime", mission.RenderRuntimeRuns(vm), m.theme)
-	trustPanel := components.Panel("Trust", mission.RenderTrustPane(vm), m.theme)
-	flowPanel := components.Panel("Active Flow", mission.RenderActiveFlowPane(vm), m.theme)
-	agentsPanel := components.Panel("Agent Theatre", mission.RenderAgentTheatrePane(vm), m.theme)
-	eventsPanel := components.Panel("Events", mission.RenderEventsPane(vm), m.theme)
-
-	panes := []string{headerPanel}
-	if m.width >= m.layout.CompactThreshold {
-		if almostEqual(m.verticalSplit, defaultSplitRatio) {
-			panes = append(panes, lipgloss.JoinHorizontal(lipgloss.Top, runtimePanel, trustPanel))
-		} else {
-			leftWidth, rightWidth := m.verticalPaneWidths()
-			left := lipgloss.NewStyle().Width(leftWidth).Render(runtimePanel)
-			right := lipgloss.NewStyle().Width(rightWidth).Render(trustPanel)
-			panes = append(panes, lipgloss.JoinHorizontal(lipgloss.Top, left, right))
-		}
-	} else {
-		panes = append(panes, runtimePanel, trustPanel)
-	}
-	panes = append(panes, flowPanel, agentsPanel, eventsPanel)
-	return strings.Join(panes, "\n")
 }
 
 func (m model) renderHelpScreen() string {
@@ -572,6 +636,10 @@ func (m model) renderHelpScreen() string {
 	b.WriteString("- ctrl+r: replay explorer\n")
 	b.WriteString("- ctrl+l: logs\n")
 	b.WriteString("- tab / shift+tab: move focus\n")
+	b.WriteString("- ctrl+[ / ctrl+]: previous / next layout tab\n")
+	b.WriteString("- ctrl+shift+l: cycle layout mode\n")
+	b.WriteString("- ctrl+\\: collapse/expand focused pane\n")
+	b.WriteString("- f11: toggle fullscreen layout\n")
 	b.WriteString("- esc: close modal or palette\n")
 	b.WriteString("- q: quit\n")
 	b.WriteString("\nAccessibility\n")
@@ -585,8 +653,11 @@ func (m model) renderHelpScreen() string {
 	b.WriteString("- mouse support: " + onOffLabel(m.cfg.Mouse) + "\n")
 	b.WriteString("- plain/json mode: available with ui.mode=plain|json for CI/screen readers\n")
 	b.WriteString("\nMouse\n")
+	b.WriteString("- left click: select list row / recommended action\n")
+	b.WriteString("- double click: open detail or explain focused item\n")
+	b.WriteString("- right click: context menu (explorers, mission, prototype)\n")
 	b.WriteString("- wheel up/down: resize current split\n")
-	b.WriteString("- drag divider with left click: basic panel resize\n")
+	b.WriteString("- drag divider with left click: panel resize\n")
 	return components.Panel("Accessibility & key help", b.String(), m.theme)
 }
 
@@ -612,37 +683,238 @@ func (m model) verticalPaneWidths() (int, int) {
 }
 
 func (m model) updateMouse(v tea.MouseMsg) (tea.Model, tea.Cmd) {
-	if !m.cfg.Mouse || m.showHelp || m.showPalette || m.confirmation != nil {
+	if !m.cfg.Mouse {
 		return m, nil
 	}
-	currentLayout := m.currentLayout()
-	if currentLayout != layout.SplitVertical && currentLayout != layout.SplitHorizontal {
+	if m.showHelp || m.showPalette {
 		return m, nil
+	}
+	if m.confirmation != nil {
+		return m, nil
+	}
+	if m.mouse.ContextMenu != nil {
+		return m.updateContextMenuMouse(v)
 	}
 
-	switch {
-	case v.Button == tea.MouseButtonWheelUp && v.Action == tea.MouseActionPress:
-		if m.adjustSplit(currentLayout, splitResizeStep) {
-			return m, nil
-		}
-	case v.Button == tea.MouseButtonWheelDown && v.Action == tea.MouseActionPress:
-		if m.adjustSplit(currentLayout, -splitResizeStep) {
-			return m, nil
-		}
-	case v.Button == tea.MouseButtonLeft && v.Action == tea.MouseActionPress:
-		if m.isOnDivider(currentLayout, v.X, v.Y) {
-			m.mouseResizing = true
+	currentLayout := m.currentLayout()
+	if currentLayout == layout.SplitVertical || currentLayout == layout.SplitHorizontal {
+		switch {
+		case v.Button == tea.MouseButtonWheelUp && v.Action == tea.MouseActionPress:
+			if m.adjustSplit(currentLayout, splitResizeStep) {
+				return m, nil
+			}
+		case v.Button == tea.MouseButtonWheelDown && v.Action == tea.MouseActionPress:
+			if m.adjustSplit(currentLayout, -splitResizeStep) {
+				return m, nil
+			}
+		case v.Button == tea.MouseButtonLeft && v.Action == tea.MouseActionPress:
+			if m.isOnDivider(currentLayout, v.X, v.Y) {
+				m.mouseResizing = true
+				m.setSplitFromPointer(currentLayout, v.X, v.Y)
+				return m, nil
+			}
+		case v.Button == tea.MouseButtonLeft && v.Action == tea.MouseActionMotion && m.mouseResizing:
 			m.setSplitFromPointer(currentLayout, v.X, v.Y)
 			return m, nil
+		case (v.Action == tea.MouseActionRelease || (v.Button == tea.MouseButtonNone && v.Action == tea.MouseActionMotion)) && m.mouseResizing:
+			m.mouseResizing = false
+			return m, nil
 		}
-	case v.Button == tea.MouseButtonLeft && v.Action == tea.MouseActionMotion && m.mouseResizing:
-		m.setSplitFromPointer(currentLayout, v.X, v.Y)
+	}
+
+	switch v.Action {
+	case tea.MouseActionMotion:
+		if v.Button == tea.MouseButtonNone {
+			m.mouse.HoverRow = input.ListRowFromY(v.Y, mouseListTopY)
+			m.mouse.HoverCol = v.X
+		}
+	case tea.MouseActionPress:
+		if v.Button == tea.MouseButtonRight {
+			items := m.contextMenuItems()
+			m.mouse.ContextMenu = input.OpenContextMenu(v.X, v.Y, items)
+			return m, nil
+		}
+		if v.Button == tea.MouseButtonLeft {
+			if input.IsDoubleClick(m.mouse.LastClickAt, m.mouse.LastClickX, m.mouse.LastClickY, v.X, v.Y, time.Now()) {
+				return m.handleMouseDoubleClick(v)
+			}
+			m.mouse.LastClickAt = time.Now()
+			m.mouse.LastClickX = v.X
+			m.mouse.LastClickY = v.Y
+			m.selectExplorerRowFromMouse(v.Y)
+			if m.eventFeedScreenActive() {
+				m.eventFeedFocused = true
+				m.eventFeed.Focused = true
+				m.eventFeed.SelectRow(v.Y)
+			}
+		}
+	}
+	return m, nil
+}
+
+func (m model) updateContextMenuMouse(v tea.MouseMsg) (tea.Model, tea.Cmd) {
+	menu := m.mouse.ContextMenu
+	if menu == nil {
 		return m, nil
-	case (v.Action == tea.MouseActionRelease || (v.Button == tea.MouseButtonNone && v.Action == tea.MouseActionMotion)) && m.mouseResizing:
-		m.mouseResizing = false
+	}
+	switch v.Action {
+	case tea.MouseActionPress:
+		if v.Button == tea.MouseButtonLeft {
+			row := v.Y - menu.Y
+			if row >= 0 && row < len(menu.Items) {
+				item := menu.Items[row]
+				m.mouse.ClearContextMenu()
+				return m.runContextMenuItem(item)
+			}
+			m.mouse.ClearContextMenu()
+		}
+		if v.Button == tea.MouseButtonRight {
+			m.mouse.ClearContextMenu()
+		}
+	case tea.MouseActionMotion:
+		row := v.Y - menu.Y
+		if row >= 0 && row < len(menu.Items) {
+			menu.Selected = row
+		}
+	}
+	return m, nil
+}
+
+func (m *model) selectExplorerRowFromMouse(y int) {
+	row := input.ListRowFromY(y, mouseListTopY)
+	if row < 0 {
+		return
+	}
+	m.mouse.SelectRow(row)
+	switch m.router.Current() {
+	case ScreenGraph:
+		nodes := m.refreshGraphView().Nodes
+		if len(nodes) == 0 {
+			nodes = m.snapshot.GraphExplorer.Nodes
+		}
+		m.graphExplorer.SelectIndex(row, len(nodes))
+	case ScreenFlow:
+		m.flowExplorer.SelectIndex(row, len(m.snapshot.FlowExplorer.Steps))
+	case ScreenKnowledge:
+		m.knowledgeExplorer.SelectIndex(row, len(m.snapshot.Knowledge.Matches))
+	case ScreenTrust:
+		m.trustExplorer.SelectIndex(row, len(m.snapshot.TrustExplorer.Dimensions))
+	case ScreenReplay:
+		m.replayExplorer.SelectIndex(row, len(m.snapshot.Replay.Timeline))
+	}
+}
+
+func (m model) runContextMenuItem(item input.MenuItem) (tea.Model, tea.Cmd) {
+	if item.ID == "nav.explain" {
+		m.openExplainForFocus(bus.FocusKindDecision, m.explainSubject(), m.router.Current())
+		return m, nil
+	}
+	return m.runPaletteAction(item.ID, item.CLI)
+}
+
+func (m model) handleMouseDoubleClick(v tea.MouseMsg) (tea.Model, tea.Cmd) {
+	switch m.router.Current() {
+	case ScreenGraph:
+		selected := m.graphExplorer.SelectedNode(m.refreshGraphView(), m.snapshot.GraphExplorer.Nodes)
+		if selected == nil {
+			return m, nil
+		}
+		detail := m.queryGraphNodeDetail(m.snapshot.GraphExplorer.GraphID, selected.ID)
+		m.graphExplorer.Detail = detail
+		m.graphExplorer.ShowDetail = true
+		return m, nil
+	case ScreenFlow:
+		stepID := m.flowExplorer.SelectedStepID(m.snapshot.FlowExplorer)
+		if stepID == "" {
+			return m, nil
+		}
+		m.flowStep = m.queryFlowStepDetail(m.snapshot.FlowExplorer.FlowID, stepID)
+		return m, nil
+	case ScreenTrust:
+		label := m.trustExplorer.SelectedLabel(m.snapshot.TrustExplorer)
+		if label == "" {
+			return m, nil
+		}
+		m.openExplainForFocus(bus.FocusKindTrustDimension, label, "")
+		return m, nil
+	case ScreenKnowledge:
+		match := m.knowledgeExplorer.SelectedMatch(m.snapshot.Knowledge)
+		if match == nil {
+			return m, nil
+		}
+		m.openExplainForFocus(bus.FocusKindDecision, match.Name, match.ID)
+		return m, nil
+	case ScreenReplay:
+		idx := m.replayExplorer.SelectedEventIndex(len(m.snapshot.Replay.Timeline))
+		m.openExplainForFocus(bus.FocusKindReplayEvent, m.snapshot.Replay.ReplayID, fmt.Sprintf("event-%d", idx))
+		return m, nil
+	case ScreenMission, ScreenDashboard:
+		m.eventFeedFocused = true
+		m.eventFeed.Focused = true
+		ev := m.eventFeed.SelectedEvent(m.snapshot.Events)
+		if ev == nil {
+			if m.router.Current() == ScreenMission {
+				row := input.ListRowFromY(v.Y, mouseListTopY)
+				if row >= 0 && row < len(m.snapshot.RecommendedActions) {
+					action := m.snapshot.RecommendedActions[row]
+					return m.runPaletteAction(action.ActionID, action.CLIEquivalent)
+				}
+			}
+			return m, nil
+		}
+		screen, cli := components.ArtifactNavigation(*ev)
+		m.navigateTo(screen, cli)
 		return m, nil
 	}
 	return m, nil
+}
+
+func (m model) contextMenuItems() []input.MenuItem {
+	screen := m.router.Current()
+	items := []input.MenuItem{
+		{ID: "nav.explain", Label: "Explain selection", CLI: "asa explain"},
+	}
+	switch screen {
+	case ScreenGraph:
+		items = append(items,
+			input.MenuItem{ID: "ctx.graph-resume", Label: "Resume graph", CLI: "asa graph resume <graph-id>"},
+			input.MenuItem{ID: "ctx.graph-export", Label: "Export graph", CLI: "asa graph visualize <graph-id> --format mermaid"},
+		)
+	case ScreenFlow:
+		items = append(items, input.MenuItem{ID: "nav.flow", Label: "Open flow detail", CLI: "asa flow"})
+	case ScreenTrust:
+		items = append(items, input.MenuItem{ID: "cmd.verify-trust", Label: "Verify trust", CLI: "asa verify trust onboarding"})
+	case ScreenPrototype:
+		items = append(items,
+			input.MenuItem{ID: "cmd.prototype-create", Label: "Prototype create", CLI: `asa prototype create "<intent>"`},
+			input.MenuItem{ID: "cmd.flows-extract", Label: "Flows extract", CLI: "asa flows extract <product>"},
+			input.MenuItem{ID: "cmd.contracts-extract", Label: "Contracts extract", CLI: "asa contracts extract <product>"},
+			input.MenuItem{ID: "cmd.spec-generate", Label: "Spec generate from product", CLI: "asa spec generate-from-product <product>"},
+		)
+	case ScreenReplay:
+		items = append(items, input.MenuItem{ID: "ctx.replay-run", Label: "Replay offline", CLI: "asa replay run --offline"})
+	}
+	return items
+}
+
+func (m model) renderContextMenu() string {
+	menu := m.mouse.ContextMenu
+	if menu == nil || len(menu.Items) == 0 {
+		return ""
+	}
+	var b strings.Builder
+	b.WriteString("\nContext menu\n")
+	for i, item := range menu.Items {
+		prefix := "  "
+		if i == menu.Selected {
+			prefix = "> "
+		}
+		b.WriteString(prefix + item.Label + "\n")
+		if m.cfg.ShowCLIEquivalents && item.CLI != "" {
+			b.WriteString("    CLI: " + item.CLI + "\n")
+		}
+	}
+	return strings.TrimRight(b.String(), "\n")
 }
 
 func (m *model) setSplitFromPointer(kind layout.Kind, x, y int) {
@@ -652,12 +924,14 @@ func (m *model) setSplitFromPointer(kind layout.Kind, x, y int) {
 			return
 		}
 		m.verticalSplit = clampSplit(float64(x) / float64(m.width))
+		m.state.Panels.SetSizeRatio(layout.PaneMain, m.verticalSplit)
 		m.lastCommandResult = splitStatusText(m.verticalSplit)
 	case layout.SplitHorizontal:
 		if m.height <= 0 {
 			return
 		}
 		m.horizontalSplit = clampSplit(float64(y) / float64(m.height))
+		m.state.Panels.SetSizeRatio(layout.PaneSide, m.horizontalSplit)
 		m.lastCommandResult = splitStatusText(m.horizontalSplit)
 	}
 }

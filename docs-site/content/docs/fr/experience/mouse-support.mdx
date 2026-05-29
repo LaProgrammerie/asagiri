@@ -1,6 +1,6 @@
 ---
 title: Support souris
-description: Interactions souris optionnelles pour navigation et resize basique.
+description: Interactions souris pour sélection, menus contextuels et resize de panneaux.
 ---
 
 # Support souris
@@ -12,10 +12,12 @@ ui:
   mouse: true
 ```
 
-## Interactions actuelles
+## Interactions (lot 7D)
 
-- événements pointeur si terminal compatible ;
-- resize de split à la molette (basique) ;
-- drag du divider pour resize de panneaux (basique).
+- **Clic gauche** — sélection d’une ligne (explorers, actions recommandées sur Mission Control)
+- **Double-clic** — ouvrir le détail nœud/étape ou sauter depuis les événements
+- **Clic droit** — menu contextuel (explain, reprise graph, pipeline prototype, verify trust…)
+- **Survol** — surbrillance de ligne si le terminal supporte le cell motion
+- **Molette / drag du séparateur** — redimensionner les panneaux split
 
-Toutes les actions critiques restent accessibles au clavier.
+Le clavier reste obligatoire : chaque action est aussi disponible via raccourcis et **Ctrl+P**.

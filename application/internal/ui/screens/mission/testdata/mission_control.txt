@@ -29,7 +29,11 @@ Agent theatre
 - none
 
 
+Recommended actions
+- none
+
+
 Recent events
-Filter: all (stub)  Search: (none)
-- 12:32:56  runtime.started
-- 12:33:56  session.created
+Filter: all  Search: (none)  [live]
+  12:32:56  runtime.started
+  12:33:56  session.created

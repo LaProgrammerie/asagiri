@@ -36,10 +36,11 @@ func Render(vm ViewModel) string {
 				break
 			}
 			b.WriteString(fmt.Sprintf("- %s/%s action=%s screen=%s next=%s\n", value(step.FlowID, "-"), value(step.StepID, "-"), value(step.Action, "-"), value(step.Screen, "-"), value(step.Next, "-")))
-			b.WriteString(fmt.Sprintf("  contract=%s trust=%s metric=%s\n", value(step.Contract, "TODO"), value(step.Trust, "pending"), value(step.Metric, "-")))
+			b.WriteString(fmt.Sprintf("  contract=%s trust=%s metric=%s\n", formatContract(step.Contract), value(step.Trust, "pending"), value(step.Metric, "-")))
 		}
 	}
 	b.WriteString("\nPipeline actions\n")
+	b.WriteString("Keys: 1 create  2 flows extract  3 contracts extract  4 spec generate\n")
 	for _, action := range vm.Pipeline.SuggestedActions {
 		b.WriteString("- " + action + "\n")
 	}
@@ -66,4 +67,8 @@ func value(v string, fallback string) string {
 		return fallback
 	}
 	return v
+}
+
+func formatContract(ref string) string {
+	return bus.FormatContractRef(ref)
 }

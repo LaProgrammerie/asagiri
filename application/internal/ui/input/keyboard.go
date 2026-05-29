@@ -15,7 +15,10 @@ const (
 	KeySettings  = "s"
 	KeyHelp      = "?"
 	KeyPalette   = "ctrl+p"
-	KeyNextPane  = "tab"
-	KeyPrevPane  = "shift+tab"
-	KeyClose     = "esc"
+	KeyNextPane        = "tab"
+	KeyPrevPane        = "shift+tab"
+	KeyClose           = "esc"
+	KeyCycleLayout     = "ctrl+shift+l"
+	KeyToggleCollapse  = "ctrl+\\"
+	KeyFullscreen      = "f11"
 )
