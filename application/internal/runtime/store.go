@@ -356,6 +356,29 @@ func (s *Store) UpsertMemory(e MemoryEntry) error {
 	return err
 }
 
+// KnownFlowIDs returns flow identifiers referenced by sessions, events, or flow state.
+func (s *Store) KnownFlowIDs() (map[string]struct{}, error) {
+	rows, err := s.db.Query(`
+		SELECT DISTINCT flow_id FROM sessions WHERE flow_id IS NOT NULL AND flow_id != ''
+		UNION
+		SELECT DISTINCT flow_id FROM runtime_events WHERE flow_id IS NOT NULL AND flow_id != ''
+		UNION
+		SELECT DISTINCT flow_id FROM flow_states WHERE flow_id IS NOT NULL AND flow_id != ''`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	out := map[string]struct{}{}
+	for rows.Next() {
+		var id string
+		if err := rows.Scan(&id); err != nil {
+			return nil, err
+		}
+		out[id] = struct{}{}
+	}
+	return out, rows.Err()
+}
+
 // CountMemory returns memory entry count.
 func (s *Store) CountMemory() (int, error) {
 	var n int

@@ -1,13 +1,16 @@
 package executiongraph
 
 import (
+	"context"
 	"encoding/json"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/LaProgrammerie/asagiri/application/internal/analysis"
+	"github.com/LaProgrammerie/asagiri/application/internal/runtime"
 	"github.com/stretchr/testify/require"
 )
 
@@ -436,6 +439,248 @@ func TestLoadBundleUsedByInferer(t *testing.T) {
 	})
 	require.NoError(t, err)
 	require.True(t, loaded)
+}
+
+func TestInferDependencyV2PublicEventEdges(t *testing.T) {
+	repo := writeMinimalPlanningFixture(t)
+	inferer := DefaultDependencyInferer{}
+	edges, err := inferer.Infer(t.Context(), DependencyInput{
+		Product:  "minimal-product",
+		Flow:     "workspace-onboarding",
+		RepoRoot: repo,
+		Nodes: []GraphNode{
+			{ID: "derive-contracts", Type: NodeTypeContractGeneration},
+			{ID: "implement-invite-member", Type: NodeTypeImplementation},
+			{ID: "verify-contracts", Type: NodeTypeValidation},
+			{ID: "trust-gate", Type: NodeTypeTrustVerification},
+		},
+		TaskBindings: []TaskBinding{
+			{NodeID: "implement-click-get-started", StepIndex: 0, Action: "click_get_started"},
+			{NodeID: "implement-invite-member", StepIndex: 1, Action: "invite_member"},
+		},
+	})
+	require.NoError(t, err)
+	requireContainsEdge(t, edges, GraphEdge{
+		From: "verify-contracts",
+		To:   "implement-invite-member",
+		Type: EdgeTypeRequires,
+	})
+	requireContainsEdge(t, edges, GraphEdge{
+		From: "implement-invite-member",
+		To:   "trust-gate",
+		Type: EdgeTypeRequires,
+	})
+}
+
+func TestInferDependencyV2ArchitectureProjection(t *testing.T) {
+	bundle := analysis.Bundle{
+		Product: "minimal-product",
+		Graphs: map[string]analysis.Graph{
+			"dependency": {
+				Kind: "dependency",
+				Nodes: []analysis.Node{
+					{ID: "pkg:trust", Kind: "package", Name: "internal/trust"},
+					{ID: "pkg:onboarding", Kind: "package", Name: "internal/onboarding"},
+				},
+				Edges: []analysis.Edge{
+					{From: "pkg:onboarding", To: "pkg:trust", Kind: "depends_on"},
+				},
+			},
+		},
+	}
+	inferer := DefaultDependencyInferer{
+		LoadBundle: func(_, _ string) (analysis.Bundle, error) { return bundle, nil },
+	}
+	edges, err := inferer.Infer(t.Context(), DependencyInput{
+		Product: "minimal-product",
+		Flow:    "workspace-onboarding",
+		Nodes: []GraphNode{
+			{ID: "implement-click-get-started", Type: NodeTypeImplementation},
+			{ID: "implement-invite-member", Type: NodeTypeImplementation},
+		},
+		TaskBindings: []TaskBinding{
+			{
+				NodeID:     "implement-click-get-started",
+				StepIndex:  0,
+				Action:     "click_get_started",
+				ScopePaths: []string{"application/internal/trust/**"},
+			},
+			{
+				NodeID:     "implement-invite-member",
+				StepIndex:  1,
+				Action:     "invite_member",
+				ScopePaths: []string{"application/internal/onboarding/**"},
+			},
+		},
+	})
+	require.NoError(t, err)
+	requireContainsEdge(t, edges, GraphEdge{
+		From: "implement-click-get-started",
+		To:   "implement-invite-member",
+		Type: EdgeTypeRequires,
+	})
+}
+
+func TestInferDependencyV2RecentFlowFailure(t *testing.T) {
+	loader := stubRecentFailuresLoader{failures: []RecentFlowFailure{
+		{FlowID: "workspace-onboarding", GraphID: "graph-test", NodeID: "implement-invite-member"},
+	}}
+	inferer := DefaultDependencyInferer{}
+	edges, err := inferer.Infer(t.Context(), DependencyInput{
+		Product:        "minimal-product",
+		Flow:           "workspace-onboarding",
+		RepoRoot:       t.TempDir(),
+		RecentFailures: loader,
+		Nodes: []GraphNode{
+			{ID: "investigate-onboarding", Type: NodeTypeInvestigation},
+			{ID: "implement-click-get-started", Type: NodeTypeImplementation},
+			{ID: "implement-invite-member", Type: NodeTypeImplementation},
+		},
+		TaskBindings: []TaskBinding{
+			{NodeID: "implement-click-get-started", StepIndex: 0, Action: "click_get_started"},
+			{NodeID: "implement-invite-member", StepIndex: 1, Action: "invite_member"},
+		},
+	})
+	require.NoError(t, err)
+	requireContainsEdge(t, edges, GraphEdge{
+		From: "investigate-onboarding",
+		To:   "implement-click-get-started",
+		Type: EdgeTypeRequires,
+	})
+	requireContainsEdge(t, edges, GraphEdge{
+		From: "investigate-onboarding",
+		To:   "implement-invite-member",
+		Type: EdgeTypeRequires,
+	})
+}
+
+func TestDefaultRecentFailuresLoaderFromRuntime(t *testing.T) {
+	repo := t.TempDir()
+	store, err := runtime.Open(repo)
+	require.NoError(t, err)
+	t.Cleanup(func() { _ = store.Close() })
+
+	emitter := &runtime.GraphEmitter{Store: store}
+	require.NoError(t, emitter.Emit(runtime.EventGraphNodeFailed, "graph-1", "workspace-onboarding", map[string]any{
+		"node_id": "implement-invite-member",
+	}))
+
+	loader := DefaultRecentFailuresLoader{}
+	failures, err := loader.RecentFlowFailures(t.Context(), repo, "minimal-product", "workspace-onboarding", 5)
+	require.NoError(t, err)
+	require.Len(t, failures, 1)
+	require.Equal(t, "implement-invite-member", failures[0].NodeID)
+}
+
+func TestDependencyV2GoldenFixtureEdges(t *testing.T) {
+	raw, err := os.ReadFile(filepath.Join("testdata", "dependency-inference-v2", "expected-edges.json"))
+	require.NoError(t, err)
+	var want []GraphEdge
+	require.NoError(t, json.Unmarshal(raw, &want))
+
+	repo := writeDependencyV2PlannerFixture(t)
+	graph, err := NewPlanner(repo).Build(t.Context(), GraphPlanRequest{
+		Product:        "minimal-product",
+		Flow:           "workspace-onboarding",
+		FromProduct:    true,
+		IncludeReviews: true,
+	})
+	require.NoError(t, err)
+
+	for _, edge := range want {
+		requireContainsEdge(t, graph.Edges, edge)
+	}
+}
+
+func TestPlannerBuildDependencyV2AdditionalEdges(t *testing.T) {
+	repo := writeDependencyV2PlannerFixture(t)
+	planner := Planner{
+		RepoRoot: repo,
+		Inferer:  DefaultDependencyInferer{},
+		Now: func() time.Time {
+			return time.Date(2026, 5, 29, 12, 0, 0, 0, time.UTC)
+		},
+	}
+
+	graph, err := planner.Build(t.Context(), GraphPlanRequest{
+		Product:        "minimal-product",
+		Flow:           "workspace-onboarding",
+		FromProduct:    true,
+		IncludeReviews: true,
+	})
+	require.NoError(t, err)
+
+	requireContainsEdge(t, graph.Edges, GraphEdge{
+		From: "implement-click-get-started",
+		To:   "implement-invite-member",
+		Type: EdgeTypeRequires,
+	})
+	requireContainsEdge(t, graph.Edges, GraphEdge{
+		From: "investigate-onboarding",
+		To:   "implement-click-get-started",
+		Type: EdgeTypeRequires,
+	})
+	requireContainsEdge(t, graph.Edges, GraphEdge{
+		From: "implement-invite-member",
+		To:   "trust-gate",
+		Type: EdgeTypeRequires,
+	})
+}
+
+type stubRecentFailuresLoader struct {
+	failures []RecentFlowFailure
+	err      error
+}
+
+func (s stubRecentFailuresLoader) RecentFlowFailures(context.Context, string, string, string, int) ([]RecentFlowFailure, error) {
+	if s.err != nil {
+		return nil, s.err
+	}
+	return s.failures, nil
+}
+
+func writeDependencyV2PlannerFixture(t *testing.T) string {
+	t.Helper()
+	repo := writeMinimalPlanningFixture(t)
+	tasksDir := filepath.Join(repo, ".asagiri", "tasks", "minimal-product")
+	require.NoError(t, os.MkdirAll(tasksDir, 0o755))
+	require.NoError(t, os.WriteFile(filepath.Join(tasksDir, "task-001.yaml"), []byte(`id: minimal-product-001
+title: Click get started
+feature: minimal-product
+status: pending
+type: implementation
+source:
+  product: minimal-product
+  flow: workspace-onboarding
+  step: step-1
+  action: click_get_started
+scope:
+  allowed_paths:
+    - application/internal/trust/**
+`), 0o644))
+	require.NoError(t, os.WriteFile(filepath.Join(tasksDir, "task-002.yaml"), []byte(`id: minimal-product-002
+title: Invite member
+feature: minimal-product
+status: pending
+type: implementation
+source:
+  product: minimal-product
+  flow: workspace-onboarding
+  step: step-2
+  action: invite_member
+scope:
+  allowed_paths:
+    - application/internal/onboarding/**
+`), 0o644))
+
+	store, err := runtime.Open(repo)
+	require.NoError(t, err)
+	t.Cleanup(func() { _ = store.Close() })
+	emitter := &runtime.GraphEmitter{Store: store}
+	require.NoError(t, emitter.Emit(runtime.EventGraphNodeFailed, "graph-v2-fixture", "workspace-onboarding", map[string]any{
+		"node_id": "implement-invite-member",
+	}))
+	return repo
 }
 
 func TestBundleJSONFixtureValid(t *testing.T) {

@@ -4,9 +4,11 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/LaProgrammerie/asagiri/application/internal/investigation"
 	"github.com/LaProgrammerie/asagiri/application/internal/version"
+	"github.com/LaProgrammerie/asagiri/application/internal/workflow"
 	"github.com/spf13/cobra"
 )
 
@@ -316,10 +318,11 @@ func newStatusCmd(dryRun *bool) *cobra.Command {
 func newResumeCmd(dryRun *bool) *cobra.Command {
 	var force bool
 	var execute bool
+	var maxSteps int
 	cmd := &cobra.Command{
 		Use:     "resume <run-id>",
 		Short:   "Reprendre un run interrompu",
-		Example: "  asa resume run-2026-05-17-001\n  asa resume run-2026-05-17-001 --execute\n  # Enchaîner les steps jusqu'à fin de run :\n  while asa resume run-2026-05-17-001 --execute; do :; done",
+		Example: "  asa resume run-2026-05-17-001\n  asa resume run-2026-05-17-001 --execute",
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			startDir, err := os.Getwd()
@@ -333,25 +336,20 @@ func newResumeCmd(dryRun *bool) *cobra.Command {
 			defer ctx.Close()
 			wf := ctx.Workflow()
 			if execute {
-				var next string
-				var err error
+				var steps []string
 				if ctx.DryRun {
-					next, err = wf.ResumeRunDryExecute(cmd.Context(), args[0], force)
-					if err != nil {
-						return err
-					}
-					fmt.Fprintf(cmd.OutOrStdout(), "reprise dry-run exécutée: %s\n", next)
-					return nil
+					steps, err = wf.ResumeRunDryExecute(cmd.Context(), args[0], force, maxSteps)
+				} else {
+					steps, err = wf.ResumeRunExecute(cmd.Context(), args[0], force, maxSteps)
 				}
-				next, err = wf.ResumeRunExecute(cmd.Context(), args[0], force)
 				if err != nil {
 					return err
 				}
-				if next == "" {
+				if len(steps) == 0 {
 					fmt.Fprintln(cmd.OutOrStdout(), "run terminé: aucun step à reprendre")
 					return nil
 				}
-				fmt.Fprintf(cmd.OutOrStdout(), "step exécuté: %s\n", next)
+				fmt.Fprintf(cmd.OutOrStdout(), "steps exécutés (%d): %s\n", len(steps), strings.Join(steps, ", "))
 				return nil
 			}
 			next, err := wf.ResumeRun(args[0], force)
@@ -367,7 +365,8 @@ func newResumeCmd(dryRun *bool) *cobra.Command {
 		},
 	}
 	cmd.Flags().BoolVar(&force, "force", false, "Relancer une étape déjà réussie")
-	cmd.Flags().BoolVar(&execute, "execute", false, "Exécuter le prochain step (agents réels hors --dry-run global)")
+	cmd.Flags().BoolVar(&execute, "execute", false, "Enchaîner les steps restants (agents réels hors --dry-run global)")
+	cmd.Flags().IntVar(&maxSteps, "max-steps", workflow.DefaultResumeMaxSteps, "Nombre maximum de steps à enchaîner avec --execute")
 	return cmd
 }
 

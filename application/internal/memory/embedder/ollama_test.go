@@ -47,6 +47,17 @@ func TestOllamaGoldenSynonymSimilarity(t *testing.T) {
 	require.Greater(t, memory.CosineSimilarity(a, b), 0.7)
 }
 
+func TestOllamaReachable(t *testing.T) {
+	t.Parallel()
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, "/api/tags", r.URL.Path)
+		require.NoError(t, json.NewEncoder(w).Encode(map[string]any{"models": []any{}}))
+	}))
+	t.Cleanup(srv.Close)
+	client := embedder.NewOllamaWithClient(embedder.OllamaConfig{BaseURL: srv.URL, Model: "m"}, srv.Client())
+	require.NoError(t, client.Reachable(context.Background()))
+}
+
 func TestOllamaMockHTTP(t *testing.T) {
 	t.Parallel()
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

@@ -1,6 +1,9 @@
 package executiongraph
 
-import "context"
+import (
+	"context"
+	"time"
+)
 
 // GraphPlanRequest groups inputs for graph planning (spec §21).
 type GraphPlanRequest struct {
@@ -26,13 +29,28 @@ type TaskBinding struct {
 	ScopePaths  []string
 }
 
+// RecentFlowFailure is a recent failed graph execution for a flow (PF-C-06).
+type RecentFlowFailure struct {
+	FlowID    string
+	GraphID   string
+	NodeID    string
+	EventType string
+	CreatedAt time.Time
+}
+
+// RecentFailuresLoader returns recent flow failures for dependency inference (injectable in tests).
+type RecentFailuresLoader interface {
+	RecentFlowFailures(ctx context.Context, repoRoot, product, flow string, limit int) ([]RecentFlowFailure, error)
+}
+
 // DependencyInput feeds dependency inference (spec §10).
 type DependencyInput struct {
-	Product      string
-	Flow         string
-	RepoRoot     string
-	Nodes        []GraphNode
-	TaskBindings []TaskBinding
+	Product          string
+	Flow             string
+	RepoRoot         string
+	Nodes            []GraphNode
+	TaskBindings     []TaskBinding
+	RecentFailures   RecentFailuresLoader // nil uses DefaultRecentFailuresLoader
 }
 
 // ScheduleRequest feeds graph scheduling (spec §11).

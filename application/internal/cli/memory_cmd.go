@@ -19,6 +19,33 @@ func configureMemoryEmbedder(repoRoot string) error {
 	return embedder.ConfigureFromConfig(cfg.Runtime.Memory)
 }
 
+func newMemoryDoctorCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:     "doctor",
+		Short:   "Vérifier Ollama, dimensions des embeddings et entrées orphelines",
+		Example: "  asa memory doctor",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			root, err := os.Getwd()
+			if err != nil {
+				return err
+			}
+			if err := configureMemoryEmbedder(root); err != nil {
+				return err
+			}
+			store, err := runtime.Open(root)
+			if err != nil {
+				return err
+			}
+			defer store.Close()
+			checks, err := memory.NewEngine(store).Doctor(cmd.Context())
+			if err != nil {
+				return err
+			}
+			return memory.FormatDoctor(cmd.OutOrStdout(), checks)
+		},
+	}
+}
+
 func newMemoryReindexCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:     "reindex",

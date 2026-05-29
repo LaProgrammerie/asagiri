@@ -117,6 +117,16 @@ agents:
 	require.NoError(t, err)
 	require.NotEmpty(t, runID)
 
+	root.SetArgs([]string{"resume", runID, "--dry-run"})
+	require.NoError(t, root.Execute(), output.String())
+	require.Contains(t, output.String(), "prochain step:")
+
+	output.Reset()
+	root.SetArgs([]string{"resume", runID, "--execute", "--dry-run"})
+	require.NoError(t, root.Execute(), output.String())
+	require.Contains(t, output.String(), "steps exécutés")
+
+	output.Reset()
 	root.SetArgs([]string{"report", runID, "--dry-run"})
 	require.NoError(t, root.Execute(), output.String())
 	require.FileExists(t, filepath.Join(repo, ".asagiri", "runs", runID, "report.md"))

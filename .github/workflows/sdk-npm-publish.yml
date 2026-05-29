@@ -40,6 +40,9 @@ jobs:
       - name: Test
         run: npm test
 
+      - name: Pack dry-run
+        run: npm pack --dry-run
+
       - name: Publish to npm
         run: npm publish --access public
         env:

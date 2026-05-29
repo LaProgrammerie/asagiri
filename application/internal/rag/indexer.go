@@ -1,6 +1,7 @@
 package rag
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"io/fs"
@@ -8,6 +9,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/LaProgrammerie/asagiri/application/internal/config"
+	"github.com/LaProgrammerie/asagiri/application/internal/memory/embedder"
 	_ "modernc.org/sqlite"
 )
 
@@ -20,13 +23,19 @@ type IndexOptions struct {
 	Paths    []string
 	Exclude  []string
 	DryRun   bool
+	// Memory selects the embedder (runtime.memory); zero value uses hash after ConfigureFromConfig.
+	Memory config.RuntimeMemoryConfig
+	// SkipEmbeddings stores chunks without vectors (keyword-only retrieval).
+	SkipEmbeddings bool
 }
 
 // IndexResult summarizes an index run.
 type IndexResult struct {
-	Files   int
-	Chunks  int
-	DBPath  string
+	Files            int
+	Chunks           int
+	EmbeddedChunks   int
+	DBPath           string
+	EmbedderConfigured bool
 }
 
 var defaultExclude = []string{".git", "vendor", "node_modules", ".asagiri/index"}
@@ -73,9 +82,23 @@ func Index(opts IndexOptions) (IndexResult, error) {
 		return IndexResult{}, err
 	}
 
-	res := IndexResult{DBPath: dbPath}
+	embedChunks := !opts.SkipEmbeddings
+	if embedChunks {
+		if err := embedder.ConfigureFromConfig(opts.Memory); err != nil {
+			return IndexResult{}, fmt.Errorf("rag index embedder: %w", err)
+		}
+	}
+
+	res := IndexResult{DBPath: dbPath, EmbedderConfigured: embedChunks}
+	ctx := context.Background()
 	for _, rel := range opts.Paths {
 		root := filepath.Join(opts.RepoRoot, rel)
+		if _, statErr := os.Stat(root); statErr != nil {
+			if os.IsNotExist(statErr) {
+				continue
+			}
+			return res, statErr
+		}
 		err := filepath.WalkDir(root, func(path string, d fs.DirEntry, walkErr error) error {
 			if walkErr != nil {
 				return walkErr
@@ -99,9 +122,19 @@ func Index(opts IndexOptions) (IndexResult, error) {
 			relPath, _ := filepath.Rel(opts.RepoRoot, path)
 			parts := SplitText(relPath, string(body), 0)
 			for _, ch := range parts {
+				var embJSON *string
+				if embedChunks {
+					vec, embErr := embedder.EmbedText(ctx, ch.Content)
+					if embErr != nil {
+						return embErr
+					}
+					s := marshalEmbedding(vec)
+					embJSON = &s
+					res.EmbeddedChunks++
+				}
 				if _, insErr := db.Exec(
-					`INSERT INTO chunks(path, offset, content) VALUES(?,?,?)`,
-					ch.Path, ch.Offset, ch.Content,
+					`INSERT INTO chunks(path, offset, content, embedding) VALUES(?,?,?,?)`,
+					ch.Path, ch.Offset, ch.Content, embJSON,
 				); insErr != nil {
 					return insErr
 				}
@@ -115,19 +148,6 @@ func Index(opts IndexOptions) (IndexResult, error) {
 		}
 	}
 	return res, nil
-}
-
-func initSchema(db *sql.DB) error {
-	_, err := db.Exec(`
-CREATE TABLE IF NOT EXISTS chunks (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  path TEXT NOT NULL,
-  offset INTEGER NOT NULL,
-  content TEXT NOT NULL
-);
-CREATE INDEX IF NOT EXISTS idx_chunks_path ON chunks(path);
-`)
-	return err
 }
 
 func shouldSkip(path, repoRoot string, excludes []string) bool {

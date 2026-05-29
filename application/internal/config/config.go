@@ -215,12 +215,20 @@ type ModelPricing struct {
 	UpdatedAt         string  `yaml:"updated_at"`
 }
 
-// TokenEstimationConfig tunes chars-per-token heuristics (specv3 §5.3).
+// TokenEstimationConfig tunes chars-per-token heuristics (specv3 §5.3) and provider tokenizers (PF-X-02).
 type TokenEstimationConfig struct {
 	DefaultCharsPerToken  float64 `yaml:"default_chars_per_token"`
 	CodeCharsPerToken     float64 `yaml:"code_chars_per_token"`
 	MarkdownCharsPerToken float64 `yaml:"markdown_chars_per_token"`
 	JSONCharsPerToken     float64 `yaml:"json_chars_per_token"`
+	// DisableProviderTokenizer forces chars-per-token heuristics even when a model is known.
+	DisableProviderTokenizer bool `yaml:"disable_provider_tokenizer"`
+	// LocalEncoding is the tiktoken encoding name used for local/Ollama models (default cl100k_base).
+	LocalEncoding string `yaml:"local_encoding"`
+	// AnthropicCharsPerToken tunes the offline Claude ratio when no public tokenizer is available.
+	AnthropicCharsPerToken float64 `yaml:"anthropic_chars_per_token"`
+	// GoogleCharsPerToken tunes the offline Gemini ratio (no stable Go tokenizer).
+	GoogleCharsPerToken float64 `yaml:"google_chars_per_token"`
 }
 
 // RoutingConfig selects local vs cloud steps (specv3 §11).
@@ -521,6 +529,15 @@ func (c *Config) applyV3Defaults() {
 	}
 	if c.TokenEst.JSONCharsPerToken == 0 {
 		c.TokenEst.JSONCharsPerToken = 3.6
+	}
+	if c.TokenEst.AnthropicCharsPerToken == 0 {
+		c.TokenEst.AnthropicCharsPerToken = 3.5
+	}
+	if c.TokenEst.GoogleCharsPerToken == 0 {
+		c.TokenEst.GoogleCharsPerToken = 4.0
+	}
+	if c.TokenEst.LocalEncoding == "" {
+		c.TokenEst.LocalEncoding = "cl100k_base"
 	}
 	if c.Routing.DefaultStrategy == "" {
 		c.Routing.DefaultStrategy = "cost_aware"

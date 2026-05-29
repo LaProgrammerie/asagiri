@@ -64,8 +64,8 @@ func BuildPack(cfg *config.Config, in PackInput) ContextPack {
 	}
 }
 
-// PackTokens estimates token footprint of a pack using cfg ratios (delegates to cost estimators in Optimize).
-func PackApproxTokens(pack ContextPack, te config.TokenEstimationConfig) int {
+// PackText concatenates pack fields for token counting.
+func PackText(pack ContextPack) string {
 	var sb strings.Builder
 	sb.WriteString(pack.TaskObjective)
 	sb.WriteString(pack.AcceptanceCriteria)
@@ -79,8 +79,12 @@ func PackApproxTokens(pack ContextPack, te config.TokenEstimationConfig) int {
 		sb.WriteString(v)
 	}
 	sb.WriteString(pack.OutputFormat)
-	// inline token formula: chars/default ratio
-	chars := sb.Len()
+	return sb.String()
+}
+
+// PackApproxTokens estimates token footprint using chars-per-token heuristics only.
+func PackApproxTokens(pack ContextPack, te config.TokenEstimationConfig) int {
+	chars := len(PackText(pack))
 	if te.DefaultCharsPerToken <= 0 {
 		te.DefaultCharsPerToken = 4
 	}

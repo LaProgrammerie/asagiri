@@ -197,7 +197,13 @@ func (s *Server) toolCall(ctx context.Context, base rpcResponse, params json.Raw
 		if stringArg(args, "kind") == "code" {
 			k = cost.ContentCode
 		}
-		tok := cost.EstimateFromText(content, k, s.Config.TokenEst)
+		model := stringArg(args, "model")
+		var tok int
+		if model != "" {
+			tok = cost.EstimateFromTextForModel(content, model, k, s.Config.TokenEst)
+		} else {
+			tok = cost.EstimateFromText(content, k, s.Config.TokenEst)
+		}
 		text = fmt.Sprintf("%d", tok)
 	case "asagiri.estimate_cost":
 		model := stringArg(args, "model")

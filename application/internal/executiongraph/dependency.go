@@ -28,7 +28,7 @@ type DefaultDependencyInferer struct {
 	ReadFile   func(path string) ([]byte, error)
 }
 
-func (d DefaultDependencyInferer) Infer(_ context.Context, input DependencyInput) ([]GraphEdge, error) {
+func (d DefaultDependencyInferer) Infer(ctx context.Context, input DependencyInput) ([]GraphEdge, error) {
 	if input.Product == "" {
 		return nil, fmt.Errorf("dependency infer: product required")
 	}
@@ -43,7 +43,7 @@ func (d DefaultDependencyInferer) Infer(_ context.Context, input DependencyInput
 
 	var bundle analysis.Bundle
 	var bundleErr error
-	if input.RepoRoot != "" {
+	if input.Product != "" && (input.RepoRoot != "" || d.LoadBundle != nil) {
 		bundle, bundleErr = loadBundle(input.RepoRoot, input.Product)
 	}
 
@@ -57,6 +57,11 @@ func (d DefaultDependencyInferer) Infer(_ context.Context, input DependencyInput
 	edges = append(edges, inferContractBlocking(input, bindings, nodeSet, readFile)...)
 	edges = append(edges, inferSecurityReviewChain(input, bindings, nodeSet)...)
 	edges = append(edges, inferBackwardCompat(input, bindings, nodeSet, bundle, bundleErr)...)
+
+	flow, _ := loadFlowForInference(input, readFile)
+	edges = append(edges, inferPublicEventEdges(input, bindings, nodeSet, bundle, bundleErr, flow)...)
+	edges = append(edges, inferArchitectureProjectionEdges(bindings, bundle, bundleErr)...)
+	edges = append(edges, inferHistoricalFailureEdges(ctx, input, bindings, nodeSet, input.RecentFailures)...)
 
 	return dedupeEdges(edges), nil
 }

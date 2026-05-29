@@ -3,6 +3,7 @@ package workflow
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	osExec "os/exec"
@@ -359,7 +360,10 @@ func (s *Service) contextFilesForTask(feature string, task asagiri.Task) []strin
 		return rag.HeuristicContextFiles(s.repoRoot, feature)
 	}
 	defer db.Close()
-	paths, err := rag.NewRetriever(db).Search(task.Title, 8)
+	paths, err := rag.NewRetriever(db).SearchWithOptions(context.Background(), task.Title, rag.SearchOptions{
+		Limit:  8,
+		Memory: s.cfg.Runtime.Memory,
+	})
 	if err != nil || len(paths) == 0 {
 		return rag.HeuristicContextFiles(s.repoRoot, feature)
 	}
@@ -568,39 +572,75 @@ func (s *Service) ResumeRun(runID string, force bool) (string, error) {
 				return step.Name, nil
 			}
 		}
+		if next == "report" {
+			for _, step := range steps {
+				if step.Name == "report" && step.Status == sqlite.StatusDone {
+					return "", nil
+				}
+			}
+			return "report", nil
+		}
 		return "", nil
 	}
 	_ = force
 	return next, nil
 }
 
-// ResumeRunExecute runs the next workflow step (agents invoked when not in dry-run).
-func (s *Service) ResumeRunExecute(ctx context.Context, runID string, force bool) (string, error) {
-	run, err := s.store.GetRun(runID)
-	if err != nil {
-		return "", err
+func normalizeResumeMaxSteps(maxSteps int) int {
+	if maxSteps <= 0 {
+		return DefaultResumeMaxSteps
 	}
-	step, err := s.ResumeRun(runID, force)
-	if err != nil || step == "" {
-		return step, err
-	}
-	return step, s.executeResumeStep(ctx, run, step, force)
+	return maxSteps
 }
 
-// ResumeRunDryExecute simulates continuing from the next workflow step (dry-run only).
-func (s *Service) ResumeRunDryExecute(ctx context.Context, runID string, force bool) (string, error) {
-	if !s.dryRun {
-		return "", fmt.Errorf("reprise dry-run: service must be constructed with dryRun=true")
+func isResumeGateBlock(err error) bool {
+	return errors.Is(err, ErrStepAlreadyDone) || errors.Is(err, ErrInvalidTransition)
+}
+
+func (s *Service) resumeRunExecuteLoop(ctx context.Context, runID string, force bool, maxSteps int) ([]string, error) {
+	maxSteps = normalizeResumeMaxSteps(maxSteps)
+	executed := make([]string, 0, maxSteps)
+	for range maxSteps {
+		step, err := s.ResumeRun(runID, force)
+		if err != nil {
+			return executed, err
+		}
+		if step == "" {
+			return executed, nil
+		}
+		run, err := s.store.GetRun(runID)
+		if err != nil {
+			return executed, err
+		}
+		if err := s.executeResumeStep(ctx, run, step, force); err != nil {
+			if isResumeGateBlock(err) {
+				return executed, fmt.Errorf("%w: %s", ErrResumeGateBlocked, step)
+			}
+			return executed, fmt.Errorf("step %s: %w", step, err)
+		}
+		executed = append(executed, step)
 	}
-	run, err := s.store.GetRun(runID)
+	remaining, err := s.ResumeRun(runID, force)
 	if err != nil {
-		return "", err
+		return executed, err
 	}
-	step, err := s.ResumeRun(runID, force)
-	if err != nil || step == "" {
-		return step, err
+	if remaining != "" {
+		return executed, fmt.Errorf("%w: remaining step %q", ErrResumeMaxStepsExceeded, remaining)
 	}
-	return step, s.executeResumeStep(ctx, run, step, force)
+	return executed, nil
+}
+
+// ResumeRunExecute runs remaining workflow steps until completion, a gate block, max steps, or failure.
+func (s *Service) ResumeRunExecute(ctx context.Context, runID string, force bool, maxSteps int) ([]string, error) {
+	return s.resumeRunExecuteLoop(ctx, runID, force, maxSteps)
+}
+
+// ResumeRunDryExecute simulates continuing workflow steps (dry-run only).
+func (s *Service) ResumeRunDryExecute(ctx context.Context, runID string, force bool, maxSteps int) ([]string, error) {
+	if !s.dryRun {
+		return nil, fmt.Errorf("reprise dry-run: service must be constructed with dryRun=true")
+	}
+	return s.resumeRunExecuteLoop(ctx, runID, force, maxSteps)
 }
 
 func (s *Service) executeResumeStep(ctx context.Context, run *sqlite.Run, step string, force bool) error {
@@ -622,10 +662,44 @@ func (s *Service) executeResumeStep(ctx context.Context, run *sqlite.Run, step s
 		return err
 	case "report":
 		_, _, err := s.GenerateReport(run.ID)
-		return err
+		if err != nil {
+			return err
+		}
+		return s.markReportStepDone(run)
 	default:
 		return nil
 	}
+}
+
+func (s *Service) markReportStepDone(run *sqlite.Run) error {
+	steps := deserializeSteps(run.StepsJSON)
+	found := false
+	now := time.Now().UTC().Format(time.RFC3339Nano)
+	for i := range steps {
+		if steps[i].Name != "report" {
+			continue
+		}
+		steps[i].Status = sqlite.StatusDone
+		steps[i].Message = "report généré"
+		if steps[i].StartedAt == "" {
+			steps[i].StartedAt = now
+		}
+		steps[i].EndedAt = now
+		found = true
+		break
+	}
+	if !found {
+		steps = append(steps, StepState{
+			Name:      "report",
+			Status:    sqlite.StatusDone,
+			Message:   "report généré",
+			StartedAt: now,
+			EndedAt:   now,
+		})
+	}
+	run.StepsJSON = serializeSteps(steps)
+	run.Status = sqlite.StatusDone
+	return s.store.UpdateRun(run)
 }
 
 func (s *Service) GenerateReport(runID string) (string, string, error) {

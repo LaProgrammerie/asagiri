@@ -7,9 +7,13 @@ import (
 	"github.com/LaProgrammerie/asagiri/application/pkg/asagiri"
 )
 
+const DefaultResumeMaxSteps = 20
+
 var (
-	ErrInvalidTransition = errors.New("transition d'état invalide")
-	ErrStepAlreadyDone   = errors.New("étape déjà réussie — utilisez --force pour relancer")
+	ErrInvalidTransition       = errors.New("transition d'état invalide")
+	ErrStepAlreadyDone         = errors.New("étape déjà réussie — utilisez --force pour relancer")
+	ErrResumeMaxStepsExceeded  = errors.New("resume: max steps exceeded with remaining work")
+	ErrResumeGateBlocked       = errors.New("resume: step blocked by gate")
 )
 
 // allowedTransitions maps from-status to permitted next statuses (spec §12).

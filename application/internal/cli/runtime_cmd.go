@@ -158,7 +158,7 @@ func newMemoryCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "memory",
 		Short:   "Mémoire persistante runtime",
-		Example: "  asa memory list --scope session\n  asa memory list --query \"checkout flow\"\n  asa memory reindex",
+		Example: "  asa memory doctor\n  asa memory list --query \"checkout flow\"\n  asa memory reindex",
 	}
 	var scope, query string
 	listCmd := &cobra.Command{
@@ -219,7 +219,7 @@ func newMemoryCmd() *cobra.Command {
 	listCmd.Flags().StringVar(&scope, "scope", "", "Filtrer par scope")
 	listCmd.Flags().StringVar(&query, "query", "", "Recherche sémantique (embeddings)")
 
-	cmd.AddCommand(listCmd, consolidateCmd, newMemoryReindexCmd())
+	cmd.AddCommand(listCmd, consolidateCmd, newMemoryReindexCmd(), newMemoryDoctorCmd())
 	return cmd
 }
 

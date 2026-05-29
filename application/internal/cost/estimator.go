@@ -28,9 +28,8 @@ func BuildEstimate(ctx context.Context, plan intent.ExecutionPlan, inv investiga
 	if dm == nil {
 		dm = DefaultDurationModel{Cfg: cfg}
 	}
-	baseCtxTok := contextopt.PackApproxTokens(pack, cfg.TokenEst)
-	invTok := EstimateFromText(stringsJoinLines(inv.CandidateFiles)+"\n"+stringsJoinLines(inv.GrepHits), ContentDefault, cfg.TokenEst)
-	contextTok := baseCtxTok + invTok
+	packText := contextopt.PackText(pack)
+	invText := stringsJoinLines(inv.CandidateFiles) + "\n" + stringsJoinLines(inv.GrepHits)
 	if opts.DefaultOutputTokens <= 0 {
 		opts.DefaultOutputTokens = 4096
 	}
@@ -71,11 +70,10 @@ func BuildEstimate(ctx context.Context, plan intent.ExecutionPlan, inv investiga
 	}
 	totalDur := time.Duration(0)
 
-	sharedContext := contextTok
 	defDM, _ := dm.(DefaultDurationModel)
 
 	for _, s := range plan.Steps {
-		step := estimatedFromPlanStep(s, cfg, agent, reviewer, enricher, sharedContext, outSplit)
+		step := estimatedFromPlanStep(s, cfg, agent, reviewer, enricher, packText, invText, outSplit)
 		if stepUsesCloudModel(s.Command) {
 			rd := routing.Route(cfg, s.Command, false, false, true)
 			if step.Reason == "" {
@@ -144,12 +142,12 @@ func stepUsesCloudModel(cmd string) bool {
 	}
 }
 
-func estimatedFromPlanStep(step intent.PlanStep, cfg *config.Config, agent, reviewer, enricher string, sharedCtxTok, outTok int) EstimatedStep {
+func estimatedFromPlanStep(step intent.PlanStep, cfg *config.Config, agent, reviewer, enricher, packText, invText string, outTok int) EstimatedStep {
 	name := step.Command
 	local := !stepUsesCloudModel(step.Command)
 	ag := agent
 	mdl := ""
-	inTok := sharedCtxTok
+	inTok := 0
 	reason := step.Reason
 	switch step.Command {
 	case "spec":
@@ -171,6 +169,10 @@ func estimatedFromPlanStep(step intent.PlanStep, cfg *config.Config, agent, revi
 		local = true
 		inTok = 500
 		outTok = 0
+	}
+	if inTok == 0 && !local {
+		inTok = CountTokens(packText, mdl, ContentDefault, cfg.TokenEst) +
+			CountTokens(invText, mdl, ContentDefault, cfg.TokenEst)
 	}
 	out := outTok
 	if local {

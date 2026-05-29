@@ -68,7 +68,8 @@ func hasSuffixFold(p string, suf ...string) bool {
 	return false
 }
 
-// EstimateFromText is a convenience for raw text with explicit kind.
+// EstimateFromText counts tokens using chars-per-token heuristics only (no model-aware tokenizer).
+// Prefer EstimateFromTextForModel or CountTokens when a model id is available.
 func EstimateFromText(text string, kind ContentKind, cfg config.TokenEstimationConfig) int {
 	return EstimateTokensApprox(len(text), kind, cfg)
 }

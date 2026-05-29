@@ -23,6 +23,17 @@
       ],
       "edges": []
     },
+    "event": {
+      "kind": "event",
+      "nodes": [
+        {
+          "id": "event:workspace.created",
+          "kind": "event",
+          "name": "workspace.created"
+        }
+      ],
+      "edges": []
+    },
     "dependency": {
       "kind": "dependency",
       "nodes": [
@@ -30,9 +41,20 @@
           "id": "pkg:trust",
           "kind": "package",
           "name": "internal/trust"
+        },
+        {
+          "id": "pkg:onboarding",
+          "kind": "package",
+          "name": "internal/onboarding"
         }
       ],
-      "edges": []
+      "edges": [
+        {
+          "from": "pkg:onboarding",
+          "to": "pkg:trust",
+          "kind": "depends_on"
+        }
+      ]
     }
   }
 }
