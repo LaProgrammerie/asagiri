@@ -16,6 +16,19 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestViewOnboardingWizardFullscreen(t *testing.T) {
+	m := newModel(context.Background(), Options{
+		Config:        config.UIConfig{Theme: "asagiri-dark", Mouse: true},
+		InitialScreen: ScreenOnboarding,
+	})
+	m.width = 120
+	m.height = 40
+	got := m.View()
+	require.Contains(t, got, "Project Onboarding Wizard")
+	require.NotContains(t, got, "Runtime: stopped")
+	require.NotContains(t, got, "Screen: onboarding")
+}
+
 func TestRunQuitsOnQ(t *testing.T) {
 	var out bytes.Buffer
 	err := Run(context.Background(), Options{
@@ -157,6 +170,7 @@ func TestViewDashboardFrameGolden(t *testing.T) {
 		},
 		CostTodayEUR: 0.42,
 		CostMonthEUR: 6.10,
+		Readiness:    bus.ReadinessResult{Ready: true, Score: 100},
 		UpdatedAt:    fixed,
 	}
 

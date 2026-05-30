@@ -1,8 +1,7 @@
 package components
 
 import (
-	"fmt"
-	"strings"
+	"github.com/LaProgrammerie/asagiri/application/internal/ui/theme"
 )
 
 // TabsViewModel configures tab rendering.
@@ -10,28 +9,18 @@ type TabsViewModel struct {
 	Labels  []string
 	Active  int
 	Focused bool
+	Theme   theme.Theme
 }
 
-// RenderTabs renders a horizontal tab bar.
+// RenderTabs renders a horizontal tab bar with lipgloss pill styling.
 func RenderTabs(vm TabsViewModel) string {
 	if len(vm.Labels) == 0 {
 		return ""
 	}
-	parts := make([]string, 0, len(vm.Labels))
-	for i, label := range vm.Labels {
-		prefix := " "
-		if vm.Focused && i == vm.Active {
-			prefix = "▸"
-		}
-		style := "["
-		if i == vm.Active {
-			style = "("
-		}
-		end := "]"
-		if i == vm.Active {
-			end = ")"
-		}
-		parts = append(parts, fmt.Sprintf("%s%s%s%s%s", prefix, style, label, end, ""))
+	th := vm.Theme
+	if th.Name == "" {
+		th = theme.Default()
 	}
-	return strings.Join(parts, "  ")
+	st := th.Styles()
+	return st.RenderTabBar(vm.Labels, vm.Active)
 }

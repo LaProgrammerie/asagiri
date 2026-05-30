@@ -58,6 +58,7 @@ func (m model) renderTabBar() string {
 		Labels:  labels,
 		Active:  m.activeScreenTab(),
 		Focused: true,
+		Theme:   m.theme,
 	})
 }
 

@@ -11,6 +11,7 @@ import (
 // Palette stores terminal color tokens.
 type Palette struct {
 	Primary    string
+	Foreground string
 	Muted      string
 	Success    string
 	Warning    string
@@ -71,7 +72,7 @@ func (t Theme) BorderStyle() lipgloss.Style {
 	return lipgloss.NewStyle().
 		Border(border).
 		BorderForeground(lipgloss.Color(t.Palette.Border)).
-		Foreground(lipgloss.Color(t.Palette.Primary))
+		Foreground(lipgloss.Color(t.Palette.Foreground))
 }
 
 // IsHighContrast reports whether the current theme targets accessibility contrast.

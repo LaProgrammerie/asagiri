@@ -27,6 +27,7 @@ type ViewModel struct {
 	Warnings          []string
 	Warning           string
 	Recommended       []bus.RecommendedAction
+	Readiness         bus.ReadinessResult
 	Now               time.Time
 	DisableAnimations bool
 	AnimFrame         int
@@ -38,6 +39,10 @@ func Render(vm ViewModel) string {
 	var b strings.Builder
 	b.WriteString("Mission Control\n")
 	b.WriteString("=============\n")
+	if banner := components.ReadinessBanner(components.ReadinessBannerFromResult(vm.Readiness)); banner != "" {
+		b.WriteString(banner)
+		b.WriteString("\n\n")
+	}
 	b.WriteString(RenderHeader(vm))
 	b.WriteString("\n\n")
 	b.WriteString(RenderRuntimeRuns(vm))

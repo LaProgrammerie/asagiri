@@ -37,6 +37,8 @@ func newRootCmd() *cobra.Command {
 	root.AddCommand(
 		newInitCmd(),
 		newDoctorCmd(),
+		newOnboardCmd(),
+		newReadyCmd(),
 		newSpecCmd(&dryRun),
 		newPlanCmd(&dryRun),
 		newEnrichCmd(&dryRun),

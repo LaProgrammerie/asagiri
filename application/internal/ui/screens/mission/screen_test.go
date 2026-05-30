@@ -25,6 +25,7 @@ func TestRenderGolden(t *testing.T) {
 		},
 		QueuedEvents: 2,
 		Now:          fixed,
+		Readiness:    bus.ReadinessResult{Ready: true, Score: 100},
 	}
 
 	vm.EventFeed = components.EventFeedViewModel{Filter: "all", Search: "(none)"}

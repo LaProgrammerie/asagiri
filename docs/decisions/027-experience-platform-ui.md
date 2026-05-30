@@ -2,7 +2,7 @@
 
 **Date :** 2026-05-29  
 **Status :** accepted  
-**Spec :** [`spec-ui.md`](../../spec-ui.md) §6–9, §23, §26–29 ; lot 1 (Phase 1)
+**Spec :** [`spec-ui.md`](../ai/archives/specs/spec-ui.md) §6–9, §23, §26–29 ; lot 1 (Phase 1)
 
 ## Context
 
@@ -140,6 +140,6 @@ Lot 1 : Bubble Tea + Lip Gloss obligatoires ; `bubbles` (viewport/table), `huh` 
 
 ## Related
 
-- [`spec-ui.md`](../../spec-ui.md)
+- [`spec-ui.md`](../ai/archives/specs/spec-ui.md)
 - ADR-010 (`internal/tui` isolée)
 - [`02-architecture.md`](../ai/02-architecture.md) — section Experience Platform

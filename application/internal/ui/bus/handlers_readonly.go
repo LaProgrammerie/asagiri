@@ -1047,6 +1047,20 @@ func (b *queryBus) handleGetMissionControlSnapshot(ctx context.Context, q GetMis
 	}
 	recommendedRes, _ := recommendedAny.(RecommendedActionsResult)
 
+	readinessAny, _ := b.handleGetReadiness(ctx, GetReadinessQuery{})
+	readinessRes, _ := readinessAny.(ReadinessResult)
+	if !readinessRes.Ready {
+		prepended := []RecommendedAction{{
+			ID:            "rec.complete-onboarding",
+			Title:         "Complete onboarding",
+			Description:   fmt.Sprintf("Project readiness %d%%", readinessRes.Score),
+			Priority:      0,
+			CLIEquivalent: "asa onboard --yes --non-interactive",
+			ActionID:      "cmd.complete-onboarding",
+		}}
+		recommendedRes.Actions = append(prepended, recommendedRes.Actions...)
+	}
+
 	warnings := compactWarnings(
 		runtimeRes.Warning,
 		runsRes.Warning,
@@ -1093,6 +1107,7 @@ func (b *queryBus) handleGetMissionControlSnapshot(ctx context.Context, q GetMis
 		CostTodayEUR:       costToday,
 		CostMonthEUR:       costMonth,
 		RecommendedActions: recommendedRes.Actions,
+		Readiness:          readinessRes,
 		UpdatedAt:          time.Now().UTC(),
 		Warnings:           warnings,
 	}, nil

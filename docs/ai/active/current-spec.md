@@ -1,37 +1,33 @@
-# Current spec — spec-ui FULL FEATURE
+# Current spec — project-onboarding (livré)
 
-**Phase :** [`spec-ui.md`](../../../spec-ui.md) — Asagiri Experience Platform — **FULL FEATURE livré** (`2026-05-29`, audit reviewer)  
-**Handoff :** [`handoff.md`](handoff.md) — lots 7A–7D clôturés ; réserves P1/P2 documentées dans l'audit
+**Phase :** [`spec-onboarding.md`](../archives/specs/spec-onboarding.md) — Project Onboarding & Readiness — **FULL livré** (`2026-05-29`)  
+**Handoff :** [`handoff.md`](handoff.md)
 
-## Spec active
+## Spec livrée
 
-- **Registre :** [`spec-ui.md`](../../../spec-ui.md) — Spec G — Asagiri Experience Platform (§1–36)
-- **Canon :** [`06-spec-ui.md`](../06-spec-ui.md)
-- **Handoff :** [`handoff.md`](handoff.md)
+- **Registre :** [`spec-onboarding.md`](../archives/specs/spec-onboarding.md)
+- **Canon :** [`06-spec-onboarding.md`](../06-spec-onboarding.md)
+- **Kiro :** `.kiro/specs/project-onboarding/`
+- **Code :** `application/internal/onboarding/`, CLI `onboard`/`ready`, doctor `--full`, TUI bus + écran
 
-## Lot 7D livré
+## Lots
 
-| Domaine | Contenu |
-|---------|---------|
-| **Mission Control §11** | Actions recommandées (runtime/trust/queue), coût jour/mois, flows critiques |
-| **Prototype §19** | Pipeline TUI : `prototype create`, `flows extract`, `contracts extract`, `spec generate-from-product` |
-| **Explain §21** | Questions typées, `FocusContext` → QueryBus, drill-down depuis explorers |
-| **Souris §10.2** | Double-clic, hover, menu contextuel, sélection, resize |
-| **Tests §32** | Intégration TTY `integration_test.go` |
-| **Docs §31** | `experience/` 4 locales + `06-spec-ui.md` |
+| Lot | Focus | Statut |
+|-----|-------|--------|
+| 1 | Core CLI (detect, writer, ready, doctor --full) | livré |
+| 2 | TUI + bandeau Mission Control + bus | livré |
+| 3 | `--resume`, backups, docs-site 4 locales, generate-cli | livré |
 
-## Validation
+## Commandes
 
-```bash
-cd application && go test ./... -count=1
-make build
-make build && ./bin/asa docs generate-cli
-cd docs-site && pnpm docs:check  # si pnpm dispo
-```
+| Commande | Rôle |
+|----------|------|
+| `asa onboard` | Wizard CLI/TUI |
+| `asa ready` | Readiness (`--json` CI) |
+| `asa doctor --full` | Doctor + checks onboarding |
 
-## Précédent
+## Précédent (livré)
 
-- **V1 lots 1–6** — shell + navigation + golden tests — livré `2026-05-29`
-- **specv3** — [`06-spec-v3.md`](../06-spec-v3.md) — livrée `2026-05-29`
+- **spec-ui** — Experience Platform FULL FEATURE — livré `2026-05-29`
 
-Branding : **Asagiri** / **`asa`** / `github.com/LaProgrammerie/asagiri`.
+Branding : **Asagiri** / **`asa`**.

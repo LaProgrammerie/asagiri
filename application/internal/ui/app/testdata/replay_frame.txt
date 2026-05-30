@@ -1,6 +1,7 @@
  ╭────────────────────────────────────────────────────────────────────╮ 
- │ ASAGIRI                                                            │ 
- │ Screen: replay  |  Runtime: stopped                                │ 
+ │  ASAGIRI   Mission Control                                         │ 
+ │ Screen · replay                                                    │ 
+ │   RUNTIME  stopped  Screen: replay                                 │ 
  │                                                                    │ 
  │ ╭────────────────────────────────────────────────────────────────╮ │ 
  │ │ Replay Explorer                                                │ │ 

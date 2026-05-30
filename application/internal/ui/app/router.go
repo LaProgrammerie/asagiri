@@ -13,6 +13,7 @@ const (
 	ScreenKnowledge = "knowledge"
 	ScreenTrust     = "trust"
 	ScreenSettings  = "settings"
+	ScreenOnboarding = "onboarding"
 )
 
 type router struct {
@@ -27,7 +28,7 @@ func newRouter(initial string) router {
 
 func (r *router) Set(screen string) {
 	switch screen {
-	case ScreenMission, ScreenDashboard, ScreenAgents, ScreenGraph, ScreenFlow, ScreenLogs, ScreenExplain, ScreenReplay, ScreenPrototype, ScreenKnowledge, ScreenTrust, ScreenSettings:
+	case ScreenMission, ScreenDashboard, ScreenAgents, ScreenGraph, ScreenFlow, ScreenLogs, ScreenExplain, ScreenReplay, ScreenPrototype, ScreenKnowledge, ScreenTrust, ScreenSettings, ScreenOnboarding:
 		r.current = screen
 	default:
 		r.current = ScreenMission

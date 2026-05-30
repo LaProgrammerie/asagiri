@@ -1,7 +1,7 @@
 # Spec-ui — Asagiri Experience Platform (canon `docs/ai`)
 
 **Statut :** FULL FEATURE livré (`2026-05-29`, audit reviewer) — réserves P1/P2 : voir [`active/handoff.md`](active/handoff.md#audit-reviewer-2026-05-29)  
-**Spec racine :** [`spec-ui.md`](../../spec-ui.md)  
+**Spec racine :** [`spec-ui.md`](archives/specs/spec-ui.md)  
 **Handoff :** [`active/handoff.md`](active/handoff.md)
 
 ---

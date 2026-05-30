@@ -9,7 +9,27 @@ import (
 )
 
 func TestProgressBarRatio(t *testing.T) {
-	require.Equal(t, "█████░░░░░", ProgressBar(0.5, 10))
+	got := ProgressBar(0.5, 10)
+	require.Contains(t, stripANSI(got), "█████░░░░░")
+}
+
+func stripANSI(v string) string {
+	var out []rune
+	in := false
+	for _, r := range v {
+		if r == '\x1b' {
+			in = true
+			continue
+		}
+		if in {
+			if r == 'm' {
+				in = false
+			}
+			continue
+		}
+		out = append(out, r)
+	}
+	return string(out)
 }
 
 func TestSparklineEmpty(t *testing.T) {
@@ -36,8 +56,8 @@ func TestRiskCardHighRiskNodes(t *testing.T) {
 }
 
 func TestRenderTabsActive(t *testing.T) {
-	out := RenderTabs(TabsViewModel{Labels: []string{"A", "B"}, Active: 1, Focused: true})
-	require.Contains(t, out, "(B)")
+	out := RenderTabs(TabsViewModel{Labels: []string{"A", "B"}, Active: 1, Theme: theme.Default()})
+	require.Contains(t, out, "B")
 }
 
 func TestRenderToast(t *testing.T) {

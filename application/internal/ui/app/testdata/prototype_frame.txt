@@ -1,6 +1,7 @@
  ╭───────────────────────────────────────────────────────────────────────────────────────╮ 
- │ ASAGIRI                                                                               │ 
- │ Screen: prototype  |  Runtime: stopped                                                │ 
+ │  ASAGIRI   Mission Control                                                            │ 
+ │ Screen · prototype                                                                    │ 
+ │   RUNTIME  stopped  Screen: prototype                                                 │ 
  │                                                                                       │ 
  │ ╭───────────────────────────────────────────────────────────────────────────────────╮ │ 
  │ │ Prototype Mode                                                                    │ │ 

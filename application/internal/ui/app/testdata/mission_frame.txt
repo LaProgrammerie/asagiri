@@ -1,8 +1,11 @@
  ╭─────────────────────────────────────────────────────────────────────────────╮ 
- │ ASAGIRI                                                                     │ 
- │ Screen: mission  |  Runtime: running                                        │ 
+ │  ASAGIRI   Mission Control                                                  │ 
+ │ Screen · mission                                                            │ 
+ │   RUNTIME  running  Screen: mission                                         │ 
  │                                                                             │ 
- │ ▸(Overview)   [Agents]   [Events]                                           │ 
+ │  Overview   Agents   Events                                                 │ 
+ │                                                                             │ 
+ │  Overview   Agents   Events                                                 │ 
  │ ╭──────────────────────────────────────────────────╮                        │ 
  │ │ ASAGIRI                                          │                        │ 
  │ │ Workspace: workspace-saas  Branch: onboarding-v2 │                        │ 

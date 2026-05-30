@@ -27,6 +27,14 @@ type ViewModel struct {
 // Render builds the live dashboard with composable widgets (spec-ui §12, §23).
 func Render(vm ViewModel) string {
 	var b strings.Builder
+	if banner := components.ReadinessBanner(components.ReadinessBannerViewModel{
+		Ready: vm.Snapshot.Readiness.Ready,
+		Score: vm.Snapshot.Readiness.Score,
+		Theme: vm.Theme,
+	}); banner != "" {
+		b.WriteString(banner)
+		b.WriteString("\n\n")
+	}
 	if bar := renderDashboardTabBar(vm); bar != "" {
 		b.WriteString(bar)
 		b.WriteString("\n\n")
@@ -54,6 +62,7 @@ func renderDashboardTabBar(vm ViewModel) string {
 		Labels:  vm.TabLabels,
 		Active:  vm.TabIndex,
 		Focused: true,
+		Theme:   vm.Theme,
 	})
 }
 

@@ -351,6 +351,7 @@ type MissionControlSnapshotResult struct {
 	CostTodayEUR       float64
 	CostMonthEUR       float64
 	RecommendedActions []RecommendedAction
+	Readiness          ReadinessResult
 	UpdatedAt          time.Time
 	Warnings           []string
 }
@@ -370,6 +371,160 @@ func (AgentTheatreResult) isQueryResult()           {}
 func (ReplayPackageResult) isQueryResult()          {}
 func (PrototypePipelineResult) isQueryResult()      {}
 func (MissionControlSnapshotResult) isQueryResult() {}
+func (ReadinessResult) isQueryResult()              {}
+func (OnboardingStateResult) isQueryResult()        {}
+func (OnboardingWizardResult) isQueryResult()       {}
+
+// ReadinessCheck is one readiness row for the UI.
+type ReadinessCheck struct {
+	ID      string
+	Status  string
+	Message string
+	FixCLI  string
+}
+
+// ReadinessAction is a suggested CLI next step.
+type ReadinessAction struct {
+	Title string
+	CLI   string
+}
+
+// AutofixOffer is a safe automatic correction offered after onboarding.
+type AutofixOffer struct {
+	ID          string
+	Title       string
+	Description string
+	Lines       []string
+}
+
+// ReadinessResult mirrors onboarding readiness for QueryBus consumers.
+type ReadinessResult struct {
+	Ready         bool
+	Score         int
+	Checks        []ReadinessCheck
+	NextActions   []ReadinessAction
+	AutofixOffers []AutofixOffer
+}
+
+// OnboardingStateResult exposes wizard progress to the TUI.
+type OnboardingStateResult struct {
+	CurrentStep string
+	Answers     map[string]string
+	Completed   []string
+}
+
+// OnboardingWizardResult is the prefilled interactive wizard snapshot.
+type OnboardingWizardResult struct {
+	CurrentStep       string
+	Steps             []string
+	Fields            map[string]string
+	Advanced          map[string]string
+	ValidationPreview []string
+	DetectedStacks    []string
+	Errors            map[string]string
+	SkippedFields     []string
+}
+
+// GetReadinessQuery loads project readiness report.
+type GetReadinessQuery struct {
+	Strict bool
+}
+
+func (GetReadinessQuery) Name() string { return "GetReadiness" }
+
+// GetOnboardingStateQuery loads saved wizard state.
+type GetOnboardingStateQuery struct{}
+
+func (GetOnboardingStateQuery) Name() string { return "GetOnboardingState" }
+
+// GetOnboardingWizardQuery loads prefilled wizard form for the TUI.
+type GetOnboardingWizardQuery struct{}
+
+func (GetOnboardingWizardQuery) Name() string { return "GetOnboardingWizard" }
+
+// ValidateOnboardingStepQuery validates one wizard step from field maps.
+type ValidateOnboardingStepQuery struct {
+	Step     string
+	Fields   map[string]string
+	Advanced map[string]string
+}
+
+func (ValidateOnboardingStepQuery) Name() string { return "ValidateOnboardingStep" }
+
+// ValidateOnboardingStepResult returns field errors for a step.
+type ValidateOnboardingStepResult struct {
+	Valid  bool
+	Errors map[string]string
+}
+
+func (ValidateOnboardingStepResult) isQueryResult() {}
+
+// RunOnboardingStepCommand advances or runs one wizard step.
+type RunOnboardingStepCommand struct {
+	Step string
+	Yes  bool
+}
+
+func (RunOnboardingStepCommand) Name() string { return "RunOnboardingStep" }
+func (c RunOnboardingStepCommand) CLIEquivalent() string {
+	step := emptyCLIArg(c.Step, "<step>")
+	return "asa onboard --step " + step + " --yes"
+}
+
+// AdvanceOnboardingStepCommand moves the wizard prev/next with draft fields.
+type AdvanceOnboardingStepCommand struct {
+	Direction string
+	Fields    map[string]string
+	Advanced  map[string]string
+}
+
+func (AdvanceOnboardingStepCommand) Name() string { return "AdvanceOnboardingStep" }
+func (c AdvanceOnboardingStepCommand) CLIEquivalent() string {
+	dir := emptyCLIArg(c.Direction, "next")
+	return "asa onboard --step " + dir
+}
+
+// SetOnboardingFieldCommand updates one wizard field in persisted state.
+type SetOnboardingFieldCommand struct {
+	Field string
+	Value string
+}
+
+func (SetOnboardingFieldCommand) Name() string { return "SetOnboardingField" }
+func (c SetOnboardingFieldCommand) CLIEquivalent() string {
+	return "asa onboard --resume"
+}
+
+// ApplyOnboardingConfigCommand runs onboard from wizard field maps.
+type ApplyOnboardingConfigCommand struct {
+	Yes      bool
+	Stack    string
+	Fields   map[string]string
+	Advanced map[string]string
+}
+
+func (ApplyOnboardingConfigCommand) Name() string { return "ApplyOnboardingConfig" }
+func (ApplyOnboardingConfigCommand) CLIEquivalent() string {
+	return "asa onboard --yes --non-interactive"
+}
+
+// SkipOnboardingCheckCommand acknowledges a warn check (UI-only).
+type SkipOnboardingCheckCommand struct {
+	CheckID string
+}
+
+func (SkipOnboardingCheckCommand) Name() string { return "SkipOnboardingCheck" }
+func (c SkipOnboardingCheckCommand) CLIEquivalent() string {
+	return "asa ready --plain"
+}
+
+// ApplyReadinessAutofixCommand applies safe automatic readiness fixes (e.g. .gitignore).
+type ApplyReadinessAutofixCommand struct{}
+
+func (ApplyReadinessAutofixCommand) Name() string { return "ApplyReadinessAutofix" }
+func (ApplyReadinessAutofixCommand) CLIEquivalent() string {
+	return "asa ready --autofix"
+}
 
 // GetRuntimeStatusQuery loads current daemon counters.
 type GetRuntimeStatusQuery struct{}

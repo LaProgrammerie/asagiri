@@ -1,0 +1,42 @@
+{
+  "ready": true,
+  "score": 95,
+  "checks": [
+    {
+      "id": "config.valid",
+      "status": "ok"
+    },
+    {
+      "id": "gitignore..asagiri_state.sqlite",
+      "status": "ok"
+    },
+    {
+      "id": "gitignore.worktrees_",
+      "status": "ok"
+    },
+    {
+      "id": "agents.cursor",
+      "status": "ok"
+    },
+    {
+      "id": "docs.product",
+      "status": "ok"
+    },
+    {
+      "id": "spec.kiro",
+      "status": "ok"
+    },
+    {
+      "id": "system.asa_conflict",
+      "status": "warn",
+      "message": "binaire système /usr/bin/asa détecté — peut masquer le CLI Asagiri",
+      "fix_cli": "which asa"
+    }
+  ],
+  "next_actions": [
+    {
+      "title": "binaire système /usr/bin/asa détecté — peut masquer le CLI Asagiri",
+      "cli": "which asa"
+    }
+  ]
+}

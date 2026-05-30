@@ -1,0 +1,7 @@
+{
+  "name": "fixture-node",
+  "scripts": {
+    "test": "node -e \"process.exit(0)\"",
+    "qa:js": "eslint ."
+  }
+}

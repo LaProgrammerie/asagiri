@@ -333,6 +333,14 @@ func (m model) runPaletteAction(actionID string, cliEquivalent string) (tea.Mode
 		return m, nil
 	case "rec.prototype-create":
 		return m, m.dispatchCommand(bus.PrototypeCreateCommand{Intent: "workspace onboarding prototype"}, cliEquivalent)
+	case "cmd.complete-onboarding", "rec.complete-onboarding":
+		return m, m.dispatchCommand(bus.ApplyOnboardingConfigCommand{Yes: true, Stack: "auto"}, cliEquivalent)
+	case "cmd.show-readiness":
+		(&m).navigateTo(ScreenOnboarding, "asa ready --plain")
+		return m, nil
+	case "cmd.doctor-full":
+		m.lastCommandResult = cliEquivalent + " (exécutez dans un terminal)"
+		return m, nil
 	case "ctx.graph-resume":
 		graphID := m.snapshot.GraphExplorer.GraphID
 		return m, m.dispatchCommand(bus.GraphResumeCommand{GraphID: graphID}, cliEquivalent)

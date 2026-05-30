@@ -94,6 +94,9 @@ func staticPaletteEntries() []PaletteEntry {
 		{ID: "cmd.flows-extract", Title: "Flows extract", Description: "Extract flows from product prototype", CLI: "asa flows extract <product>", Keywords: []string{"flows", "extract", "prototype"}, ActionID: "cmd.flows-extract"},
 		{ID: "cmd.contracts-extract", Title: "Contracts extract", Description: "Extract API contracts from product flows", CLI: "asa contracts extract <product>", Keywords: []string{"contracts", "extract", "openapi"}, ActionID: "cmd.contracts-extract"},
 		{ID: "cmd.spec-generate-from-product", Title: "Spec generate from product", Description: "Generate implementation spec from product artefacts", CLI: "asa spec generate-from-product <product>", Keywords: []string{"spec", "generate", "product"}, ActionID: "cmd.spec-generate-from-product"},
+		{ID: "cmd.complete-onboarding", Title: "Complete onboarding", Description: "Run non-interactive project onboarding", CLI: "asa onboard --yes --non-interactive", Keywords: []string{"onboard", "ready", "setup"}, ActionID: "cmd.complete-onboarding"},
+		{ID: "cmd.doctor-full", Title: "Run doctor --full", Description: "Extended environment and onboarding checks", CLI: "asa doctor --full", Keywords: []string{"doctor", "diagnostics", "onboard"}, ActionID: "cmd.doctor-full"},
+		{ID: "cmd.show-readiness", Title: "Show readiness", Description: "Display readiness score and checklist", CLI: "asa ready --plain", Keywords: []string{"ready", "readiness", "score"}, ActionID: "cmd.show-readiness"},
 	}
 }
 

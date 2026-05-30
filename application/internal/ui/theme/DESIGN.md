@@ -2,7 +2,7 @@
 
 Spécification visuelle designer → dev. Implémentation cible : `theme/palette.go`, `theme/theme.go`, lipgloss (cf. `internal/tui/rich_ui.go` : `RoundedBorder`, titres `Bold`).
 
-Références : `spec-ui.md` §8, §11.2, §26, §28.
+Références : [`spec-ui.md`](../../../../docs/ai/archives/specs/spec-ui.md) §8, §11.2, §26, §28.
 
 ---
 

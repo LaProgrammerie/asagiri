@@ -1,8 +1,11 @@
  ╭─────────────────────────────────────────────────────────────────────────────────────────────────────────╮ 
- │ ASAGIRI                                                                                                 │ 
- │ Screen: dashboard  |  Runtime: running                                                                  │ 
+ │  ASAGIRI   Mission Control                                                                              │ 
+ │ Screen · dashboard                                                                                      │ 
+ │   RUNTIME  running  Screen: dashboard                                                                   │ 
  │                                                                                                         │ 
- │ ▸(Widgets)   [Metrics]                                                                                  │ 
+ │  Widgets   Metrics                                                                                      │ 
+ │                                                                                                         │ 
+ │  Widgets   Metrics                                                                                      │ 
  │                                                                                                         │ 
  │ ╭─────────────────────╮╭───────────────╮                                                                │ 
  │ │ Runtime             ││ Sessions      │                                                                │ 

@@ -125,5 +125,6 @@ func fixtureSnapshot() bus.MissionControlSnapshotResult {
 		},
 		CostTodayEUR: 0.42,
 		CostMonthEUR: 6.10,
+		Readiness:    bus.ReadinessResult{Ready: true, Score: 100},
 	}
 }

@@ -20,6 +20,7 @@ import (
 	"github.com/LaProgrammerie/asagiri/application/internal/ui/screens/graph"
 	"github.com/LaProgrammerie/asagiri/application/internal/ui/screens/knowledge"
 	"github.com/LaProgrammerie/asagiri/application/internal/ui/screens/mission"
+	"github.com/LaProgrammerie/asagiri/application/internal/ui/screens/onboarding"
 	"github.com/LaProgrammerie/asagiri/application/internal/ui/screens/prototype"
 	"github.com/LaProgrammerie/asagiri/application/internal/ui/screens/replay"
 	"github.com/LaProgrammerie/asagiri/application/internal/ui/screens/settings"
@@ -55,6 +56,9 @@ func run(ctx context.Context, opts Options) error {
 		tea.WithInput(opts.In),
 		tea.WithOutput(opts.Out),
 		tea.WithoutSignals(),
+	}
+	if model.wizardMode {
+		programOpts = append(programOpts, tea.WithAltScreen())
 	}
 	if opts.Config.Mouse {
 		programOpts = append(programOpts, tea.WithMouseCellMotion())
@@ -106,6 +110,8 @@ type model struct {
 	knowledgeExplorer knowledge.Model
 	trustExplorer     trust.Model
 	replayExplorer    replay.Model
+	onboardingWizard  onboarding.Model
+	wizardMode        bool
 	confirmation      *safetyConfirmation
 	refreshEvery      time.Duration
 	refreshThrottle   time.Duration
@@ -162,7 +168,9 @@ func newModel(ctx context.Context, opts Options) model {
 		flowExplorer:     flows.NewModel(),
 		knowledgeExplorer: knowledge.NewModel(),
 		trustExplorer:    trust.NewModel(),
-		replayExplorer:   replay.NewModel(),
+		replayExplorer:    replay.NewModel(),
+		onboardingWizard:  onboarding.NewModel(),
+		wizardMode:        opts.InitialScreen == ScreenOnboarding,
 		refreshEvery: time.Duration(refreshMs) * time.Millisecond,
 		refreshThrottle: maxDuration(
 			200*time.Millisecond,
@@ -175,10 +183,11 @@ func newModel(ctx context.Context, opts Options) model {
 }
 
 func (m model) Init() tea.Cmd {
-	return tea.Batch(
-		m.tickCmd(),
-		m.snapshotQueryCmd(),
-	)
+	cmds := []tea.Cmd{m.loadOnboardingWizardCmd()}
+	if !m.wizardMode {
+		cmds = append(cmds, m.tickCmd(), m.snapshotQueryCmd())
+	}
+	return tea.Batch(cmds...)
 }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -195,6 +204,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tickMsg:
 		if m.cfg.Animations {
 			m.animFrame++
+		}
+		if m.wizardMode {
+			return m, m.tickCmd()
 		}
 		cmds := []tea.Cmd{m.tickCmd()}
 		if m.canRefresh(time.Time(v)) {
@@ -229,6 +241,18 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, nil
 	case paletteActionMsg:
 		return m.handlePaletteAction(v)
+	case onboardingWizardMsg:
+		return m.handleOnboardingWizardLoaded(v)
+	case onboarding.OnboardingFooterMsg:
+		return m.handleOnboardingFooter(v)
+	case onboardingAdvanceMsg:
+		return m.handleOnboardingAdvance(v)
+	case onboardingApplyMsg:
+		return m.handleOnboardingApply(v)
+	case onboarding.OnboardingAutofixMsg:
+		return m.handleOnboardingAutofixRequest()
+	case onboardingAutofixMsg:
+		return m.handleOnboardingAutofix(v)
 	default:
 		return m, nil
 	}
@@ -236,6 +260,14 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m model) updateKey(v tea.KeyMsg) (tea.Model, tea.Cmd) {
 	key := v.String()
+	if m.wizardMode {
+		switch key {
+		case "ctrl+q", "ctrl+c":
+			return m, tea.Quit
+		default:
+			return m.updateOnboardingKey(v)
+		}
+	}
 	if m.mouse.ContextMenu != nil {
 		switch key {
 		case "up":
@@ -350,6 +382,9 @@ func (m model) updateKey(v tea.KeyMsg) (tea.Model, tea.Cmd) {
 		current := m.computeLayout()
 		m.state.Focus = layout.PrevFocus(current, m.state.Focus)
 	default:
+		if m.onboardingInputActive() {
+			return m.updateOnboardingKey(v)
+		}
 		if m.prototypeInputActive() {
 			return m.updatePrototypeKey(v)
 		}
@@ -377,14 +412,17 @@ func (m model) View() string {
 	if m.height == 0 {
 		m.height = 30
 	}
+	if m.wizardMode {
+		return m.renderFullscreenWizard()
+	}
 	root := lipgloss.NewStyle().Padding(0, 1)
-	title := lipgloss.NewStyle().
-		Bold(true).
-		Foreground(lipgloss.Color(m.theme.Palette.Primary)).
-		Render("ASAGIRI")
-	statusLine := lipgloss.NewStyle().
-		Foreground(lipgloss.Color(m.theme.Palette.Muted)).
-		Render(fmt.Sprintf("Screen: %s  |  Runtime: %s", m.router.Current(), m.runtimeStatusLabel()))
+	st := m.theme.Styles()
+	title := st.RenderHero("ASAGIRI", "Mission Control", fmt.Sprintf("Screen · %s", m.router.Current()))
+	statusBar := st.RenderStatusBar(
+		"RUNTIME",
+		m.runtimeStatusLabel(),
+		fmt.Sprintf("Screen: %s", m.router.Current()),
+	)
 
 	body := m.renderScreen()
 	if m.showHelp {
@@ -412,8 +450,38 @@ func (m model) View() string {
 	if m.lastCommandResult != "" {
 		footer += "  |  action: " + m.lastCommandResult
 	}
-	frame := m.theme.BorderStyle().Padding(0, 1).Render(title + "\n" + statusLine + "\n\n" + body + "\n\n" + footer)
+	tabBar := m.renderTabBar()
+	frameBody := title + "\n" + statusBar
+	if tabBar != "" {
+		frameBody += "\n\n" + tabBar
+	}
+	frameBody += "\n\n" + body + "\n\n" + st.Hint.Render(footer)
+	frame := st.Theme.BorderStyle().
+		Padding(0, 1).
+		Background(lipgloss.Color(m.theme.Palette.Background)).
+		Render(frameBody)
 	return root.Render(frame)
+}
+
+func (m model) renderFullscreenWizard() string {
+	m.ensureOnboardingWizard()
+	inner := onboarding.Render(onboarding.ViewModel{
+		Model:      m.onboardingWizard,
+		Readiness:  m.snapshot.Readiness,
+		ShowCLI:    m.cfg.ShowCLIEquivalents,
+		WizardMode: true,
+		FullScreen: true,
+		Width:      m.width,
+		Height:     m.height,
+		Theme:      m.theme,
+	})
+	if m.lastError != "" {
+		errLine := lipgloss.NewStyle().
+			Foreground(lipgloss.Color(m.theme.Palette.Error)).
+			Render("Erreur: " + m.lastError)
+		inner += "\n" + errLine
+	}
+	return inner
 }
 
 func (m model) renderScreen() string {
@@ -505,6 +573,15 @@ func (m model) renderScreen() string {
 			AvailableThemes: theme.Names(),
 		})
 		return components.Panel("Settings", content, m.theme)
+	case ScreenOnboarding:
+		m.ensureOnboardingWizard()
+		content := onboarding.Render(onboarding.ViewModel{
+			Model:      m.onboardingWizard,
+			Readiness:  m.snapshot.Readiness,
+			ShowCLI:    m.cfg.ShowCLIEquivalents,
+			WizardMode: m.wizardMode,
+		})
+		return components.Panel("Onboarding", content, m.theme)
 	default:
 		vm := mission.ViewModel{
 			Workspace:         m.snapshot.Workspace,
@@ -523,6 +600,7 @@ func (m model) renderScreen() string {
 			Warnings:          m.snapshot.Warnings,
 			Warning:           m.snapshot.Runtime.Warning,
 			Recommended:       m.snapshot.RecommendedActions,
+			Readiness:         m.snapshot.Readiness,
 			Now:               fallbackTime(m.snapshot.UpdatedAt, m.now().UTC()),
 			DisableAnimations: !m.cfg.Animations,
 			AnimFrame:         m.animFrame,
@@ -741,6 +819,9 @@ func (m model) updateMouse(v tea.MouseMsg) (tea.Model, tea.Cmd) {
 			m.mouse.LastClickAt = time.Now()
 			m.mouse.LastClickX = v.X
 			m.mouse.LastClickY = v.Y
+			if m.onboardingInputActive() {
+				return m.updateOnboardingMouse(v)
+			}
 			m.selectExplorerRowFromMouse(v.Y)
 			if m.eventFeedScreenActive() {
 				m.eventFeedFocused = true

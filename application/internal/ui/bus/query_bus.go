@@ -66,6 +66,14 @@ func (b *queryBus) Query(ctx context.Context, query Query) (QueryResult, error) 
 		return b.handleGetReplayEventDetail(ctx, q)
 	case GetReplayCompareQuery:
 		return b.handleGetReplayCompare(ctx, q)
+	case GetReadinessQuery:
+		return b.handleGetReadiness(ctx, q)
+	case GetOnboardingStateQuery:
+		return b.handleGetOnboardingState(ctx, q)
+	case GetOnboardingWizardQuery:
+		return b.handleGetOnboardingWizard(ctx, q)
+	case ValidateOnboardingStepQuery:
+		return b.handleValidateOnboardingStep(ctx, q)
 	default:
 		return nil, fmt.Errorf("ui query not supported: %T", query)
 	}

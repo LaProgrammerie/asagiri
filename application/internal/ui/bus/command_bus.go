@@ -53,6 +53,18 @@ func (b *commandBus) Dispatch(ctx context.Context, cmd Command) (CommandResult, 
 		return b.deps.ContractsExtract(ctx, b.deps, typed)
 	case SpecGenerateFromProductCommand:
 		return b.deps.SpecGenerateFromProduct(ctx, b.deps, typed)
+	case RunOnboardingStepCommand:
+		return dispatchRunOnboardingStep(ctx, b.deps, typed)
+	case AdvanceOnboardingStepCommand:
+		return dispatchAdvanceOnboardingStep(ctx, b.deps, typed)
+	case SetOnboardingFieldCommand:
+		return dispatchSetOnboardingField(ctx, b.deps, typed)
+	case ApplyOnboardingConfigCommand:
+		return dispatchApplyOnboardingConfig(ctx, b.deps, typed)
+	case SkipOnboardingCheckCommand:
+		return dispatchSkipOnboardingCheck(ctx, b.deps, typed)
+	case ApplyReadinessAutofixCommand:
+		return dispatchApplyReadinessAutofix(ctx, b.deps, typed)
 	default:
 		return CommandResult{}, fmt.Errorf("ui command not supported: %T", cmd)
 	}

@@ -1,0 +1,34 @@
+---
+title: Project onboarding
+description: Guided setup from template fork to a ready Asagiri repository.
+---
+
+# Project onboarding
+
+**Project onboarding** prepares a forked template (Go, PHP/Castor, Node) so `asa work` and Mission Control can run without hand-editing `config.yaml`.
+
+```
+asa onboard  →  detect stack  →  merge config  →  bootstrap docs  →  ready
+```
+
+## What it does
+
+- Detects stack signals (`go.mod`, `castor.php`, `package.json`)
+- Merges validation commands idempotently (preserves custom config)
+- Bootstraps `docs/ai/`, Kiro spec skeleton, guarded by `--force-docs`
+- Produces a **readiness score** via `asa ready`
+
+## What it does not do
+
+- Generate business features automatically
+- Install agent binaries (detection + instructions only)
+
+## CLI parity
+
+Every TUI onboarding action maps to a documented CLI command (ADR-027).
+
+## See also
+
+- [`asa onboard`](/docs/cli/onboard)
+- [`asa ready`](/docs/cli/ready)
+- [`asa doctor --full`](/docs/cli/generated/doctor)
