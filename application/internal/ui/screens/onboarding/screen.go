@@ -10,35 +10,11 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-const (
-	outerBorderCols = 2
-	outerPaddingCols = 4
-	panelBorderCols = 2
-	panelPaddingCols = 2
-)
-
-// frameLayout holds lipgloss-safe widths (content width inside each box).
-type frameLayout struct {
-	InnerW int // inside outer frame, before its border+padding
-	PanelW int // inside inner panel, before its border+padding
-}
-
-func computeFrameLayout(width int) frameLayout {
-	w := width - outerBorderCols - outerPaddingCols
-	if w < 40 {
-		w = 40
-	}
-	pw := w - panelBorderCols - panelPaddingCols
-	if pw < 36 {
-		pw = 36
-	}
-	return frameLayout{InnerW: w, PanelW: pw}
-}
-
 // ViewModel is the data contract for the onboarding screen.
 type ViewModel struct {
 	Model           Model
 	Readiness       bus.ReadinessResult
+	Shell           ShellContext
 	ShowCLI         bool
 	WizardMode      bool
 	FullScreen      bool
@@ -49,42 +25,56 @@ type ViewModel struct {
 
 // Render returns the interactive onboarding wizard view.
 func Render(vm ViewModel) string {
+	if vm.FullScreen && vm.WizardMode && vm.Width >= 90 {
+		return renderEOS(vm)
+	}
 	if vm.Model.Applied {
 		return renderReadySummary(vm)
 	}
 	return renderWizard(vm)
 }
 
+func innerContentWidth(termW int, st theme.Styles) int {
+	outer := st.Theme.BorderStyle().Padding(1, 2)
+	w := termW - outer.GetHorizontalBorderSize() - outer.GetHorizontalPadding()
+	if w < 40 {
+		return 40
+	}
+	return w
+}
+
+func outerBoxWidth(termW int, st theme.Styles) int {
+	outer := st.Theme.BorderStyle().Padding(1, 2)
+	w := termW - outer.GetHorizontalBorderSize()
+	if w < 44 {
+		return 44
+	}
+	return w
+}
+
 func renderWizard(vm ViewModel) string {
 	m := vm.Model
 	st := vm.Theme.Styles()
-	layout := computeFrameLayout(vm.Width)
+	innerW := innerContentWidth(vm.Width, st)
 
 	meta := fmt.Sprintf("Étape %s · %s", StepLabel(m.Step), StepProgress(m.Step))
 	header := st.RenderPageHeader("Project Onboarding Wizard", meta)
 	tabs := st.RenderTabBar(wizardTabLabels(), stepIndex(m.Step))
-	contentPanel := st.Panel.Width(layout.PanelW).Render(renderWizardPanelBody(vm, st))
+	content := st.ContentArea.Width(innerW).Render(renderWizardPanelBody(vm, st))
 	footer := renderFooterStyled(m, st)
 
 	var hints strings.Builder
-	hints.WriteString(st.Hint.Render("Tab/↑↓ champs · ←→ boutons · Ctrl+P/N étapes · Ctrl+A advanced · Ctrl+S apply"))
+	hints.WriteString(st.Hint.Render("Tab/↑↓ champs · ←→ boutons · Ctrl+P/N étapes · Ctrl+A advanced · Ctrl+S apply · Ctrl+Q quitter"))
 	if vm.ShowCLI {
 		hints.WriteString("\n")
 		hints.WriteString(st.Muted.Render("CLI: asa onboard --yes | asa ready --json"))
 	}
 
-	body := joinBlocks(
-		header,
-		tabs,
-		contentPanel,
-		footer,
-		hints.String(),
-	)
-
+	body := joinBlocks(header, tabs, content, footer, hints.String())
 	if !vm.FullScreen {
 		return body + "\n"
 	}
-	return wrapFullscreen(body, StepLabel(m.Step), "Ctrl+P/N · étapes · Ctrl+S · apply · Ctrl+Q · quitter", st, layout)
+	return wrapFullscreen(body, StepLabel(m.Step), st, vm.Width)
 }
 
 func renderWizardPanelBody(vm ViewModel, st theme.Styles) string {
@@ -146,7 +136,7 @@ func renderReadySummary(vm ViewModel) string {
 		r = vm.Model.Readiness
 	}
 	st := vm.Theme.Styles()
-	layout := computeFrameLayout(vm.Width)
+	innerW := innerContentWidth(vm.Width, st)
 
 	statusLabel := "NOT READY"
 	statusStyle := st.Error
@@ -156,7 +146,7 @@ func renderReadySummary(vm ViewModel) string {
 	}
 
 	var body strings.Builder
-	body.WriteString(statusStyle.Render(statusLabel) + "  " + st.RenderProgress(r.Score, 100, progressBarWidth(layout.InnerW)) + "\n\n")
+	body.WriteString(statusStyle.Render(statusLabel) + "  " + st.RenderProgress(r.Score, 100, progressBarWidth(innerW)) + "\n\n")
 
 	if len(r.Checks) > 0 {
 		body.WriteString(st.PanelTitle.Render("Checks") + "\n")
@@ -190,26 +180,22 @@ func renderReadySummary(vm ViewModel) string {
 
 	content := joinBlocks(
 		st.RenderPageHeader("Onboarding terminé", "Readiness du dépôt"),
-		st.Panel.Width(layout.PanelW).Render(body.String()),
+		st.ContentArea.Width(innerW).Render(body.String()),
 	)
-
-	footerHint := "Ctrl+Q · quitter"
-	if len(r.AutofixOffers) > 0 && !r.Ready {
-		footerHint = "O · appliquer   N · ignorer   Ctrl+F · appliquer   Ctrl+Q · quitter"
-	}
 
 	if !vm.FullScreen {
 		return content + "\n"
 	}
-	return wrapFullscreen(content, "Récap", footerHint, st, layout)
+	return wrapFullscreen(content, "Récap", st, vm.Width)
 }
 
-func wrapFullscreen(body, stepLabel, footerHint string, st theme.Styles, layout frameLayout) string {
-	statusBar := st.RenderStatusBar("WIZARD", stepLabel, footerHint)
+func wrapFullscreen(body, stepLabel string, st theme.Styles, termW int) string {
+	statusBar := st.RenderStatusBar("WIZARD", stepLabel, "")
 	column := joinBlocks(body, statusBar)
+	boxW := outerBoxWidth(termW, st)
 	return st.Theme.BorderStyle().
-		Width(layout.InnerW).
 		Padding(1, 2).
+		Width(boxW).
 		Background(lipgloss.Color(st.Theme.Palette.Background)).
 		Render(column)
 }

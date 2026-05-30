@@ -24,7 +24,8 @@ func TestViewOnboardingWizardFullscreen(t *testing.T) {
 	m.width = 120
 	m.height = 40
 	got := m.View()
-	require.Contains(t, got, "Project Onboarding Wizard")
+	require.Contains(t, got, "Engineering Operating System")
+	require.Contains(t, got, "ASAGIRI PROJECT ONBOARDING WIZARD")
 	require.NotContains(t, got, "Runtime: stopped")
 	require.NotContains(t, got, "Screen: onboarding")
 }

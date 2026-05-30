@@ -55,12 +55,14 @@ func TestRenderReadySummaryWithAutofixOffers(t *testing.T) {
 				Lines: []string{".asagiri/state.sqlite", ".asagiri/worktrees/"},
 			}},
 		},
+		WizardMode: true,
 		FullScreen: true,
-		Width:      100,
+		Width:      140,
 		Height:     40,
 		Theme:      theme.Default(),
+		Shell:      onboarding.ShellContext{Workspace: "chatbot"},
 	})
-	require.Contains(t, got, "Corrections automatiques disponibles")
+	require.Contains(t, got, "Corrections auto disponibles")
 	require.Contains(t, got, "O · appliquer")
 }
 
@@ -180,12 +182,14 @@ func TestRenderWizardFullscreen(t *testing.T) {
 	}, true)
 	got := onboarding.Render(onboarding.ViewModel{
 		Model:      m,
+		WizardMode: true,
 		FullScreen: true,
 		Width:      120,
 		Height:     40,
 		Theme:      theme.Default(),
+		Shell:      onboarding.ShellContext{Workspace: "chatbot"},
 	})
-	require.Contains(t, got, "Project Onboarding Wizard")
+	require.Contains(t, got, "ASAGIRI PROJECT ONBOARDING WIZARD")
 	require.Contains(t, got, "chatbot")
 	require.NotContains(t, got, "Screen: onboarding")
 }

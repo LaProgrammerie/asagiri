@@ -7,6 +7,7 @@ import (
 	onbdomain "github.com/LaProgrammerie/asagiri/application/internal/onboarding"
 	"github.com/LaProgrammerie/asagiri/application/internal/ui/screens/onboarding"
 	"github.com/LaProgrammerie/asagiri/application/internal/ui/theme"
+	"github.com/charmbracelet/lipgloss"
 	"github.com/stretchr/testify/require"
 )
 
@@ -29,53 +30,70 @@ func stripANSI(v string) string {
 	return string(out)
 }
 
-func TestWizardWelcomeRendersIntactBorders(t *testing.T) {
+func TestEOSLayoutRendersShell(t *testing.T) {
 	m := onboarding.NewModelFromForm(onbdomain.Form{Step: onbdomain.StepWelcome}, false)
 	got := stripANSI(onboarding.Render(onboarding.ViewModel{
 		Model:      m,
+		WizardMode: true,
 		FullScreen: true,
-		Width:      100,
-		Height:     30,
+		Width:      140,
+		Height:     40,
 		Theme:      theme.Default(),
+		Shell: onboarding.ShellContext{
+			Workspace:   "chatbot",
+			Branch:      "main",
+			Version:     "0.4.0",
+			APIProvider: "OpenRouter",
+			Online:      true,
+		},
 	}))
 
-	require.Contains(t, got, "╭")
-	require.Contains(t, got, "╯")
-	require.NotContains(t, got, "╭╭")
-	require.Equal(t, 1, strings.Count(got, "ASAGIRI"))
+	require.Contains(t, got, "Engineering Operating System")
+	require.Contains(t, got, "NAVIGATION")
+	require.Contains(t, got, "Onboarding Wizard")
+	require.Contains(t, got, "CONTEXTE PROJET")
+	require.Contains(t, got, "Bienvenue dans Asagiri")
+	require.Contains(t, got, "Ce que nous allons faire")
+	require.Contains(t, got, "Précédent")
+	require.Contains(t, got, "Suivant")
+	require.Equal(t, 2, strings.Count(got, "ASAGIRI"))
+}
 
-	for _, line := range strings.Split(got, "\n") {
-		if strings.Contains(line, "Bienvenue") && strings.Contains(line, "│") {
-			require.True(t, strings.HasPrefix(strings.TrimLeft(line, " "), "│") || strings.Contains(line, "│ Bienvenue"),
-				"unexpected panel line layout: %q", line)
+func TestEOSLayoutWidthMatchesTerminal(t *testing.T) {
+	m := onboarding.NewModelFromForm(onbdomain.Form{Step: onbdomain.StepWelcome}, false)
+	const termW = 120
+	got := onboarding.Render(onboarding.ViewModel{
+		Model: m, WizardMode: true, FullScreen: true,
+		Width: termW, Height: 40, Theme: theme.Default(),
+		Shell: onboarding.ShellContext{Workspace: "chatbot", Branch: "main"},
+	})
+	lines := strings.Split(strings.TrimRight(got, "\n"), "\n")
+	require.NotEmpty(t, lines)
+	for i, line := range lines {
+		w := lipgloss.Width(line)
+		if w > termW {
+			t.Fatalf("line %d width %d exceeds terminal %d: %q", i, w, termW, line)
 		}
 	}
 }
 
-func TestWizardPanelAlignsWithOuterFrame(t *testing.T) {
+func TestEOSLayoutStepProject(t *testing.T) {
 	m := onboarding.NewModelFromForm(onbdomain.Form{
-		Step: onbdomain.StepReview,
+		Step: onbdomain.StepProject,
 		Answers: onbdomain.Answers{
-			ProjectName: "chatbot",
+			ProjectName:   "chatbot",
+			DefaultBranch: "main",
 		},
 	}, false)
 	got := stripANSI(onboarding.Render(onboarding.ViewModel{
 		Model:      m,
+		WizardMode: true,
 		FullScreen: true,
-		Width:      100,
-		Height:     30,
+		Width:      140,
+		Height:     40,
 		Theme:      theme.Default(),
+		Shell:      onboarding.ShellContext{Workspace: "chatbot", Branch: "main"},
 	}))
-
-	var widths []int
-	for _, line := range strings.Split(got, "\n") {
-		if strings.Contains(line, "╮") || strings.Contains(line, "╯") {
-			widths = append(widths, len([]rune(line)))
-		}
-	}
-	require.NotEmpty(t, widths)
-	first := widths[0]
-	for _, w := range widths {
-		require.InDelta(t, first, w, 2, "border lines should share width")
-	}
+	require.Contains(t, got, "chatbot")
+	require.Contains(t, got, "Projet")
 }

@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/LaProgrammerie/asagiri/application/internal/config"
+	"github.com/LaProgrammerie/asagiri/application/internal/version"
 	"github.com/LaProgrammerie/asagiri/application/internal/ui/bus"
 	"github.com/LaProgrammerie/asagiri/application/internal/ui/components"
 	"github.com/LaProgrammerie/asagiri/application/internal/ui/input"
@@ -465,8 +466,9 @@ func (m model) View() string {
 
 func (m model) renderFullscreenWizard() string {
 	m.ensureOnboardingWizard()
+	w := m.onboardingWizard
 	inner := onboarding.Render(onboarding.ViewModel{
-		Model:      m.onboardingWizard,
+		Model:      w,
 		Readiness:  m.snapshot.Readiness,
 		ShowCLI:    m.cfg.ShowCLIEquivalents,
 		WizardMode: true,
@@ -474,6 +476,16 @@ func (m model) renderFullscreenWizard() string {
 		Width:      m.width,
 		Height:     m.height,
 		Theme:      m.theme,
+		Shell: onboarding.ShellContext{
+			Workspace:    firstNonEmpty(m.snapshot.Workspace, w.Fields["project_name"]),
+			Branch:       firstNonEmpty(m.snapshot.Branch, w.Fields["default_branch"], "main"),
+			Directory:    firstNonEmpty(w.Fields["project_name"], "."),
+			Clock:        m.now().Format("15:04:05"),
+			Version:      version.Version,
+			CostTodayEUR: m.snapshot.CostTodayEUR,
+			APIProvider:  "OpenRouter",
+			Online:       true,
+		},
 	})
 	if m.lastError != "" {
 		errLine := lipgloss.NewStyle().
