@@ -7,6 +7,7 @@ import (
 	"github.com/LaProgrammerie/asagiri/application/internal/env"
 	"github.com/LaProgrammerie/asagiri/application/internal/runtime"
 	"github.com/LaProgrammerie/asagiri/application/internal/store/sqlite"
+	"github.com/LaProgrammerie/asagiri/application/internal/telemetry"
 )
 
 type runtimeStore interface {
@@ -21,6 +22,9 @@ type stateStore interface {
 	Close() error
 	Migrate() error
 	ListRuns(limit int) ([]sqlite.Run, error)
+	GetRun(id string) (*sqlite.Run, error)
+	ListTasksByRun(runID string) ([]sqlite.Task, error)
+	GetRunMetric(runID string) (*telemetry.RunMetric, error)
 }
 
 type startWorkHandler func(ctx context.Context, deps Deps, cmd StartWorkCommand) (CommandResult, error)

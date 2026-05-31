@@ -1,33 +1,33 @@
- ╭────────────────────────────────────────────────────────────────────╮ 
- │  ASAGIRI   Mission Control                                         │ 
- │ Screen · replay                                                    │ 
- │   RUNTIME  stopped  Screen: replay                                 │ 
- │                                                                    │ 
- │ ╭────────────────────────────────────────────────────────────────╮ │ 
- │ │ Replay Explorer                                                │ │ 
- │ │ Replay                                                         │ │ 
- │ │ ID: replay-001                                                 │ │ 
- │ │ Created: 2026-05-29T12:29:56Z                                  │ │ 
- │ │ Repo: feature/spec-ui @ abcdef123456                           │ │ 
- │ │ Mode: simulation                                               │ │ 
- │ │                                                                │ │ 
- │ │ Artifacts                                                      │ │ 
- │ │ - graph/execution-graph.json                                   │ │ 
- │ │ - runtime/events.jsonl                                         │ │ 
- │ │                                                                │ │ 
- │ │ Timeline                                                       │ │ 
- │ │ > 12:30:56 investigation.started                               │ │ 
- │ │   12:31:56 graph.generated artifact=graph/execution-graph.json │ │ 
- │ │ Actions                                                        │ │ 
- │ │ - jump to event: j                                             │ │ 
- │ │ - inspect artifact: a                                          │ │ 
- │ │ - compare run: m                                               │ │ 
- │ │ - replay offline: O                                            │ │ 
- │ │ - explain divergence: D                                        │ │ 
- │ │ - open replay: asa replay open replay-001                      │ │ 
- │ │ - compare: asa replay compare <replay-a> <replay-b>            │ │ 
- │ │ - explain: asa replay explain <replay-a> <replay-b>            │ │ 
- │ ╰────────────────────────────────────────────────────────────────╯ │ 
- │                                                                    │ 
- │ Screen: replay  |  CLI: asa replay                                 │ 
- ╰────────────────────────────────────────────────────────────────────╯ 
+ ╭────────────────────────────────────────────────────────────────────────────────────────────╮ 
+ │  ASAGIRI   Mission Control                                                                 │ 
+ │ Screen · replay                                                                            │ 
+ │   RUNTIME  stopped  Screen: replay                                                         │ 
+ │                                                                                            │ 
+ │  NAVIGATION            │╭────────────────────────────────────────────────────────────────╮ │ 
+ │                        ││ Replay Explorer                                                │ │ 
+ │   ◆  Mission           ││ Replay                                                         │ │ 
+ │   ▣  Dashboard         ││ ID: replay-001                                                 │ │ 
+ │   ▶  Runs              ││ Created: 2026-05-29T12:29:56Z                                  │ │ 
+ │   ◎  Agents            ││ Repo: feature/spec-ui @ abcdef123456                           │ │ 
+ │   ⇄  Flow              ││ Mode: simulation                                               │ │ 
+ │   ⊹  Graph             ││                                                                │ │ 
+ │   ⛉  Trust             ││ Artifacts                                                      │ │ 
+ │   ❏  Knowledge         ││ - graph/execution-graph.json                                   │ │ 
+ │   ↺  Replay            ││ - runtime/events.jsonl                                         │ │ 
+ │   ▤  Logs              ││                                                                │ │ 
+ │   ?  Explain           ││ Timeline                                                       │ │ 
+ │   ⚙  Settings          ││ > 12:30:56 investigation.started                               │ │ 
+ │                        ││   12:31:56 graph.generated artifact=graph/execution-graph.json │ │ 
+ │                        ││ Actions                                                        │ │ 
+ │                        ││ - jump to event: j                                             │ │ 
+ │                        ││ - inspect artifact: a                                          │ │ 
+ │                        ││ - compare run: m                                               │ │ 
+ │                        ││ - replay offline: O                                            │ │ 
+ │                        ││ - explain divergence: D                                        │ │ 
+ │                        ││ - open replay: asa replay open replay-001                      │ │ 
+ │                        ││ - compare: asa replay compare <replay-a> <replay-b>            │ │ 
+ │                        ││ - explain: asa replay explain <replay-a> <replay-b>            │ │ 
+ │                        │╰────────────────────────────────────────────────────────────────╯ │ 
+ │                                                                                            │ 
+ │ Screen: replay  |  CLI: asa replay                                                         │ 
+ ╰────────────────────────────────────────────────────────────────────────────────────────────╯ 

@@ -82,6 +82,7 @@ func newRootCmd() *cobra.Command {
 		newDocsCmd(),
 		newMissionCmd(&dryRun),
 		newDashboardCmd(&dryRun),
+		newRunsCmd(&dryRun),
 		newAgentsCmd(&dryRun),
 		newExplainCmd(&dryRun),
 		&cobra.Command{

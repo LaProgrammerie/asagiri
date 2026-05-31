@@ -1,93 +1,69 @@
 # Handoff — execution
 
-> **Contrat d'exécution** Cursor / Copilot / humain.  
-> **Tranche active :** **project-onboarding** — TUI wizard interactif livré (`2026-05-30`).  
-> **Précédent :** onboarding core CLI/readiness — FULL (`2026-05-29`).
+> **Contrat d'exécution** Cursor / Copilot / humain.
+> **Tranche active :** **cockpit-consolidation** — Direction 4 « Asagiri
+> Operations Cockpit ». **Livré** (`2026-05-31`, ADR-029) — Phases 0→4 ;
+> `go test ./...` vert, `go vet` propre, `make build` ok.
+> **Précédent :** project-onboarding — TUI wizard interactif — FULL (`2026-05-30`).
 
-## Objectif (lot 4 — wizard TUI)
+## Objectif
 
-Remplacer l'écran onboarding read-only par un formulaire navigable : champs préremplis, Prev/Next, Advanced, Apply → config + docs + readiness.
+Consolider l'Experience Platform (ADR-027) sur l'infrastructure UI existante.
+Corriger l'inversion d'effort : Mission Control (écran quotidien) est en texte
+brut ; le wizard onboarding (one-shot) porte le chrome premium « EOS ». Aucune
+grosse refonte : ~75 % des briques existent (layout engine, 13 widgets, palette,
+event feed, design system, explorers, bus). Seul vrai développement neuf :
+l'écran **Runs** + la requête bus `RunDetail`.
 
-| Livrable | Statut |
-|----------|--------|
-| `internal/onboarding/form.go` — état, validation, ApplyForm | ✅ |
-| `ui/screens/onboarding/model.go` — Model interactif | ✅ |
-| Bus Advance/SetField/Apply/Wizard query | ✅ |
-| `asa onboard --ui` wizard mode | ✅ |
-| Tests unit + intégration Castor | ✅ |
+## Scope (autorisé)
 
----
+- `application/internal/ui/components/` — `PanelSized`.
+- `application/internal/ui/app/` — rail persistant dans `View()`, helpers shell,
+  route Runs, onboarding via shell commun.
+- `application/internal/ui/screens/mission/` — panelisation.
+- `application/internal/ui/screens/runs/` — **nouveau** (liste + détail).
+- `application/internal/ui/bus/` — `RunDetail`, `RunPipelineStep`,
+  `GetRunDetailQuery` + handler d'agrégation.
+- `application/internal/ui/screens/onboarding/` — réduction `eos_*` aux helpers
+  partagés, suppression télémétrie fictive.
+- `application/internal/ui/app/router.go`, `palette*.go` — `ScreenRuns` + entrée.
 
-## Objectif (clôturé — lots 1–3)
+## Hors scope (interdit sans MAJ spec)
 
-Parcours **`asa onboard`** → détection stack → config merge idempotent → bootstrap docs/Kiro → **`asa ready`** / **`asa doctor --full`**. TUI Mission Control (bannière + écran onboarding) et docs-site 4 locales inclus.
+- Nouveau moteur d'orchestration ; toute logique métier dans `internal/ui`.
+- `internal/tui` (specv3) ; `internal/onboarding/form.go` (logique onboarding).
+- UI web/desktop.
 
----
+## Ordre d'exécution
 
-## Matrice traçabilité (100 %)
+| Phase | Tâches | Donnée bus | DoD partiel | Statut |
+|-------|--------|-----------|-------------|--------|
+| 0 | CK-0.1 → CK-0.3 | inchangée | `PanelSized` + helpers shell testés | ✅ |
+| 1 | CK-1.1 → CK-1.4 | inchangée | Mission Control panelisé responsive | ✅ |
+| 2 | CK-2.1 → CK-2.5 | inchangée | rail persistant + nav sans régression | ✅ |
+| 3 | RUN-3.1 → RUN-3.7 | **nouvelle** | écran Runs + `RunDetail` | ✅ |
+| 4 | CK-4.1 → CK-4.6 | inchangée | shell unique, `eos_*` mort supprimé | ✅ |
 
-| ID spec | Livrable | Lot | Statut |
-|---------|----------|-----|--------|
-| FR-1.1–1.4 | Détecteurs Go/Castor/Node + `--stack` | 1 | ✅ |
-| FR-2.1–2.4 | Writer merge, backup, dry-run, validate | 1 | ✅ |
-| FR-3.1–3.3 | `asa ready` JSON/plain/ci/strict + report.json | 1 | ✅ |
-| FR-4.1–4.2 | `asa doctor --full` + macOS `/usr/bin/asa` | 1 | ✅ |
-| FR-5.1–5.4 | Docs bootstrap + `--force-docs` | 1 | ✅ |
-| FR-6.1–6.2 | Idempotence + `--resume` | 1/3 | ✅ |
-| FR-7.1–7.2 | TUI banner, écran, palette, parité CLI | 2 | ✅ |
-| §12 CLI | Fixtures Go/Castor, dry-run, ready CI | 1 | ✅ |
-| §12 UI | Mission Control readiness | 2 | ✅ |
-| §12 Docs | docs-site en/fr/de/es + generate-cli | 3 | ✅ |
-| OB-3.4 | `examples/onboarding/` | 3 | ✅ |
+MVP livrable après Phase 2 (cockpit crédible sans changement de données).
 
----
+## Definition of Done
 
-## Definition of Done (lots 1–3)
+- [x] Mission Control panelisé + responsive ; rail persistant et state-aware
+- [x] Runs écran de premier rang adossé à `RunDetail`
+- [x] Onboarding dans le shell commun, sans télémétrie fictive, bascule Mission
+- [x] Un seul chemin de rendu ; code `eos_*` mort supprimé
+- [x] `go test ./... -count=1` vert ; `make build` ok ; équivalents CLI conservés
+- [x] `06-spec-ui.md` + ADR (ADR-029) mis à jour ; `current-spec.md` / `handoff.md` synchro
 
-- [x] `asa onboard --yes --non-interactive` sur fixture Castor → validation Castor
-- [x] `asa onboard --yes` sur fixture Go → validation Go
-- [x] `asa onboard --dry-run` n'écrit pas
-- [x] `asa ready --json` retourne `ready`, `score`, `checks`, `next_actions`
-- [x] `asa doctor --full` inclut agents + gitignore + kiro spec
-- [x] Idempotence : second onboard ne duplique pas validation
-- [x] Bootstrap crée `.kiro/specs/<feature>/` ; garde-fou handoff
-- [x] Mission Control bannière readiness + palette
-- [x] `--resume` + backups config
-- [x] docs-site en/fr/de/es + `asa docs generate-cli`
-- [x] `go test ./... -count=1` vert sous `application/`
+## Garde-fous
 
----
-
-## Audit clôture (`2026-05-29`)
-
-| Vérification | Résultat |
-|--------------|----------|
-| Commandes spec (`onboard`, `ready`, `doctor --full`) | OK |
-| Package `internal/onboarding/` | OK |
-| TUI bus-only (pas de logique métier dans `ui/`) | OK |
-| Doc EN/FR/DE/ES | OK (`concepts/project-onboarding`, `cli/onboard`, `cli/ready`) |
-| CLI généré EN | OK (`en/cli/generated/onboard`, `ready`) |
-| `current-spec` ↔ handoff | alignés |
-| Tests | `go test ./... -count=1` vert |
-
----
-
-## Écarts / notes
-
-- **Palette `doctor --full`** : équivalent CLI affiché (pas d'exécution in-process) — parité ADR-027 respectée.
-- **Check macOS `/usr/bin/asa`** : info/warn si conflit détecté (comportement spec).
-
----
-
-## Prochaine spec
-
-Aucune tranche onboarding restante. Spec suivante à définir par product (hors scope onboarding).
-
----
+- UI = client du bus (ADR-027). Pas de logique trust/workflow/runtime dans les écrans.
+- Parité plain/json : fallback plat conservé, jamais conditionné au rendu panelisé.
+- Landing Phases 0–2 (sans changement de données) avant de toucher l'onboarding.
 
 ## Références
 
-- [`spec-onboarding.md`](../archives/specs/spec-onboarding.md)
-- [`06-spec-onboarding.md`](../06-spec-onboarding.md)
-- `.kiro/specs/project-onboarding/`
-- ADR-028, ADR-027, ADR-005
+- `.kiro/specs/cockpit-consolidation/` (requirements, design, tasks)
+- [`06-spec-ui.md`](../06-spec-ui.md) — ADR-027 Experience Platform
+- Code : `ui/app/app.go`, `ui/layout/`, `ui/screens/dashboard/widgets.go`,
+  `ui/screens/mission/screen.go`, `ui/bus/bus.go`, `ui/theme/styles.go`

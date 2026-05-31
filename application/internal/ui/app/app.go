@@ -24,6 +24,7 @@ import (
 	"github.com/LaProgrammerie/asagiri/application/internal/ui/screens/onboarding"
 	"github.com/LaProgrammerie/asagiri/application/internal/ui/screens/prototype"
 	"github.com/LaProgrammerie/asagiri/application/internal/ui/screens/replay"
+	"github.com/LaProgrammerie/asagiri/application/internal/ui/screens/runs"
 	"github.com/LaProgrammerie/asagiri/application/internal/ui/screens/settings"
 	"github.com/LaProgrammerie/asagiri/application/internal/ui/screens/trust"
 	"github.com/LaProgrammerie/asagiri/application/internal/ui/state"
@@ -111,6 +112,8 @@ type model struct {
 	knowledgeExplorer knowledge.Model
 	trustExplorer     trust.Model
 	replayExplorer    replay.Model
+	runsExplorer      runs.Model
+	runDetail         bus.RunDetail
 	onboardingWizard  onboarding.Model
 	wizardMode        bool
 	confirmation      *safetyConfirmation
@@ -170,6 +173,7 @@ func newModel(ctx context.Context, opts Options) model {
 		knowledgeExplorer: knowledge.NewModel(),
 		trustExplorer:    trust.NewModel(),
 		replayExplorer:    replay.NewModel(),
+		runsExplorer:      runs.NewModel(),
 		onboardingWizard:  onboarding.NewModel(),
 		wizardMode:        opts.InitialScreen == ScreenOnboarding,
 		refreshEvery: time.Duration(refreshMs) * time.Millisecond,
@@ -456,7 +460,12 @@ func (m model) View() string {
 	if tabBar != "" {
 		frameBody += "\n\n" + tabBar
 	}
-	frameBody += "\n\n" + body + "\n\n" + st.Hint.Render(footer)
+	middle := body
+	if rw := m.railWidth(); rw > 0 {
+		rail := m.renderNavRail(rw, lipgloss.Height(body))
+		middle = lipgloss.JoinHorizontal(lipgloss.Top, rail, body)
+	}
+	frameBody += "\n\n" + middle + "\n\n" + st.Hint.Render(footer)
 	frame := st.Theme.BorderStyle().
 		Padding(0, 1).
 		Background(lipgloss.Color(m.theme.Palette.Background)).
@@ -509,6 +518,16 @@ func (m model) renderScreen() string {
 			TabIndex:  m.activeScreenTab(),
 			TabLabels: m.screenTabLabels(),
 			Compact:   m.layout.CompactThreshold,
+		})
+	case ScreenRuns:
+		return runs.Render(runs.ViewModel{
+			Runs:    m.snapshot.Runs,
+			Detail:  m.currentRunDetail(),
+			Model:   m.runsExplorer,
+			ShowCLI: m.cfg.ShowCLIEquivalents,
+			Width:   m.bodyWidth(),
+			Height:  m.height,
+			Theme:   m.theme,
 		})
 	case ScreenAgents:
 		content := agents.Render(agents.ViewModel{
@@ -616,6 +635,10 @@ func (m model) renderScreen() string {
 			Now:               fallbackTime(m.snapshot.UpdatedAt, m.now().UTC()),
 			DisableAnimations: !m.cfg.Animations,
 			AnimFrame:         m.animFrame,
+			Width:             m.bodyWidth(),
+			Height:            m.height,
+			CompactThreshold:  m.layout.CompactThreshold,
+			Theme:             m.theme,
 		}
 		return m.renderMissionWithTabs(vm)
 	}
@@ -825,6 +848,10 @@ func (m model) updateMouse(v tea.MouseMsg) (tea.Model, tea.Cmd) {
 			return m, nil
 		}
 		if v.Button == tea.MouseButtonLeft {
+			if screen := m.railScreenAt(v.X, v.Y); screen != "" {
+				m.navigateTo(screen, "asa "+screen)
+				return m, nil
+			}
 			if input.IsDoubleClick(m.mouse.LastClickAt, m.mouse.LastClickX, m.mouse.LastClickY, v.X, v.Y, time.Now()) {
 				return m.handleMouseDoubleClick(v)
 			}
@@ -894,6 +921,8 @@ func (m *model) selectExplorerRowFromMouse(y int) {
 		m.trustExplorer.SelectIndex(row, len(m.snapshot.TrustExplorer.Dimensions))
 	case ScreenReplay:
 		m.replayExplorer.SelectIndex(row, len(m.snapshot.Replay.Timeline))
+	case ScreenRuns:
+		m.runsExplorer.SelectIndex(row, len(m.snapshot.Runs))
 	}
 }
 

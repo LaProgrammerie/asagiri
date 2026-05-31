@@ -14,7 +14,7 @@ func (m model) explorerInputActive() bool {
 		return false
 	}
 	switch m.router.Current() {
-	case ScreenGraph, ScreenFlow, ScreenKnowledge, ScreenTrust, ScreenReplay:
+	case ScreenGraph, ScreenFlow, ScreenKnowledge, ScreenTrust, ScreenReplay, ScreenRuns:
 		return true
 	default:
 		return false
@@ -37,9 +37,53 @@ func (m *model) updateExplorerKey(v tea.KeyMsg) (tea.Model, tea.Cmd) {
 		return m.updateTrustExplorerKey(v, key)
 	case ScreenReplay:
 		return m.updateReplayExplorerKey(v, key)
+	case ScreenRuns:
+		return m.updateRunsExplorerKey(v, key)
 	default:
 		return m, nil
 	}
+}
+
+func (m *model) updateRunsExplorerKey(v tea.KeyMsg, key string) (tea.Model, tea.Cmd) {
+	next, _ := m.runsExplorer.Update(v)
+	m.runsExplorer = next
+	m.runsExplorer.Focused = true
+	switch key {
+	case "t":
+		m.navigateTo(ScreenTrust, "asa trust")
+		return m, nil
+	case input.KeyExplorerGraph: // "g"
+		m.navigateTo(ScreenGraph, "asa graph")
+		return m, nil
+	case input.KeyExplorerRun: // "r" → replay drill-down
+		m.navigateTo(ScreenReplay, "asa replay open <replay-id>")
+		return m, nil
+	}
+	return m, nil
+}
+
+// currentRunDetail returns the aggregated detail for the selected run.
+func (m model) currentRunDetail() bus.RunDetail {
+	runID := m.runsExplorer.SelectedRunID(m.snapshot.Runs)
+	if runID == "" {
+		return bus.RunDetail{}
+	}
+	return m.queryRunDetail(runID)
+}
+
+func (m model) queryRunDetail(runID string) bus.RunDetail {
+	if m.queryBus == nil {
+		return bus.RunDetail{ID: runID}
+	}
+	res, err := m.queryBus.Query(m.ctx, bus.GetRunDetailQuery{RunID: runID})
+	if err != nil {
+		return bus.RunDetail{ID: runID, Warning: err.Error()}
+	}
+	typed, ok := res.(bus.RunDetail)
+	if !ok {
+		return bus.RunDetail{ID: runID}
+	}
+	return typed
 }
 
 func (m *model) updateGraphExplorerKey(v tea.KeyMsg, key string) (tea.Model, tea.Cmd) {

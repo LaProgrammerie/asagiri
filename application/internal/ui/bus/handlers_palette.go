@@ -77,6 +77,7 @@ func staticPaletteEntries() []PaletteEntry {
 	return []PaletteEntry{
 		{ID: "nav.dashboard", Title: "Open dashboard", Description: "Navigate to dashboard live view", CLI: "asa dashboard", Keywords: []string{"screen", "dashboard", "nav"}, ActionID: "nav.dashboard"},
 		{ID: "nav.mission", Title: "Open mission control", Description: "Navigate to mission control", CLI: "asa mission", Keywords: []string{"screen", "mission", "nav"}, ActionID: "nav.mission"},
+		{ID: "nav.runs", Title: "Open runs", Description: "Navigate to runs list and detail", CLI: "asa runs", Keywords: []string{"screen", "runs", "run", "nav"}, ActionID: "nav.runs"},
 		{ID: "nav.agents", Title: "Open agent theatre", Description: "Navigate to live agent cards", CLI: "asa agents watch", Keywords: []string{"screen", "agents", "watch", "nav"}, ActionID: "nav.agents"},
 		{ID: "nav.graph", Title: "Open graph explorer", Description: "Navigate to graph explorer", CLI: "asa graph", Keywords: []string{"screen", "graph", "nav"}, ActionID: "nav.graph"},
 		{ID: "nav.flow", Title: "Open flow explorer", Description: "Navigate to flow explorer", CLI: "asa flow", Keywords: []string{"screen", "flow", "nav"}, ActionID: "nav.flow"},

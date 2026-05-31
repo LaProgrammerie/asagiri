@@ -252,6 +252,9 @@ func (m model) runPaletteAction(actionID string, cliEquivalent string) (tea.Mode
 	case "nav.mission":
 		(&m).navigateTo(ScreenMission, "asa mission")
 		return m, nil
+	case "nav.runs":
+		(&m).navigateTo(ScreenRuns, "asa runs")
+		return m, nil
 	case "nav.agents":
 		(&m).navigateTo(ScreenAgents, "asa agents watch")
 		return m, nil

@@ -24,10 +24,30 @@ func TestViewOnboardingWizardFullscreen(t *testing.T) {
 	m.width = 120
 	m.height = 40
 	got := m.View()
-	require.Contains(t, got, "Engineering Operating System")
-	require.Contains(t, got, "ASAGIRI PROJECT ONBOARDING WIZARD")
+	require.Contains(t, got, "Project Onboarding")
+	require.Contains(t, got, "NAVIGATION")
 	require.NotContains(t, got, "Runtime: stopped")
 	require.NotContains(t, got, "Screen: onboarding")
+	// CK-4.2: no fake telemetry in the shared shell.
+	require.NotContains(t, got, "Onboarding Analyzer")
+}
+
+func TestOnboardingApplyReadyHandsOffToMission(t *testing.T) {
+	m := newModel(context.Background(), Options{
+		Config:        config.UIConfig{Theme: "asagiri-dark"},
+		InitialScreen: ScreenOnboarding,
+	})
+	m.width = 120
+	m.height = 40
+	require.True(t, m.wizardMode)
+
+	next, _ := m.handleOnboardingApply(onboardingApplyMsg{
+		readiness: bus.ReadinessResult{Ready: true, Score: 100},
+		message:   "applied",
+	})
+	nm := next.(model)
+	require.False(t, nm.wizardMode)
+	require.Equal(t, ScreenMission, nm.router.Current())
 }
 
 func TestRunQuitsOnQ(t *testing.T) {

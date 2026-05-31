@@ -50,6 +50,42 @@ type RunSummary struct {
 	UpdatedAt time.Time
 }
 
+// RunPipelineStep is one pipeline step (spec→plan→dev→verify→trust→report)
+// projected for the Runs detail pane.
+type RunPipelineStep struct {
+	ID     string
+	Label  string
+	Status string
+}
+
+// RunDetail aggregates a single run's pipeline, worktree, agents, validation,
+// trust gate, cost and recent events for the Runs screen. Built by ui/bus
+// adapters from workflow/runtime/trust; no business logic lives in screens.
+type RunDetail struct {
+	ID         string
+	Feature    string
+	Status     string
+	Worktree   string
+	Pipeline   []RunPipelineStep
+	Agents     []ActiveAgentSummary
+	Validation string
+	TrustGate  TrustSummaryResult
+	CostEUR    float64
+	Events     []EventSummary
+	CreatedAt  time.Time
+	UpdatedAt  time.Time
+	Warning    string
+}
+
+func (RunDetail) isQueryResult() {}
+
+// GetRunDetailQuery loads the aggregated detail for one run.
+type GetRunDetailQuery struct {
+	RunID string
+}
+
+func (GetRunDetailQuery) Name() string { return "GetRunDetail" }
+
 // EventSummary is a view model for runtime events.
 type EventSummary struct {
 	ID        string

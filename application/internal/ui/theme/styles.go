@@ -40,6 +40,18 @@ type Styles struct {
 	CheckOK     lipgloss.Style
 	CheckWarn   lipgloss.Style
 	CheckFail   lipgloss.Style
+	Badge       lipgloss.Style
+	BadgeMuted  lipgloss.Style
+	KeyCap      lipgloss.Style
+	NavActive   lipgloss.Style
+	Card        lipgloss.Style
+	SectionHead lipgloss.Style
+	HeroTitle   lipgloss.Style
+	StepBadge       lipgloss.Style
+	StepActive      lipgloss.Style
+	StepActiveGlyph lipgloss.Style
+	StepDone        lipgloss.Style
+	StepPending     lipgloss.Style
 }
 
 // Styles returns lipgloss styles derived from the theme palette.
@@ -52,6 +64,10 @@ func (t Theme) Styles() Styles {
 	bg := p.Background
 	if bg == "" {
 		bg = "#0D0F14"
+	}
+	surface := p.Surface
+	if surface == "" {
+		surface = p.Border
 	}
 	border := lipgloss.RoundedBorder()
 	if t.IsHighContrast() {
@@ -162,6 +178,52 @@ func (t Theme) Styles() Styles {
 			Foreground(lipgloss.Color(p.Warning)),
 		CheckFail: lipgloss.NewStyle().
 			Foreground(lipgloss.Color(p.Error)),
+		Badge: lipgloss.NewStyle().
+			Bold(true).
+			Foreground(lipgloss.Color(bg)).
+			Background(lipgloss.Color(p.Primary)).
+			Padding(0, 1),
+		BadgeMuted: lipgloss.NewStyle().
+			Foreground(lipgloss.Color(fg)).
+			Background(lipgloss.Color(p.Border)).
+			Padding(0, 1),
+		KeyCap: lipgloss.NewStyle().
+			Bold(true).
+			Foreground(lipgloss.Color(fg)).
+			Background(lipgloss.Color(p.Border)).
+			Padding(0, 1),
+		NavActive: lipgloss.NewStyle().
+			Bold(true).
+			Foreground(lipgloss.Color(bg)).
+			Background(lipgloss.Color(p.Primary)),
+		Card: lipgloss.NewStyle().
+			Border(border).
+			BorderForeground(lipgloss.Color(p.Border)).
+			Background(lipgloss.Color(surface)).
+			Padding(1, 2),
+		SectionHead: lipgloss.NewStyle().
+			Bold(true).
+			Foreground(lipgloss.Color(p.Muted)),
+		HeroTitle: lipgloss.NewStyle().
+			Bold(true).
+			Foreground(lipgloss.Color(p.Primary)),
+		StepBadge: lipgloss.NewStyle().
+			Foreground(lipgloss.Color(p.Primary)).
+			Border(lipgloss.RoundedBorder()).
+			BorderForeground(lipgloss.Color(p.Primary)).
+			Padding(0, 1),
+		StepActive: lipgloss.NewStyle().
+			Bold(true).
+			Foreground(lipgloss.Color(bg)).
+			Background(lipgloss.Color(p.Primary)),
+		StepActiveGlyph: lipgloss.NewStyle().
+			Bold(true).
+			Foreground(lipgloss.Color(p.Primary)),
+		StepDone: lipgloss.NewStyle().
+			Bold(true).
+			Foreground(lipgloss.Color(p.Success)),
+		StepPending: lipgloss.NewStyle().
+			Foreground(lipgloss.Color(p.Muted)),
 	}
 }
 
@@ -187,6 +249,110 @@ func (s Styles) RenderButton(label string, focused bool) string {
 		return s.ButtonFocus.Render(label)
 	}
 	return s.Button.Render(label)
+}
+
+// RenderBadge renders a primary-filled value pill.
+func (s Styles) RenderBadge(label string) string {
+	if strings.TrimSpace(label) == "" {
+		label = "—"
+	}
+	return s.Badge.Render(label)
+}
+
+// RenderBadgeMuted renders a secondary value pill.
+func (s Styles) RenderBadgeMuted(label string) string {
+	if strings.TrimSpace(label) == "" {
+		label = "—"
+	}
+	return s.BadgeMuted.Render(label)
+}
+
+// RenderKeyCap renders a keyboard key cap.
+func (s Styles) RenderKeyCap(label string) string {
+	return s.KeyCap.Render(label)
+}
+
+// RenderStepBadge renders the wizard step counter chip.
+func (s Styles) RenderStepBadge(current, total int) string {
+	return s.StepBadge.Render(fmt.Sprintf("Étape %d / %d", current, total))
+}
+
+// RenderCircularGauge renders a circular ring progress gauge.
+func (s Styles) RenderCircularGauge(pct int) string {
+	return s.RenderRingGauge(pct)
+}
+
+// RenderEOSFieldGrid renders one aligned label/value row for the wizard card.
+func (s Styles) RenderEOSFieldGrid(icon, label, value string, focused, pill bool, labelW int) string {
+	if labelW < 10 {
+		labelW = 10
+	}
+	if value == "" {
+		value = "—"
+	}
+	cursor := "  "
+	if focused {
+		cursor = s.PanelTitle.Render("▸ ")
+	}
+	labelPart := lipgloss.NewStyle().
+		Width(labelW).
+		Align(lipgloss.Right).
+		Foreground(lipgloss.Color(s.Theme.Palette.Muted)).
+		Render(icon + " " + label)
+	var valPart string
+	switch {
+	case focused:
+		valPart = s.RenderBadge(value)
+	case pill:
+		valPart = s.RenderBadgeMuted(value)
+	default:
+		valPart = s.FieldValue.Render(value)
+	}
+	return cursor + labelPart + "  " + valPart
+}
+
+// RenderKVGrid renders one aligned key/value row for side panels.
+func (s Styles) RenderKVGrid(icon, key, value string, pill bool, labelW int) string {
+	if labelW < 10 {
+		labelW = 10
+	}
+	labelPart := lipgloss.NewStyle().
+		Width(labelW).
+		Align(lipgloss.Right).
+		Foreground(lipgloss.Color(s.Theme.Palette.Muted)).
+		Render(icon + " " + key)
+	var valPart string
+	if pill {
+		valPart = s.RenderBadgeMuted(value)
+	} else {
+		valPart = s.Fg.Render(value)
+	}
+	return labelPart + "  " + valPart
+}
+
+// RenderSection renders an uppercase section title with spacing.
+func (s Styles) RenderSection(title string) string {
+	return s.SectionHead.Render(strings.ToUpper(title)) + "\n" + s.Divider.Render(strings.Repeat("─", len(title)+2))
+}
+
+// RenderEOSField renders one wizard field row with optional badge value.
+func (s Styles) RenderEOSField(label, value string, focused, pill bool) string {
+	return s.RenderEOSFieldGrid(fieldIcon(label), label, value, focused, pill, 14)
+}
+
+func fieldIcon(label string) string {
+	switch strings.ToLower(strings.TrimSpace(label)) {
+	case "stack", "détecté":
+		return "⚙"
+	case "validation":
+		return "✓"
+	case "nom du projet", "projet":
+		return "◫"
+	case "branche", "branche par défaut":
+		return "⎇"
+	default:
+		return "·"
+	}
 }
 
 // RenderTabBar renders horizontal step tabs.
@@ -246,6 +412,34 @@ func (s Styles) RenderProgress(score, max int, width int) string {
 	filledStr := barStyle.Render(strings.Repeat("█", filled))
 	emptyStr := s.Divider.Render(strings.Repeat("░", width-filled))
 	return filledStr + emptyStr + s.Bold.Render(fmt.Sprintf(" %d/%d", score, max))
+}
+
+// RenderBarGauge renders a labelled horizontal bar gauge with a percentage.
+func (s Styles) RenderBarGauge(label string, pct, labelW, barW int) string {
+	if pct < 0 {
+		pct = 0
+	}
+	if pct > 100 {
+		pct = 100
+	}
+	if barW < 4 {
+		barW = 4
+	}
+	filled := pct * barW / 100
+	barStyle := s.Success
+	switch {
+	case pct < 50:
+		barStyle = s.Error
+	case pct < 80:
+		barStyle = s.Warning
+	}
+	bar := barStyle.Render(strings.Repeat("█", filled)) +
+		s.Divider.Render(strings.Repeat("░", barW-filled))
+	lbl := lipgloss.NewStyle().
+		Width(labelW).
+		Foreground(lipgloss.Color(s.Theme.Palette.Muted)).
+		Render(label)
+	return lbl + " " + bar + " " + s.Bold.Render(fmt.Sprintf("%3d%%", pct))
 }
 
 // RenderCheckStatus formats a readiness check line.

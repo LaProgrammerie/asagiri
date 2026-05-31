@@ -12,6 +12,7 @@ var themes = map[string]Theme{
 			Error:      "#F87171",
 			Border:     "#3D3552",
 			Background: "#0D0F14",
+			Surface:    "#141820",
 		},
 	},
 	"asagiri-light": {
@@ -25,6 +26,7 @@ var themes = map[string]Theme{
 			Error:      "#DC2626",
 			Border:     "#CBD5E1",
 			Background: "#F8F9FB",
+			Surface:    "#EEF2F7",
 		},
 	},
 	"minimal": {

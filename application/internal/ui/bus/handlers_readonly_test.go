@@ -15,6 +15,7 @@ import (
 	_ "github.com/LaProgrammerie/asagiri/application/internal/knowledge/sqlite"
 	"github.com/LaProgrammerie/asagiri/application/internal/runtime"
 	"github.com/LaProgrammerie/asagiri/application/internal/store/sqlite"
+	"github.com/LaProgrammerie/asagiri/application/internal/telemetry"
 	"github.com/stretchr/testify/require"
 )
 
@@ -54,6 +55,10 @@ func (m *mockRuntimeStore) CollectMetrics() (runtime.MetricsSnapshot, error) {
 
 type mockStateStore struct {
 	runs       []sqlite.Run
+	tasks      []sqlite.Task
+	metric     *telemetry.RunMetric
+	getRun     *sqlite.Run
+	getRunErr  error
 	listErr    error
 	migrateErr error
 	closeErr   error
@@ -71,6 +76,36 @@ func (m *mockStateStore) ListRuns(limit int) ([]sqlite.Run, error) {
 		return m.runs, nil
 	}
 	return m.runs[:limit], nil
+}
+
+func (m *mockStateStore) GetRun(id string) (*sqlite.Run, error) {
+	if m.getRunErr != nil {
+		return nil, m.getRunErr
+	}
+	if m.getRun != nil {
+		return m.getRun, nil
+	}
+	for i := range m.runs {
+		if m.runs[i].ID == id {
+			r := m.runs[i]
+			return &r, nil
+		}
+	}
+	return nil, nil
+}
+
+func (m *mockStateStore) ListTasksByRun(runID string) ([]sqlite.Task, error) {
+	var out []sqlite.Task
+	for _, t := range m.tasks {
+		if t.RunID == runID {
+			out = append(out, t)
+		}
+	}
+	return out, nil
+}
+
+func (m *mockStateStore) GetRunMetric(runID string) (*telemetry.RunMetric, error) {
+	return m.metric, nil
 }
 
 func TestQueryBusRuntimeStatusOpenFailureReturnsWarning(t *testing.T) {

@@ -18,6 +18,7 @@ type Palette struct {
 	Error      string
 	Border     string
 	Background string
+	Surface    string // card/panel fill; defaults to Border tone when empty
 }
 
 // Theme defines one named UI palette.

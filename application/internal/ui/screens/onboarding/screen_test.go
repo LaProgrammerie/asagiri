@@ -189,7 +189,7 @@ func TestRenderWizardFullscreen(t *testing.T) {
 		Theme:      theme.Default(),
 		Shell:      onboarding.ShellContext{Workspace: "chatbot"},
 	})
-	require.Contains(t, got, "ASAGIRI PROJECT ONBOARDING WIZARD")
+	require.Contains(t, got, "Project Onboarding")
 	require.Contains(t, got, "chatbot")
 	require.NotContains(t, got, "Screen: onboarding")
 }

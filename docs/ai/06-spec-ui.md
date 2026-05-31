@@ -30,6 +30,7 @@ Spec-ui introduit l’Experience Platform terminal au-dessus des primitives CLI 
 | `asa knowledge` | Knowledge Explorer |
 | `asa trust` | Trust Explorer |
 | `asa replay open <id>` | Replay Explorer |
+| `asa runs` | Runs screen (liste + détail) |
 | `asa prototype` | Prototype Mode |
 | `asa explain` | Explain screen |
 
@@ -127,3 +128,63 @@ cd docs-site && pnpm docs:check
 ```
 
 **FULL FEATURE** : matrice handoff 100 % `[x]` ; `go test ./...` vert ; revue §33 signée `2026-05-29` (COMMENT — durcissement shimmer/tabs/test binaire optionnel).
+
+---
+
+## 9. Operations Cockpit — consolidation Direction 4 (ADR-029, `2026-05-31`)
+
+Consolidation (pas refonte) corrigeant l'inversion d'effort UI : Mission Control
+(écran quotidien) était en texte brut, le wizard onboarding (one-shot) portait le
+chrome premium « EOS ». Livré en 5 phases, Phases 0–2 sans changement de données.
+
+### 9.1 Fondation visuelle partagée (Phase 0)
+
+- `components.PanelSized(title, body, w, h, theme)` — panneau borné (bordure,
+  padding, clamp hauteur) dérivé de `eosColumn`.
+- `components.RenderNavRail` / `RenderTopBar` / `RenderBottomBar` — shell partagé
+  généralisé depuis `renderEOS*`. **Un seul jeu de helpers** pour le cockpit et
+  l'onboarding.
+
+### 9.2 Mission Control panelisé (Phase 1)
+
+- `mission.RenderCockpit` construit les panneaux (Runtime, Trust, Agents, Active
+  Flow, Runs, Events) via `PanelSized`, disposés par `layout.DashboardColumns`
+  (1/2/3 colonnes selon la largeur). Fallback plat conservé pour `plain|json`.
+
+### 9.3 Rail de navigation persistant (Phase 2)
+
+- `app.renderNavRail` injecté dans `View()` ; entrée active = `router.Current()`.
+- Badges d'état depuis le snapshot (runs actifs, alerte trust, file d'events).
+- Collapse sous `compact_threshold` ; clic souris sur une ligne → `navigateTo` ;
+  `Ctrl+<lettre>` + palette conservés.
+
+### 9.4 Écran Runs + `RunDetail` (Phase 3 — seul vrai dev neuf)
+
+- Bus : `RunDetail`, `RunPipelineStep`, `GetRunDetailQuery` + handler
+  d'agrégation (`handleGetRunDetail`) combinant sqlite (`runs`/`tasks`/
+  `run_metrics`), trust gate, agents actifs et events filtrés par run. **Aucune
+  logique métier dans `ui/`** : pure agrégation de données déjà exposées.
+- `screens/runs/` : liste + panneau détail (glyphes pipeline, worktree, agents,
+  validation, trust gate, events) ; sélection clavier/souris ; drill-down
+  `t` (trust) / `g` (graph) / `r` (replay) ; empty state → `asa onboard --ui`.
+- Router `ScreenRuns` + entrée palette `nav.runs` + entrée rail + CLI `asa runs`.
+
+### 9.5 Consolidation onboarding (Phase 4)
+
+- Wizard fullscreen routé dans le **shell commun** (`components.*`) ; chrome
+  `renderFullscreenWizard` bespoke supprimé.
+- Télémétrie fictive retirée : `analyzerConfidence`, panneau « AGENT ACTIF »,
+  ligne cost/API du bottom bar.
+- Code `eos_*` mort supprimé ; seuls les helpers partagés et le contenu réutilisé
+  (`renderStepPanel`, `renderWelcomePanel`, progression/readiness) subsistent.
+- Bascule automatique vers Mission Control après apply + readiness `Ready`.
+
+### 9.6 Validation
+
+```bash
+go test ./... -count=1   # vert
+go vet ./...             # propre
+make build               # ok (bin/asa)
+```
+
+Équivalents CLI préservés (`asa runs --help`) ; parité plain/json maintenue.

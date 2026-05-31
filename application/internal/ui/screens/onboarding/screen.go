@@ -23,10 +23,12 @@ type ViewModel struct {
 	Theme           theme.Theme
 }
 
-// Render returns the interactive onboarding wizard view.
+// Render returns the interactive onboarding wizard view. The fullscreen wizard
+// is routed through the shared cockpit shell (components.*); narrower terminals
+// and non-wizard contexts fall back to the flat layout.
 func Render(vm ViewModel) string {
-	if vm.FullScreen && vm.WizardMode && vm.Width >= 90 {
-		return renderEOS(vm)
+	if vm.FullScreen && vm.WizardMode && vm.Width >= 90 && vm.Height >= 24 {
+		return renderShell(vm)
 	}
 	if vm.Model.Applied {
 		return renderReadySummary(vm)

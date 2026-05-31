@@ -20,6 +20,8 @@ func (b *queryBus) Query(ctx context.Context, query Query) (QueryResult, error) 
 		return b.handleGetRuntimeStatus(ctx, q)
 	case ListRunsQuery:
 		return b.handleListRuns(ctx, q)
+	case GetRunDetailQuery:
+		return b.handleGetRunDetail(ctx, q)
 	case GetRecentEventsQuery:
 		return b.handleGetRecentEvents(ctx, q)
 	case GetTrustSummaryQuery:

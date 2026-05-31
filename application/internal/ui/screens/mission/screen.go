@@ -8,6 +8,7 @@ import (
 
 	"github.com/LaProgrammerie/asagiri/application/internal/ui/bus"
 	"github.com/LaProgrammerie/asagiri/application/internal/ui/components"
+	"github.com/LaProgrammerie/asagiri/application/internal/ui/theme"
 )
 
 // ViewModel is the data contract for Mission Control.
@@ -32,6 +33,13 @@ type ViewModel struct {
 	DisableAnimations bool
 	AnimFrame         int
 	EventFeed         components.EventFeedViewModel
+
+	// Rich cockpit geometry (panelised path). Zero values fall back to the
+	// flat Render output for plain/json parity.
+	Width            int
+	Height           int
+	CompactThreshold int
+	Theme            theme.Theme
 }
 
 // Render returns Mission Control textual content.

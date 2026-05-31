@@ -94,6 +94,14 @@ func newDashboardCmd(dryRun *bool) *cobra.Command {
 	}
 }
 
+func newRunsCmd(dryRun *bool) *cobra.Command {
+	return &cobra.Command{
+		Use:   "runs",
+		Short: "Ouvrir l'écran Runs (liste + détail)",
+		RunE:  runUIScreenCommand(dryRun, uiapp.ScreenRuns),
+	}
+}
+
 func newAgentsCmd(dryRun *bool) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "agents",

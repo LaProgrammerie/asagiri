@@ -235,6 +235,12 @@ func (m model) handleOnboardingApply(msg onboardingApplyMsg) (tea.Model, tea.Cmd
 	m.onboardingWizard.Message = msg.message
 	m.lastError = ""
 	m.lastCommandResult = msg.message
+	// CK-4.4: once the repo is ready, hand off to Mission Control through the
+	// shared shell. Otherwise keep the ready summary so autofixes can be applied.
+	if msg.readiness.Ready {
+		m.wizardMode = false
+		m.navigateTo(ScreenMission, "asa")
+	}
 	return m, m.snapshotQueryCmd()
 }
 

@@ -30,7 +30,7 @@ func stripANSI(v string) string {
 	return string(out)
 }
 
-func TestEOSLayoutRendersShell(t *testing.T) {
+func TestShellLayoutRendersThroughSharedShell(t *testing.T) {
 	m := onboarding.NewModelFromForm(onbdomain.Form{Step: onbdomain.StepWelcome}, false)
 	got := stripANSI(onboarding.Render(onboarding.ViewModel{
 		Model:      m,
@@ -48,18 +48,23 @@ func TestEOSLayoutRendersShell(t *testing.T) {
 		},
 	}))
 
-	require.Contains(t, got, "Engineering Operating System")
+	require.Contains(t, got, "Project Onboarding")
 	require.Contains(t, got, "NAVIGATION")
-	require.Contains(t, got, "Onboarding Wizard")
-	require.Contains(t, got, "CONTEXTE PROJET")
+	require.Contains(t, got, "Onboarding")
 	require.Contains(t, got, "Bienvenue dans Asagiri")
-	require.Contains(t, got, "Ce que nous allons faire")
+	require.Contains(t, got, "CE QUE NOUS ALLONS FAIRE")
 	require.Contains(t, got, "Précédent")
 	require.Contains(t, got, "Suivant")
 	require.Equal(t, 2, strings.Count(got, "ASAGIRI"))
+
+	// CK-4.2: no fake telemetry leaks into the shared shell.
+	require.NotContains(t, got, "Onboarding Analyzer")
+	require.NotContains(t, got, "Analyzing")
+	require.NotContains(t, got, "Confiance")
+	require.NotContains(t, got, "API:")
 }
 
-func TestEOSLayoutWidthMatchesTerminal(t *testing.T) {
+func TestShellLayoutWidthMatchesTerminal(t *testing.T) {
 	m := onboarding.NewModelFromForm(onbdomain.Form{Step: onbdomain.StepWelcome}, false)
 	const termW = 120
 	got := onboarding.Render(onboarding.ViewModel{
@@ -77,7 +82,7 @@ func TestEOSLayoutWidthMatchesTerminal(t *testing.T) {
 	}
 }
 
-func TestEOSLayoutStepProject(t *testing.T) {
+func TestShellLayoutStepProject(t *testing.T) {
 	m := onboarding.NewModelFromForm(onbdomain.Form{
 		Step: onbdomain.StepProject,
 		Answers: onbdomain.Answers{

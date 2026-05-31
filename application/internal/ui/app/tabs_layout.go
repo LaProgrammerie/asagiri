@@ -106,6 +106,12 @@ func (m model) renderMissionBody(vm mission.ViewModel, tab int) string {
 		panes := []string{headerPanel, actionsPanel, eventsPanel}
 		return strings.Join(panes, "\n")
 	default:
+		// Rich panelised cockpit (CK-1): responsive grid via PanelSized +
+		// DashboardColumns. Falls back to the flat overview when geometry is
+		// unavailable (vm.Width/Height zero).
+		if vm.Width > 0 && vm.Height > 0 {
+			return mission.RenderCockpit(vm)
+		}
 		return m.renderMissionOverview(vm, headerPanel, runtimePanel, trustPanel, flowPanel, agentsPanel, actionsPanel, eventsPanel)
 	}
 }

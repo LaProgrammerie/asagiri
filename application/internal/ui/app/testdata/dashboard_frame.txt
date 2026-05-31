@@ -1,55 +1,55 @@
- ╭─────────────────────────────────────────────────────────────────────────────────────────────────────────╮ 
- │  ASAGIRI   Mission Control                                                                              │ 
- │ Screen · dashboard                                                                                      │ 
- │   RUNTIME  running  Screen: dashboard                                                                   │ 
- │                                                                                                         │ 
- │  Widgets   Metrics                                                                                      │ 
- │                                                                                                         │ 
- │  Widgets   Metrics                                                                                      │ 
- │                                                                                                         │ 
- │ ╭─────────────────────╮╭───────────────╮                                                                │ 
- │ │ Runtime             ││ Sessions      │                                                                │ 
- │ │ ░ ⠋ Status: running ││ Active: 3     │                                                                │ 
- │ │ Sessions: 3         ││ State: active │                                                                │ 
- │ │ Flows: 1            │╰───────────────╯                                                                │ 
- │ │ Queue: 2            │                                                                                 │ 
- │ ╰─────────────────────╯                                                                                 │ 
- │ ╭─────────────────╮╭────────────────────────╮                                                           │ 
- │ │ Queue           ││ Agents                 │                                                           │ 
- │ │ Depth: 2        ││ ✓ investigator codex   │                                                           │ 
- │ │ Trend: ▄▄▄▄████ ││ ░ ⠋ implementer cursor │                                                           │ 
- │ ╰─────────────────╯╰────────────────────────╯                                                           │ 
- │ ╭──────────────────────────────╮╭──────────────╮                                                        │ 
- │ │ Trust                        ││ Costs        │                                                        │ 
- │ │ Architecture  ████████░░ 82% ││ Today: €0.42 │                                                        │ 
- │ │ Security      ███████░░░ 71% ││ Month: €6.10 │                                                        │ 
- │ │ Observability ██████░░░░ 63% │╰──────────────╯                                                        │ 
- │ │ Regression    ███████░░░ 78% │                                                                        │ 
- │ │ Overall       ███████░░░ 76% │                                                                        │ 
- │ ╰──────────────────────────────╯                                                                        │ 
- │ ╭────────────────────────────────────────╮╭────────────────────╮                                        │ 
- │ │ Flow                                   ││ Risk               │                                        │ 
- │ │ ✓ create_workspace   ░ ⠋ invite_member ││ Residual: unknown  │                                        │ 
- │ ╰────────────────────────────────────────╯│ No high-risk nodes │                                        │ 
- │                                           ╰────────────────────╯                                        │ 
- │ ╭───────────────────╮╭───────────────────╮                                                              │ 
- │ │ Knowledge         ││ Replay            │                                                              │ 
- │ │ No knowledge hits ││ No replay package │                                                              │ 
- │ ╰───────────────────╯╰───────────────────╯                                                              │ 
- │ ╭─────────────────────────────────────────────────────────────────────────╮╭──────────────────────────╮ │ 
- │ │ Events                                                                  ││ Progress                 │ │ 
- │ │ Filter: all  Search: (none)  [live]                                     ││ Completed: 1/2           │ │ 
- │ │ Keys: f filter  / search  p pause  x export  o open  e focus  ↑↓ select ││ Progress: █████░░░░░ 50% │ │ 
- │ │ CLI: asa runtime events --type <filter> --search <query> --export       │╰──────────────────────────╯ │ 
- │ │   12:32:56  investigation.completed                                     │                             │ 
- │ │   12:33:56  graph.generated                                             │                             │ 
- │ ╰─────────────────────────────────────────────────────────────────────────╯                             │ 
- │ ╭────────────────────────╮                                                                              │ 
- │ │ Performance            │                                                                              │ 
- │ │ Events: 2              │                                                                              │ 
- │ │ Throughput: ▅▅▅▅▅█████ │                                                                              │ 
- │ │ Runs done: █████░░░░░  │                                                                              │ 
- │ ╰────────────────────────╯                                                                              │ 
- │                                                                                                         │ 
- │ Screen: dashboard  |  CLI: asa dashboard                                                                │ 
- ╰─────────────────────────────────────────────────────────────────────────────────────────────────────────╯ 
+ ╭─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮ 
+ │  ASAGIRI   Mission Control                                                                                                      │ 
+ │ Screen · dashboard                                                                                                              │ 
+ │   RUNTIME  running  Screen: dashboard                                                                                           │ 
+ │                                                                                                                                 │ 
+ │  Widgets   Metrics                                                                                                              │ 
+ │                                                                                                                                 │ 
+ │  NAVIGATION            │ Widgets   Metrics                                                                                      │ 
+ │                        │                                                                                                        │ 
+ │   ◆  Mission           │╭─────────────────────╮╭───────────────╮                                                                │ 
+ │   ▣  Dashboard         ││ Runtime             ││ Sessions      │                                                                │ 
+ │   ▶  Runs          1   ││ ░ ⠋ Status: running ││ Active: 3     │                                                                │ 
+ │   ◎  Agents        2   ││ Sessions: 3         ││ State: active │                                                                │ 
+ │   ⇄  Flow              ││ Flows: 1            │╰───────────────╯                                                                │ 
+ │   ⊹  Graph             ││ Queue: 2            │                                                                                 │ 
+ │   ⛉  Trust             │╰─────────────────────╯                                                                                 │ 
+ │   ❏  Knowledge         │╭─────────────────╮╭────────────────────────╮                                                           │ 
+ │   ↺  Replay            ││ Queue           ││ Agents                 │                                                           │ 
+ │   ▤  Logs          2   ││ Depth: 2        ││ ✓ investigator codex   │                                                           │ 
+ │   ?  Explain           ││ Trend: ▄▄▄▄████ ││ ░ ⠋ implementer cursor │                                                           │ 
+ │   ⚙  Settings          │╰─────────────────╯╰────────────────────────╯                                                           │ 
+ │                        │╭──────────────────────────────╮╭──────────────╮                                                        │ 
+ │                        ││ Trust                        ││ Costs        │                                                        │ 
+ │                        ││ Architecture  ████████░░ 82% ││ Today: €0.42 │                                                        │ 
+ │                        ││ Security      ███████░░░ 71% ││ Month: €6.10 │                                                        │ 
+ │                        ││ Observability ██████░░░░ 63% │╰──────────────╯                                                        │ 
+ │                        ││ Regression    ███████░░░ 78% │                                                                        │ 
+ │                        ││ Overall       ███████░░░ 76% │                                                                        │ 
+ │                        │╰──────────────────────────────╯                                                                        │ 
+ │                        │╭────────────────────────────────────────╮╭────────────────────╮                                        │ 
+ │                        ││ Flow                                   ││ Risk               │                                        │ 
+ │                        ││ ✓ create_workspace   ░ ⠋ invite_member ││ Residual: unknown  │                                        │ 
+ │                        │╰────────────────────────────────────────╯│ No high-risk nodes │                                        │ 
+ │                        │                                          ╰────────────────────╯                                        │ 
+ │                        │╭───────────────────╮╭───────────────────╮                                                              │ 
+ │                        ││ Knowledge         ││ Replay            │                                                              │ 
+ │                        ││ No knowledge hits ││ No replay package │                                                              │ 
+ │                        │╰───────────────────╯╰───────────────────╯                                                              │ 
+ │                        │╭─────────────────────────────────────────────────────────────────────────╮╭──────────────────────────╮ │ 
+ │                        ││ Events                                                                  ││ Progress                 │ │ 
+ │                        ││ Filter: all  Search: (none)  [live]                                     ││ Completed: 1/2           │ │ 
+ │                        ││ Keys: f filter  / search  p pause  x export  o open  e focus  ↑↓ select ││ Progress: █████░░░░░ 50% │ │ 
+ │                        ││ CLI: asa runtime events --type <filter> --search <query> --export       │╰──────────────────────────╯ │ 
+ │                        ││   12:32:56  investigation.completed                                     │                             │ 
+ │                        ││   12:33:56  graph.generated                                             │                             │ 
+ │                        │╰─────────────────────────────────────────────────────────────────────────╯                             │ 
+ │                        │╭────────────────────────╮                                                                              │ 
+ │                        ││ Performance            │                                                                              │ 
+ │                        ││ Events: 2              │                                                                              │ 
+ │                        ││ Throughput: ▅▅▅▅▅█████ │                                                                              │ 
+ │                        ││ Runs done: █████░░░░░  │                                                                              │ 
+ │                        │╰────────────────────────╯                                                                              │ 
+ │                                                                                                                                 │ 
+ │ Screen: dashboard  |  CLI: asa dashboard                                                                                        │ 
+ ╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯ 
