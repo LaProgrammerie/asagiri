@@ -58,6 +58,13 @@ func (m *model) updateRunsExplorerKey(v tea.KeyMsg, key string) (tea.Model, tea.
 	case input.KeyExplorerRun: // "r" → replay drill-down
 		m.navigateTo(ScreenReplay, "asa replay open <replay-id>")
 		return m, nil
+	case input.KeyExplorerOpen, input.KeyExplorerEnter:
+		runID := m.runsExplorer.SelectedRunID(m.snapshot.Runs)
+		if runID == "" {
+			return m, nil
+		}
+		m.lastCommandResult = "run: opened " + runID
+		return m, nil
 	}
 	return m, nil
 }

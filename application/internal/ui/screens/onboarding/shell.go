@@ -112,11 +112,6 @@ func renderShellCenter(vm ViewModel, st theme.Styles, w, h int) string {
 
 	const footerLines = 1
 	base := header + "\n\n" + card
-	if free := h - 2 - lineCount(base) - footerLines; free >= 9 {
-		if dash := renderCenterDashboard(vm, st, innerW, free-2); dash != "" {
-			base = base + "\n\n" + dash
-		}
-	}
 
 	spacer := h - 2 - lineCount(base) - footerLines
 	if spacer < 0 {

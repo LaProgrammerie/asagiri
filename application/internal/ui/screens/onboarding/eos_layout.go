@@ -37,23 +37,6 @@ func renderEOSCenterHeader(st theme.Styles, step onbdomain.WizardStep, idx, tota
 	return line1 + "\n" + line2
 }
 
-// renderCenterDashboard renders the borderless Activity + Readiness columns.
-func renderCenterDashboard(vm ViewModel, st theme.Styles, innerW, maxRows int) string {
-	if maxRows < 4 {
-		return ""
-	}
-	gap := 3
-	colW := (innerW - gap) / 2
-	rows := maxRows - 2 // reserve for section heads
-
-	act := st.SectionHead.Render("ACTIVITY") + "\n\n" + renderActivitySection(st, vm, rows, colW)
-	ready := st.SectionHead.Render("READINESS") + "\n\n" + renderReadinessSection(st, vm, colW)
-
-	actCol := lipgloss.NewStyle().Width(colW).Render(act)
-	readyCol := lipgloss.NewStyle().Width(colW).Render(ready)
-	return lipgloss.JoinHorizontal(lipgloss.Top, actCol, strings.Repeat(" ", gap), readyCol)
-}
-
 func renderEOSStepContent(vm ViewModel, st theme.Styles, boxW int) string {
 	if boxW < 20 {
 		boxW = 20
@@ -207,18 +190,4 @@ func fallbackStr(values ...string) string {
 		}
 	}
 	return "—"
-}
-
-func renderWizardCompact(vm ViewModel) string {
-	st := vm.Theme.Styles()
-	innerW := contentBoxWidth(vm.Width)
-	model := vm.Model
-	content := st.ContentArea.Width(innerW).Render(renderWizardPanelBody(vm, st))
-	body := joinBlocks(
-		st.RenderPageHeader("Project Onboarding Wizard", StepProgress(model.Step)),
-		renderStepper(model.Step, st, innerW),
-		content,
-		renderEOSFooter(model, st, innerW),
-	)
-	return wrapFullscreen(body, StepLabel(model.Step), st, vm.Width)
 }

@@ -76,3 +76,15 @@ func TestHandleGetRunDetailNotFound(t *testing.T) {
 	require.True(t, ok)
 	require.Equal(t, "run not found", detail.Warning)
 }
+
+func TestFilterRunAgents(t *testing.T) {
+	t.Parallel()
+	all := []ActiveAgentSummary{
+		{Role: "implementer", AgentRef: "cursor", FlowID: "cockpit-consolidation", Status: "running"},
+		{Role: "reviewer", AgentRef: "gpt", FlowID: "other-feature", Status: "idle"},
+	}
+	matched := filterRunAgents(all, "cockpit-consolidation", "run-1")
+	require.Len(t, matched, 1)
+	require.Equal(t, "cursor", matched[0].AgentRef)
+	require.Empty(t, filterRunAgents(all, "unknown", "run-99"))
+}

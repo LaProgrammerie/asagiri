@@ -38,6 +38,13 @@ func TestRunsDrillDownNavigates(t *testing.T) {
 	}
 }
 
+func TestRunsEnterOpensSelectedRun(t *testing.T) {
+	m := newRunsModel()
+	next, _ := m.updateRunsExplorerKey(tea.KeyMsg{Type: tea.KeyEnter}, "enter")
+	nm := next.(*model)
+	require.Contains(t, nm.lastCommandResult, "run-1")
+}
+
 func TestRunsListSelectionMovesCursor(t *testing.T) {
 	m := newRunsModel()
 	next, _ := m.updateRunsExplorerKey(tea.KeyMsg{Type: tea.KeyDown}, "down")

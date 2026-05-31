@@ -417,12 +417,13 @@ func (m model) View() string {
 	if m.height == 0 {
 		m.height = 30
 	}
-	if m.wizardMode {
-		return m.renderFullscreenWizard()
-	}
 	root := lipgloss.NewStyle().Padding(0, 1)
 	st := m.theme.Styles()
-	title := st.RenderHero("ASAGIRI", "Mission Control", fmt.Sprintf("Screen · %s", m.router.Current()))
+	heroTitle := "Mission Control"
+	if m.wizardMode {
+		heroTitle = "Project Onboarding"
+	}
+	title := st.RenderHero("ASAGIRI", heroTitle, fmt.Sprintf("Screen · %s", m.router.Current()))
 	statusBar := st.RenderStatusBar(
 		"RUNTIME",
 		m.runtimeStatusLabel(),
@@ -473,17 +474,22 @@ func (m model) View() string {
 	return root.Render(frame)
 }
 
-func (m model) renderFullscreenWizard() string {
+func (m model) renderOnboardingBody() string {
 	m.ensureOnboardingWizard()
 	w := m.onboardingWizard
+	bodyH := m.height - 8
+	if bodyH < 12 {
+		bodyH = 12
+	}
 	inner := onboarding.Render(onboarding.ViewModel{
 		Model:      w,
 		Readiness:  m.snapshot.Readiness,
 		ShowCLI:    m.cfg.ShowCLIEquivalents,
-		WizardMode: true,
-		FullScreen: true,
-		Width:      m.width,
-		Height:     m.height,
+		WizardMode: m.wizardMode,
+		InAppShell: m.wizardMode,
+		FullScreen: m.wizardMode,
+		Width:      m.bodyWidth(),
+		Height:     bodyH,
 		Theme:      m.theme,
 		Shell: onboarding.ShellContext{
 			Workspace:    firstNonEmpty(m.snapshot.Workspace, w.Fields["project_name"]),
@@ -521,13 +527,14 @@ func (m model) renderScreen() string {
 		})
 	case ScreenRuns:
 		return runs.Render(runs.ViewModel{
-			Runs:    m.snapshot.Runs,
-			Detail:  m.currentRunDetail(),
-			Model:   m.runsExplorer,
-			ShowCLI: m.cfg.ShowCLIEquivalents,
-			Width:   m.bodyWidth(),
-			Height:  m.height,
-			Theme:   m.theme,
+			Runs:      m.snapshot.Runs,
+			Detail:    m.currentRunDetail(),
+			Model:     m.runsExplorer,
+			Readiness: m.snapshot.Readiness,
+			ShowCLI:   m.cfg.ShowCLIEquivalents,
+			Width:     m.bodyWidth(),
+			Height:    m.height,
+			Theme:     m.theme,
 		})
 	case ScreenAgents:
 		content := agents.Render(agents.ViewModel{
@@ -605,6 +612,9 @@ func (m model) renderScreen() string {
 		})
 		return components.Panel("Settings", content, m.theme)
 	case ScreenOnboarding:
+		if m.wizardMode {
+			return m.renderOnboardingBody()
+		}
 		m.ensureOnboardingWizard()
 		content := onboarding.Render(onboarding.ViewModel{
 			Model:      m.onboardingWizard,

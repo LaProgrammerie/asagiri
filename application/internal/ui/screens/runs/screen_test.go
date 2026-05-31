@@ -1,6 +1,7 @@
 package runs
 
 import (
+	"os"
 	"testing"
 
 	"github.com/LaProgrammerie/asagiri/application/internal/ui/bus"
@@ -33,6 +34,7 @@ func sampleVM(width int) ViewModel {
 			{ID: "run-1", Feature: "cockpit", Status: "running"},
 			{ID: "run-2", Feature: "spec-ui", Status: "completed"},
 		},
+		Readiness: bus.ReadinessResult{Ready: true, Score: 100},
 		Detail: bus.RunDetail{
 			ID:       "run-1",
 			Feature:  "cockpit",
@@ -73,6 +75,18 @@ func TestRenderRunsEmptyState(t *testing.T) {
 	require.Contains(t, got, "asa onboard --ui")
 }
 
+func TestRenderRunsEmptyWhenNotOnboarded(t *testing.T) {
+	got := stripANSI(Render(ViewModel{
+		Runs:      []bus.RunSummary{{ID: "run-1", Feature: "x", Status: "running"}},
+		Readiness: bus.ReadinessResult{Ready: false, Score: 20},
+		Theme:     theme.Default(),
+		Width:     120,
+		Height:    30,
+	}))
+	require.Contains(t, got, "No runs yet")
+	require.Contains(t, got, "asa onboard --ui")
+}
+
 func TestRunsSelectionClamps(t *testing.T) {
 	m := NewModel()
 	m.SelectIndex(5, 2)
@@ -88,4 +102,20 @@ func TestRenderRunsNarrowStacks(t *testing.T) {
 	got := stripANSI(Render(sampleVM(60)))
 	require.Contains(t, got, "Runs")
 	require.Contains(t, got, "Run detail")
+}
+
+func TestRenderRunsGolden(t *testing.T) {
+	got := Render(sampleVM(120))
+	golden := "testdata/runs_wide.txt"
+	if os.Getenv("UPDATE_GOLDEN") == "1" {
+		require.NoError(t, os.MkdirAll("testdata", 0o755))
+		require.NoError(t, os.WriteFile(golden, []byte(got), 0o644))
+		return
+	}
+	want, err := os.ReadFile(golden)
+	if os.IsNotExist(err) {
+		t.Fatalf("golden %s missing; run with UPDATE_GOLDEN=1", golden)
+	}
+	require.NoError(t, err)
+	require.Equal(t, string(want), got)
 }

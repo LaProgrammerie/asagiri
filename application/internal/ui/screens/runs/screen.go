@@ -78,19 +78,20 @@ func (m Model) SelectedRunID(runs []bus.RunSummary) string {
 
 // ViewModel contains Runs screen data.
 type ViewModel struct {
-	Runs    []bus.RunSummary
-	Detail  bus.RunDetail
-	Model   Model
-	ShowCLI bool
-	Width   int
-	Height  int
-	Theme   theme.Theme
+	Runs      []bus.RunSummary
+	Detail    bus.RunDetail
+	Model     Model
+	Readiness bus.ReadinessResult
+	ShowCLI   bool
+	Width     int
+	Height    int
+	Theme     theme.Theme
 }
 
 // Render returns the Runs screen content: list pane + detail pane. When the
-// repository has no runs, it renders an empty state prompting onboarding.
+// repository has no runs or is not onboarded, it renders an empty state.
 func Render(vm ViewModel) string {
-	if len(vm.Runs) == 0 {
+	if len(vm.Runs) == 0 || !vm.Readiness.Ready {
 		return renderEmptyState(vm)
 	}
 	selected := vm.Model.Selected(len(vm.Runs))
@@ -180,7 +181,7 @@ func renderRunDetail(vm ViewModel) string {
 	}
 
 	b.WriteString("\nActions\n")
-	b.WriteString("- t trust   g graph   r replay\n")
+	b.WriteString("- enter open   t trust   g graph   r replay\n")
 	if vm.ShowCLI {
 		b.WriteString("- CLI: asa runs\n")
 	}

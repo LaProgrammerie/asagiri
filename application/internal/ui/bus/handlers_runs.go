@@ -77,7 +77,7 @@ func (b *queryBus) handleGetRunDetail(ctx context.Context, q GetRunDetailQuery) 
 	}
 	if agentsAny, aerr := b.handleListActiveAgents(ctx, ListActiveAgentsQuery{Limit: 50}); aerr == nil {
 		if typed, ok := agentsAny.(ActiveAgentsResult); ok {
-			detail.Agents = typed.Agents
+			detail.Agents = filterRunAgents(typed.Agents, run.Feature, run.ID)
 		}
 	}
 	if eventsAny, eerr := b.handleGetRecentEvents(ctx, GetRecentEventsQuery{Limit: 8}); eerr == nil {
@@ -132,4 +132,20 @@ func filterRunEvents(events []EventSummary, feature, runID string) []EventSummar
 		return matched
 	}
 	return events
+}
+
+func filterRunAgents(agents []ActiveAgentSummary, feature, runID string) []ActiveAgentSummary {
+	feature = strings.TrimSpace(feature)
+	runID = strings.TrimSpace(runID)
+	var matched []ActiveAgentSummary
+	for _, ag := range agents {
+		if feature != "" && (ag.FlowID == feature || strings.Contains(ag.FlowID, feature)) {
+			matched = append(matched, ag)
+			continue
+		}
+		if runID != "" && (ag.FlowID == runID || strings.Contains(ag.AgentRef, runID)) {
+			matched = append(matched, ag)
+		}
+	}
+	return matched
 }

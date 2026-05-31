@@ -80,6 +80,9 @@ type queueWidget struct {
 	snapshot bus.MissionControlSnapshotResult
 	animated bool
 }
+type runsSummaryWidget struct {
+	snapshot bus.MissionControlSnapshotResult
+}
 
 func RuntimeWidget(snapshot bus.MissionControlSnapshotResult, animated bool, animFrame int) Widget {
 	return runtimeWidget{snapshot: snapshot, animated: animated, animFrame: animFrame}
@@ -120,6 +123,9 @@ func SessionsWidget(snapshot bus.MissionControlSnapshotResult, animated bool) Wi
 func QueueWidget(snapshot bus.MissionControlSnapshotResult, animated bool) Widget {
 	return queueWidget{snapshot: snapshot, animated: animated}
 }
+func RunsSummaryWidget(snapshot bus.MissionControlSnapshotResult) Widget {
+	return runsSummaryWidget{snapshot: snapshot}
+}
 
 func (w runtimeWidget) Init() tea.Cmd  { return nil }
 func (w agentWidget) Init() tea.Cmd    { return nil }
@@ -133,7 +139,8 @@ func (w knowledgeWidget) Init() tea.Cmd { return nil }
 func (w replayWidget) Init() tea.Cmd   { return nil }
 func (w performanceWidget) Init() tea.Cmd { return nil }
 func (w sessionsWidget) Init() tea.Cmd { return nil }
-func (w queueWidget) Init() tea.Cmd   { return nil }
+func (w queueWidget) Init() tea.Cmd        { return nil }
+func (w runsSummaryWidget) Init() tea.Cmd { return nil }
 
 func (w runtimeWidget) Update(msg tea.Msg) (tea.Model, tea.Cmd) { return w, nil }
 func (w agentWidget) Update(msg tea.Msg) (tea.Model, tea.Cmd)     { return w, nil }
@@ -147,7 +154,8 @@ func (w knowledgeWidget) Update(msg tea.Msg) (tea.Model, tea.Cmd) { return w, ni
 func (w replayWidget) Update(msg tea.Msg) (tea.Model, tea.Cmd)    { return w, nil }
 func (w performanceWidget) Update(msg tea.Msg) (tea.Model, tea.Cmd) { return w, nil }
 func (w sessionsWidget) Update(msg tea.Msg) (tea.Model, tea.Cmd)  { return w, nil }
-func (w queueWidget) Update(msg tea.Msg) (tea.Model, tea.Cmd)    { return w, nil }
+func (w queueWidget) Update(msg tea.Msg) (tea.Model, tea.Cmd)       { return w, nil }
+func (w runsSummaryWidget) Update(msg tea.Msg) (tea.Model, tea.Cmd) { return w, nil }
 
 func (w runtimeWidget) Title() string     { return "Runtime" }
 func (w agentWidget) Title() string       { return "Agents" }
@@ -161,7 +169,8 @@ func (w knowledgeWidget) Title() string   { return "Knowledge" }
 func (w replayWidget) Title() string      { return "Replay" }
 func (w performanceWidget) Title() string { return "Performance" }
 func (w sessionsWidget) Title() string    { return "Sessions" }
-func (w queueWidget) Title() string       { return "Queue" }
+func (w queueWidget) Title() string          { return "Queue" }
+func (w runsSummaryWidget) Title() string     { return "Runs" }
 
 func (w runtimeWidget) MinSize() Size      { return Size{Width: 32, Height: 5} }
 func (w agentWidget) MinSize() Size        { return Size{Width: 32, Height: 5} }
@@ -175,7 +184,8 @@ func (w knowledgeWidget) MinSize() Size   { return Size{Width: 36, Height: 4} }
 func (w replayWidget) MinSize() Size        { return Size{Width: 36, Height: 4} }
 func (w performanceWidget) MinSize() Size  { return Size{Width: 36, Height: 4} }
 func (w sessionsWidget) MinSize() Size      { return Size{Width: 28, Height: 3} }
-func (w queueWidget) MinSize() Size        { return Size{Width: 28, Height: 3} }
+func (w queueWidget) MinSize() Size           { return Size{Width: 28, Height: 3} }
+func (w runsSummaryWidget) MinSize() Size      { return Size{Width: 32, Height: 4} }
 
 func (w runtimeWidget) View() string {
 	return components.RuntimeCard(w.snapshot.Runtime, w.animated, w.animFrame)
@@ -279,6 +289,39 @@ func (w queueWidget) View() string {
 		components.LiveCounter("Depth", q, 0),
 		fmt.Sprintf("Trend: %s", components.Sparkline(samples, 8)),
 	}, "\n")
+}
+
+func (w runsSummaryWidget) View() string {
+	if len(w.snapshot.Runs) == 0 {
+		return "No recent runs"
+	}
+	var b strings.Builder
+	for i, run := range w.snapshot.Runs {
+		if i >= 5 {
+			break
+		}
+		feature := run.Feature
+		if feature == "" {
+			feature = run.ID
+		}
+		b.WriteString(fmt.Sprintf("%s  %s  %s\n", runStatusGlyph(run.Status), feature, run.Status))
+	}
+	return strings.TrimRight(b.String(), "\n")
+}
+
+func runStatusGlyph(status string) string {
+	switch status {
+	case "completed", "done", "success":
+		return "✓"
+	case "running":
+		return "•"
+	case "failed", "error":
+		return "✕"
+	case "blocked":
+		return "⊘"
+	default:
+		return "○"
+	}
 }
 
 func performanceSamples(snapshot bus.MissionControlSnapshotResult) []float64 {

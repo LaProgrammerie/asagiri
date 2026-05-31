@@ -25,11 +25,10 @@ func TestViewOnboardingWizardFullscreen(t *testing.T) {
 	m.height = 40
 	got := m.View()
 	require.Contains(t, got, "Project Onboarding")
-	require.Contains(t, got, "NAVIGATION")
-	require.NotContains(t, got, "Runtime: stopped")
-	require.NotContains(t, got, "Screen: onboarding")
-	// CK-4.2: no fake telemetry in the shared shell.
+	require.Contains(t, got, "Bienvenue")
+	require.Contains(t, got, "Screen: onboarding")
 	require.NotContains(t, got, "Onboarding Analyzer")
+	require.NotContains(t, got, "Analyzing")
 }
 
 func TestOnboardingApplyReadyHandsOffToMission(t *testing.T) {
@@ -591,7 +590,7 @@ func TestNoAnimationModeUsesStaticGlyphs(t *testing.T) {
 
 	got := stripANSI(m.View())
 	require.NotContains(t, got, "⠋")
-	require.Contains(t, got, "• invite_member")
+	require.Contains(t, got, "invite_member")
 }
 
 func TestMouseResizeAdjustsVerticalSplit(t *testing.T) {

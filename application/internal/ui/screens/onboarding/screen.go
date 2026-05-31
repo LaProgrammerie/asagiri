@@ -17,6 +17,7 @@ type ViewModel struct {
 	Shell           ShellContext
 	ShowCLI         bool
 	WizardMode      bool
+	InAppShell      bool // true when rendered inside app.View() (FR-5.1)
 	FullScreen      bool
 	Width           int
 	Height          int
@@ -27,6 +28,9 @@ type ViewModel struct {
 // is routed through the shared cockpit shell (components.*); narrower terminals
 // and non-wizard contexts fall back to the flat layout.
 func Render(vm ViewModel) string {
+	if vm.InAppShell {
+		return renderInAppShell(vm)
+	}
 	if vm.FullScreen && vm.WizardMode && vm.Width >= 90 && vm.Height >= 24 {
 		return renderShell(vm)
 	}
