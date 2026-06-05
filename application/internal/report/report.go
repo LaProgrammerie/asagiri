@@ -20,31 +20,31 @@ type Step struct {
 }
 
 type RunReport struct {
-	RunID      string        `json:"run_id"`
-	Feature    string        `json:"feature"`
-	Status     string        `json:"status"`
-	Generated  string        `json:"generated_at"`
-	Steps      []Step        `json:"steps"`
-	Tasks      []sqlite.Task `json:"tasks"`
-	Repository string        `json:"repository"`
+	RunID      string           `json:"run_id"`
+	Feature    string           `json:"feature"`
+	Status     string           `json:"status"`
+	Generated  string           `json:"generated_at"`
+	Steps      []Step           `json:"steps"`
+	Tasks      []sqlite.Task    `json:"tasks"`
+	Repository string           `json:"repository"`
 	Cost       *CostPerformance `json:"cost_performance,omitempty"`
 }
 
 // CostPerformance is an optional V3 section (specv3 §15).
 type CostPerformance struct {
-	EstimatedInputTokens      int    `json:"estimated_input_tokens"`
-	EstimatedOutputTokens     int    `json:"estimated_output_tokens"`
-	ActualInputTokens         int    `json:"actual_input_tokens"`
-	ActualOutputTokens        int    `json:"actual_output_tokens"`
-	EstimatedCost             string `json:"estimated_cost"`
-	ActualCost                string `json:"actual_cost"`
-	EstimatedDuration         string `json:"estimated_duration"`
-	ActualDuration            string `json:"actual_duration"`
-	FilesScanned              int    `json:"files_scanned_local"`
-	CandidateFiles            int    `json:"candidate_files"`
-	LargeFilesSummarized      int    `json:"large_files_summarized"`
-	CloudContextReducedFrom   int    `json:"cloud_context_reduced_from_tokens"`
-	TokenSavingsPercent       float64 `json:"token_savings_percent"`
+	EstimatedInputTokens    int     `json:"estimated_input_tokens"`
+	EstimatedOutputTokens   int     `json:"estimated_output_tokens"`
+	ActualInputTokens       int     `json:"actual_input_tokens"`
+	ActualOutputTokens      int     `json:"actual_output_tokens"`
+	EstimatedCost           string  `json:"estimated_cost"`
+	ActualCost              string  `json:"actual_cost"`
+	EstimatedDuration       string  `json:"estimated_duration"`
+	ActualDuration          string  `json:"actual_duration"`
+	FilesScanned            int     `json:"files_scanned_local"`
+	CandidateFiles          int     `json:"candidate_files"`
+	LargeFilesSummarized    int     `json:"large_files_summarized"`
+	CloudContextReducedFrom int     `json:"cloud_context_reduced_from_tokens"`
+	TokenSavingsPercent     float64 `json:"token_savings_percent"`
 }
 
 type Writer struct {
@@ -94,17 +94,17 @@ func (w *Writer) Write(run sqlite.Run, tasks []sqlite.Task, steps []Step, cost *
 func toMarkdown(r RunReport) string {
 	var sb strings.Builder
 	sb.WriteString("# Asagiri Report\n\n")
-	sb.WriteString(fmt.Sprintf("- Run: `%s`\n", r.RunID))
-	sb.WriteString(fmt.Sprintf("- Feature: `%s`\n", r.Feature))
-	sb.WriteString(fmt.Sprintf("- Status: `%s`\n", r.Status))
-	sb.WriteString(fmt.Sprintf("- Generated: `%s`\n\n", r.Generated))
+	fmt.Fprintf(&sb, "- Run: `%s`\n", r.RunID)
+	fmt.Fprintf(&sb, "- Feature: `%s`\n", r.Feature)
+	fmt.Fprintf(&sb, "- Status: `%s`\n", r.Status)
+	fmt.Fprintf(&sb, "- Generated: `%s`\n\n", r.Generated)
 
 	sb.WriteString("## Steps\n\n")
 	if len(r.Steps) == 0 {
 		sb.WriteString("- Aucun step enregistré\n\n")
 	} else {
 		for _, step := range r.Steps {
-			sb.WriteString(fmt.Sprintf("- `%s`: %s", step.Name, step.Status))
+			fmt.Fprintf(&sb, "- `%s`: %s", step.Name, step.Status)
 			if step.Message != "" {
 				sb.WriteString(" — " + step.Message)
 			}
@@ -118,7 +118,7 @@ func toMarkdown(r RunReport) string {
 		sb.WriteString("- Aucune task\n")
 	} else {
 		for _, task := range r.Tasks {
-			sb.WriteString(fmt.Sprintf("- `%s` [%s] %s\n", task.ID, task.Status, extractTaskTitle(task.PayloadJSON)))
+			fmt.Fprintf(&sb, "- `%s` [%s] %s\n", task.ID, task.Status, extractTaskTitle(task.PayloadJSON))
 		}
 	}
 	if r.Cost != nil {
@@ -133,22 +133,22 @@ func CostPerformanceMarkdown(c CostPerformance) string {
 	var sb strings.Builder
 	sb.WriteString("## Cost & Performance\n\n")
 	sb.WriteString("| Metric | Estimated | Actual |\n|---|---:|---:|\n")
-	sb.WriteString(fmt.Sprintf("| Input tokens | %s | %s |\n", formatInt(c.EstimatedInputTokens), formatInt(c.ActualInputTokens)))
-	sb.WriteString(fmt.Sprintf("| Output tokens | %s | %s |\n", formatInt(c.EstimatedOutputTokens), formatInt(c.ActualOutputTokens)))
-	sb.WriteString(fmt.Sprintf("| Cost | %s | %s |\n", c.EstimatedCost, c.ActualCost))
-	sb.WriteString(fmt.Sprintf("| Duration | %s | %s |\n", c.EstimatedDuration, c.ActualDuration))
+	fmt.Fprintf(&sb, "| Input tokens | %s | %s |\n", formatInt(c.EstimatedInputTokens), formatInt(c.ActualInputTokens))
+	fmt.Fprintf(&sb, "| Output tokens | %s | %s |\n", formatInt(c.EstimatedOutputTokens), formatInt(c.ActualOutputTokens))
+	fmt.Fprintf(&sb, "| Cost | %s | %s |\n", c.EstimatedCost, c.ActualCost)
+	fmt.Fprintf(&sb, "| Duration | %s | %s |\n", c.EstimatedDuration, c.ActualDuration)
 	sb.WriteString("\n## Local Work Saved\n\n")
-	sb.WriteString(fmt.Sprintf("- %s files scanned locally\n", formatInt(c.FilesScanned)))
-	sb.WriteString(fmt.Sprintf("- %s candidate files selected\n", formatInt(c.CandidateFiles)))
+	fmt.Fprintf(&sb, "- %s files scanned locally\n", formatInt(c.FilesScanned))
+	fmt.Fprintf(&sb, "- %s candidate files selected\n", formatInt(c.CandidateFiles))
 	if c.LargeFilesSummarized > 0 {
-		sb.WriteString(fmt.Sprintf("- %s large files summarized locally\n", formatInt(c.LargeFilesSummarized)))
+		fmt.Fprintf(&sb, "- %s large files summarized locally\n", formatInt(c.LargeFilesSummarized))
 	}
 	if c.CloudContextReducedFrom > 0 {
-		sb.WriteString(fmt.Sprintf("- estimated cloud context reduced from %s to %s tokens\n",
-			formatInt(c.CloudContextReducedFrom), formatInt(c.ActualInputTokens)))
+		fmt.Fprintf(&sb, "- estimated cloud context reduced from %s to %s tokens\n",
+			formatInt(c.CloudContextReducedFrom), formatInt(c.ActualInputTokens))
 	}
 	if c.TokenSavingsPercent > 0 {
-		sb.WriteString(fmt.Sprintf("- estimated token savings: %.1f%%\n", c.TokenSavingsPercent))
+		fmt.Fprintf(&sb, "- estimated token savings: %.1f%%\n", c.TokenSavingsPercent)
 	}
 	return sb.String()
 }

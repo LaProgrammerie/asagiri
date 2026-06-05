@@ -27,7 +27,7 @@ func Serve(ctx context.Context, opts Options) error {
 	if err != nil {
 		return err
 	}
-	defer store.Close()
+	defer func() { _ = store.Close() }()
 
 	token := opts.Token
 	if token == "" {

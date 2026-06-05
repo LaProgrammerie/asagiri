@@ -100,5 +100,29 @@ func TestShellLayoutStepProject(t *testing.T) {
 		Shell:      onboarding.ShellContext{Workspace: "chatbot", Branch: "main"},
 	}))
 	require.Contains(t, got, "chatbot")
-	require.Contains(t, got, "Projet")
+	require.Contains(t, got, "Étape 2 / 7")
+	require.Contains(t, got, "Nom")
+	require.NotContains(t, got, "PROJET")
+}
+
+func TestShellLayoutStepDocsNoDuplicateStepTitle(t *testing.T) {
+	m := onboarding.NewModelFromForm(onbdomain.Form{
+		Step: onbdomain.StepDocs,
+		Answers: onbdomain.Answers{
+			ProductOneLiner: "Chatbot",
+		},
+	}, false)
+	got := stripANSI(onboarding.Render(onboarding.ViewModel{
+		Model:      m,
+		WizardMode: true,
+		FullScreen: true,
+		Width:      140,
+		Height:     40,
+		Theme:      theme.Default(),
+		Shell:      onboarding.ShellContext{Workspace: "chatbot", Branch: "main"},
+	}))
+	require.Contains(t, got, "Phrase produit")
+	require.Contains(t, got, "Chatbot")
+	require.Contains(t, got, "étape Projet")
+	require.NotContains(t, got, "DOCS")
 }

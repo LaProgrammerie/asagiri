@@ -113,7 +113,7 @@ func (p *Planner) Build(ctx context.Context, req GraphPlanRequest) (ExecutionGra
 func (p *Planner) EnrichGraph(ctx context.Context, graph ExecutionGraph, bindings []TaskBinding, flow product.Flow, trustInput TrustEnrichmentInput) (ExecutionGraph, error) {
 	trustInput.Flow = flow
 	graph.Nodes = AssignAgents(graph.Nodes, bindings)
-	extraEdges := make([]GraphEdge, 0)
+	var extraEdges []GraphEdge
 	graph.Nodes, extraEdges = ApplyRiskEnrichment(graph.Nodes, bindings, graph.Edges, trustInput.Gates.HumanApprovalFor)
 	if len(extraEdges) > 0 {
 		graph.Edges = dedupeEdges(append(graph.Edges, extraEdges...))

@@ -64,13 +64,13 @@ func FormatMultiAgentRuntime(v MultiAgentRuntimeView) string {
 	b.WriteString("Agents\n")
 	b.WriteString("──────\n")
 	for _, ag := range v.Agents {
-		fmt.Fprintf(&b, "%s: %s\n", ag.Role, ag.AgentRef)
+		_, _ = fmt.Fprintf(&b, "%s: %s\n", ag.Role, ag.AgentRef)
 	}
 
 	b.WriteString("Costs\n")
 	b.WriteString("─────\n")
-	fmt.Fprintf(&b, "Current: %.2f€\n", v.CurrentEUR)
-	fmt.Fprintf(&b, "Budget:  %.2f€\n", v.BudgetEUR)
+	_, _ = fmt.Fprintf(&b, "Current: %.2f€\n", v.CurrentEUR)
+	_, _ = fmt.Fprintf(&b, "Budget:  %.2f€\n", v.BudgetEUR)
 
 	if len(v.Warnings) > 0 {
 		b.WriteString("Warnings\n")

@@ -248,7 +248,7 @@ func FormatKnowledgeExplain(result ExplainResult) string {
 	b.WriteString("Knowledge path\n")
 	b.WriteString("──────────────\n")
 	if len(result.Steps) == 0 {
-		fmt.Fprintf(&b, "No path found for %s / %s → %s\n", result.Flow, result.Action, result.Symbol)
+		_, _ = fmt.Fprintf(&b, "No path found for %s / %s → %s\n", result.Flow, result.Action, result.Symbol)
 		return b.String()
 	}
 	for i, step := range result.Steps {
@@ -264,7 +264,7 @@ func FormatKnowledgeExplain(result ExplainResult) string {
 		if step.Edge != nil {
 			edgeLabel = string(step.Edge.Type)
 		}
-		fmt.Fprintf(&b, " --%s--> %s", edgeLabel, label)
+		_, _ = fmt.Fprintf(&b, " --%s--> %s", edgeLabel, label)
 	}
 	b.WriteByte('\n')
 	return b.String()

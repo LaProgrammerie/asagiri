@@ -89,10 +89,21 @@ func RenderCockpit(vm ViewModel) string {
 	}
 
 	grid := renderCockpitGrid(panels, cols)
-	if header == "" {
-		return grid
+
+	// Onboarding invite (R7.6): when the repository is not onboarded, surface the
+	// explicit `asa onboard` call to action. Presentation only — the readiness
+	// state is sourced from the bus (ADR-027).
+	banner := components.ReadinessBanner(components.ReadinessBannerFromResult(vm.Readiness))
+
+	parts := make([]string, 0, 3)
+	if header != "" {
+		parts = append(parts, header)
 	}
-	return header + "\n" + grid
+	if banner != "" {
+		parts = append(parts, banner)
+	}
+	parts = append(parts, grid)
+	return strings.Join(parts, "\n")
 }
 
 func renderCockpitGrid(panels []string, cols int) string {

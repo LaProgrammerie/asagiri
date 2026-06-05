@@ -21,7 +21,7 @@ func (o *OllamaEmbedder) Reachable(ctx context.Context) error {
 	if err != nil {
 		return fmt.Errorf("ollama unreachable at %s: %w", o.baseURL, err)
 	}
-	defer res.Body.Close()
+	defer func() { _ = res.Body.Close() }()
 	if res.StatusCode < 200 || res.StatusCode >= 300 {
 		raw, _ := io.ReadAll(res.Body)
 		return fmt.Errorf("ollama unreachable at %s: HTTP %d: %s", o.baseURL, res.StatusCode, strings.TrimSpace(string(raw)))

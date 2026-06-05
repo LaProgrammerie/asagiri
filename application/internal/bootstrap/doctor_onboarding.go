@@ -37,13 +37,14 @@ func DoctorWithOptions(startDir string, opts DoctorOptions) ([]DoctorCheck, erro
 
 func onboardingCheckToBootstrap(c onboarding.Check) DoctorCheck {
 	var err error
-	if c.Status == onboarding.StatusFail {
+	switch c.Status {
+	case onboarding.StatusFail:
 		if c.Message != "" {
 			err = &doctorMessageError{msg: c.Message}
 		} else {
 			err = &doctorMessageError{msg: "check failed"}
 		}
-	} else if c.Status == onboarding.StatusWarn {
+	case onboarding.StatusWarn:
 		if c.Message != "" {
 			err = &doctorWarnError{msg: c.Message}
 		}

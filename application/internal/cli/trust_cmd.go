@@ -87,7 +87,7 @@ func newTrustGatesCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			fmt.Fprint(cmd.OutOrStdout(), trust.FormatGatesConfig(cfg.Verification))
+			_, _ = fmt.Fprint(cmd.OutOrStdout(), trust.FormatGatesConfig(cfg.Verification))
 			return nil
 		},
 	}
@@ -128,7 +128,7 @@ func newTrustReplayCmd() *cobra.Command {
 			if err := writeTrustVerifyOutput(cmd, result, jsonOut); err != nil {
 				return err
 			}
-			fmt.Fprintf(cmd.OutOrStdout(), "replayed from: %s\n", args[0])
+			_, _ = fmt.Fprintf(cmd.OutOrStdout(), "replayed from: %s\n", args[0])
 			return nil
 		},
 	}
@@ -174,9 +174,9 @@ func writeTrustVerifyOutput(cmd *cobra.Command, result trust.VerificationResult,
 		}
 		return nil
 	}
-	fmt.Fprint(out, trust.FormatTerminalSummary(result.Report))
-	fmt.Fprintf(out, "\nTrust ID: %s\n", result.TrustID)
-	fmt.Fprintf(out, "Reports:\n  %s\n  %s\n", result.MDPath, result.JSONPath)
+	_, _ = fmt.Fprint(out, trust.FormatTerminalSummary(result.Report))
+	_, _ = fmt.Fprintf(out, "\nTrust ID: %s\n", result.TrustID)
+	_, _ = fmt.Fprintf(out, "Reports:\n  %s\n  %s\n", result.MDPath, result.JSONPath)
 	return nil
 }
 

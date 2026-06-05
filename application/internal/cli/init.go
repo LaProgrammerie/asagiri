@@ -21,8 +21,8 @@ func newInitCmd() *cobra.Command {
 			if err := bootstrap.Init(cwd); err != nil {
 				return err
 			}
-			fmt.Fprintln(cmd.OutOrStdout(), "Asagiri initialisé.")
-			fmt.Fprintln(cmd.OutOrStdout(), "Vérifiez que .asagiri/state.sqlite et worktrees/ sont dans .gitignore.")
+			_, _ = fmt.Fprintln(cmd.OutOrStdout(), "Asagiri initialisé.")
+			_, _ = fmt.Fprintln(cmd.OutOrStdout(), "Vérifiez que .asagiri/state.sqlite et worktrees/ sont dans .gitignore.")
 			return nil
 		},
 	}

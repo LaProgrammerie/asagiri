@@ -32,9 +32,7 @@ func CollectForPipeline(repoRoot, feature string, cfg *config.Config, opts Colle
 			filepath.Join(".asagiri", "specs", feature),
 		)
 	}
-	for _, p := range cfg.Sources.Local.Paths {
-		paths = append(paths, p)
-	}
+	paths = append(paths, cfg.Sources.Local.Paths...)
 	for _, c := range candidateFiles {
 		c = strings.TrimSpace(c)
 		if c != "" {

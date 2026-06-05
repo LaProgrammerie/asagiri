@@ -43,10 +43,10 @@ Reconstruire l’index après changement d’embedder (ollama, cloud, hash).`,
 				return err
 			}
 			if res.EmbedderConfigured {
-				fmt.Fprintf(cmd.OutOrStdout(), "index: %d fichiers, %d chunks (%d embeddings) → %s\n",
+				_, _ = fmt.Fprintf(cmd.OutOrStdout(), "index: %d fichiers, %d chunks (%d embeddings) → %s\n",
 					res.Files, res.Chunks, res.EmbeddedChunks, res.DBPath)
 			} else {
-				fmt.Fprintf(cmd.OutOrStdout(), "index: %d fichiers, %d chunks (keyword-only) → %s\n",
+				_, _ = fmt.Fprintf(cmd.OutOrStdout(), "index: %d fichiers, %d chunks (keyword-only) → %s\n",
 					res.Files, res.Chunks, res.DBPath)
 			}
 			return nil
@@ -76,14 +76,14 @@ func newIndexSearchCmd(dryRun *bool) *cobra.Command {
 			}
 			defer actx.Close()
 			if actx.DryRun {
-				fmt.Fprintln(cmd.OutOrStdout(), "dry-run: recherche index ignorée")
+				_, _ = fmt.Fprintln(cmd.OutOrStdout(), "dry-run: recherche index ignorée")
 				return nil
 			}
 			db, err := rag.OpenDB(actx.RepoRoot)
 			if err != nil {
 				return err
 			}
-			defer db.Close()
+			defer func() { _ = db.Close() }()
 			query := strings.Join(args, " ")
 			paths, err := rag.NewRetriever(db).SearchWithOptions(cmd.Context(), query, rag.SearchOptions{
 				Limit:       limit,
@@ -94,7 +94,7 @@ func newIndexSearchCmd(dryRun *bool) *cobra.Command {
 				return err
 			}
 			for _, p := range paths {
-				fmt.Fprintln(cmd.OutOrStdout(), p)
+				_, _ = fmt.Fprintln(cmd.OutOrStdout(), p)
 			}
 			return nil
 		},

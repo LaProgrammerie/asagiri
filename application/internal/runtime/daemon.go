@@ -31,7 +31,7 @@ func StartDaemon(repoRoot string) (DaemonStatus, error) {
 	if err != nil {
 		return DaemonStatus{}, err
 	}
-	defer store.Close()
+	defer func() { _ = store.Close() }()
 
 	pid := os.Getpid()
 	now := time.Now().UTC()
@@ -61,7 +61,7 @@ func StopDaemon(repoRoot string) error {
 	if err != nil {
 		return err
 	}
-	defer store.Close()
+	defer func() { _ = store.Close() }()
 	_ = store.setMeta(metaDaemonStatus, "stopped")
 	_ = store.setMeta(metaDaemonPID, "")
 	_, _ = store.EmitEvent("runtime.stopped", "daemon", "", "", nil)
@@ -92,7 +92,7 @@ func (s *Store) Status() (DaemonStatus, error) {
 	st.QueuedEvents, _ = s.CountQueuedEvents()
 	rows, err := s.db.Query(`SELECT COUNT(DISTINCT flow_id) FROM runtime_events WHERE flow_id IS NOT NULL AND flow_id != ''`)
 	if err == nil {
-		defer rows.Close()
+		defer func() { _ = rows.Close() }()
 		if rows.Next() {
 			_ = rows.Scan(&st.FlowsActive)
 		}

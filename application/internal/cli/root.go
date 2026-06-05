@@ -89,7 +89,7 @@ func newRootCmd() *cobra.Command {
 			Use:   "version",
 			Short: "Afficher la version",
 			RunE: func(cmd *cobra.Command, args []string) error {
-				fmt.Fprintln(cmd.OutOrStdout(), version.String())
+				_, _ = fmt.Fprintln(cmd.OutOrStdout(), version.String())
 				return nil
 			},
 		},
@@ -118,7 +118,7 @@ func newSpecCmd(dryRun *bool) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			fmt.Fprintf(cmd.OutOrStdout(), "spec run créé: %s\n", runID)
+			_, _ = fmt.Fprintf(cmd.OutOrStdout(), "spec run créé: %s\n", runID)
 			return nil
 		},
 	}
@@ -146,7 +146,7 @@ func newPlanCmd(dryRun *bool) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			fmt.Fprintf(cmd.OutOrStdout(), "plan run: %s (%d tasks)\n", runID, len(tasks))
+			_, _ = fmt.Fprintf(cmd.OutOrStdout(), "plan run: %s (%d tasks)\n", runID, len(tasks))
 			return nil
 		},
 	}
@@ -176,7 +176,7 @@ func newEnrichCmd(dryRun *bool) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			fmt.Fprintf(cmd.OutOrStdout(), "enrich run: %s\n", runID)
+			_, _ = fmt.Fprintf(cmd.OutOrStdout(), "enrich run: %s\n", runID)
 			return nil
 		},
 	}
@@ -208,7 +208,7 @@ func newDevCmd(dryRun *bool) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			fmt.Fprintf(cmd.OutOrStdout(), "dev run: %s\n", runID)
+			_, _ = fmt.Fprintf(cmd.OutOrStdout(), "dev run: %s\n", runID)
 			return nil
 		},
 	}
@@ -250,12 +250,12 @@ func newVerifyCmd(dryRun *bool) *cobra.Command {
 					}
 					if rep, invErr := investigation.RunInvestigation(cmd.Context(), req, ctx.Config); invErr == nil {
 						_ = investigation.FeedMemory(ctx.RepoRoot, rep)
-						fmt.Fprintf(cmd.OutOrStdout(), "investigation on failure: %s\n", rep.ID)
+						_, _ = fmt.Fprintf(cmd.OutOrStdout(), "investigation on failure: %s\n", rep.ID)
 					}
 				}
 				return err
 			}
-			fmt.Fprintf(cmd.OutOrStdout(), "verify run: %s\n", runID)
+			_, _ = fmt.Fprintf(cmd.OutOrStdout(), "verify run: %s\n", runID)
 			return nil
 		},
 	}
@@ -288,7 +288,7 @@ func newReviewCmd(dryRun *bool) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			fmt.Fprintf(cmd.OutOrStdout(), "review run: %s\n", runID)
+			_, _ = fmt.Fprintf(cmd.OutOrStdout(), "review run: %s\n", runID)
 			return nil
 		},
 	}
@@ -317,7 +317,7 @@ func newStatusCmd(dryRun *bool) *cobra.Command {
 				return err
 			}
 			for _, run := range runs {
-				fmt.Fprintf(cmd.OutOrStdout(), "%s\t%s\t%s\t%s\n", run.ID, run.Feature, run.Status, run.UpdatedAt.Format("2006-01-02 15:04:05"))
+				_, _ = fmt.Fprintf(cmd.OutOrStdout(), "%s\t%s\t%s\t%s\n", run.ID, run.Feature, run.Status, run.UpdatedAt.Format("2006-01-02 15:04:05"))
 			}
 			return nil
 		},
@@ -355,10 +355,10 @@ func newResumeCmd(dryRun *bool) *cobra.Command {
 					return err
 				}
 				if len(steps) == 0 {
-					fmt.Fprintln(cmd.OutOrStdout(), "run terminé: aucun step à reprendre")
+					_, _ = fmt.Fprintln(cmd.OutOrStdout(), "run terminé: aucun step à reprendre")
 					return nil
 				}
-				fmt.Fprintf(cmd.OutOrStdout(), "steps exécutés (%d): %s\n", len(steps), strings.Join(steps, ", "))
+				_, _ = fmt.Fprintf(cmd.OutOrStdout(), "steps exécutés (%d): %s\n", len(steps), strings.Join(steps, ", "))
 				return nil
 			}
 			next, err := wf.ResumeRun(args[0], force)
@@ -366,10 +366,10 @@ func newResumeCmd(dryRun *bool) *cobra.Command {
 				return err
 			}
 			if next == "" {
-				fmt.Fprintln(cmd.OutOrStdout(), "run terminé: aucun step à reprendre")
+				_, _ = fmt.Fprintln(cmd.OutOrStdout(), "run terminé: aucun step à reprendre")
 				return nil
 			}
-			fmt.Fprintf(cmd.OutOrStdout(), "prochain step: %s\n", next)
+			_, _ = fmt.Fprintf(cmd.OutOrStdout(), "prochain step: %s\n", next)
 			return nil
 		},
 	}
@@ -398,7 +398,7 @@ func newReportCmd(dryRun *bool) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			fmt.Fprintf(cmd.OutOrStdout(), "report markdown: %s\nreport json: %s\n", md, js)
+			_, _ = fmt.Fprintf(cmd.OutOrStdout(), "report markdown: %s\nreport json: %s\n", md, js)
 			return nil
 		},
 	}
@@ -424,7 +424,7 @@ func newCleanCmd(dryRun *bool) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			fmt.Fprintf(cmd.OutOrStdout(), "worktrees supprimés: %d\n", removed)
+			_, _ = fmt.Fprintf(cmd.OutOrStdout(), "worktrees supprimés: %d\n", removed)
 			return nil
 		},
 	}
@@ -452,7 +452,7 @@ func newPRCmd(dryRun *bool) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			fmt.Fprintf(cmd.OutOrStdout(), "checklist PR: %s\n", checklist)
+			_, _ = fmt.Fprintf(cmd.OutOrStdout(), "checklist PR: %s\n", checklist)
 			return nil
 		},
 	}

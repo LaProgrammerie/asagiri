@@ -12,12 +12,12 @@ import (
 // StatusView is enriched status for rich terminal UX (spec-my-A §24.20).
 type StatusView struct {
 	DaemonStatus
-	Metrics       MetricsSnapshot
-	SessionName   string
-	BranchName    string
-	FlowID        string
-	FlowSteps     []FlowStepView
-	RecentEvents  []RuntimeEvent
+	Metrics      MetricsSnapshot
+	SessionName  string
+	BranchName   string
+	FlowID       string
+	FlowSteps    []FlowStepView
+	RecentEvents []RuntimeEvent
 }
 
 // FlowStepView is one step line in the terminal dashboard.
@@ -54,20 +54,20 @@ func FormatStatusRich(v StatusView) string {
 	b.WriteString("Asagiri Runtime\n")
 	b.WriteString("════════════════\n")
 	if v.SessionName != "" {
-		b.WriteString(fmt.Sprintf("Session: %s\n", v.SessionName))
+		fmt.Fprintf(&b, "Session: %s\n", v.SessionName)
 	}
 	if v.BranchName != "" {
-		b.WriteString(fmt.Sprintf("Branch:  %s\n", v.BranchName))
+		fmt.Fprintf(&b, "Branch:  %s\n", v.BranchName)
 	}
 	if v.FlowID != "" {
-		b.WriteString(fmt.Sprintf("Flow:    %s\n", v.FlowID))
+		fmt.Fprintf(&b, "Flow:    %s\n", v.FlowID)
 	}
 	b.WriteString("\nRuntime\n")
 	b.WriteString("───────\n")
-	b.WriteString(fmt.Sprintf("Workers active:        %d\n", v.Metrics.WorkersActive))
-	b.WriteString(fmt.Sprintf("Queued events:         %d\n", v.QueuedEvents))
-	b.WriteString(fmt.Sprintf("Memory hits:           %.0f%%\n", v.Metrics.MemoryHits*100))
-	b.WriteString(fmt.Sprintf("Context reduction:     %.0f%%\n", v.Metrics.ContextReductionRatio*100))
+	fmt.Fprintf(&b, "Workers active:        %d\n", v.Metrics.WorkersActive)
+	fmt.Fprintf(&b, "Queued events:         %d\n", v.QueuedEvents)
+	fmt.Fprintf(&b, "Memory hits:           %.0f%%\n", v.Metrics.MemoryHits*100)
+	fmt.Fprintf(&b, "Context reduction:     %.0f%%\n", v.Metrics.ContextReductionRatio*100)
 	if len(v.FlowSteps) > 0 {
 		b.WriteString("\nFlows\n")
 		b.WriteString("─────\n")
@@ -79,7 +79,7 @@ func FormatStatusRich(v StatusView) string {
 			case "active":
 				icon = "⠋"
 			}
-			b.WriteString(fmt.Sprintf("%s %s\n", icon, step.Label))
+			fmt.Fprintf(&b, "%s %s\n", icon, step.Label)
 		}
 	}
 	if len(v.RecentEvents) > 0 {
@@ -133,9 +133,10 @@ func loadFlowSteps(repoRoot, productID, flowID string) []FlowStepView {
 			label = s.ID
 		}
 		st := "pending"
-		if i == 0 {
+		switch i {
+		case 0:
 			st = "done"
-		} else if i == 1 {
+		case 1:
 			st = "active"
 		}
 		out = append(out, FlowStepView{ID: s.ID, Label: label, Status: st})

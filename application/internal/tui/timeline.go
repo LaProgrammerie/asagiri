@@ -20,7 +20,7 @@ func RenderTimeline(out io.Writer, entries []TimelineEntry) {
 		if e.Done {
 			mark = "✓"
 		}
-		fmt.Fprintf(out, "%s %-30s %s\n", mark, e.Label, formatSince(e.Since))
+		_, _ = fmt.Fprintf(out, "%s %-30s %s\n", mark, e.Label, formatSince(e.Since))
 	}
 }
 

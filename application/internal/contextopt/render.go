@@ -19,7 +19,7 @@ func RenderPackMarkdown(p ContextPack) string {
 	sb.WriteString(p.Investigation)
 	sb.WriteString("\n\n## Fichiers\n")
 	for _, d := range p.FileExcerpts {
-		sb.WriteString(fmt.Sprintf("### %s\n```\n%s\n```\n", d.Path, strings.TrimSpace(d.Excerpt)))
+		fmt.Fprintf(&sb, "### %s\n```\n%s\n```\n", d.Path, strings.TrimSpace(d.Excerpt))
 	}
 	if len(p.ValidationLines) > 0 {
 		sb.WriteString("\n## Validation\n")

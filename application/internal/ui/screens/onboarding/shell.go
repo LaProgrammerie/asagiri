@@ -146,11 +146,17 @@ func renderShellReady(vm ViewModel, st theme.Styles, w, h int) string {
 		}
 	}
 	if len(r.AutofixOffers) > 0 && !r.Ready {
-		b.WriteString("\n" + st.AccentBlock.Render("Corrections auto disponibles") + "\n")
+		b.WriteString("\n" + st.AccentBlock.Render("Corrections auto restantes") + "\n")
 		for _, o := range r.AutofixOffers {
-			b.WriteString(st.Fg.Render("• "+o.Title) + "\n")
+			line := "• " + o.Title
+			if o.Description != "" {
+				line += " — " + o.Description
+			}
+			b.WriteString(st.Fg.Render(line) + "\n")
 		}
 		b.WriteString("\n" + st.RenderButton("O · appliquer", true) + st.RenderButton("N · ignorer", false) + "\n")
+	} else if !r.Ready {
+		b.WriteString("\n" + st.Hint.Render("Avertissements restants : éditer .asagiri/config.yaml ou lancer asa doctor --full") + "\n")
 	}
 	if vm.Model.Message != "" {
 		b.WriteString("\n" + st.Fg.Render(vm.Model.Message) + "\n")

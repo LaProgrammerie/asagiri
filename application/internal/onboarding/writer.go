@@ -34,11 +34,17 @@ func MergeConfig(existing *config.Config, patch ConfigPatch, repoDirName string)
 	} else if patch.BranchPrefix != "" && out.Worktrees.BranchPrefix != patch.BranchPrefix {
 		skipped = append(skipped, "worktrees.branch_prefix")
 	}
+	if patch.DefaultSpecAgent != "" {
+		out.Work.DefaultSpecAgent = patch.DefaultSpecAgent
+	}
 	if patch.DefaultAgent != "" {
 		out.Work.DefaultAgent = patch.DefaultAgent
 	}
 	if patch.DefaultReviewer != "" {
 		out.Work.DefaultReviewer = patch.DefaultReviewer
+	}
+	if patch.DefaultEnricher != "" {
+		out.Work.DefaultEnricher = patch.DefaultEnricher
 	}
 	if len(patch.Validation) > 0 {
 		if config.IsTemplateDefaultValidationCommands(out.Validation.Commands) {

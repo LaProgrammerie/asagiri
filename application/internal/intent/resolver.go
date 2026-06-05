@@ -329,7 +329,7 @@ func (c *HTTPOllamaClient) ResolveIntent(ctx context.Context, instruction string
 	if err != nil {
 		return ResolvedIntent{}, err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	if resp.StatusCode >= 300 {
 		return ResolvedIntent{}, ErrLowConfidence
 	}

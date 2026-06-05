@@ -52,14 +52,14 @@ func newSyncCmd(dryRun *bool) *cobra.Command {
 					}
 				}
 				if ctx.DryRun || *dryRun {
-					fmt.Fprintf(cmd.OutOrStdout(), "dry-run: sync %s → %s/%s\n", ref.URL, dest.Root, feat)
+					_, _ = fmt.Fprintf(cmd.OutOrStdout(), "dry-run: sync %s → %s/%s\n", ref.URL, dest.Root, feat)
 					return nil
 				}
 				res, err := src.Sync(context.Background(), ref, dest, opts)
 				if err != nil {
 					return err
 				}
-				fmt.Fprintf(cmd.OutOrStdout(), "synced %s → %s\n", res.Feature, res.Path)
+				_, _ = fmt.Fprintf(cmd.OutOrStdout(), "synced %s → %s\n", res.Feature, res.Path)
 				return nil
 			}
 

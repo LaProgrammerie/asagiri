@@ -27,7 +27,7 @@ func (KnowledgeGraphRunner) Run(ctx context.Context, scope Scope, deps Dependenc
 		}
 		return failedLot3(scope, start, typeKnowledgeGraph, "Knowledge graph", "graph", err), nil
 	}
-	defer store.Close()
+	defer func() { _ = store.Close() }()
 
 	assess, ok, err := knowledge.AssessTrustFromGraph(ctx, store, scope.Flow, "")
 	if err != nil {
@@ -80,10 +80,6 @@ func (KnowledgeGraphRunner) Run(ctx context.Context, scope Scope, deps Dependenc
 		})
 	}
 
-	conf := assess.RegressionConfidence
-	if assess.SecurityImpact == "high" {
-		conf *= 0.85
-	}
 	result := finishLot3WithBlast(scope, start, typeKnowledgeGraph, "Knowledge graph", findings, evidence, &BlastRadiusSummary{
 		FlowsImpacted:      1,
 		PublicContractRisk: assess.SecurityImpact,

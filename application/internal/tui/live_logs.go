@@ -27,7 +27,7 @@ func (l *logPrefix) Write(p []byte) (int, error) {
 			break
 		}
 		l.rest = after
-		fmt.Fprintf(l.out, "%s %s %s\n", time.Now().UTC().Format(time.RFC3339), l.prefix, line)
+		_, _ = fmt.Fprintf(l.out, "%s %s %s\n", time.Now().UTC().Format(time.RFC3339), l.prefix, line)
 	}
 	return len(p), nil
 }

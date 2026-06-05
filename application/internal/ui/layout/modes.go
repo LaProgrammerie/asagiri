@@ -2,10 +2,10 @@ package layout
 
 // Extended layout kinds (spec-ui §9).
 const (
-	Grid        Kind = "grid"
-	Dashboard   Kind = "dashboard"
-	Focus       Kind = "focus"
-	Fullscreen  Kind = "fullscreen"
+	Grid       Kind = "grid"
+	Dashboard  Kind = "dashboard"
+	Focus      Kind = "focus"
+	Fullscreen Kind = "fullscreen"
 )
 
 // GridSpec configures a fixed column grid.
@@ -41,9 +41,10 @@ func gridLayout(width, height int, spec GridSpec) Computed {
 	for r := 0; r < rows; r++ {
 		for c := 0; c < cols; c++ {
 			id := PaneID(string(rune('a' + idx)))
-			if idx == 0 {
+			switch idx {
+			case 0:
 				id = PaneMain
-			} else if idx == 1 {
+			case 1:
 				id = PaneSide
 			}
 			panes = append(panes, PaneBounds{

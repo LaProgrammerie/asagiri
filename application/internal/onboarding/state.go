@@ -131,6 +131,11 @@ func MergeAnswers(st State, opts Options, repoRoot string) State {
 	if opts.Stack != "" && opts.Stack != "auto" {
 		a.Stack = opts.Stack
 	}
+	if opts.DefaultSpecAgent != "" {
+		a.DefaultSpecAgent = opts.DefaultSpecAgent
+	} else if a.DefaultSpecAgent == "" {
+		a.DefaultSpecAgent = "kiro"
+	}
 	if opts.DefaultAgent != "" {
 		a.DefaultAgent = opts.DefaultAgent
 	} else if a.DefaultAgent == "" {
@@ -140,6 +145,11 @@ func MergeAnswers(st State, opts Options, repoRoot string) State {
 		a.DefaultReviewer = opts.DefaultReviewer
 	} else if a.DefaultReviewer == "" {
 		a.DefaultReviewer = "codex"
+	}
+	if opts.DefaultEnricher != "" {
+		a.DefaultEnricher = opts.DefaultEnricher
+	} else if a.DefaultEnricher == "" {
+		a.DefaultEnricher = "ollama"
 	}
 	if opts.FeatureSlug != "" {
 		a.FeatureSlug = opts.FeatureSlug

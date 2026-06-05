@@ -13,11 +13,11 @@ func RenderMermaid(graph knowledge.KnowledgeGraph) string {
 	sb.WriteString("graph TD\n")
 	for _, n := range graph.SortedNodes() {
 		label := escapeMermaidLabel(nodeLabel(n))
-		sb.WriteString(fmt.Sprintf("  %s[%s]\n", sanitizeMermaidID(n.ID), label))
+		fmt.Fprintf(&sb, "  %s[%s]\n", sanitizeMermaidID(n.ID), label)
 	}
 	for _, e := range graph.SortedEdges() {
-		sb.WriteString(fmt.Sprintf("  %s -->|%s| %s\n",
-			sanitizeMermaidID(e.From), escapeMermaidLabel(edgeLabel(e)), sanitizeMermaidID(e.To)))
+		fmt.Fprintf(&sb, "  %s -->|%s| %s\n",
+			sanitizeMermaidID(e.From), escapeMermaidLabel(edgeLabel(e)), sanitizeMermaidID(e.To))
 	}
 	return sb.String()
 }

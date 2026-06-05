@@ -20,11 +20,11 @@ type AmbiguityError struct {
 
 func (e *AmbiguityError) Error() string {
 	var b strings.Builder
-	fmt.Fprintf(&b, "instruction ambiguë (confiance %.2f)", e.Confidence)
+	_, _ = fmt.Fprintf(&b, "instruction ambiguë (confiance %.2f)", e.Confidence)
 	if len(e.Candidates) > 0 {
 		b.WriteString("\nDid you mean:\n")
 		for i, c := range e.Candidates {
-			fmt.Fprintf(&b, "%d. %s\n", i+1, c)
+			_, _ = fmt.Fprintf(&b, "%d. %s\n", i+1, c)
 		}
 	}
 	return strings.TrimSpace(b.String())

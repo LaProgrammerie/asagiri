@@ -22,7 +22,7 @@ The generator walks every command except the root binary and writes one determin
 			if err := docgen.Generate(cmd.Root(), output); err != nil {
 				return err
 			}
-			fmt.Fprintf(cmd.OutOrStdout(), "generated CLI docs in %s\n", output)
+			_, _ = fmt.Fprintf(cmd.OutOrStdout(), "generated CLI docs in %s\n", output)
 			return nil
 		},
 	}

@@ -72,7 +72,7 @@ func (c *DefaultCoordinator) Coordinate(ctx context.Context, graph ExecutionGrap
 		}
 		if store != nil {
 			knowledgeStore = store
-			defer store.Close()
+			defer func() { _ = store.Close() }()
 		}
 	}
 

@@ -67,7 +67,7 @@ func (b *GraphBuilder) Build(ctx context.Context, req BuildRequest) (BuildResult
 	if err != nil {
 		return BuildResult{}, err
 	}
-	defer store.Close()
+	defer func() { _ = store.Close() }()
 
 	rebuilt := true
 	var priorMeta map[string]any

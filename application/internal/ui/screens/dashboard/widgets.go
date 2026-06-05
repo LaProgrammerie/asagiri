@@ -127,33 +127,33 @@ func RunsSummaryWidget(snapshot bus.MissionControlSnapshotResult) Widget {
 	return runsSummaryWidget{snapshot: snapshot}
 }
 
-func (w runtimeWidget) Init() tea.Cmd  { return nil }
-func (w agentWidget) Init() tea.Cmd    { return nil }
-func (w trustWidget) Init() tea.Cmd    { return nil }
-func (w costWidget) Init() tea.Cmd     { return nil }
-func (w flowWidget) Init() tea.Cmd     { return nil }
-func (w eventWidget) Init() tea.Cmd    { return nil }
-func (w progressWidget) Init() tea.Cmd { return nil }
-func (w riskWidget) Init() tea.Cmd     { return nil }
-func (w knowledgeWidget) Init() tea.Cmd { return nil }
-func (w replayWidget) Init() tea.Cmd   { return nil }
+func (w runtimeWidget) Init() tea.Cmd     { return nil }
+func (w agentWidget) Init() tea.Cmd       { return nil }
+func (w trustWidget) Init() tea.Cmd       { return nil }
+func (w costWidget) Init() tea.Cmd        { return nil }
+func (w flowWidget) Init() tea.Cmd        { return nil }
+func (w eventWidget) Init() tea.Cmd       { return nil }
+func (w progressWidget) Init() tea.Cmd    { return nil }
+func (w riskWidget) Init() tea.Cmd        { return nil }
+func (w knowledgeWidget) Init() tea.Cmd   { return nil }
+func (w replayWidget) Init() tea.Cmd      { return nil }
 func (w performanceWidget) Init() tea.Cmd { return nil }
-func (w sessionsWidget) Init() tea.Cmd { return nil }
-func (w queueWidget) Init() tea.Cmd        { return nil }
+func (w sessionsWidget) Init() tea.Cmd    { return nil }
+func (w queueWidget) Init() tea.Cmd       { return nil }
 func (w runsSummaryWidget) Init() tea.Cmd { return nil }
 
-func (w runtimeWidget) Update(msg tea.Msg) (tea.Model, tea.Cmd) { return w, nil }
-func (w agentWidget) Update(msg tea.Msg) (tea.Model, tea.Cmd)     { return w, nil }
-func (w trustWidget) Update(msg tea.Msg) (tea.Model, tea.Cmd)     { return w, nil }
-func (w costWidget) Update(msg tea.Msg) (tea.Model, tea.Cmd)      { return w, nil }
-func (w flowWidget) Update(msg tea.Msg) (tea.Model, tea.Cmd)      { return w, nil }
-func (w eventWidget) Update(msg tea.Msg) (tea.Model, tea.Cmd)     { return w, nil }
-func (w progressWidget) Update(msg tea.Msg) (tea.Model, tea.Cmd)  { return w, nil }
-func (w riskWidget) Update(msg tea.Msg) (tea.Model, tea.Cmd)     { return w, nil }
-func (w knowledgeWidget) Update(msg tea.Msg) (tea.Model, tea.Cmd) { return w, nil }
-func (w replayWidget) Update(msg tea.Msg) (tea.Model, tea.Cmd)    { return w, nil }
+func (w runtimeWidget) Update(msg tea.Msg) (tea.Model, tea.Cmd)     { return w, nil }
+func (w agentWidget) Update(msg tea.Msg) (tea.Model, tea.Cmd)       { return w, nil }
+func (w trustWidget) Update(msg tea.Msg) (tea.Model, tea.Cmd)       { return w, nil }
+func (w costWidget) Update(msg tea.Msg) (tea.Model, tea.Cmd)        { return w, nil }
+func (w flowWidget) Update(msg tea.Msg) (tea.Model, tea.Cmd)        { return w, nil }
+func (w eventWidget) Update(msg tea.Msg) (tea.Model, tea.Cmd)       { return w, nil }
+func (w progressWidget) Update(msg tea.Msg) (tea.Model, tea.Cmd)    { return w, nil }
+func (w riskWidget) Update(msg tea.Msg) (tea.Model, tea.Cmd)        { return w, nil }
+func (w knowledgeWidget) Update(msg tea.Msg) (tea.Model, tea.Cmd)   { return w, nil }
+func (w replayWidget) Update(msg tea.Msg) (tea.Model, tea.Cmd)      { return w, nil }
 func (w performanceWidget) Update(msg tea.Msg) (tea.Model, tea.Cmd) { return w, nil }
-func (w sessionsWidget) Update(msg tea.Msg) (tea.Model, tea.Cmd)  { return w, nil }
+func (w sessionsWidget) Update(msg tea.Msg) (tea.Model, tea.Cmd)    { return w, nil }
 func (w queueWidget) Update(msg tea.Msg) (tea.Model, tea.Cmd)       { return w, nil }
 func (w runsSummaryWidget) Update(msg tea.Msg) (tea.Model, tea.Cmd) { return w, nil }
 
@@ -169,23 +169,23 @@ func (w knowledgeWidget) Title() string   { return "Knowledge" }
 func (w replayWidget) Title() string      { return "Replay" }
 func (w performanceWidget) Title() string { return "Performance" }
 func (w sessionsWidget) Title() string    { return "Sessions" }
-func (w queueWidget) Title() string          { return "Queue" }
-func (w runsSummaryWidget) Title() string     { return "Runs" }
+func (w queueWidget) Title() string       { return "Queue" }
+func (w runsSummaryWidget) Title() string { return "Runs" }
 
-func (w runtimeWidget) MinSize() Size      { return Size{Width: 32, Height: 5} }
-func (w agentWidget) MinSize() Size        { return Size{Width: 32, Height: 5} }
-func (w trustWidget) MinSize() Size        { return Size{Width: 32, Height: 5} }
-func (w costWidget) MinSize() Size         { return Size{Width: 32, Height: 4} }
-func (w flowWidget) MinSize() Size         { return Size{Width: 40, Height: 4} }
-func (w eventWidget) MinSize() Size        { return Size{Width: 40, Height: 5} }
-func (w progressWidget) MinSize() Size     { return Size{Width: 32, Height: 4} }
-func (w riskWidget) MinSize() Size         { return Size{Width: 32, Height: 4} }
+func (w runtimeWidget) MinSize() Size     { return Size{Width: 32, Height: 5} }
+func (w agentWidget) MinSize() Size       { return Size{Width: 32, Height: 5} }
+func (w trustWidget) MinSize() Size       { return Size{Width: 32, Height: 5} }
+func (w costWidget) MinSize() Size        { return Size{Width: 32, Height: 4} }
+func (w flowWidget) MinSize() Size        { return Size{Width: 40, Height: 4} }
+func (w eventWidget) MinSize() Size       { return Size{Width: 40, Height: 5} }
+func (w progressWidget) MinSize() Size    { return Size{Width: 32, Height: 4} }
+func (w riskWidget) MinSize() Size        { return Size{Width: 32, Height: 4} }
 func (w knowledgeWidget) MinSize() Size   { return Size{Width: 36, Height: 4} }
-func (w replayWidget) MinSize() Size        { return Size{Width: 36, Height: 4} }
-func (w performanceWidget) MinSize() Size  { return Size{Width: 36, Height: 4} }
-func (w sessionsWidget) MinSize() Size      { return Size{Width: 28, Height: 3} }
-func (w queueWidget) MinSize() Size           { return Size{Width: 28, Height: 3} }
-func (w runsSummaryWidget) MinSize() Size      { return Size{Width: 32, Height: 4} }
+func (w replayWidget) MinSize() Size      { return Size{Width: 36, Height: 4} }
+func (w performanceWidget) MinSize() Size { return Size{Width: 36, Height: 4} }
+func (w sessionsWidget) MinSize() Size    { return Size{Width: 28, Height: 3} }
+func (w queueWidget) MinSize() Size       { return Size{Width: 28, Height: 3} }
+func (w runsSummaryWidget) MinSize() Size { return Size{Width: 32, Height: 4} }
 
 func (w runtimeWidget) View() string {
 	return components.RuntimeCard(w.snapshot.Runtime, w.animated, w.animFrame)
@@ -304,7 +304,7 @@ func (w runsSummaryWidget) View() string {
 		if feature == "" {
 			feature = run.ID
 		}
-		b.WriteString(fmt.Sprintf("%s  %s  %s\n", runStatusGlyph(run.Status), feature, run.Status))
+		fmt.Fprintf(&b, "%s  %s  %s\n", runStatusGlyph(run.Status), feature, run.Status)
 	}
 	return strings.TrimRight(b.String(), "\n")
 }

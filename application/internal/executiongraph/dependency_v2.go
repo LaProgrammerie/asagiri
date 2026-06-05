@@ -57,7 +57,7 @@ func inferPublicEventEdges(input DependencyInput, bindings []TaskBinding, nodeSe
 				From:   verifyID,
 				To:     b.NodeID,
 				Type:   EdgeTypeRequires,
-				Reason: fmt.Sprintf("public event change requires backward compatibility check"),
+				Reason: "public event change requires backward compatibility check",
 			})
 		}
 		if hasTrust && b.NodeID != trustID {

@@ -45,7 +45,7 @@ func (d *GraphStalenessDetector) Check(ctx context.Context, repoRoot string) (St
 	if err != nil {
 		return StalenessReport{}, err
 	}
-	defer store.Close()
+	defer func() { _ = store.Close() }()
 
 	meta, err := store.GetIndexMetadata(ctx, "build")
 	if err != nil {

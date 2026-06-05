@@ -19,7 +19,7 @@ func newRichUI(out io.Writer) *richUI {
 
 func (r *richUI) Box(title, body string) {
 	block := r.border.Render(lipgloss.JoinVertical(lipgloss.Left, lipgloss.NewStyle().Bold(true).Render(title), body))
-	fmt.Fprintln(r.out, block)
+	_, _ = fmt.Fprintln(r.out, block)
 }
 
 func (r *richUI) ProgressLine(label string, pct float64) {
@@ -27,9 +27,9 @@ func (r *richUI) ProgressLine(label string, pct float64) {
 }
 
 func (r *richUI) Event(kind string, payload any) {
-	fmt.Fprintf(r.out, "[%s] %v\n", kind, payload)
+	_, _ = fmt.Fprintf(r.out, "[%s] %v\n", kind, payload)
 }
 
 func (r *richUI) Printf(format string, args ...any) {
-	fmt.Fprintf(r.out, format, args...)
+	_, _ = fmt.Fprintf(r.out, format, args...)
 }

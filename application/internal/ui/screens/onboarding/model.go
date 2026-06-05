@@ -16,11 +16,22 @@ const (
 	FooterApply    = 3
 )
 
+// FieldKind controls how a wizard row is edited and rendered.
+type FieldKind int
+
+const (
+	FieldText FieldKind = iota
+	FieldSelect
+	FieldManaged // workflow step owned by Asagiri; not editable
+)
+
 // FieldDef describes one editable wizard field row.
 type FieldDef struct {
 	Key      string
 	Label    string
 	ReadOnly bool
+	Kind     FieldKind
+	Choices  []string // FieldSelect: keys from config.agents
 }
 
 // Model drives the interactive onboarding wizard.
@@ -40,6 +51,7 @@ type Model struct {
 	Message           string
 	MouseEnabled      bool
 	Initialized       bool
+	AgentChoices      []string
 	fieldRows         []FieldDef
 }
 
@@ -66,6 +78,7 @@ func NewModelFromForm(form onbdomain.Form, mouseEnabled bool) Model {
 	m.Errors = form.Errors
 	m.MouseEnabled = mouseEnabled
 	m.Initialized = true
+	m.AgentChoices = append([]string(nil), form.KnownAgentKeys...)
 	m.RefreshFieldRows()
 	return m
 }
@@ -81,6 +94,7 @@ func (m *Model) SyncForm(form onbdomain.Form) {
 	if form.Errors != nil {
 		m.Errors = form.Errors
 	}
+	m.AgentChoices = append([]string(nil), form.KnownAgentKeys...)
 	m.RefreshFieldRows()
 }
 
@@ -150,6 +164,27 @@ func (m Model) updateKey(v tea.KeyMsg) (Model, tea.Cmd) {
 	}
 
 	if m.editingField() {
+		if m.focusedSelect() {
+			switch key {
+			case "tab", "down":
+				m.cycleFocus(1)
+			case "shift+tab", "up":
+				m.cycleFocus(-1)
+			case "left", "h":
+				m.cycleSelectField(-1)
+			case "right", "l":
+				m.cycleSelectField(1)
+			case "esc":
+				m.FocusFooter = FooterNext
+			case "enter", " ":
+				m.cycleSelectField(1)
+			default:
+				if v.Type == tea.KeyRunes && len(v.Runes) > 0 {
+					m.jumpSelectToPrefix(string(v.Runes))
+				}
+			}
+			return m, nil
+		}
 		switch key {
 		case "tab", "down":
 			m.cycleFocus(1)
@@ -238,11 +273,70 @@ func (m Model) editingField() bool {
 	if m.FocusField < 0 || m.FocusField >= len(rows) {
 		return false
 	}
-	return !rows[m.FocusField].ReadOnly
+	row := rows[m.FocusField]
+	return row.Kind == FieldSelect || (!row.ReadOnly && row.Kind == FieldText)
+}
+
+func (m Model) focusedSelect() bool {
+	rows := m.fieldRows
+	if m.FocusField < 0 || m.FocusField >= len(rows) {
+		return false
+	}
+	return rows[m.FocusField].Kind == FieldSelect
+}
+
+func (m *Model) cycleSelectField(dir int) {
+	rows := m.fieldRows
+	if m.FocusField < 0 || m.FocusField >= len(rows) {
+		return
+	}
+	row := rows[m.FocusField]
+	choices := row.Choices
+	if len(choices) == 0 {
+		if row.Key == "stack" {
+			choices = defaultStackChoices()
+		} else {
+			choices = defaultAgentChoices()
+		}
+	}
+	key := row.Key
+	current := strings.TrimSpace(m.Fields[key])
+	idx := 0
+	for i, c := range choices {
+		if c == current {
+			idx = i
+			break
+		}
+	}
+	idx += dir
+	for idx < 0 {
+		idx += len(choices)
+	}
+	idx %= len(choices)
+	m.Fields[key] = choices[idx]
+}
+
+func (m *Model) jumpSelectToPrefix(prefix string) {
+	rows := m.fieldRows
+	if m.FocusField < 0 || m.FocusField >= len(rows) {
+		return
+	}
+	row := rows[m.FocusField]
+	choices := row.Choices
+	if len(choices) == 0 {
+		return
+	}
+	prefix = strings.ToLower(prefix)
+	for _, c := range choices {
+		if strings.HasPrefix(strings.ToLower(c), prefix) {
+			m.Fields[row.Key] = c
+			return
+		}
+	}
 }
 
 func (m Model) updateMouse(v tea.MouseMsg) (Model, tea.Cmd) {
-	if v.Type != tea.MouseLeft || v.Action != tea.MouseActionPress {
+	if v.Button != tea.MouseButtonLeft || v.Action != tea.MouseActionPress {
 		return m, nil
 	}
 	rows := m.fieldRows
@@ -320,13 +414,17 @@ func isAdvancedKey(key string) bool {
 
 // RefreshFieldRows rebuilds visible field rows for the current step.
 func (m *Model) RefreshFieldRows() {
-	m.fieldRows = stepFields(m.Step, m.ShowAdvanced, m.ValidationPreview, m.DetectedStacks)
+	m.fieldRows = stepFields(m.Step, m.ShowAdvanced, m.ValidationPreview, m.DetectedStacks, m.AgentChoices)
 	if m.FocusField >= len(m.fieldRows) {
 		m.FocusField = max(0, len(m.fieldRows)-1)
 	}
 }
 
-func stepFields(step onbdomain.WizardStep, advanced bool, preview, stacks []string) []FieldDef {
+func stepFields(step onbdomain.WizardStep, advanced bool, preview, stacks, agentChoices []string) []FieldDef {
+	choices := agentChoices
+	if len(choices) == 0 {
+		choices = defaultAgentChoices()
+	}
 	var rows []FieldDef
 	switch step {
 	case onbdomain.StepWelcome:
@@ -338,7 +436,9 @@ func stepFields(step onbdomain.WizardStep, advanced bool, preview, stacks []stri
 			{Key: "tagline", Label: "Tagline (optionnel)"},
 		}
 	case onbdomain.StepStack:
-		rows = []FieldDef{{Key: "stack", Label: "Stack (go|castor|node|auto)"}}
+		rows = []FieldDef{
+			{Key: "stack", Label: "Stack", Kind: FieldSelect, Choices: defaultStackChoices()},
+		}
 		if len(stacks) > 0 {
 			rows = append(rows, FieldDef{
 				Key: "detected_stacks", Label: "Détecté", ReadOnly: true,
@@ -351,22 +451,28 @@ func stepFields(step onbdomain.WizardStep, advanced bool, preview, stacks []stri
 		}
 	case onbdomain.StepAgents:
 		rows = []FieldDef{
-			{Key: "default_agent", Label: "Agent par défaut"},
-			{Key: "default_reviewer", Label: "Reviewer par défaut"},
+			{Key: "default_spec_agent", Label: "Spec", Kind: FieldSelect, Choices: choices},
+			{Key: "pipeline_plan", Label: "Plan", Kind: FieldManaged, ReadOnly: true},
+			{Key: "default_enricher", Label: "Enrich", Kind: FieldSelect, Choices: choices},
+			{Key: "default_agent", Label: "Dev", Kind: FieldSelect, Choices: choices},
+			{Key: "pipeline_verify", Label: "Verify", Kind: FieldManaged, ReadOnly: true},
+			{Key: "default_reviewer", Label: "Review", Kind: FieldSelect, Choices: choices},
 		}
 	case onbdomain.StepDocs:
-		rows = []FieldDef{{Key: "product_one_liner", Label: "Produit (une ligne)"}}
+		rows = []FieldDef{{Key: "product_one_liner", Label: productOneLinerFieldLabel()}}
 	case onbdomain.StepFeature:
-		rows = []FieldDef{{Key: "feature_slug", Label: "Slug feature Kiro"}}
+		rows = []FieldDef{{Key: "feature_slug", Label: firstFeatureSlugFieldLabel()}}
 	case onbdomain.StepReview:
 		rows = []FieldDef{
 			{Key: "project_name", Label: "Projet", ReadOnly: true},
 			{Key: "default_branch", Label: "Branche", ReadOnly: true},
 			{Key: "stack", Label: "Stack", ReadOnly: true},
-			{Key: "default_agent", Label: "Agent", ReadOnly: true},
-			{Key: "default_reviewer", Label: "Reviewer", ReadOnly: true},
-			{Key: "product_one_liner", Label: "Produit", ReadOnly: true},
-			{Key: "feature_slug", Label: "Feature", ReadOnly: true},
+			{Key: "default_spec_agent", Label: "Spec", ReadOnly: true},
+			{Key: "default_enricher", Label: "Enrich", ReadOnly: true},
+			{Key: "default_agent", Label: "Dev", ReadOnly: true},
+			{Key: "default_reviewer", Label: "Review", ReadOnly: true},
+			{Key: "product_one_liner", Label: productOneLinerFieldLabel(), ReadOnly: true},
+			{Key: "feature_slug", Label: firstFeatureStepLabel(), ReadOnly: true},
 		}
 	}
 	if advanced {
@@ -385,7 +491,7 @@ func stepFields(step onbdomain.WizardStep, advanced bool, preview, stacks []stri
 func (m Model) fieldValue(key string) string {
 	if strings.HasPrefix(key, "validation_") {
 		idx := 0
-		fmt.Sscanf(key, "validation_%d", &idx)
+		_, _ = fmt.Sscanf(key, "validation_%d", &idx)
 		if idx >= 0 && idx < len(m.ValidationPreview) {
 			return m.ValidationPreview[idx]
 		}
@@ -393,6 +499,12 @@ func (m Model) fieldValue(key string) string {
 	}
 	if key == "detected_stacks" {
 		return strings.Join(m.DetectedStacks, ", ")
+	}
+	switch key {
+	case "pipeline_plan":
+		return "Géré par Asagiri"
+	case "pipeline_verify":
+		return "Géré par Asagiri"
 	}
 	if isAdvancedKey(key) {
 		return m.Advanced[key]
@@ -431,6 +543,26 @@ type OnboardingFooterMsg struct {
 	Form   onbdomain.Form
 }
 
+func defaultAgentChoices() []string {
+	return []string{"cursor", "codex", "kiro", "ollama", "claude"}
+}
+
+func defaultStackChoices() []string {
+	return []string{"auto", "go", "castor", "node"}
+}
+
+func productOneLinerFieldLabel() string {
+	return "Que fait le produit ? (une phrase, ≠ nom du projet)"
+}
+
+func firstFeatureStepLabel() string {
+	return "1ère feature"
+}
+
+func firstFeatureSlugFieldLabel() string {
+	return "Slug Kiro (dossier .kiro/specs/<slug>/)"
+}
+
 func max(a, b int) int {
 	if a > b {
 		return a
@@ -452,7 +584,7 @@ func StepLabel(step onbdomain.WizardStep) string {
 	case onbdomain.StepDocs:
 		return "Docs"
 	case onbdomain.StepFeature:
-		return "Feature"
+		return firstFeatureStepLabel()
 	case onbdomain.StepReview:
 		return "Récap"
 	default:

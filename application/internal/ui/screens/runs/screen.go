@@ -89,9 +89,10 @@ type ViewModel struct {
 }
 
 // Render returns the Runs screen content: list pane + detail pane. When the
-// repository has no runs or is not onboarded, it renders an empty state.
+// repository has no runs or is not onboarded, it renders an empty state that
+// explicitly invites onboarding (R7.6).
 func Render(vm ViewModel) string {
-	if len(vm.Runs) == 0 || !vm.Readiness.Ready {
+	if !vm.Readiness.Ready || len(vm.Runs) == 0 {
 		return renderEmptyState(vm)
 	}
 	selected := vm.Model.Selected(len(vm.Runs))
@@ -127,7 +128,7 @@ func renderRunList(vm ViewModel, selected int) string {
 		if feature == "" {
 			feature = run.ID
 		}
-		b.WriteString(fmt.Sprintf("%s%s %s  %s\n", marker, statusGlyph(run.Status), feature, run.Status))
+		fmt.Fprintf(&b, "%s%s %s  %s\n", marker, statusGlyph(run.Status), feature, run.Status)
 	}
 	return strings.TrimRight(b.String(), "\n")
 }
@@ -156,7 +157,7 @@ func renderRunDetail(vm ViewModel) string {
 	b.WriteString("\nTrust gate\n")
 	b.WriteString(renderTrustGate(vm) + "\n")
 
-	b.WriteString(fmt.Sprintf("\nCost: €%.2f\n", d.CostEUR))
+	fmt.Fprintf(&b, "\nCost: €%.2f\n", d.CostEUR)
 
 	if len(d.Agents) > 0 {
 		b.WriteString("\nAgents\n")
@@ -166,7 +167,7 @@ func renderRunDetail(vm ViewModel) string {
 			}
 			role := value(ag.Role, "agent")
 			ref := value(ag.AgentRef, "-")
-			b.WriteString(fmt.Sprintf("- %s %s %s\n", role, statusGlyph(ag.Status), ref))
+			fmt.Fprintf(&b, "- %s %s %s\n", role, statusGlyph(ag.Status), ref)
 		}
 	}
 
@@ -215,7 +216,12 @@ func renderTrustGate(vm ViewModel) string {
 func renderEmptyState(vm ViewModel) string {
 	var b strings.Builder
 	b.WriteString("No runs yet.\n\n")
-	b.WriteString("This repository has no recorded runs.\n")
+	if !vm.Readiness.Ready {
+		// R7.6: the repository is not onboarded — invite onboarding explicitly.
+		b.WriteString("This repository is not onboarded yet.\n")
+	} else {
+		b.WriteString("This repository has no recorded runs.\n")
+	}
 	b.WriteString("Onboard the project to get started:\n\n")
 	b.WriteString("  asa onboard --ui\n")
 	return b.String()

@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
-	"strings"
 
 	"github.com/LaProgrammerie/asagiri/application/internal/memory"
 	"github.com/LaProgrammerie/asagiri/application/internal/runtime"
@@ -160,13 +159,4 @@ func (s *Server) handleListMemory(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	writeJSON(w, http.StatusOK, map[string]any{"memory": entries})
-}
-
-// sessionIDFromPath supports legacy path parsing if needed.
-func sessionIDFromPath(path string) string {
-	parts := strings.Split(strings.Trim(path, "/"), "/")
-	if len(parts) >= 3 {
-		return parts[2]
-	}
-	return ""
 }

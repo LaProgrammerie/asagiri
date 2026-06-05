@@ -29,9 +29,7 @@ func authMiddleware(token string, next http.Handler) http.Handler {
 	}
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		got := r.Header.Get("Authorization")
-		if strings.HasPrefix(got, "Bearer ") {
-			got = strings.TrimPrefix(got, "Bearer ")
-		}
+		got = strings.TrimPrefix(got, "Bearer ")
 		if got == "" {
 			got = r.Header.Get("X-Asagiri-Token")
 		}

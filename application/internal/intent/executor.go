@@ -66,6 +66,14 @@ func (e *Executor) runStep(ctx context.Context, step PlanStep, intent ResolvedIn
 	if reviewer == "" {
 		reviewer = e.Config.Work.DefaultReviewer
 	}
+	specAgent := "kiro"
+	if e.Config != nil && e.Config.Work.DefaultSpecAgent != "" {
+		specAgent = e.Config.Work.DefaultSpecAgent
+	}
+	enricher := "ollama"
+	if e.Config != nil && e.Config.Work.DefaultEnricher != "" {
+		enricher = e.Config.Work.DefaultEnricher
+	}
 	force := hasFlag(step.Args, "--force")
 
 	switch step.Command {
@@ -75,12 +83,12 @@ func (e *Executor) runStep(ctx context.Context, step PlanStep, intent ResolvedIn
 		}
 		return "", nil
 	case "spec":
-		return e.Workflow.SpecFeature(ctx, feature, agentOr(step.Args, "kiro"))
+		return e.Workflow.SpecFeature(ctx, feature, agentOr(step.Args, specAgent))
 	case "plan":
 		runID, _, err := e.Workflow.PlanFeature(feature)
 		return runID, err
 	case "enrich":
-		return e.Workflow.EnrichFeature(ctx, feature, taskID, agentOr(step.Args, "ollama"), force)
+		return e.Workflow.EnrichFeature(ctx, feature, taskID, agentOr(step.Args, enricher), force)
 	case "dev":
 		return e.Workflow.DevFeature(ctx, feature, taskID, agentOr(step.Args, agent), force)
 	case "verify":

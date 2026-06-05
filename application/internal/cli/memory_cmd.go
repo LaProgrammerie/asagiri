@@ -36,7 +36,7 @@ func newMemoryDoctorCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			defer store.Close()
+			defer func() { _ = store.Close() }()
 			checks, err := memory.NewEngine(store).Doctor(cmd.Context())
 			if err != nil {
 				return err
@@ -63,12 +63,12 @@ func newMemoryReindexCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			defer store.Close()
+			defer func() { _ = store.Close() }()
 			n, err := memory.NewEngine(store).Reindex(cmd.Context())
 			if err != nil {
 				return err
 			}
-			fmt.Fprintf(cmd.OutOrStdout(), "reindexed: %d\n", n)
+			_, _ = fmt.Fprintf(cmd.OutOrStdout(), "reindexed: %d\n", n)
 			return nil
 		},
 	}

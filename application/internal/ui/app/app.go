@@ -113,7 +113,6 @@ type model struct {
 	trustExplorer     trust.Model
 	replayExplorer    replay.Model
 	runsExplorer      runs.Model
-	runDetail         bus.RunDetail
 	onboardingWizard  onboarding.Model
 	wizardMode        bool
 	confirmation      *safetyConfirmation

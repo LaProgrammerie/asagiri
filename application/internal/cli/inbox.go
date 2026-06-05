@@ -59,15 +59,15 @@ func newInboxCmd(dryRun *bool) *cobra.Command {
 			if sourceFilter == "" || sourceFilter == "notion" {
 				if reg.Notion != nil {
 					if err := listSource("notion", reg.Notion); err != nil {
-						fmt.Fprintf(cmd.ErrOrStderr(), "notion: %v\n", err)
+						_, _ = fmt.Fprintf(cmd.ErrOrStderr(), "notion: %v\n", err)
 					}
 				} else if sourceFilter == "notion" {
-					fmt.Fprintln(cmd.ErrOrStderr(), "notion: source non configurée (sources.notion.enabled + NOTION_TOKEN)")
+					_, _ = fmt.Fprintln(cmd.ErrOrStderr(), "notion: source non configurée (sources.notion.enabled + NOTION_TOKEN)")
 				}
 			}
 
 			if len(rows) == 0 {
-				fmt.Fprintln(cmd.OutOrStdout(), "Inbox vide.")
+				_, _ = fmt.Fprintln(cmd.OutOrStdout(), "Inbox vide.")
 				return nil
 			}
 			intent.PrintInboxTable(cmd.OutOrStdout(), rows)

@@ -34,14 +34,13 @@ type StepState struct {
 }
 
 type Service struct {
-	repoRoot       string
-	cfg            *config.Config
-	store          *sqlite.Store
-	specReader     *spec.Reader
-	reportWriter   *report.Writer
-	worktreeMngr   *worktree.Manager
-	dryRun         bool
-	agentFactories map[string]func(bool) (agent.Agent, error)
+	repoRoot     string
+	cfg          *config.Config
+	store        *sqlite.Store
+	specReader   *spec.Reader
+	reportWriter *report.Writer
+	worktreeMngr *worktree.Manager
+	dryRun       bool
 }
 
 func NewService(repoRoot string, cfg *config.Config, store *sqlite.Store, dryRun bool) *Service {
@@ -359,7 +358,7 @@ func (s *Service) contextFilesForTask(feature string, task asagiri.Task) []strin
 	if err != nil {
 		return rag.HeuristicContextFiles(s.repoRoot, feature)
 	}
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 	paths, err := rag.NewRetriever(db).SearchWithOptions(context.Background(), task.Title, rag.SearchOptions{
 		Limit:  8,
 		Memory: s.cfg.Runtime.Memory,
@@ -803,7 +802,7 @@ func (s *Service) PreparePR(ctx context.Context, feature string) (string, error)
 	checklist.WriteString("- [ ] Diff revu\n")
 	checklist.WriteString("\n## Tasks\n\n")
 	for _, task := range tasks {
-		checklist.WriteString(fmt.Sprintf("- [ ] `%s` (%s)\n", task.ID, task.Status))
+		fmt.Fprintf(&checklist, "- [ ] `%s` (%s)\n", task.ID, task.Status)
 	}
 	if err := os.WriteFile(checklistPath, []byte(checklist.String()), 0o644); err != nil {
 		return "", err

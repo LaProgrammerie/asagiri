@@ -61,7 +61,7 @@ func (s *GraphSnapshotter) Snapshot(ctx context.Context, req SnapshotRequest) (S
 	if err != nil {
 		return SnapshotResult{}, err
 	}
-	defer store.Close()
+	defer func() { _ = store.Close() }()
 
 	buildMeta, err := store.GetIndexMetadata(ctx, "build")
 	if err != nil {

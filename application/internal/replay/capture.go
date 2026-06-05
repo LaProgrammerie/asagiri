@@ -310,13 +310,6 @@ func (c *CaptureContext) captureTrust(graphID string) error {
 		}
 		trustID := e.Name()
 		src := filepath.Join(trustRoot, trustID)
-		if graphID != "" {
-			replayPath := filepath.Join(src, "replay.yaml")
-			body, err := os.ReadFile(replayPath)
-			if err == nil && !strings.Contains(string(body), graphID) {
-				// keep recent trust reports regardless
-			}
-		}
 		for _, name := range []string{"report.md", "report.json", "replay.yaml"} {
 			dst := filepath.Join("trust", trustID, name)
 			if err := c.copyArtifact(src, dst, "trust-engine", name, trustID); err == nil {

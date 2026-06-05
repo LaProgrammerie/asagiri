@@ -54,7 +54,7 @@ func Init(startDir string) error {
 	if err != nil {
 		return err
 	}
-	defer store.Close()
+	defer func() { _ = store.Close() }()
 
 	if err := store.Migrate(); err != nil {
 		return fmt.Errorf("migrations SQLite: %w", err)
@@ -86,13 +86,13 @@ func copyFile(src, dst string) error {
 	if err != nil {
 		return fmt.Errorf("ouvrir example config: %w", err)
 	}
-	defer in.Close()
+	defer func() { _ = in.Close() }()
 
 	out, err := os.OpenFile(dst, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0o644)
 	if err != nil {
 		return fmt.Errorf("créer config: %w", err)
 	}
-	defer out.Close()
+	defer func() { _ = out.Close() }()
 
 	if _, err := io.Copy(out, in); err != nil {
 		return fmt.Errorf("copier config: %w", err)
@@ -138,7 +138,7 @@ func Doctor(startDir string) ([]DoctorCheck, error) {
 		checks = append(checks, DoctorCheck{Name: "sqlite", Err: dbErr})
 		return checks, nil
 	}
-	defer store.Close()
+	defer func() { _ = store.Close() }()
 
 	if err := store.Ping(); err != nil {
 		checks = append(checks, DoctorCheck{Name: "sqlite", Err: err})

@@ -149,12 +149,3 @@ func renderDashboardGrid(panels []string, cols int) string {
 	}
 	return strings.Join(rows, "\n")
 }
-
-// Legacy helpers kept for tests referencing wide/ultra-wide layouts.
-func renderWide(panels []string) string {
-	return renderDashboardGrid(panels, 2)
-}
-
-func renderUltraWide(panels []string) string {
-	return renderDashboardGrid(panels, 3)
-}

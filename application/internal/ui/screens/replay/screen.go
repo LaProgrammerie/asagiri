@@ -103,7 +103,7 @@ func Render(vm ViewModel) string {
 		b.WriteString("Created: " + vm.Replay.CreatedAt.Format(time.RFC3339) + "\n")
 	}
 	if vm.Replay.RepoBranch != "" || vm.Replay.RepoCommit != "" {
-		b.WriteString(fmt.Sprintf("Repo: %s @ %s\n", value(vm.Replay.RepoBranch, "-"), shortCommit(vm.Replay.RepoCommit)))
+		fmt.Fprintf(&b, "Repo: %s @ %s\n", value(vm.Replay.RepoBranch, "-"), shortCommit(vm.Replay.RepoCommit))
 	}
 	b.WriteString("Mode: " + value(vm.Replay.Mode, "full") + "\n")
 	if vm.Replay.Warning != "" {

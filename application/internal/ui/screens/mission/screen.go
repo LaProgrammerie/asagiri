@@ -82,12 +82,12 @@ func RenderHeader(vm ViewModel) string {
 	if session == "" {
 		session = "inactive"
 	}
-	b.WriteString(fmt.Sprintf("Workspace: %s  Branch: %s\n", workspace, branch))
+	fmt.Fprintf(&b, "Workspace: %s  Branch: %s\n", workspace, branch)
 	runtimePrefix := ""
 	if vm.RuntimeStatus == "running" && !vm.DisableAnimations {
 		runtimePrefix = components.ShimmerPrefix(true, vm.AnimFrame)
 	}
-	b.WriteString(fmt.Sprintf("Runtime: %s%s  Session: %s", runtimePrefix, vm.RuntimeStatus, session))
+	fmt.Fprintf(&b, "Runtime: %s%s  Session: %s", runtimePrefix, vm.RuntimeStatus, session)
 	return b.String()
 }
 
@@ -95,25 +95,25 @@ func RenderHeader(vm ViewModel) string {
 func RenderRuntimeRuns(vm ViewModel) string {
 	var b strings.Builder
 	b.WriteString("Runtime\n")
-	b.WriteString(fmt.Sprintf("Agents: %d\n", len(vm.ActiveAgents)))
+	fmt.Fprintf(&b, "Agents: %d\n", len(vm.ActiveAgents))
 	sessionCount := 0
 	if vm.SessionStatus == "active" {
 		sessionCount = 1
 	}
-	b.WriteString(fmt.Sprintf("Sessions: %d\n", sessionCount))
-	b.WriteString(fmt.Sprintf("Queue: %d\n", vm.QueuedEvents))
-	b.WriteString(fmt.Sprintf("Cost today: €%.2f\n", vm.CostTodayEUR))
-	b.WriteString(fmt.Sprintf("Cost month: €%.2f\n", vm.CostMonthEUR))
+	fmt.Fprintf(&b, "Sessions: %d\n", sessionCount)
+	fmt.Fprintf(&b, "Queue: %d\n", vm.QueuedEvents)
+	fmt.Fprintf(&b, "Cost today: €%.2f\n", vm.CostTodayEUR)
+	fmt.Fprintf(&b, "Cost month: €%.2f\n", vm.CostMonthEUR)
 	if vm.Warning != "" || len(vm.Warnings) > 0 {
 		b.WriteString("Warnings:\n")
 		if vm.Warning != "" {
-			b.WriteString(fmt.Sprintf("- %s\n", vm.Warning))
+			fmt.Fprintf(&b, "- %s\n", vm.Warning)
 		}
 		for _, warning := range vm.Warnings {
-			b.WriteString(fmt.Sprintf("- %s\n", warning))
+			fmt.Fprintf(&b, "- %s\n", warning)
 		}
 	}
-	b.WriteString(fmt.Sprintf("Updated: %s\n\n", vm.Now.Format(time.RFC3339)))
+	fmt.Fprintf(&b, "Updated: %s\n\n", vm.Now.Format(time.RFC3339))
 	b.WriteString("Recent runs\n")
 	if len(vm.Runs) == 0 {
 		b.WriteString("- none\n")
@@ -123,7 +123,7 @@ func RenderRuntimeRuns(vm ViewModel) string {
 		if i >= 5 {
 			break
 		}
-		b.WriteString(fmt.Sprintf("- %s  %s  %s\n", run.ID, run.Feature, run.Status))
+		fmt.Fprintf(&b, "- %s  %s  %s\n", run.ID, run.Feature, run.Status)
 	}
 	return b.String()
 }
@@ -137,9 +137,9 @@ func RenderTrustPane(vm ViewModel) string {
 		return b.String()
 	}
 	for _, dim := range vm.Trust.Dimensions {
-		b.WriteString(fmt.Sprintf("- %-13s %s %2.0f%%\n", dim.Label, meter(dim.Score), dim.Score*100))
+		fmt.Fprintf(&b, "- %-13s %s %2.0f%%\n", dim.Label, meter(dim.Score), dim.Score*100)
 	}
-	b.WriteString(fmt.Sprintf("- Overall       %s %2.0f%%", meter(vm.Trust.Overall), vm.Trust.Overall*100))
+	fmt.Fprintf(&b, "- Overall       %s %2.0f%%", meter(vm.Trust.Overall), vm.Trust.Overall*100)
 	return b.String()
 }
 
@@ -157,7 +157,7 @@ func RenderActiveFlowPane(vm ViewModel) string {
 		return b.String()
 	}
 	for _, step := range vm.Flow.Steps {
-		b.WriteString(fmt.Sprintf("%s %s  ", flowStatusGlyph(step.Status, !vm.DisableAnimations, vm.AnimFrame), stepLabel(step)))
+		fmt.Fprintf(&b, "%s %s  ", flowStatusGlyph(step.Status, !vm.DisableAnimations, vm.AnimFrame), stepLabel(step))
 	}
 	return strings.TrimRight(b.String(), " ")
 }
@@ -179,7 +179,7 @@ func RenderAgentTheatrePane(vm ViewModel) string {
 		if agentRef == "" {
 			agentRef = "-"
 		}
-		b.WriteString(fmt.Sprintf("- %s %s %s\n", role, statusGlyph(ag.Status, !vm.DisableAnimations, vm.AnimFrame), agentRef))
+		fmt.Fprintf(&b, "- %s %s %s\n", role, statusGlyph(ag.Status, !vm.DisableAnimations, vm.AnimFrame), agentRef)
 	}
 	return strings.TrimRight(b.String(), "\n")
 }
@@ -196,9 +196,9 @@ func RenderRecommendedActionsPane(vm ViewModel) string {
 		if i >= 6 {
 			break
 		}
-		b.WriteString(fmt.Sprintf("- %s: %s\n", action.Title, action.Description))
+		fmt.Fprintf(&b, "- %s: %s\n", action.Title, action.Description)
 		if strings.TrimSpace(action.CLIEquivalent) != "" {
-			b.WriteString(fmt.Sprintf("  CLI: %s\n", action.CLIEquivalent))
+			fmt.Fprintf(&b, "  CLI: %s\n", action.CLIEquivalent)
 		}
 	}
 	return strings.TrimRight(b.String(), "\n")

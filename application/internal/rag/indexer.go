@@ -73,7 +73,7 @@ func Index(opts IndexOptions) (IndexResult, error) {
 	if err != nil {
 		return IndexResult{}, err
 	}
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 
 	if err := initSchema(db); err != nil {
 		return IndexResult{}, err

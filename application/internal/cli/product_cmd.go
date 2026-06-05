@@ -43,7 +43,7 @@ func newPrototypeCmd(dryRun *bool) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			fmt.Fprintf(cmd.OutOrStdout(), "prototype créé: %s\n", name)
+			_, _ = fmt.Fprintf(cmd.OutOrStdout(), "prototype créé: %s\n", name)
 			return nil
 		},
 	}
@@ -75,10 +75,10 @@ func newPrototypeCmd(dryRun *bool) *cobra.Command {
 				return err
 			}
 			if actx.DryRun || *dryRun {
-				fmt.Fprintf(cmd.OutOrStdout(), "prototype %s prêt (%s). cd %s && npm run dev\n", result.Product, result.URL, result.Dir)
+				_, _ = fmt.Fprintf(cmd.OutOrStdout(), "prototype %s prêt (%s). cd %s && npm run dev\n", result.Product, result.URL, result.Dir)
 				return nil
 			}
-			fmt.Fprintf(cmd.OutOrStdout(), "prototype %s démarré (%s) pid=%d dir=%s\n", result.Product, result.URL, result.PID, result.Dir)
+			_, _ = fmt.Fprintf(cmd.OutOrStdout(), "prototype %s démarré (%s) pid=%d dir=%s\n", result.Product, result.URL, result.PID, result.Dir)
 			return nil
 		},
 	}
@@ -101,7 +101,7 @@ func newPrototypeCmd(dryRun *bool) *cobra.Command {
 			if err := svc.PatchPrototype(args[0], args[1], actx.DryRun || *dryRun); err != nil {
 				return err
 			}
-			fmt.Fprintf(cmd.OutOrStdout(), "prototype patché: %s\n", product.Slug(args[0]))
+			_, _ = fmt.Fprintf(cmd.OutOrStdout(), "prototype patché: %s\n", product.Slug(args[0]))
 			return nil
 		},
 	}
@@ -133,7 +133,7 @@ func newFlowsCmd(dryRun *bool) *cobra.Command {
 			if err := svc.ExtractFlows(args[0], actx.DryRun || *dryRun); err != nil {
 				return err
 			}
-			fmt.Fprintf(cmd.OutOrStdout(), "flows extraits: %s\n", product.Slug(args[0]))
+			_, _ = fmt.Fprintf(cmd.OutOrStdout(), "flows extraits: %s\n", product.Slug(args[0]))
 			return nil
 		},
 	}
@@ -156,7 +156,7 @@ func newFlowsCmd(dryRun *bool) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			fmt.Fprintln(cmd.OutOrStdout(), summary)
+			_, _ = fmt.Fprintln(cmd.OutOrStdout(), summary)
 			return nil
 		},
 	}
@@ -188,10 +188,10 @@ func newFlowsCmd(dryRun *bool) *cobra.Command {
 				return err
 			}
 			if actx.DryRun || *dryRun {
-				fmt.Fprintf(cmd.OutOrStdout(), "e2e skeleton (%s): %s (%d steps)\n", result.Runner, result.Path, result.StepCount)
+				_, _ = fmt.Fprintf(cmd.OutOrStdout(), "e2e skeleton (%s): %s (%d steps)\n", result.Runner, result.Path, result.StepCount)
 				return nil
 			}
-			fmt.Fprintf(cmd.OutOrStdout(), "e2e généré: %s (%s, %d steps)\n", result.Path, result.Runner, result.StepCount)
+			_, _ = fmt.Fprintf(cmd.OutOrStdout(), "e2e généré: %s (%s, %d steps)\n", result.Path, result.Runner, result.StepCount)
 			return nil
 		},
 	}
@@ -218,7 +218,7 @@ func newFlowsCmd(dryRun *bool) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			fmt.Fprintln(cmd.OutOrStdout(), summary)
+			_, _ = fmt.Fprintln(cmd.OutOrStdout(), summary)
 			return nil
 		},
 	}
@@ -249,7 +249,7 @@ func newContractsCmd(dryRun *bool) *cobra.Command {
 			if err := svc.ExtractContracts(args[0], actx.DryRun || *dryRun); err != nil {
 				return err
 			}
-			fmt.Fprintf(cmd.OutOrStdout(), "contracts extraits: %s\n", product.Slug(args[0]))
+			_, _ = fmt.Fprintf(cmd.OutOrStdout(), "contracts extraits: %s\n", product.Slug(args[0]))
 			return nil
 		},
 	}
@@ -286,7 +286,7 @@ func newProductReviewSubCmd(dryRun *bool) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			fmt.Fprintf(cmd.OutOrStdout(), "review produit %s: %s\n", product.Slug(args[0]), summary)
+			_, _ = fmt.Fprintf(cmd.OutOrStdout(), "review produit %s: %s\n", product.Slug(args[0]), summary)
 			return nil
 		},
 	}
@@ -311,7 +311,7 @@ func newSpecGenerateFromProductCmd(dryRun *bool) *cobra.Command {
 			if err := svc.GenerateSpecFromProduct(args[0], actx.DryRun || *dryRun); err != nil {
 				return err
 			}
-			fmt.Fprintf(cmd.OutOrStdout(), "spec générée depuis produit: %s\n", product.Slug(args[0]))
+			_, _ = fmt.Fprintf(cmd.OutOrStdout(), "spec générée depuis produit: %s\n", product.Slug(args[0]))
 			return nil
 		},
 	}
@@ -341,7 +341,7 @@ func newArchitectureCmd(dryRun *bool) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			fmt.Fprintln(cmd.OutOrStdout(), summary)
+			_, _ = fmt.Fprintln(cmd.OutOrStdout(), summary)
 			return nil
 		},
 	}

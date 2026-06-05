@@ -25,7 +25,7 @@ func migrateChunksEmbedding(db *sql.DB) error {
 	if err != nil {
 		return err
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 	hasEmbedding := false
 	for rows.Next() {
 		var cid int

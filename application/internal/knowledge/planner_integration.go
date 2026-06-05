@@ -25,7 +25,7 @@ func EnrichPlannerFromGraph(ctx context.Context, repoRoot, flowID string, nodeOu
 		}
 		return PlannerKnowledgeHints{}, false, err
 	}
-	defer store.Close()
+	defer func() { _ = store.Close() }()
 
 	flowID = strings.TrimSpace(flowID)
 	if flowID == "" {

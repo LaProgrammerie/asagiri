@@ -85,7 +85,7 @@ func newWorkCmd(dryRun *bool) *cobra.Command {
 					return invErr
 				}
 				_ = investigation.FeedMemory(actx.RepoRoot, rep)
-				fmt.Fprintf(cmd.OutOrStdout(), "investigate-first: %s (candidates: %d)\n",
+				_, _ = fmt.Fprintf(cmd.OutOrStdout(), "investigate-first: %s (candidates: %d)\n",
 					rep.ID, len(rep.RootCauseCandidates))
 			}
 
@@ -208,7 +208,7 @@ func newWorkCmd(dryRun *bool) *cobra.Command {
 				}
 				eng := trust.NewEngineForStrict(actx.RepoRoot, actx.Config)
 				if store, err := runtime.Open(actx.RepoRoot); err == nil {
-					defer store.Close()
+					defer func() { _ = store.Close() }()
 					eng.Emitter = trust.NewRuntimeEmitter(store)
 				}
 				eng.Config = actx.Config
@@ -216,8 +216,8 @@ func newWorkCmd(dryRun *bool) *cobra.Command {
 				if err != nil {
 					return err
 				}
-				fmt.Fprint(cmd.OutOrStdout(), trust.FormatTerminalSummary(result.Report))
-				fmt.Fprintf(cmd.OutOrStdout(), "\nstrict-trust: passed (trust id %s)\n", result.TrustID)
+				_, _ = fmt.Fprint(cmd.OutOrStdout(), trust.FormatTerminalSummary(result.Report))
+				_, _ = fmt.Fprintf(cmd.OutOrStdout(), "\nstrict-trust: passed (trust id %s)\n", result.TrustID)
 			}
 			return nil
 		},
@@ -263,5 +263,5 @@ func runInvestigationOnFailure(cmd *cobra.Command, actx *appContext, instruction
 		return
 	}
 	_ = investigation.FeedMemory(actx.RepoRoot, rep)
-	fmt.Fprintf(cmd.OutOrStdout(), "investigate-on-failure: %s\n", rep.ID)
+	_, _ = fmt.Fprintf(cmd.OutOrStdout(), "investigate-on-failure: %s\n", rep.ID)
 }

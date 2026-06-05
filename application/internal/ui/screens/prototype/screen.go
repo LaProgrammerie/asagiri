@@ -35,8 +35,8 @@ func Render(vm ViewModel) string {
 			if i >= 5 {
 				break
 			}
-			b.WriteString(fmt.Sprintf("- %s/%s action=%s screen=%s next=%s\n", value(step.FlowID, "-"), value(step.StepID, "-"), value(step.Action, "-"), value(step.Screen, "-"), value(step.Next, "-")))
-			b.WriteString(fmt.Sprintf("  contract=%s trust=%s metric=%s\n", formatContract(step.Contract), value(step.Trust, "pending"), value(step.Metric, "-")))
+			fmt.Fprintf(&b, "- %s/%s action=%s screen=%s next=%s\n", value(step.FlowID, "-"), value(step.StepID, "-"), value(step.Action, "-"), value(step.Screen, "-"), value(step.Next, "-"))
+			fmt.Fprintf(&b, "  contract=%s trust=%s metric=%s\n", formatContract(step.Contract), value(step.Trust, "pending"), value(step.Metric, "-"))
 		}
 	}
 	b.WriteString("\nPipeline actions\n")

@@ -86,7 +86,7 @@ func AppendKnowledgeDependencyEdges(ctx context.Context, repoRoot, flowID string
 		}
 		return nil, err
 	}
-	defer store.Close()
+	defer func() { _ = store.Close() }()
 
 	flowID = strings.TrimSpace(flowID)
 	if flowID == "" {

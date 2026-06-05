@@ -29,7 +29,7 @@ func (b *queryBus) handleGetRunDetail(ctx context.Context, q GetRunDetailQuery) 
 	if err != nil {
 		return RunDetail{ID: id, Warning: err.Error()}, nil
 	}
-	defer store.Close()
+	defer func() { _ = store.Close() }()
 	if err := store.Migrate(); err != nil {
 		return RunDetail{ID: id, Warning: err.Error()}, nil
 	}

@@ -49,14 +49,6 @@ func stampEdge(edge knowledge.GraphEdge, now time.Time) knowledge.GraphEdge {
 	return edge
 }
 
-func mergeResults(dst *ExtractResult, parts ...ExtractResult) {
-	for _, p := range parts {
-		dst.Nodes = append(dst.Nodes, p.Nodes...)
-		dst.Edges = append(dst.Edges, p.Edges...)
-		dst.Warnings = append(dst.Warnings, p.Warnings...)
-	}
-}
-
 // APIOperationKey builds a stable api_operation id segment from HTTP method and path.
 func APIOperationKey(method, path string) string {
 	method = strings.ToUpper(strings.TrimSpace(method))

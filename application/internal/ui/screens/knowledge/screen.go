@@ -114,7 +114,7 @@ func Render(vm ViewModel) string {
 	}
 
 	var b strings.Builder
-	b.WriteString(fmt.Sprintf("Knowledge search: %s\n", displayQuery))
+	fmt.Fprintf(&b, "Knowledge search: %s\n", displayQuery)
 	if vm.Search.Warning != "" {
 		b.WriteString("Warning: " + vm.Search.Warning + "\n")
 	}

@@ -22,7 +22,7 @@ func tryKnowledgeBlastRadius(ctx context.Context, scope Scope, flowID string, de
 		}
 		return BlastRadiusSummary{}, false
 	}
-	defer store.Close()
+	defer func() { _ = store.Close() }()
 
 	result, err := knowledge.NewImpactAnalyzer(store).Analyze(ctx, knowledge.ImpactRequest{Flow: flowID})
 	if err != nil {

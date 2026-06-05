@@ -72,21 +72,21 @@ func newInvestigateCmd(dryRun *bool) *cobra.Command {
 			if !estimateOnly {
 				reportPath = fmt.Sprintf(".asagiri/investigations/%s/report.md", rep.ID)
 			}
-			fmt.Fprintf(cmd.OutOrStdout(), "Investigation: %s\n", rep.ID)
-			fmt.Fprintf(cmd.OutOrStdout(), "Scope flow: %s | hypotheses: %d | evidence: %d\n",
+			_, _ = fmt.Fprintf(cmd.OutOrStdout(), "Investigation: %s\n", rep.ID)
+			_, _ = fmt.Fprintf(cmd.OutOrStdout(), "Scope flow: %s | hypotheses: %d | evidence: %d\n",
 				rep.Scope.Flow, len(rep.Hypotheses), len(rep.Evidence))
 			if reportPath != "" {
-				fmt.Fprintf(cmd.OutOrStdout(), "Report: %s\n", reportPath)
+				_, _ = fmt.Fprintf(cmd.OutOrStdout(), "Report: %s\n", reportPath)
 			}
 			if rep.ContextPackPath != "" {
-				fmt.Fprintf(cmd.OutOrStdout(), "Context pack: %s\n", rep.ContextPackPath)
+				_, _ = fmt.Fprintf(cmd.OutOrStdout(), "Context pack: %s\n", rep.ContextPackPath)
 			}
 			if rep.ReplayPackPath != "" {
-				fmt.Fprintf(cmd.OutOrStdout(), "Replay pack: %s\n", rep.ReplayPackPath)
+				_, _ = fmt.Fprintf(cmd.OutOrStdout(), "Replay pack: %s\n", rep.ReplayPackPath)
 			}
-			fmt.Fprintf(cmd.OutOrStdout(), "Estimated tokens: %d | cost: €%.4f\n", rep.EstimateTokens, rep.EstimateCostEUR)
+			_, _ = fmt.Fprintf(cmd.OutOrStdout(), "Estimated tokens: %d | cost: €%.4f\n", rep.EstimateTokens, rep.EstimateCostEUR)
 			for _, h := range rep.RootCauseCandidates {
-				fmt.Fprintf(cmd.OutOrStdout(), "  candidate (%.2f): %s\n", h.Score, h.Statement)
+				_, _ = fmt.Fprintf(cmd.OutOrStdout(), "  candidate (%.2f): %s\n", h.Score, h.Statement)
 			}
 			return nil
 		},
@@ -122,7 +122,7 @@ func newInvestigateCmd(dryRun *bool) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			fmt.Fprintf(cmd.OutOrStdout(), "Impact: %s\nAffected: %d files\nReport: %s\n",
+			_, _ = fmt.Fprintf(cmd.OutOrStdout(), "Impact: %s\nAffected: %d files\nReport: %s\n",
 				rep.ID, len(rep.Affected), path)
 			return nil
 		},
@@ -146,7 +146,7 @@ func newInvestigateCmd(dryRun *bool) *cobra.Command {
 			if err := json.Unmarshal(raw, &g); err != nil {
 				return err
 			}
-			fmt.Fprint(cmd.OutOrStdout(), investigation.FormatGraphPlain(g))
+			_, _ = fmt.Fprint(cmd.OutOrStdout(), investigation.FormatGraphPlain(g))
 			return nil
 		},
 	}

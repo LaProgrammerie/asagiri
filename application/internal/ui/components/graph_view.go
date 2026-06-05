@@ -27,7 +27,7 @@ func RenderGraphView(vm GraphViewModel) string {
 	var b strings.Builder
 	for i, node := range vm.Nodes {
 		if i >= limit {
-			b.WriteString(fmt.Sprintf("… +%d more\n", len(vm.Nodes)-limit))
+			fmt.Fprintf(&b, "… +%d more\n", len(vm.Nodes)-limit)
 			break
 		}
 		prefix := " "

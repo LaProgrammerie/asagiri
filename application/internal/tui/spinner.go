@@ -26,7 +26,7 @@ func (s *Spinner) Tick() {
 	}
 	f := s.frames[s.i%len(s.frames)]
 	s.i++
-	fmt.Fprintf(s.out, "\r%c %s", f, s.label)
+	_, _ = fmt.Fprintf(s.out, "\r%c %s", f, s.label)
 }
 
 // Stop clears the line.
@@ -34,7 +34,7 @@ func (s *Spinner) Stop(final string) {
 	if s.out == nil {
 		return
 	}
-	fmt.Fprintf(s.out, "\r%s\n", final)
+	_, _ = fmt.Fprintf(s.out, "\r%s\n", final)
 }
 
 // Sleep is a test-friendly delay wrapper.

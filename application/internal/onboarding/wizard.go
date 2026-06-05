@@ -45,7 +45,7 @@ func runStep(repoRoot string, st *State, opts Options, interactive bool, in io.R
 	switch st.CurrentStep {
 	case StepWelcome:
 		if interactive {
-			fmt.Fprintln(out, "Bienvenue — Asagiri onboarding prépare config, docs et validation.")
+			_, _ = fmt.Fprintln(out, "Bienvenue — Asagiri onboarding prépare config, docs et validation.")
 		}
 	case StepProject:
 		if interactive && st.Answers.ProjectName == "" {
@@ -63,11 +63,22 @@ func runStep(repoRoot string, st *State, opts Options, interactive bool, in io.R
 			}
 		}
 		if interactive {
-			fmt.Fprintf(out, "Stack détectée: %s\n", st.Answers.Stack)
+			_, _ = fmt.Fprintf(out, "Stack détectée: %s\n", st.Answers.Stack)
 		}
 	case StepAgents:
-		if interactive && st.Answers.DefaultAgent == "" {
-			st.Answers.DefaultAgent = promptString(in, out, "Agent par défaut", "cursor")
+		if interactive {
+			if st.Answers.DefaultSpecAgent == "" {
+				st.Answers.DefaultSpecAgent = promptString(in, out, "Agent spec (asa spec)", "kiro")
+			}
+			if st.Answers.DefaultEnricher == "" {
+				st.Answers.DefaultEnricher = promptString(in, out, "Agent enrich (asa enrich)", "ollama")
+			}
+			if st.Answers.DefaultAgent == "" {
+				st.Answers.DefaultAgent = promptString(in, out, "Agent dev (asa dev)", "cursor")
+			}
+			if st.Answers.DefaultReviewer == "" {
+				st.Answers.DefaultReviewer = promptString(in, out, "Agent review (asa review)", "codex")
+			}
 		}
 	case StepSources, StepDocs:
 		// defaults from MergeAnswers
@@ -80,7 +91,7 @@ func runStep(repoRoot string, st *State, opts Options, interactive bool, in io.R
 		}
 	case StepReview:
 		if interactive {
-			fmt.Fprintln(out, "Récap — écriture config et docs au step validate.")
+			_, _ = fmt.Fprintln(out, "Récap — écriture config et docs au step validate.")
 		}
 	case StepValidate:
 		return nil
@@ -92,7 +103,7 @@ func promptString(in io.Reader, out io.Writer, label, def string) string {
 	if !isTerminal(in) {
 		return def
 	}
-	fmt.Fprintf(out, "%s [%s]: ", label, def)
+	_, _ = fmt.Fprintf(out, "%s [%s]: ", label, def)
 	scanner := bufio.NewScanner(in)
 	if !scanner.Scan() {
 		return def

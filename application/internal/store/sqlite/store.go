@@ -324,7 +324,7 @@ func (s *Store) ListRuns(limit int) ([]Run, error) {
 	if err != nil {
 		return nil, fmt.Errorf("list runs: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	out := make([]Run, 0)
 	for rows.Next() {
@@ -497,7 +497,7 @@ func (s *Store) ListTasksByRun(runID string) ([]Task, error) {
 	if err != nil {
 		return nil, fmt.Errorf("list tasks by run: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	return scanTasks(rows)
 }
@@ -514,7 +514,7 @@ func (s *Store) ListTasksByFeature(feature string) ([]Task, error) {
 	if err != nil {
 		return nil, fmt.Errorf("list tasks by feature: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 	return scanTasks(rows)
 }
 

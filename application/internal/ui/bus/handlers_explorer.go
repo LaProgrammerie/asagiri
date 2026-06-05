@@ -119,7 +119,7 @@ func (b *queryBus) handleGetKnowledgeMatchDetail(ctx context.Context, q GetKnowl
 			Name:    matchID,
 		}, nil
 	}
-	defer store.Close()
+	defer func() { _ = store.Close() }()
 	graph, err := store.LoadGraph(ctx)
 	if err != nil {
 		return KnowledgeMatchDetail{MatchID: matchID, Name: matchID}, nil

@@ -37,17 +37,6 @@ func confidenceFromStatus(status string) float64 {
 
 const testsNoCandidatesCap = 0.5
 
-func clamp01(v float64) float64 {
-	switch {
-	case v < 0:
-		return 0
-	case v > 1:
-		return 1
-	default:
-		return v
-	}
-}
-
 func countSeverity(findings []Finding, severity string) int {
 	n := 0
 	for _, f := range findings {

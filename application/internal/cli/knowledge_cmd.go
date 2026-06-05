@@ -52,7 +52,7 @@ func newKnowledgeBuildCmd() *cobra.Command {
 
 			staleReport, _ := knowledge.DefaultStalenessDetector().Check(cmd.Context(), c.RepoRoot)
 			if !jsonOut && c.Config.Knowledge.WarnOnStale && staleReport.Stale {
-				fmt.Fprint(cmd.OutOrStdout(), knowledge.FormatStaleness(staleReport))
+				_, _ = fmt.Fprint(cmd.OutOrStdout(), knowledge.FormatStaleness(staleReport))
 			}
 
 			req := knowledge.BuildRequestFromConfig(c.RepoRoot, c.Config)
@@ -142,7 +142,7 @@ func newKnowledgeSnapshotCmd() *cobra.Command {
 				enc.SetIndent("", "  ")
 				return enc.Encode(result)
 			}
-			fmt.Fprintf(cmd.OutOrStdout(), "Snapshot saved: %s\n", result.Path)
+			_, _ = fmt.Fprintf(cmd.OutOrStdout(), "Snapshot saved: %s\n", result.Path)
 			return nil
 		},
 	}
@@ -177,7 +177,7 @@ func newKnowledgeQueryCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			defer store.Close()
+			defer func() { _ = store.Close() }()
 
 			q := knowledge.NewQuerier(store)
 			var result knowledge.GraphQueryResult
@@ -246,7 +246,7 @@ func newKnowledgeExplainCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			defer store.Close()
+			defer func() { _ = store.Close() }()
 
 			q := knowledge.NewQuerier(store)
 			result, err := q.ExplainShortestPath(cmd.Context(), knowledge.ExplainRequest{
@@ -262,7 +262,7 @@ func newKnowledgeExplainCmd() *cobra.Command {
 				enc.SetIndent("", "  ")
 				return enc.Encode(result)
 			}
-			fmt.Fprint(cmd.OutOrStdout(), knowledge.FormatKnowledgeExplain(result))
+			_, _ = fmt.Fprint(cmd.OutOrStdout(), knowledge.FormatKnowledgeExplain(result))
 			return nil
 		},
 	}
@@ -271,12 +271,12 @@ func newKnowledgeExplainCmd() *cobra.Command {
 }
 
 func printQueryResult(out interface{ Write([]byte) (int, error) }, result knowledge.GraphQueryResult) {
-	fmt.Fprintf(out, "Nodes (%d)\n", len(result.Nodes))
+	_, _ = fmt.Fprintf(out, "Nodes (%d)\n", len(result.Nodes))
 	for _, n := range result.Nodes {
-		fmt.Fprintf(out, "  %s  %s\n", n.ID, n.Name)
+		_, _ = fmt.Fprintf(out, "  %s  %s\n", n.ID, n.Name)
 	}
-	fmt.Fprintf(out, "Edges (%d)\n", len(result.Edges))
+	_, _ = fmt.Fprintf(out, "Edges (%d)\n", len(result.Edges))
 	for _, e := range result.Edges {
-		fmt.Fprintf(out, "  %s  %s -> %s\n", e.Type, e.From, e.To)
+		_, _ = fmt.Fprintf(out, "  %s  %s -> %s\n", e.Type, e.From, e.To)
 	}
 }

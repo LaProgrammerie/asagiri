@@ -14,11 +14,11 @@ func RenderDOT(graph knowledge.KnowledgeGraph) string {
 	sb.WriteString("  rankdir=LR;\n")
 	for _, n := range graph.SortedNodes() {
 		label := nodeLabel(n)
-		sb.WriteString(fmt.Sprintf("  %q [label=%q];\n", n.ID, dotEscape(label)))
+		fmt.Fprintf(&sb, "  %q [label=%q];\n", n.ID, dotEscape(label))
 	}
 	for _, e := range graph.SortedEdges() {
 		label := edgeLabel(e)
-		sb.WriteString(fmt.Sprintf("  %q -> %q [label=%q];\n", e.From, e.To, dotEscape(label)))
+		fmt.Fprintf(&sb, "  %q -> %q [label=%q];\n", e.From, e.To, dotEscape(label))
 	}
 	sb.WriteString("}\n")
 	return sb.String()

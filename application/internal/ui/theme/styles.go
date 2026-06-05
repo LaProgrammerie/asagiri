@@ -283,28 +283,25 @@ func (s Styles) RenderCircularGauge(pct int) string {
 }
 
 // RenderEOSFieldGrid renders one aligned label/value row for the wizard card.
-func (s Styles) RenderEOSFieldGrid(icon, label, value string, focused, pill bool, labelW int) string {
-	if labelW < 10 {
-		labelW = 10
-	}
+// pill adds a filled badge on the value only when true (e.g. focused select).
+// When managed is true the value is plain muted text without a pill background.
+func (s Styles) RenderEOSFieldGrid(icon, label, value string, focused, pill, managed bool) string {
 	if value == "" {
 		value = "—"
 	}
 	cursor := "  "
-	if focused {
+	if focused && !managed {
 		cursor = s.PanelTitle.Render("▸ ")
+	} else if focused && managed {
+		cursor = s.Muted.Render("▸ ")
 	}
-	labelPart := lipgloss.NewStyle().
-		Width(labelW).
-		Align(lipgloss.Right).
-		Foreground(lipgloss.Color(s.Theme.Palette.Muted)).
-		Render(icon + " " + label)
+	labelPart := s.Muted.Render(icon + " " + label)
 	var valPart string
 	switch {
-	case focused:
-		valPart = s.RenderBadge(value)
+	case managed:
+		valPart = s.Muted.Render(value)
 	case pill:
-		valPart = s.RenderBadgeMuted(value)
+		valPart = s.RenderBadge(value)
 	default:
 		valPart = s.FieldValue.Render(value)
 	}
@@ -337,7 +334,7 @@ func (s Styles) RenderSection(title string) string {
 
 // RenderEOSField renders one wizard field row with optional badge value.
 func (s Styles) RenderEOSField(label, value string, focused, pill bool) string {
-	return s.RenderEOSFieldGrid(fieldIcon(label), label, value, focused, pill, 14)
+	return s.RenderEOSFieldGrid(fieldIcon(label), label, value, focused, pill, false)
 }
 
 func fieldIcon(label string) string {

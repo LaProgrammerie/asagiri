@@ -41,12 +41,12 @@ func newCostReportCmd(dryRun *bool) *cobra.Command {
 				return err
 			}
 			localPct, cloudPct := stepMixPercent(steps)
-			fmt.Fprintf(cmd.OutOrStdout(), "Last %d days\n%s\nRuns: %d\nEstimated cost: €%.2f\nActual cost: €%.2f\n",
+			_, _ = fmt.Fprintf(cmd.OutOrStdout(), "Last %d days\n%s\nRuns: %d\nEstimated cost: €%.2f\nActual cost: €%.2f\n",
 				days, repeatDash(11), tot.RunCount,
 				float64(tot.EstimatedCostCents)/100,
 				float64(tot.ActualCostCents)/100)
 			if steps.StepCount > 0 {
-				fmt.Fprintf(cmd.OutOrStdout(), "Local steps:       %.0f%%\nCloud steps:       %.0f%%\nAvg token savings: %.0f%%\n",
+				_, _ = fmt.Fprintf(cmd.OutOrStdout(), "Local steps:       %.0f%%\nCloud steps:       %.0f%%\nAvg token savings: %.0f%%\n",
 					localPct, cloudPct, steps.AvgTokenSavingsPct)
 			}
 			return nil
@@ -66,13 +66,13 @@ func newCostModelsCmd(dryRun *bool) *cobra.Command {
 				return err
 			}
 			defer c.Close()
-			fmt.Fprintf(cmd.OutOrStdout(), "Currency: %s\n", c.Config.Pricing.Currency)
+			_, _ = fmt.Fprintf(cmd.OutOrStdout(), "Currency: %s\n", c.Config.Pricing.Currency)
 			for name, p := range c.Config.Pricing.Models {
-				fmt.Fprintf(cmd.OutOrStdout(), "  %s: in=%.4f/1M out=%.4f/1M (%s)\n",
+				_, _ = fmt.Fprintf(cmd.OutOrStdout(), "  %s: in=%.4f/1M out=%.4f/1M (%s)\n",
 					name, p.InputPer1MTokens, p.OutputPer1MTokens, p.Source)
 			}
 			for id, prof := range c.Config.Models {
-				fmt.Fprintf(cmd.OutOrStdout(), "  profile %s: class=%s model=%s\n", id, prof.Class, prof.Model)
+				_, _ = fmt.Fprintf(cmd.OutOrStdout(), "  profile %s: class=%s model=%s\n", id, prof.Class, prof.Model)
 			}
 			return nil
 		},

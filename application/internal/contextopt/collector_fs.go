@@ -7,10 +7,6 @@ import (
 	"path/filepath"
 )
 
-type fileInfo struct {
-	fs.FileInfo
-}
-
 func statFile(path string) (fs.FileInfo, error) {
 	return os.Stat(path)
 }
@@ -20,7 +16,7 @@ func readFileLimited(path string, maxBytes int64) ([]byte, fs.FileInfo, error) {
 	if err != nil {
 		return nil, nil, err
 	}
-	defer f.Close()
+	defer func() { _ = f.Close() }()
 	st, err := f.Stat()
 	if err != nil {
 		return nil, nil, err

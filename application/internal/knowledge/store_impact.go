@@ -32,6 +32,6 @@ func (a *StoreImpactAnalyzer) Analyze(ctx context.Context, req ImpactRequest) (I
 	if err != nil {
 		return ImpactResult{}, err
 	}
-	defer store.Close()
+	defer func() { _ = store.Close() }()
 	return NewImpactAnalyzer(store).Analyze(ctx, req)
 }

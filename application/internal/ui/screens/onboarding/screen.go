@@ -86,10 +86,10 @@ func renderWizard(vm ViewModel) string {
 func renderWizardPanelBody(vm ViewModel, st theme.Styles) string {
 	m := vm.Model
 	var body strings.Builder
-	body.WriteString(st.PanelTitle.Render(StepLabel(m.Step)) + "\n\n")
 
 	switch m.Step {
 	case onbdomain.StepWelcome:
+		body.WriteString(st.PanelTitle.Render(StepLabel(m.Step)) + "\n\n")
 		body.WriteString(st.Fg.Render("Asagiri prépare config, validation, docs et première spec Kiro.") + "\n")
 		body.WriteString(st.Muted.Render("L'onboarding ne remplace pas la spec produit ni le handoff.") + "\n")
 	default:
@@ -253,7 +253,7 @@ func tabShortLabel(step onbdomain.WizardStep) string {
 	case onbdomain.StepDocs:
 		return "Docs"
 	case onbdomain.StepFeature:
-		return "Feature"
+		return firstFeatureStepLabel()
 	case onbdomain.StepReview:
 		return "Review"
 	default:

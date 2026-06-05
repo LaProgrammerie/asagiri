@@ -30,7 +30,7 @@ func (DefaultRecentFailuresLoader) RecentFlowFailures(ctx context.Context, repoR
 
 	var out []RecentFlowFailure
 	if store, err := runtime.Open(repoRoot); err == nil {
-		defer store.Close()
+		defer func() { _ = store.Close() }()
 		events, err := store.ListEvents(limit * 4)
 		if err != nil {
 			return nil, err
@@ -143,7 +143,7 @@ func failuresInGraphEvents(path, flowID, graphID string) ([]RecentFlowFailure, e
 		}
 		return nil, err
 	}
-	defer f.Close()
+	defer func() { _ = f.Close() }()
 
 	var out []RecentFlowFailure
 	sc := bufio.NewScanner(f)

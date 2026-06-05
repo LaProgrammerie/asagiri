@@ -136,7 +136,7 @@ func (r *Repository) AppendGraphEvent(graphID, eventType string, payload map[str
 	if err != nil {
 		return fmt.Errorf("open events.jsonl: %w", err)
 	}
-	defer f.Close()
+	defer func() { _ = f.Close() }()
 	if _, err := f.Write(append(body, '\n')); err != nil {
 		return fmt.Errorf("write events.jsonl: %w", err)
 	}

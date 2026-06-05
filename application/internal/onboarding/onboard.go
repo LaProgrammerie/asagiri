@@ -46,12 +46,14 @@ func Onboard(startDir string, opts Options, in io.Reader, out io.Writer) (Result
 	}
 
 	patch := ConfigPatch{
-		ProjectName:     st.Answers.ProjectName,
-		DefaultBranch:   st.Answers.DefaultBranch,
-		BranchPrefix:    SlugFromName(st.Answers.ProjectName),
-		DefaultAgent:    st.Answers.DefaultAgent,
-		DefaultReviewer: st.Answers.DefaultReviewer,
-		Validation:      validation,
+		ProjectName:      st.Answers.ProjectName,
+		DefaultBranch:    st.Answers.DefaultBranch,
+		BranchPrefix:     SlugFromName(st.Answers.ProjectName),
+		DefaultSpecAgent: st.Answers.DefaultSpecAgent,
+		DefaultAgent:     st.Answers.DefaultAgent,
+		DefaultReviewer:  st.Answers.DefaultReviewer,
+		DefaultEnricher:  st.Answers.DefaultEnricher,
+		Validation:       validation,
 	}
 
 	cfgPath := config.ConfigPath(repoRoot)
@@ -128,7 +130,10 @@ func Ready(startDir string, opts Options, out io.Writer) (Result, error) {
 			return Result{}, err
 		}
 	}
-	if !opts.DryRun {
+	// --check-only must not create, modify or delete any file (req 7.3). Persist
+	// the report only when not in check-only mode, or when an explicit --autofix
+	// has already mutated the repository.
+	if !opts.DryRun && (!opts.CheckOnly || len(applied) > 0) {
 		_ = PersistReport(repoRoot, report)
 	}
 	res := Result{Report: report}
@@ -146,17 +151,17 @@ func Ready(startDir string, opts Options, out io.Writer) (Result, error) {
 func formatAutofixPlain(out io.Writer, applied []AppliedAutofix, report Report) error {
 	for _, fix := range applied {
 		if fix.Description != "" {
-			fmt.Fprintf(out, "Autofix: %s\n", fix.Description)
+			_, _ = fmt.Fprintf(out, "Autofix: %s\n", fix.Description)
 		}
 		for _, line := range fix.AddedLines {
-			fmt.Fprintf(out, "  + %s\n", line)
+			_, _ = fmt.Fprintf(out, "  + %s\n", line)
 		}
 	}
 	status := "NOT READY"
 	if report.Ready {
 		status = "READY"
 	}
-	fmt.Fprintf(out, "Après corrections: %s (%d/100)\n\n", status, report.Score)
+	_, _ = fmt.Fprintf(out, "Après corrections: %s (%d/100)\n\n", status, report.Score)
 	return nil
 }
 
@@ -167,18 +172,18 @@ func formatOnboardOutput(out io.Writer, opts Options, res Result) error {
 		return enc.Encode(res)
 	}
 	if opts.DryRun {
-		fmt.Fprintln(out, "Dry-run — changements prévus :")
+		_, _ = fmt.Fprintln(out, "Dry-run — changements prévus :")
 		for _, p := range res.PlannedChanges {
-			fmt.Fprintf(out, "  [%s] %s %s\n", p.Action, p.Path, p.Summary)
+			_, _ = fmt.Fprintf(out, "  [%s] %s %s\n", p.Action, p.Path, p.Summary)
 		}
 		return nil
 	}
 	if opts.Plain || opts.CI {
 		return formatReadyPlain(out, res.Report)
 	}
-	fmt.Fprintf(out, "Onboarding terminé — ready=%v score=%d\n", res.Report.Ready, res.Report.Score)
+	_, _ = fmt.Fprintf(out, "Onboarding terminé — ready=%v score=%d\n", res.Report.Ready, res.Report.Score)
 	if len(res.SkippedFields) > 0 {
-		fmt.Fprintf(out, "Champs conservés: %s\n", strings.Join(res.SkippedFields, ", "))
+		_, _ = fmt.Fprintf(out, "Champs conservés: %s\n", strings.Join(res.SkippedFields, ", "))
 	}
 	return nil
 }
@@ -197,24 +202,24 @@ func formatReadyPlain(out io.Writer, report Report) error {
 	if report.Ready {
 		status = "READY"
 	}
-	fmt.Fprintf(out, "Readiness: %s (score %d/100)\n\n", status, report.Score)
+	_, _ = fmt.Fprintf(out, "Readiness: %s (score %d/100)\n\n", status, report.Score)
 	for _, c := range report.Checks {
 		line := fmt.Sprintf("[%s] %s", c.Status, c.ID)
 		if c.Message != "" {
 			line += ": " + c.Message
 		}
-		fmt.Fprintln(out, line)
+		_, _ = fmt.Fprintln(out, line)
 	}
 	if len(report.NextActions) > 0 {
-		fmt.Fprintln(out, "\nNext actions:")
+		_, _ = fmt.Fprintln(out, "\nNext actions:")
 		for _, a := range report.NextActions {
-			fmt.Fprintf(out, "  - %s → %s\n", a.Title, a.CLI)
+			_, _ = fmt.Fprintf(out, "  - %s → %s\n", a.Title, a.CLI)
 		}
 	}
 	if offers := ListAutofixOffers(report.Checks); len(offers) > 0 && !report.Ready {
-		fmt.Fprintln(out, "\nCorrections auto disponibles (asa ready --autofix):")
+		_, _ = fmt.Fprintln(out, "\nCorrections auto disponibles (asa ready --autofix):")
 		for _, o := range offers {
-			fmt.Fprintf(out, "  - %s\n", o.Title)
+			_, _ = fmt.Fprintf(out, "  - %s\n", o.Title)
 		}
 	}
 	return nil

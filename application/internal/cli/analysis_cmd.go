@@ -36,9 +36,9 @@ func newAnalysisCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			fmt.Fprintf(cmd.OutOrStdout(), "analysis graphs: %s (%d kinds)\n", path, len(b.Graphs))
+			_, _ = fmt.Fprintf(cmd.OutOrStdout(), "analysis graphs: %s (%d kinds)\n", path, len(b.Graphs))
 			for k, g := range b.Graphs {
-				fmt.Fprintf(cmd.OutOrStdout(), "  %s: %d nodes, %d edges\n", k, len(g.Nodes), len(g.Edges))
+				_, _ = fmt.Fprintf(cmd.OutOrStdout(), "  %s: %d nodes, %d edges\n", k, len(g.Nodes), len(g.Edges))
 			}
 			return nil
 		},

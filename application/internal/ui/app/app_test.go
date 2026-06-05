@@ -112,6 +112,7 @@ func TestViewMissionFrameGolden(t *testing.T) {
 		CostTodayEUR: 0.42,
 		CostMonthEUR: 6.10,
 		UpdatedAt:    fixed,
+		Readiness:    bus.ReadinessResult{Ready: true, Score: 100},
 	}
 	m.snapshot.Runs = []bus.RunSummary{
 		{ID: "run-1", Feature: "spec-ui", Status: "running"},

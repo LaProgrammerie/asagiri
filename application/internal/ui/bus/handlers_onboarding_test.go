@@ -59,8 +59,10 @@ func TestApplyOnboardingConfigFromWizard(t *testing.T) {
 		"project_name":      "chatbot-php",
 		"default_branch":    "main",
 		"stack":             "castor",
-		"default_agent":     "cursor",
-		"default_reviewer":  "codex",
+		"default_spec_agent": "kiro",
+		"default_enricher":   "ollama",
+		"default_agent":      "cursor",
+		"default_reviewer":   "codex",
 		"feature_slug":      "chatbot-mvp",
 		"product_one_liner": "Chatbot Castor",
 	}

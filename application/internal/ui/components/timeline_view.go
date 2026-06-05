@@ -44,7 +44,7 @@ func RenderTimelineView(vm TimelineViewModel) string {
 		if entry.Time.IsZero() {
 			ts = "--:--:--"
 		}
-		b.WriteString(fmt.Sprintf("%s %s %s\n", prefix, ts, label))
+		fmt.Fprintf(&b, "%s %s %s\n", prefix, ts, label)
 	}
 	return strings.TrimRight(b.String(), "\n")
 }

@@ -21,7 +21,7 @@ func FormatGatesConfig(v config.VerificationConfig) string {
 	sb.WriteString("══════════════════\n")
 	for _, name := range names {
 		p := v.Gates[name]
-		sb.WriteString(fmt.Sprintf("\nProfile: %s\n", name))
+		fmt.Fprintf(&sb, "\nProfile: %s\n", name)
 		if len(p.MinConfidence) > 0 {
 			sb.WriteString("  Min confidence:\n")
 			keys := make([]string, 0, len(p.MinConfidence))
@@ -30,18 +30,18 @@ func FormatGatesConfig(v config.VerificationConfig) string {
 			}
 			sort.Strings(keys)
 			for _, k := range keys {
-				sb.WriteString(fmt.Sprintf("    %s: %.0f%%\n", k, p.MinConfidence[k]*100))
+				fmt.Fprintf(&sb, "    %s: %.0f%%\n", k, p.MinConfidence[k]*100)
 			}
 		}
 		if len(p.RequiredChecks) > 0 {
 			sb.WriteString("  Required checks:\n")
 			for _, c := range p.RequiredChecks {
-				sb.WriteString(fmt.Sprintf("    - %s\n", c))
+				fmt.Fprintf(&sb, "    - %s\n", c)
 			}
 		}
 	}
 	if v.DefaultProfile != "" {
-		sb.WriteString(fmt.Sprintf("\nDefault profile: %s\n", v.DefaultProfile))
+		fmt.Fprintf(&sb, "\nDefault profile: %s\n", v.DefaultProfile)
 	}
 	return sb.String()
 }

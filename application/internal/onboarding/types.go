@@ -10,6 +10,8 @@ const (
 	scoreFail    = 20
 	scoreWarn    = 5
 	initialScore = 100
+	minScore     = 0
+	maxScore     = 100
 )
 
 // CheckStatus is one readiness/doctor check outcome.
@@ -45,41 +47,45 @@ type Report struct {
 
 // Options controls onboard/ready/doctor behaviour.
 type Options struct {
-	Yes             bool
-	NonInteractive  bool
-	Stack           string
-	Resume          bool
-	Step            string
-	Plain           bool
-	JSON            bool
-	CI              bool
-	DryRun          bool
-	ForceDocs       bool
-	Strict          bool
-	CheckOnly       bool
-	UI              bool
-	Autofix         bool
-	ProjectName     string
-	DefaultBranch   string
-	Tagline         string
-	DefaultAgent    string
-	DefaultReviewer string
-	FeatureSlug     string
-	ProductOneLiner string
-	ProductUsers    string
+	Yes              bool
+	NonInteractive   bool
+	Stack            string
+	Resume           bool
+	Step             string
+	Plain            bool
+	JSON             bool
+	CI               bool
+	DryRun           bool
+	ForceDocs        bool
+	Strict           bool
+	CheckOnly        bool
+	UI               bool
+	Autofix          bool
+	ProjectName      string
+	DefaultBranch    string
+	Tagline          string
+	DefaultSpecAgent string
+	DefaultAgent     string
+	DefaultReviewer  string
+	DefaultEnricher  string
+	FeatureSlug      string
+	ProductOneLiner  string
+	ProductUsers     string
 }
 
 // Answers collects wizard inputs persisted in state.
 type Answers struct {
-	ProjectName     string `json:"project_name,omitempty"`
-	DefaultBranch   string `json:"default_branch,omitempty"`
-	Tagline         string `json:"tagline,omitempty"`
-	Stack           string `json:"stack,omitempty"`
-	DefaultAgent    string `json:"default_agent,omitempty"`
-	DefaultReviewer string `json:"default_reviewer,omitempty"`
-	FeatureSlug     string `json:"feature_slug,omitempty"`
-	ProductOneLiner string `json:"product_one_liner,omitempty"`
-	ProductUsers    string `json:"product_users,omitempty"`
+	ProjectName      string `json:"project_name,omitempty"`
+	DefaultBranch    string `json:"default_branch,omitempty"`
+	Tagline          string `json:"tagline,omitempty"`
+	Stack            string `json:"stack,omitempty"`
+	DefaultSpecAgent string `json:"default_spec_agent,omitempty"`
+	DefaultAgent     string `json:"default_agent,omitempty"`
+	DefaultReviewer  string `json:"default_reviewer,omitempty"`
+	DefaultEnricher  string `json:"default_enricher,omitempty"`
+	FeatureSlug      string `json:"feature_slug,omitempty"`
+	ProductOneLiner  string `json:"product_one_liner,omitempty"`
+	ProductUsers     string `json:"product_users,omitempty"`
 }
 
 // PlannedChange describes one file write during dry-run.
@@ -91,19 +97,22 @@ type PlannedChange struct {
 
 // Result summarizes an onboard run.
 type Result struct {
-	Report         Report          `json:"report,omitempty"`
-	PlannedChanges []PlannedChange `json:"planned_changes,omitempty"`
-	SkippedFields  []string        `json:"skipped_fields,omitempty"`
-	ConfigPath     string          `json:"config_path,omitempty"`
-	BackupPath     string          `json:"backup_path,omitempty"`
+	Report           Report           `json:"report,omitempty"`
+	PlannedChanges   []PlannedChange  `json:"planned_changes,omitempty"`
+	SkippedFields    []string         `json:"skipped_fields,omitempty"`
+	AppliedAutofixes []AppliedAutofix `json:"applied_autofixes,omitempty"`
+	ConfigPath       string           `json:"config_path,omitempty"`
+	BackupPath       string           `json:"backup_path,omitempty"`
 }
 
 // ConfigPatch holds fields to merge into config.yaml.
 type ConfigPatch struct {
-	ProjectName     string
-	DefaultBranch   string
-	BranchPrefix    string
-	DefaultAgent    string
-	DefaultReviewer string
-	Validation      []config.ValidationCommand
+	ProjectName      string
+	DefaultBranch    string
+	BranchPrefix     string
+	DefaultSpecAgent string
+	DefaultAgent     string
+	DefaultReviewer  string
+	DefaultEnricher  string
+	Validation       []config.ValidationCommand
 }

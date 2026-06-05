@@ -29,19 +29,19 @@ const (
 
 // TrustReport is the machine- and human-readable verification summary (spec §6).
 type TrustReport struct {
-	TrustID      string              `json:"trust_id"`
-	GeneratedAt  string              `json:"generated_at"`
-	Flow         string              `json:"flow,omitempty"`
-	Branch       string              `json:"branch,omitempty"`
-	Task         string              `json:"task,omitempty"`
-	Repository   string              `json:"repository"`
-	Checks       []VerificationCheck `json:"checks"`
-	Confidence   confidence.Report   `json:"confidence"`
-	BlastRadius  *BlastRadiusReport  `json:"blast_radius,omitempty"`
-	Warnings     []string            `json:"warnings,omitempty"`
-	ResidualRisk      ResidualRisk        `json:"residual_risk"`
-	Gate              GateEvaluation      `json:"gate"`
-	SuggestedReviews  []SuggestedReview   `json:"suggested_reviews,omitempty"`
+	TrustID          string              `json:"trust_id"`
+	GeneratedAt      string              `json:"generated_at"`
+	Flow             string              `json:"flow,omitempty"`
+	Branch           string              `json:"branch,omitempty"`
+	Task             string              `json:"task,omitempty"`
+	Repository       string              `json:"repository"`
+	Checks           []VerificationCheck `json:"checks"`
+	Confidence       confidence.Report   `json:"confidence"`
+	BlastRadius      *BlastRadiusReport  `json:"blast_radius,omitempty"`
+	Warnings         []string            `json:"warnings,omitempty"`
+	ResidualRisk     ResidualRisk        `json:"residual_risk"`
+	Gate             GateEvaluation      `json:"gate"`
+	SuggestedReviews []SuggestedReview   `json:"suggested_reviews,omitempty"`
 }
 
 // WriteReport writes report.md and report.json under .asagiri/trust/<id>/ (spec §6).
@@ -73,18 +73,18 @@ func WriteReport(repoRoot, trustID string, report TrustReport) (mdPath, jsonPath
 func toTrustMarkdown(r TrustReport) string {
 	var sb strings.Builder
 	sb.WriteString("# Trust Report\n\n")
-	sb.WriteString(fmt.Sprintf("- Trust ID: `%s`\n", r.TrustID))
-	sb.WriteString(fmt.Sprintf("- Generated: `%s`\n", r.GeneratedAt))
+	fmt.Fprintf(&sb, "- Trust ID: `%s`\n", r.TrustID)
+	fmt.Fprintf(&sb, "- Generated: `%s`\n", r.GeneratedAt)
 	if r.Flow != "" {
-		sb.WriteString(fmt.Sprintf("- Flow: `%s`\n", r.Flow))
+		fmt.Fprintf(&sb, "- Flow: `%s`\n", r.Flow)
 	}
 	if r.Branch != "" {
-		sb.WriteString(fmt.Sprintf("- Branch: `%s`\n", r.Branch))
+		fmt.Fprintf(&sb, "- Branch: `%s`\n", r.Branch)
 	}
 	if r.Task != "" {
-		sb.WriteString(fmt.Sprintf("- Task: `%s`\n", r.Task))
+		fmt.Fprintf(&sb, "- Task: `%s`\n", r.Task)
 	}
-	sb.WriteString(fmt.Sprintf("- Residual risk: **%s**\n\n", r.ResidualRisk))
+	fmt.Fprintf(&sb, "- Residual risk: **%s**\n\n", r.ResidualRisk)
 
 	sb.WriteString("## Confidence\n\n")
 	sb.WriteString(formatConfidenceMarkdownLine("Architecture", confidence.DimensionArchitecture, r.Confidence.Architecture, r.Checks, r.Confidence))
@@ -99,7 +99,7 @@ func toTrustMarkdown(r TrustReport) string {
 	if len(r.Confidence.UncoveredZones) > 0 {
 		sb.WriteString("## Uncovered zones\n\n")
 		for _, z := range r.Confidence.UncoveredZones {
-			sb.WriteString(fmt.Sprintf("- %s\n", z))
+			fmt.Fprintf(&sb, "- %s\n", z)
 		}
 		sb.WriteString("\n")
 	}
@@ -107,7 +107,7 @@ func toTrustMarkdown(r TrustReport) string {
 	if len(r.Warnings) > 0 {
 		sb.WriteString("## Warnings\n\n")
 		for _, w := range r.Warnings {
-			sb.WriteString(fmt.Sprintf("- %s\n", w))
+			fmt.Fprintf(&sb, "- %s\n", w)
 		}
 		sb.WriteString("\n")
 	}
@@ -121,7 +121,7 @@ func toTrustMarkdown(r TrustReport) string {
 	if len(r.Checks) > 0 {
 		sb.WriteString("## Checks\n\n")
 		for _, c := range r.Checks {
-			sb.WriteString(fmt.Sprintf("- `%s` [%s] %s\n", c.ID, c.Status, c.Name))
+			fmt.Fprintf(&sb, "- `%s` [%s] %s\n", c.ID, c.Status, c.Name)
 		}
 		sb.WriteString("\n")
 	}
@@ -129,15 +129,15 @@ func toTrustMarkdown(r TrustReport) string {
 	if len(r.SuggestedReviews) > 0 {
 		sb.WriteString("## Suggested reviews\n\n")
 		for _, rev := range r.SuggestedReviews {
-			sb.WriteString(fmt.Sprintf("- **%s**: %s\n", rev.Kind, rev.Reason))
+			fmt.Fprintf(&sb, "- **%s**: %s\n", rev.Kind, rev.Reason)
 		}
 		sb.WriteString("\n")
 	}
 
 	sb.WriteString("## Gate\n\n")
-	sb.WriteString(fmt.Sprintf("- Status: `%s`\n", r.Gate.Status))
+	fmt.Fprintf(&sb, "- Status: `%s`\n", r.Gate.Status)
 	if r.Gate.Reason != "" {
-		sb.WriteString(fmt.Sprintf("- Reason: %s\n", r.Gate.Reason))
+		fmt.Fprintf(&sb, "- Reason: %s\n", r.Gate.Reason)
 	}
 	return sb.String()
 }
@@ -148,10 +148,10 @@ func FormatTerminalSummary(r TrustReport) string {
 	sb.WriteString("Asagiri Trust Engine\n")
 	sb.WriteString("════════════════════\n")
 	if r.Flow != "" {
-		sb.WriteString(fmt.Sprintf("Flow: %s\n", r.Flow))
+		fmt.Fprintf(&sb, "Flow: %s\n", r.Flow)
 	}
 	if r.Branch != "" {
-		sb.WriteString(fmt.Sprintf("Branch: %s\n", r.Branch))
+		fmt.Fprintf(&sb, "Branch: %s\n", r.Branch)
 	}
 	sb.WriteString("\nChecks\n")
 	sb.WriteString("──────\n")
@@ -159,7 +159,7 @@ func FormatTerminalSummary(r TrustReport) string {
 		sb.WriteString("(no checks executed)\n")
 	} else {
 		for _, c := range r.Checks {
-			sb.WriteString(fmt.Sprintf("%s %s\n", checkStatusGlyph(c.Status), c.Name))
+			fmt.Fprintf(&sb, "%s %s\n", checkStatusGlyph(c.Status), c.Name)
 		}
 	}
 	sb.WriteString("\nConfidence\n")
@@ -176,7 +176,7 @@ func FormatTerminalSummary(r TrustReport) string {
 		sb.WriteString("\nUncovered zones\n")
 		sb.WriteString("───────────────\n")
 		for _, z := range r.Confidence.UncoveredZones {
-			sb.WriteString(fmt.Sprintf("- %s\n", z))
+			fmt.Fprintf(&sb, "- %s\n", z)
 		}
 	}
 
@@ -184,7 +184,7 @@ func FormatTerminalSummary(r TrustReport) string {
 		sb.WriteString("\nWarnings\n")
 		sb.WriteString("────────\n")
 		for _, w := range r.Warnings {
-			sb.WriteString(fmt.Sprintf("- %s\n", w))
+			fmt.Fprintf(&sb, "- %s\n", w)
 		}
 	}
 	if r.BlastRadius != nil {
@@ -196,13 +196,13 @@ func FormatTerminalSummary(r TrustReport) string {
 		sb.WriteString("\nSuggested reviews\n")
 		sb.WriteString("─────────────────\n")
 		for _, rev := range r.SuggestedReviews {
-			sb.WriteString(fmt.Sprintf("- %s: %s\n", rev.Kind, rev.Reason))
+			fmt.Fprintf(&sb, "- %s: %s\n", rev.Kind, rev.Reason)
 		}
 	}
-	sb.WriteString(fmt.Sprintf("\nResidual risk: %s\n", r.ResidualRisk))
-	sb.WriteString(fmt.Sprintf("\nGate status: %s\n", strings.ToUpper(string(r.Gate.Status))))
+	fmt.Fprintf(&sb, "\nResidual risk: %s\n", r.ResidualRisk)
+	fmt.Fprintf(&sb, "\nGate status: %s\n", strings.ToUpper(string(r.Gate.Status)))
 	if r.Gate.Reason != "" {
-		sb.WriteString(fmt.Sprintf("Reason: %s\n", r.Gate.Reason))
+		fmt.Fprintf(&sb, "Reason: %s\n", r.Gate.Reason)
 	}
 	return sb.String()
 }

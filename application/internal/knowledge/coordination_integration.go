@@ -71,10 +71,6 @@ func EnrichHandoffFromGraph(ctx context.Context, store GraphStore, flow, action 
 	if err != nil {
 		return HandoffGraphEnrichment{}, err
 	}
-	tests := scope.TestFiles
-	if len(tests) == 0 {
-		tests = scope.Tests
-	}
 	var constraints []string
 	for _, api := range scope.APIs {
 		constraints = append(constraints, "respect contract: "+api)

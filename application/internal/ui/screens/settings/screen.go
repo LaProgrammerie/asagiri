@@ -18,9 +18,9 @@ func Render(vm ViewModel) string {
 	var b strings.Builder
 	b.WriteString("Settings\n")
 	b.WriteString("========\n")
-	b.WriteString(fmt.Sprintf("Theme: %s\n", vm.ThemeName))
-	b.WriteString(fmt.Sprintf("Mouse: %t\n", vm.MouseEnabled))
-	b.WriteString(fmt.Sprintf("Animations: %t\n", vm.Animations))
+	fmt.Fprintf(&b, "Theme: %s\n", vm.ThemeName)
+	fmt.Fprintf(&b, "Mouse: %t\n", vm.MouseEnabled)
+	fmt.Fprintf(&b, "Animations: %t\n", vm.Animations)
 	b.WriteString("\nThemes:\n")
 	for _, name := range vm.AvailableThemes {
 		prefix := "- "

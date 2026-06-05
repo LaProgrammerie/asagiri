@@ -27,6 +27,7 @@ type Form struct {
 	Advanced          AdvancedFields
 	ValidationPreview []string
 	DetectedStacks    []string
+	KnownAgentKeys    []string
 	Errors            map[string]string
 	SkippedFields     []string
 }
@@ -76,6 +77,9 @@ func BuildForm(repoRoot string, st State, cfg *config.Config) Form {
 	if form.Answers.FeatureSlug == "" && form.Answers.ProjectName != "" {
 		form.Answers.FeatureSlug = SlugFromName(form.Answers.ProjectName) + "-mvp"
 	}
+	if form.Step == StepDocs {
+		prefillProductOneLiner(&form)
+	}
 	return form
 }
 
@@ -86,12 +90,19 @@ func overlayConfig(form Form, cfg *config.Config) Form {
 	if cfg.Project.DefaultBranch != "" {
 		form.Answers.DefaultBranch = cfg.Project.DefaultBranch
 	}
+	if cfg.Work.DefaultSpecAgent != "" && form.Answers.DefaultSpecAgent == "" {
+		form.Answers.DefaultSpecAgent = cfg.Work.DefaultSpecAgent
+	}
 	if cfg.Work.DefaultAgent != "" && form.Answers.DefaultAgent == "" {
 		form.Answers.DefaultAgent = cfg.Work.DefaultAgent
 	}
 	if cfg.Work.DefaultReviewer != "" && form.Answers.DefaultReviewer == "" {
 		form.Answers.DefaultReviewer = cfg.Work.DefaultReviewer
 	}
+	if cfg.Work.DefaultEnricher != "" && form.Answers.DefaultEnricher == "" {
+		form.Answers.DefaultEnricher = cfg.Work.DefaultEnricher
+	}
+	form.KnownAgentKeys = AgentKeys(cfg)
 	return form
 }
 
@@ -117,16 +128,22 @@ func advancedFromConfig(cfg *config.Config) AdvancedFields {
 
 // FieldsMap flattens answers and advanced fields for bus transport.
 func (f Form) FieldsMap() map[string]string {
-	return map[string]string{
-		"project_name":     f.Answers.ProjectName,
-		"default_branch":   f.Answers.DefaultBranch,
-		"tagline":          f.Answers.Tagline,
-		"stack":            f.Answers.Stack,
-		"default_agent":    f.Answers.DefaultAgent,
-		"default_reviewer": f.Answers.DefaultReviewer,
-		"product_one_liner": f.Answers.ProductOneLiner,
-		"feature_slug":     f.Answers.FeatureSlug,
+	m := map[string]string{
+		"project_name":       f.Answers.ProjectName,
+		"default_branch":     f.Answers.DefaultBranch,
+		"tagline":            f.Answers.Tagline,
+		"stack":              f.Answers.Stack,
+		"default_spec_agent": f.Answers.DefaultSpecAgent,
+		"default_enricher":   f.Answers.DefaultEnricher,
+		"default_agent":      f.Answers.DefaultAgent,
+		"default_reviewer":   f.Answers.DefaultReviewer,
+		"product_one_liner":  f.Answers.ProductOneLiner,
+		"feature_slug":       f.Answers.FeatureSlug,
 	}
+	if len(f.KnownAgentKeys) > 0 {
+		m["agents_available"] = strings.Join(f.KnownAgentKeys, ", ")
+	}
+	return m
 }
 
 // AdvancedMap flattens advanced panel fields.
@@ -148,14 +165,19 @@ func FormFromMaps(step WizardStep, fields, advanced map[string]string) Form {
 		f.Step = StepWelcome
 	}
 	f.Answers = Answers{
-		ProjectName:     strings.TrimSpace(fields["project_name"]),
-		DefaultBranch:   strings.TrimSpace(fields["default_branch"]),
-		Tagline:         strings.TrimSpace(fields["tagline"]),
-		Stack:           strings.TrimSpace(fields["stack"]),
-		DefaultAgent:    strings.TrimSpace(fields["default_agent"]),
-		DefaultReviewer: strings.TrimSpace(fields["default_reviewer"]),
-		ProductOneLiner: strings.TrimSpace(fields["product_one_liner"]),
-		FeatureSlug:     strings.TrimSpace(fields["feature_slug"]),
+		ProjectName:      strings.TrimSpace(fields["project_name"]),
+		DefaultBranch:    strings.TrimSpace(fields["default_branch"]),
+		Tagline:          strings.TrimSpace(fields["tagline"]),
+		Stack:            strings.TrimSpace(fields["stack"]),
+		DefaultSpecAgent: strings.TrimSpace(fields["default_spec_agent"]),
+		DefaultEnricher:  strings.TrimSpace(fields["default_enricher"]),
+		DefaultAgent:     strings.TrimSpace(fields["default_agent"]),
+		DefaultReviewer:  strings.TrimSpace(fields["default_reviewer"]),
+		ProductOneLiner:  strings.TrimSpace(fields["product_one_liner"]),
+		FeatureSlug:      strings.TrimSpace(fields["feature_slug"]),
+	}
+	if v := strings.TrimSpace(fields["agents_available"]); v != "" {
+		f.KnownAgentKeys = strings.Split(v, ", ")
 	}
 	f.Advanced = AdvancedFields{
 		WorkStopAfter:           strings.TrimSpace(advanced["work_stop_after"]),
@@ -184,8 +206,19 @@ func ValidateStep(step WizardStep, f Form) map[string]string {
 			errors["stack"] = "stack requise (go, castor, node…)"
 		}
 	case StepAgents:
-		if strings.TrimSpace(f.Answers.DefaultAgent) == "" {
-			errors["default_agent"] = "agent requis"
+		known := f.KnownAgentKeys
+		for _, spec := range []struct {
+			key string
+			val string
+		}{
+			{"default_spec_agent", f.Answers.DefaultSpecAgent},
+			{"default_enricher", f.Answers.DefaultEnricher},
+			{"default_agent", f.Answers.DefaultAgent},
+			{"default_reviewer", f.Answers.DefaultReviewer},
+		} {
+			if msg := validateAgentRef(spec.val, known); msg != "" {
+				errors[spec.key] = msg
+			}
 		}
 	case StepFeature:
 		slug := SlugFromName(f.Answers.FeatureSlug)
@@ -247,7 +280,20 @@ func AdvanceTUIStep(f Form, direction string, validate bool) (Form, error) {
 		return f, fmt.Errorf("direction inconnue %q", direction)
 	}
 	f.Errors = map[string]string{}
+	if f.Step == StepDocs {
+		prefillProductOneLiner(&f)
+	}
 	return f, nil
+}
+
+// prefillProductOneLiner copies tagline into the product pitch when docs step is empty.
+func prefillProductOneLiner(f *Form) {
+	if strings.TrimSpace(f.Answers.ProductOneLiner) != "" {
+		return
+	}
+	if t := strings.TrimSpace(f.Answers.Tagline); t != "" {
+		f.Answers.ProductOneLiner = t
+	}
 }
 
 // StateFromForm converts a form to persisted wizard state.
@@ -267,9 +313,11 @@ func OptionsFromForm(f Form) Options {
 		ProjectName:     f.Answers.ProjectName,
 		DefaultBranch:   f.Answers.DefaultBranch,
 		Tagline:         f.Answers.Tagline,
-		DefaultAgent:    f.Answers.DefaultAgent,
-		DefaultReviewer: f.Answers.DefaultReviewer,
-		FeatureSlug:     f.Answers.FeatureSlug,
+		DefaultSpecAgent: f.Answers.DefaultSpecAgent,
+		DefaultAgent:     f.Answers.DefaultAgent,
+		DefaultReviewer:  f.Answers.DefaultReviewer,
+		DefaultEnricher:  f.Answers.DefaultEnricher,
+		FeatureSlug:      f.Answers.FeatureSlug,
 		ProductOneLiner: f.Answers.ProductOneLiner,
 	}
 }
@@ -322,9 +370,11 @@ func ApplyForm(repoRoot string, f Form) (Result, error) {
 		ProjectName:     st.Answers.ProjectName,
 		DefaultBranch:   st.Answers.DefaultBranch,
 		BranchPrefix:    SlugFromName(st.Answers.ProjectName),
-		DefaultAgent:    st.Answers.DefaultAgent,
-		DefaultReviewer: st.Answers.DefaultReviewer,
-		Validation:      validation,
+		DefaultSpecAgent: st.Answers.DefaultSpecAgent,
+		DefaultAgent:     st.Answers.DefaultAgent,
+		DefaultReviewer:  st.Answers.DefaultReviewer,
+		DefaultEnricher:  st.Answers.DefaultEnricher,
+		Validation:       validation,
 	}
 
 	cfgPath := config.ConfigPath(repoRoot)
@@ -356,14 +406,22 @@ func ApplyForm(repoRoot string, f Form) (Result, error) {
 	if err != nil {
 		return Result{}, err
 	}
+	var applied []AppliedAutofix
+	if !report.Ready && len(ListAutofixOffers(report.Checks)) > 0 {
+		applied, report, err = ApplyReadinessAutofixes(repoRoot)
+		if err != nil {
+			return Result{}, err
+		}
+	}
 	_ = PersistReport(repoRoot, report)
 
 	return Result{
-		Report:         report,
-		PlannedChanges: planned,
-		SkippedFields:  skipped,
-		ConfigPath:     cfgPath,
-		BackupPath:     backupPath,
+		Report:           report,
+		PlannedChanges:   planned,
+		SkippedFields:    skipped,
+		AppliedAutofixes: applied,
+		ConfigPath:       cfgPath,
+		BackupPath:       backupPath,
 	}, nil
 }
 

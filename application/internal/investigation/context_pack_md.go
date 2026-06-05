@@ -14,9 +14,9 @@ func FormatContextPackMarkdown(rep Report, pack ContextPack) string {
 	b.WriteString("## Problem\n\n")
 	b.WriteString(rep.Request.Symptom + "\n\n")
 	b.WriteString("## Scope\n\n")
-	b.WriteString(fmt.Sprintf("- Flow: %s\n", rep.Scope.Flow))
-	b.WriteString(fmt.Sprintf("- Step: %s\n", rep.Scope.Step))
-	b.WriteString(fmt.Sprintf("- Action: %s\n", rep.Scope.Action))
+	fmt.Fprintf(&b, "- Flow: %s\n", rep.Scope.Flow)
+	fmt.Fprintf(&b, "- Step: %s\n", rep.Scope.Step)
+	fmt.Fprintf(&b, "- Action: %s\n", rep.Scope.Action)
 	if len(rep.Scope.Contracts) > 0 {
 		b.WriteString("\n## Related contracts\n\n")
 		for _, c := range rep.Scope.Contracts {
@@ -64,7 +64,7 @@ func FormatContextPackMarkdown(rep Report, pack ContextPack) string {
 	if len(rep.Hypotheses) > 0 {
 		b.WriteString("\n## Hypotheses (scored)\n\n")
 		for _, h := range rep.Hypotheses {
-			b.WriteString(fmt.Sprintf("- (%.2f) %s\n", h.Score, h.Statement))
+			fmt.Fprintf(&b, "- (%.2f) %s\n", h.Score, h.Statement)
 		}
 	}
 	b.WriteString("\n## Suggested commands\n\n")

@@ -30,7 +30,7 @@ func newContextCmd(dryRun *bool) *cobra.Command {
 			Request: investigation.Request{Symptom: feature, Flow: flow},
 			Scope:   investigation.ResolvedScope{Flow: flow, Action: action},
 		}
-		fmt.Fprint(cmd.OutOrStdout(), investigation.FormatContextPackMarkdown(rep, graphPack))
+		_, _ = fmt.Fprint(cmd.OutOrStdout(), investigation.FormatContextPackMarkdown(rep, graphPack))
 		return nil
 	}
 	run := func(cmd *cobra.Command, feature string, graphOnly bool) error {
@@ -86,7 +86,7 @@ func newContextCmd(dryRun *bool) *cobra.Command {
 		})
 		opt := contextopt.ComputeOptimize(entries, reduced, pack, c.Config.TokenEst)
 		if show {
-			fmt.Fprint(cmd.OutOrStdout(), contextopt.RenderPackMarkdown(pack))
+			_, _ = fmt.Fprint(cmd.OutOrStdout(), contextopt.RenderPackMarkdown(pack))
 			if fromGraph {
 				if err := renderGraphPack(cmd, c, feature); err != nil {
 					return err
@@ -94,7 +94,7 @@ func newContextCmd(dryRun *bool) *cobra.Command {
 			}
 		}
 		if optimize {
-			fmt.Fprintf(cmd.OutOrStdout(), "Original context: %d tokens\nOptimized: %d tokens\nSavings: %.1f%%\n",
+			_, _ = fmt.Fprintf(cmd.OutOrStdout(), "Original context: %d tokens\nOptimized: %d tokens\nSavings: %.1f%%\n",
 				opt.OriginalTokens, opt.OptimizedTokens, opt.SavingsRatio*100)
 		}
 		return nil

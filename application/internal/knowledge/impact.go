@@ -180,7 +180,7 @@ func FormatImpactAnalysis(r ImpactResult) string {
 	var b strings.Builder
 	b.WriteString("Impact Analysis\n")
 	b.WriteString("───────────────\n")
-	fmt.Fprintf(&b, "Input: %s\n", r.Input)
+	_, _ = fmt.Fprintf(&b, "Input: %s\n", r.Input)
 	writeImpactList(&b, "Impacted flows:", r.ImpactedFlows)
 	writeImpactList(&b, "Impacted APIs:", r.ImpactedAPIs)
 	writeImpactList(&b, "Impacted events:", r.ImpactedEvents)
@@ -189,14 +189,14 @@ func FormatImpactAnalysis(r ImpactResult) string {
 	if r.Risk == "" {
 		b.WriteString("low\n")
 	} else {
-		fmt.Fprintf(&b, "%s\n", r.Risk)
+		_, _ = fmt.Fprintf(&b, "%s\n", r.Risk)
 	}
 	b.WriteString("Recommended checks:\n")
 	if len(r.RecommendedChecks) == 0 {
 		b.WriteString("- review impacted graph nodes manually\n")
 	} else {
 		for _, check := range r.RecommendedChecks {
-			fmt.Fprintf(&b, "- %s\n", check)
+			_, _ = fmt.Fprintf(&b, "- %s\n", check)
 		}
 	}
 	return b.String()
@@ -209,6 +209,6 @@ func writeImpactList(b *strings.Builder, title string, items []string) {
 	b.WriteString(title)
 	b.WriteByte('\n')
 	for _, item := range items {
-		fmt.Fprintf(b, "- %s\n", item)
+		_, _ = fmt.Fprintf(b, "- %s\n", item)
 	}
 }

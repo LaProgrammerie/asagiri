@@ -52,7 +52,7 @@ func gzipFile(path string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	defer src.Close()
+	defer func() { _ = src.Close() }()
 
 	gzPath := path + gzipSuffix
 	dst, err := os.Create(gzPath)
@@ -96,6 +96,6 @@ func decompressGzip(body []byte) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer r.Close()
+	defer func() { _ = r.Close() }()
 	return io.ReadAll(r)
 }

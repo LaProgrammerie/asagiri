@@ -18,7 +18,7 @@ func RunWorker(ctx context.Context, repoRoot string) error {
 	if err != nil {
 		return err
 	}
-	defer store.Close()
+	defer func() { _ = store.Close() }()
 
 	workerID := uuid.NewString()
 	if err := store.TouchWorkerHeartbeat(workerID); err != nil {

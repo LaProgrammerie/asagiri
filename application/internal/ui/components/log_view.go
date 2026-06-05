@@ -47,10 +47,10 @@ func RenderLogView(vm LogViewModel) string {
 		if ts == "" {
 			ts = "--:--:--"
 		}
-		b.WriteString(fmt.Sprintf("%s %s %s %s\n", prefix, ts, glyph, line.Message))
+		fmt.Fprintf(&b, "%s %s %s %s\n", prefix, ts, glyph, line.Message)
 	}
 	if win.Total > win.Limit {
-		b.WriteString(fmt.Sprintf("… showing %d-%d of %d", win.Offset+1, win.Offset+len(lines), win.Total))
+		fmt.Fprintf(&b, "… showing %d-%d of %d", win.Offset+1, win.Offset+len(lines), win.Total)
 	}
 	return strings.TrimRight(b.String(), "\n")
 }

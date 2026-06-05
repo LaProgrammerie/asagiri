@@ -62,7 +62,7 @@ func TestRenderReadySummaryWithAutofixOffers(t *testing.T) {
 		Theme:      theme.Default(),
 		Shell:      onboarding.ShellContext{Workspace: "chatbot"},
 	})
-	require.Contains(t, got, "Corrections auto disponibles")
+	require.Contains(t, got, "Corrections auto restantes")
 	require.Contains(t, got, "O · appliquer")
 }
 

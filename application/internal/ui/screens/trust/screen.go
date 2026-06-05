@@ -87,8 +87,8 @@ func (m Model) SelectedLabel(trust bus.TrustExplorerResult) string {
 func Render(vm ViewModel) string {
 	var b strings.Builder
 	b.WriteString("Trust Summary\n")
-	b.WriteString(fmt.Sprintf("Overall: %.0f%%  Residual risk: %s\n", vm.Trust.Overall*100, value(vm.Trust.ResidualRisk, "unknown")))
-	b.WriteString(fmt.Sprintf("Gate: %s\n", value(vm.Trust.GateStatus, "unknown")))
+	fmt.Fprintf(&b, "Overall: %.0f%%  Residual risk: %s\n", vm.Trust.Overall*100, value(vm.Trust.ResidualRisk, "unknown"))
+	fmt.Fprintf(&b, "Gate: %s\n", value(vm.Trust.GateStatus, "unknown"))
 	if vm.Trust.GateReason != "" {
 		b.WriteString("Gate reason: " + vm.Trust.GateReason + "\n")
 	}
@@ -124,7 +124,7 @@ func Render(vm ViewModel) string {
 	if vm.Model.ShowDetail && vm.Detail != nil {
 		b.WriteString("\nSelected: " + vm.Detail.Label + "\n")
 		b.WriteString("───────────────────────\n")
-		b.WriteString(fmt.Sprintf("Score          %.0f%%\n", vm.Detail.Score*100))
+		fmt.Fprintf(&b, "Score          %.0f%%\n", vm.Detail.Score*100)
 		b.WriteString("Gate           " + value(vm.Detail.GateStatus, "unknown") + "\n")
 		if vm.Detail.GateReason != "" {
 			b.WriteString("Gate reason    " + vm.Detail.GateReason + "\n")

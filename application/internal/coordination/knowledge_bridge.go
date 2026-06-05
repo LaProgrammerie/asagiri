@@ -175,7 +175,7 @@ func (d KnowledgeAwareConflictDetector) Detect(ctx context.Context, graph Execut
 	if store == nil {
 		return conflicts, nil
 	}
-	defer store.Close()
+	defer func() { _ = store.Close() }()
 	extra, err := DetectKnowledgeConflicts(ctx, graph, store)
 	if err != nil {
 		return conflicts, err

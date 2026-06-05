@@ -31,7 +31,7 @@ func (b *queryBus) handleGetRuntimeStatus(ctx context.Context, _ GetRuntimeStatu
 			Warning: err.Error(),
 		}, nil
 	}
-	defer store.Close()
+	defer func() { _ = store.Close() }()
 
 	status, err := store.Status()
 	if err != nil {
@@ -54,7 +54,7 @@ func (b *queryBus) handleListRuns(ctx context.Context, q ListRunsQuery) (QueryRe
 			Warning: err.Error(),
 		}, nil
 	}
-	defer store.Close()
+	defer func() { _ = store.Close() }()
 
 	if err := store.Migrate(); err != nil {
 		return ListRunsResult{
@@ -94,7 +94,7 @@ func (b *queryBus) handleGetRecentEvents(ctx context.Context, q GetRecentEventsQ
 	if err != nil {
 		return RecentEventsResult{}, nil
 	}
-	defer store.Close()
+	defer func() { _ = store.Close() }()
 
 	rows, err := store.ListEvents(q.Limit)
 	if err != nil {
@@ -152,7 +152,7 @@ func (b *queryBus) handleListActiveAgents(ctx context.Context, q ListActiveAgent
 			Warning: err.Error(),
 		}, nil
 	}
-	defer store.Close()
+	defer func() { _ = store.Close() }()
 	limit := q.Limit
 	if limit <= 0 {
 		limit = 200
@@ -321,7 +321,7 @@ func (b *queryBus) handleSearchKnowledge(ctx context.Context, q SearchKnowledgeQ
 			Warning: "knowledge graph unavailable",
 		}, nil
 	}
-	defer store.Close()
+	defer func() { _ = store.Close() }()
 	graph, err := store.LoadGraph(ctx)
 	if err != nil {
 		return KnowledgeSearchResult{
@@ -459,7 +459,7 @@ func (b *queryBus) handleGetRecommendedActions(ctx context.Context, q GetRecomme
 	runtimeRes, _ := runtimeAny.(RuntimeStatusResult)
 	trustAny, _ := b.handleGetTrustSummary(ctx, GetTrustSummaryQuery{})
 	trustRes, _ := trustAny.(TrustSummaryResult)
-	graphAny, _ := b.handleGetGraphExplorer(ctx, GetGraphExplorerQuery{FlowID: q.FlowID})
+	graphAny, _ := b.handleGetGraphExplorer(ctx, GetGraphExplorerQuery(q))
 	graphRes, _ := graphAny.(GraphExplorerResult)
 	flowAny, _ := b.handleGetFlowGraph(ctx, GetFlowGraphQuery{FlowID: q.FlowID})
 	flowRes, _ := flowAny.(FlowGraphResult)
@@ -752,7 +752,7 @@ func (b *queryBus) handleGetAgentTheatre(ctx context.Context, q GetAgentTheatreQ
 			Warning: err.Error(),
 		}, nil
 	}
-	defer store.Close()
+	defer func() { _ = store.Close() }()
 
 	limit := firstPositive(q.Limit, 400)
 	events, err := store.ListEvents(limit)
@@ -1087,22 +1087,22 @@ func (b *queryBus) handleGetMissionControlSnapshot(ctx context.Context, q GetMis
 		sessionStatus = "active"
 	}
 	return MissionControlSnapshotResult{
-		Workspace:     workspace,
-		Branch:        branch,
-		SessionStatus: sessionStatus,
-		Runtime:       runtimeRes,
-		Trust:         trustRes,
-		Runs:          runsRes.Runs,
-		Events:        eventsRes.Events,
-		ActiveAgents:  agentsRes.Agents,
-		Flow:          flowRes,
-		FlowExplorer:  flowExplorerRes,
-		GraphExplorer: graphExplorerRes,
-		Knowledge:     knowledgeRes,
-		TrustExplorer: trustExplorerRes,
-		Explain:       explainRes,
-		AgentTheatre:  agentTheatreRes,
-		Replay:        replayRes,
+		Workspace:          workspace,
+		Branch:             branch,
+		SessionStatus:      sessionStatus,
+		Runtime:            runtimeRes,
+		Trust:              trustRes,
+		Runs:               runsRes.Runs,
+		Events:             eventsRes.Events,
+		ActiveAgents:       agentsRes.Agents,
+		Flow:               flowRes,
+		FlowExplorer:       flowExplorerRes,
+		GraphExplorer:      graphExplorerRes,
+		Knowledge:          knowledgeRes,
+		TrustExplorer:      trustExplorerRes,
+		Explain:            explainRes,
+		AgentTheatre:       agentTheatreRes,
+		Replay:             replayRes,
 		Prototype:          prototypeRes,
 		CostTodayEUR:       costToday,
 		CostMonthEUR:       costMonth,

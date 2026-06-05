@@ -238,7 +238,7 @@ func newReplaySnapshotCmd() *cobra.Command {
 				enc.SetIndent("", "  ")
 				return enc.Encode(result)
 			}
-			fmt.Fprintf(cmd.OutOrStdout(), "snapshot: %s\npath: %s\n", result.Name, result.Path)
+			_, _ = fmt.Fprintf(cmd.OutOrStdout(), "snapshot: %s\npath: %s\n", result.Name, result.Path)
 			return nil
 		},
 	}

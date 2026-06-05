@@ -87,8 +87,10 @@ func onboardingStateAnswers(st onboarding.State) map[string]string {
 		"default_branch":    st.Answers.DefaultBranch,
 		"tagline":           st.Answers.Tagline,
 		"stack":             st.Answers.Stack,
-		"default_agent":     st.Answers.DefaultAgent,
-		"default_reviewer":  st.Answers.DefaultReviewer,
+		"default_spec_agent": st.Answers.DefaultSpecAgent,
+		"default_enricher":   st.Answers.DefaultEnricher,
+		"default_agent":      st.Answers.DefaultAgent,
+		"default_reviewer":   st.Answers.DefaultReviewer,
 		"feature_slug":      st.Answers.FeatureSlug,
 		"product_one_liner": st.Answers.ProductOneLiner,
 	}
@@ -195,6 +197,10 @@ func dispatchSetOnboardingField(ctx context.Context, deps Deps, cmd SetOnboardin
 		st.Answers.Tagline = value
 	case "stack":
 		st.Answers.Stack = value
+	case "default_spec_agent":
+		st.Answers.DefaultSpecAgent = value
+	case "default_enricher":
+		st.Answers.DefaultEnricher = value
 	case "default_agent":
 		st.Answers.DefaultAgent = value
 	case "default_reviewer":
@@ -228,12 +234,15 @@ func dispatchApplyOnboardingConfig(ctx context.Context, deps Deps, cmd ApplyOnbo
 			return CommandResult{}, err
 		}
 		msg := "Configuration appliquée"
+		if len(res.AppliedAutofixes) > 0 {
+			msg += fmt.Sprintf(" — %d correction(s) auto (.gitignore…)", len(res.AppliedAutofixes))
+		}
 		if res.Report.Ready {
 			msg += " — READY"
 		} else {
 			msg += " — NOT READY"
 			if len(onboarding.ListAutofixOffers(res.Report.Checks)) > 0 {
-				msg += " — corrections auto disponibles (O ou Ctrl+F)"
+				msg += " — corrections restantes (O ou Ctrl+F)"
 			}
 		}
 		return CommandResult{

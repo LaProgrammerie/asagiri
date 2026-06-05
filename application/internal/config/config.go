@@ -295,6 +295,7 @@ type IntentResolverConfig struct {
 
 // WorkConfig defaults for work/continue (specv2 §9).
 type WorkConfig struct {
+	DefaultSpecAgent        string `yaml:"default_spec_agent"`
 	DefaultAgent            string `yaml:"default_agent"`
 	DefaultReviewer         string `yaml:"default_reviewer"`
 	DefaultEnricher         string `yaml:"default_enricher"`
@@ -658,6 +659,9 @@ func (c *Config) applyIntentDefaults() {
 	if !c.Intent.Resolver.AskWhenBelowConfidence {
 		c.Intent.Resolver.AskWhenBelowConfidence = true
 	}
+	if c.Work.DefaultSpecAgent == "" {
+		c.Work.DefaultSpecAgent = "kiro"
+	}
 	if c.Work.DefaultAgent == "" {
 		c.Work.DefaultAgent = "cursor"
 	}
@@ -803,7 +807,7 @@ func (c *Config) validateCoordination() error {
 			return fmt.Errorf("coordination.profiles[%q].agent: requis", id)
 		}
 		if _, ok := c.Agents[p.Agent]; !ok {
-			return fmt.Errorf("coordination.profiles[%q].agent: %q absent de agents:", id, p.Agent)
+			return fmt.Errorf("coordination.profiles[%q].agent: %q absent de agents", id, p.Agent)
 		}
 		if p.Isolation != "" {
 			switch p.Isolation {
@@ -857,7 +861,7 @@ func warnLegacyConfigDir(dir string) {
 	if _, loaded := legacyConfigWarned.LoadOrStore(dir, true); loaded {
 		return
 	}
-	fmt.Fprintf(os.Stderr, "warning: %s is deprecated; migrate to .asagiri/\n", dir)
+	_, _ = fmt.Fprintf(os.Stderr, "warning: %s is deprecated; migrate to .asagiri/\n", dir)
 }
 
 // ResolveConfigPath picks .asagiri/config.yaml, or legacy .agentflow/config.yaml with a warning.

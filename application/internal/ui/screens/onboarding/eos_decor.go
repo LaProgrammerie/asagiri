@@ -1,130 +1,12 @@
 package onboarding
 
 import (
-	"fmt"
 	"strings"
 
 	onbdomain "github.com/LaProgrammerie/asagiri/application/internal/onboarding"
 	"github.com/LaProgrammerie/asagiri/application/internal/ui/theme"
 	"github.com/charmbracelet/lipgloss"
 )
-
-const eosLabelColW = 16
-
-// renderStepperVisual draws numbered circular nodes connected by lines, with a
-// label row underneath. Falls back to a compact dotted line when too narrow.
-func renderStepperVisual(step onbdomain.WizardStep, st theme.Styles, w int) string {
-	active := stepIndex(step)
-	labels := wizardStepLabels()
-	n := len(labels)
-	if n == 0 {
-		return ""
-	}
-	cell := w / n
-	if cell < 5 {
-		return renderStepperCompact(active, st, w)
-	}
-
-	var nodeRow, labelRow strings.Builder
-	for i, label := range labels {
-		nodeRow.WriteString(stepCell(i, active, n, cell, st))
-
-		lb := label
-		if lipglossWidth(lb) > cell-1 {
-			lb = truncateRunes(lb, cell-1)
-		}
-		var styled string
-		switch {
-		case i == active:
-			styled = st.PanelTitle.Render(lb)
-		case i < active:
-			styled = st.Success.Render(lb)
-		default:
-			styled = st.Muted.Render(lb)
-		}
-		labelRow.WriteString(padCenter(styled, cell))
-	}
-	return strings.TrimRight(nodeRow.String(), " ") + "\n" + strings.TrimRight(labelRow.String(), " ")
-}
-
-func stepCell(i, active, n, cell int, st theme.Styles) string {
-	node := stepNode(i, active, st)
-	nodeW := lipglossWidth(node)
-	rem := cell - nodeW
-	if rem < 0 {
-		rem = 0
-	}
-	leftN := rem / 2
-	rightN := rem - leftN
-
-	leftSeg := strings.Repeat("─", leftN)
-	rightSeg := strings.Repeat("─", rightN)
-	if i == 0 {
-		leftSeg = strings.Repeat(" ", leftN)
-	}
-	if i == n-1 {
-		rightSeg = strings.Repeat(" ", rightN)
-	}
-	left := colorConnector(leftSeg, i <= active, st)
-	right := colorConnector(rightSeg, i < active, st)
-	return left + node + right
-}
-
-func colorConnector(seg string, done bool, st theme.Styles) string {
-	if strings.TrimSpace(seg) == "" {
-		return seg
-	}
-	if done {
-		return st.Success.Render(seg)
-	}
-	return st.Muted.Render(seg)
-}
-
-var (
-	stepOutlineGlyphs = []rune("①②③④⑤⑥⑦⑧⑨")
-	stepFilledGlyphs  = []rune("❶❷❸❹❺❻❼❽❾")
-)
-
-// stepNode renders one circular step marker using circled-digit glyphs.
-func stepNode(i, active int, st theme.Styles) string {
-	switch {
-	case i < active:
-		return st.StepDone.Render("✓")
-	case i == active:
-		if i < len(stepFilledGlyphs) {
-			return st.StepActiveGlyph.Render(string(stepFilledGlyphs[i]))
-		}
-		return st.StepActiveGlyph.Render(fmt.Sprintf("%d", i+1))
-	default:
-		if i < len(stepOutlineGlyphs) {
-			return st.StepPending.Render(string(stepOutlineGlyphs[i]))
-		}
-		return st.StepPending.Render(fmt.Sprintf("%d", i+1))
-	}
-}
-
-func padCenter(s string, w int) string {
-	sw := lipglossWidth(s)
-	if sw >= w {
-		return s
-	}
-	pad := w - sw
-	left := pad / 2
-	return strings.Repeat(" ", left) + s + strings.Repeat(" ", pad-left)
-}
-
-func lipglossWidth(s string) int { return lipgloss.Width(s) }
-
-func truncateRunes(s string, maxLen int) string {
-	r := []rune(s)
-	if len(r) <= maxLen {
-		return s
-	}
-	if maxLen <= 1 {
-		return string(r[:maxLen])
-	}
-	return string(r[:maxLen-1]) + "…"
-}
 
 // renderWelcomePanel renders the welcome step as a single flat card with
 // borderless sections (no nested frames).
@@ -153,24 +35,35 @@ func renderWelcomePanel(vm ViewModel, st theme.Styles, boxW int) string {
 func renderStepPanel(vm ViewModel, st theme.Styles, boxW int) string {
 	m := vm.Model
 	var rows []string
-	rows = append(rows, st.HeroTitle.Render(StepLabel(m.Step)), "")
+	if m.Step == onbdomain.StepDocs {
+		rows = append(rows, st.Muted.Render("Phrase pour docs/ai/01-product.md — pas le nom saisi à l’étape Projet."))
+		rows = append(rows, "")
+	}
+	if m.Step == onbdomain.StepFeature {
+		rows = append(rows, st.Muted.Render("Première spec à développer — crée .kiro/specs/<slug>/ (complétable ensuite)."))
+		rows = append(rows, "")
+	}
 
 	for i, row := range m.fieldRows {
 		focused := m.FocusFooter < 0 && i == m.FocusField
 		label := rowLabel(row)
 		icon := fieldIconForKey(row.Key, label)
-		pill := row.Key == "stack" || row.Key == "detected_stacks" || row.ReadOnly
+		managed := row.Kind == FieldManaged
+		pill := false
+		if row.Kind == FieldSelect {
+			pill = focused // badge only while editing; otherwise plain text
+		}
 		value := m.fieldValue(row.Key)
 		isValidation := strings.HasPrefix(row.Key, "validation_")
 		if isValidation {
 			value = validationName(value)
 		}
-		rows = append(rows, st.RenderEOSFieldGrid(icon, label, value, focused, pill, eosLabelColW))
+		if row.Kind == FieldSelect {
+			value = formatSelectDisplay(value, row.Choices, focused)
+		}
+		rows = append(rows, st.RenderEOSFieldGrid(icon, label, value, focused, pill, managed))
 		if errMsg := m.Errors[row.Key]; errMsg != "" {
 			rows = append(rows, "     "+st.Error.Render("! "+errMsg))
-		}
-		if row.Key == "stack" && !row.ReadOnly {
-			rows = append(rows, "     "+st.Muted.Render("(go | castor | node | auto)"))
 		}
 		// Group consecutive read-only validation rows tightly; blank line otherwise.
 		if !isValidation {
@@ -199,8 +92,10 @@ func fieldIconForKey(key, _ string) string {
 		return "⎇"
 	case key == "tagline":
 		return "✎"
-	case key == "default_agent", key == "default_reviewer":
+	case key == "default_spec_agent", key == "default_enricher", key == "default_agent", key == "default_reviewer":
 		return "◎"
+	case key == "pipeline_plan", key == "pipeline_verify":
+		return "◇"
 	default:
 		return "·"
 	}
@@ -218,19 +113,41 @@ func rowLabel(row FieldDef) string {
 		return "Branche"
 	case "tagline":
 		return "Tagline"
+	case "default_spec_agent":
+		return "Spec"
+	case "default_enricher":
+		return "Enrich"
 	case "default_agent":
-		return "Agent"
+		return "Dev"
 	case "default_reviewer":
-		return "Reviewer"
+		return "Review"
+	case "pipeline_plan":
+		return "Plan"
+	case "pipeline_verify":
+		return "Verify"
 	case "product_one_liner":
-		return "Produit"
+		return "Phrase produit"
 	case "feature_slug":
-		return "Feature"
+		return "Slug"
 	default:
 		if strings.HasPrefix(row.Key, "validation_") {
 			return "Validation"
 		}
 	}
 	return row.Label
+}
+
+func formatSelectDisplay(current string, choices []string, focused bool) string {
+	current = strings.TrimSpace(current)
+	if current == "" && len(choices) > 0 {
+		current = choices[0]
+	}
+	if focused {
+		return "‹ " + current + " ›"
+	}
+	if len(choices) > 1 {
+		return current + " ▾"
+	}
+	return current
 }
 

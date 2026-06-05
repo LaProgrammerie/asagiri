@@ -156,7 +156,7 @@ func (s *Store) ListSessions() ([]Session, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 	var out []Session
 	for rows.Next() {
 		var sess Session
@@ -240,7 +240,7 @@ func (s *Store) ListBranches(sessionID string) ([]Branch, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 	var out []Branch
 	for rows.Next() {
 		var b Branch
@@ -287,7 +287,7 @@ func (s *Store) ListEvents(limit int) ([]RuntimeEvent, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 	return scanEvents(rows)
 }
 
@@ -302,7 +302,7 @@ func (s *Store) ListEventsSince(since time.Time, limit int) ([]RuntimeEvent, err
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 	return scanEvents(rows)
 }
 
@@ -367,7 +367,7 @@ func (s *Store) KnownFlowIDs() (map[string]struct{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 	out := map[string]struct{}{}
 	for rows.Next() {
 		var id string
@@ -421,7 +421,7 @@ func (s *Store) ListMemory(scope MemoryScope, limit int) ([]MemoryEntry, error) 
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 	var out []MemoryEntry
 	for rows.Next() {
 		var e MemoryEntry
@@ -461,7 +461,7 @@ func (s *Store) DequeueHooks(limit int) ([]HookJob, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 	var out []HookJob
 	for rows.Next() {
 		var j HookJob

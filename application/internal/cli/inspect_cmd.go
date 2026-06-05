@@ -31,7 +31,7 @@ func newInspectCmd(dryRun *bool) *cobra.Command {
 				}
 				found := investigation.FindSymbolFiles(c.RepoRoot, inv.CandidateFiles, args[0]) //nolint:staticcheck
 				for _, f := range found {
-					fmt.Fprintln(cmd.OutOrStdout(), f)
+					_, _ = fmt.Fprintln(cmd.OutOrStdout(), f)
 				}
 				return nil
 			},
@@ -48,7 +48,7 @@ func newInspectCmd(dryRun *bool) *cobra.Command {
 				defer c.Close()
 				inv, _ := investigation.Run(cmd.Context(), c.RepoRoot, args[0], "", c.Config)
 				for _, t := range inv.RelatedTests {
-					fmt.Fprintln(cmd.OutOrStdout(), t)
+					_, _ = fmt.Fprintln(cmd.OutOrStdout(), t)
 				}
 				return nil
 			},
@@ -70,7 +70,7 @@ func newInspectCmd(dryRun *bool) *cobra.Command {
 				if len(lines) > 30 {
 					lines = append(lines[:30], "...")
 				}
-				fmt.Fprintln(cmd.OutOrStdout(), strings.Join(lines, "\n"))
+				_, _ = fmt.Fprintln(cmd.OutOrStdout(), strings.Join(lines, "\n"))
 				return nil
 			},
 		},

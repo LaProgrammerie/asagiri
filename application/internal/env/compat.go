@@ -13,7 +13,7 @@ func warnLegacy(oldKey, newKey string) {
 	if _, loaded := warned.LoadOrStore(oldKey, true); loaded {
 		return
 	}
-	fmt.Fprintf(os.Stderr, "warning: %s is deprecated; use %s\n", oldKey, newKey)
+	_, _ = fmt.Fprintf(os.Stderr, "warning: %s is deprecated; use %s\n", oldKey, newKey)
 }
 
 // Truthy returns true when value is "1" (trimmed).

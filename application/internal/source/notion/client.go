@@ -59,7 +59,7 @@ func (c *Client) do(ctx context.Context, method, path string, body any) ([]byte,
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	data, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
@@ -183,7 +183,7 @@ func BlocksToMarkdown(blocks []Block) (markdown string, tasksYAML string) {
 			} else {
 				tasks = append(tasks, "- [ ] "+text)
 			}
-			md.WriteString(fmt.Sprintf("- [%s] %s\n", checked, text))
+			fmt.Fprintf(&md, "- [%s] %s\n", checked, text)
 		default:
 			md.WriteString(text + "\n\n")
 			md.WriteString("<!-- unsupported block: " + b.Type + " -->\n\n")

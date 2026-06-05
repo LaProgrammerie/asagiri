@@ -33,7 +33,7 @@ func ExportRepoGraph(repoRoot string) error {
 	if err != nil {
 		return fmt.Errorf("export repo knowledge graph: %w", err)
 	}
-	defer store.Close()
+	defer func() { _ = store.Close() }()
 
 	graph, err := store.LoadGraph(context.Background())
 	if err != nil {

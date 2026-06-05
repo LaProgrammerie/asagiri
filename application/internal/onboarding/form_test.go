@@ -41,13 +41,36 @@ func TestAdvanceTUIStepPrev(t *testing.T) {
 	require.Equal(t, onboarding.StepProject, prev.Step)
 }
 
+func TestAdvanceTUIStepPrefillsProductFromTagline(t *testing.T) {
+	form := onboarding.Form{
+		Step: onboarding.StepAgents,
+		Answers: onboarding.Answers{
+			DefaultSpecAgent: "kiro",
+			DefaultAgent:     "cursor",
+			DefaultReviewer:  "codex",
+			DefaultEnricher:  "ollama",
+			Tagline:          "Assistant conversationnel pour le support",
+		},
+	}
+	next, err := onboarding.AdvanceTUIStep(form, "next", false)
+	require.NoError(t, err)
+	require.Equal(t, onboarding.StepDocs, next.Step)
+	require.Equal(t, "Assistant conversationnel pour le support", next.Answers.ProductOneLiner)
+}
+
 func TestBuildFormPrefillFromConfig(t *testing.T) {
 	repo := t.TempDir()
 	cfg := config.NewTestConfig("my-project")
 	cfg.Project.Name = "chatbot-php"
 	cfg.Project.DefaultBranch = "develop"
+	cfg.Work.DefaultSpecAgent = "kiro"
 	cfg.Work.DefaultAgent = "cursor"
 	cfg.Work.DefaultReviewer = "codex"
+	cfg.Work.DefaultEnricher = "ollama"
+	cfg.Agents["kiro"] = config.Agent{Command: "kiro"}
+	cfg.Agents["cursor"] = config.Agent{Command: "cursor"}
+	cfg.Agents["codex"] = config.Agent{Command: "codex"}
+	cfg.Agents["ollama"] = config.Agent{Command: "ollama"}
 	cfg.Verification.DefaultProfile = "staging"
 	cfg.UI.Theme = "asagiri-dark"
 	cfg.Budgets.PerRun.MaxEstimatedCost = 2.5
@@ -57,7 +80,10 @@ func TestBuildFormPrefillFromConfig(t *testing.T) {
 	form := onboarding.BuildForm(repo, onboarding.State{}, cfg)
 	require.Equal(t, "chatbot-php", form.Answers.ProjectName)
 	require.Equal(t, "develop", form.Answers.DefaultBranch)
+	require.Equal(t, "kiro", form.Answers.DefaultSpecAgent)
 	require.Equal(t, "cursor", form.Answers.DefaultAgent)
+	require.Equal(t, "ollama", form.Answers.DefaultEnricher)
+	require.Contains(t, form.FieldsMap()["agents_available"], "cursor")
 	require.Equal(t, "staging", form.Advanced.VerificationProfile)
 	require.Equal(t, "2.50", form.Advanced.BudgetMaxCost)
 	require.Equal(t, "3", form.Advanced.CoordinationMaxParallel)

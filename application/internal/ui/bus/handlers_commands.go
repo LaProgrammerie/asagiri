@@ -37,7 +37,7 @@ func dispatchStartWork(ctx context.Context, deps Deps, cmd StartWorkCommand) (Co
 	if err != nil {
 		return CommandResult{}, err
 	}
-	defer store.Close()
+	defer func() { _ = store.Close() }()
 
 	snapshot, err := intent.BuildSnapshot(deps.RepoRoot, cfg, store)
 	if err != nil {
@@ -86,8 +86,7 @@ func dispatchStartWork(ctx context.Context, deps Deps, cmd StartWorkCommand) (Co
 	if err != nil {
 		return CommandResult{}, err
 	}
-	out := pre
-	out, err = pipeline.RunV3Execute(ctx, app, resolved, plan, opts, pre)
+	out, err := pipeline.RunV3Execute(ctx, app, resolved, plan, opts, pre)
 	if err != nil {
 		return CommandResult{}, err
 	}
@@ -187,24 +186,6 @@ func openStateStore(deps Deps, cfg *config.Config) (*sqlite.Store, error) {
 	return store, nil
 }
 
-func sanitizeIntentAsFallbackFeature(raw string) string {
-	value := strings.TrimSpace(strings.ToLower(raw))
-	if value == "" {
-		return "ui-work"
-	}
-	value = strings.ReplaceAll(value, " ", "-")
-	value = strings.ReplaceAll(value, "/", "-")
-	value = strings.Trim(value, "-")
-	if value == "" {
-		return "ui-work"
-	}
-	return value
-}
-
-func fallbackRunID(prefix string) string {
-	return fmt.Sprintf("%s-%s", prefix, time.Now().UTC().Format("20060102-150405"))
-}
-
 func dispatchBuildKnowledgeGraph(ctx context.Context, deps Deps, cmd BuildKnowledgeGraphCommand) (CommandResult, error) {
 	cfg, err := resolveConfig(deps)
 	if err != nil {
@@ -288,7 +269,7 @@ func dispatchExportEvents(ctx context.Context, deps Deps, cmd ExportEventsComman
 	if err != nil {
 		return CommandResult{}, err
 	}
-	defer store.Close()
+	defer func() { _ = store.Close() }()
 
 	rows, err := store.ListEvents(500)
 	if err != nil {
@@ -413,7 +394,7 @@ func dispatchAnalyzeKnowledgeImpact(ctx context.Context, deps Deps, cmd AnalyzeK
 	if err != nil {
 		return CommandResult{}, fmt.Errorf("ui impact analyze: knowledge store unavailable")
 	}
-	defer store.Close()
+	defer func() { _ = store.Close() }()
 	analyzer := knowledge.NewImpactAnalyzer(store)
 	result, err := analyzer.Analyze(ctx, knowledge.ImpactRequest{
 		File:   strings.TrimSpace(cmd.File),
@@ -439,7 +420,7 @@ func dispatchBuildKnowledgeContext(ctx context.Context, deps Deps, cmd BuildKnow
 	if err != nil {
 		return CommandResult{}, fmt.Errorf("ui build knowledge context: knowledge store unavailable")
 	}
-	defer store.Close()
+	defer func() { _ = store.Close() }()
 	querier := knowledge.NewQuerier(store)
 	result, err := querier.Query(ctx, knowledge.GraphQuery{
 		StartID:  nodeID,

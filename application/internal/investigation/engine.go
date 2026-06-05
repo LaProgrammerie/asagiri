@@ -26,14 +26,6 @@ func RunInvestigation(ctx context.Context, req Request, cfg *config.Config) (Rep
 	}
 	scope := ResolveScope(req)
 
-	pattern := req.Symptom
-	if pattern == "" {
-		pattern = req.Feature
-	}
-	if len(scope.SearchPatterns) > 0 && pattern == "" {
-		pattern = scope.SearchPatterns[0]
-	}
-
 	feature := req.Feature
 	if feature == "" {
 		feature = req.Symptom
@@ -159,7 +151,7 @@ func FeedMemory(repoRoot string, rep Report) error {
 	if err != nil {
 		return err
 	}
-	defer store.Close()
+	defer func() { _ = store.Close() }()
 	summary := rep.Request.Symptom
 	if len(rep.RootCauseCandidates) > 0 {
 		summary = rep.RootCauseCandidates[0].Statement

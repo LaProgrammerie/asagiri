@@ -53,8 +53,8 @@ func explainSteps(steps []cost.EstimatedStep) string {
 		if reason == "" {
 			reason = "plan"
 		}
-		b.WriteString(fmt.Sprintf("  • %s → agent=%s model=%s tier=%s in=%d out=%d — %s\n",
-			s.Name, s.Agent, displayModel(s.Model), tier, s.InputTokens, s.OutputTokens, reason))
+		fmt.Fprintf(&b, "  • %s → agent=%s model=%s tier=%s in=%d out=%d — %s\n",
+			s.Name, s.Agent, displayModel(s.Model), tier, s.InputTokens, s.OutputTokens, reason)
 	}
 	return b.String()
 }
@@ -67,22 +67,22 @@ func displayModel(m string) string {
 }
 
 func printWorkSummary(w io.Writer, instruction string, est cost.ExecutionEstimate, exec intent.ExecuteResult) {
-	fmt.Fprintf(w, "\n── Résumé ──\n")
-	fmt.Fprintf(w, "Instruction: %s\n", instruction)
+	_, _ = fmt.Fprintf(w, "\n── Résumé ──\n")
+	_, _ = fmt.Fprintf(w, "Instruction: %s\n", instruction)
 	if est.Feature != "" {
-		fmt.Fprintf(w, "Feature: %s", est.Feature)
+		_, _ = fmt.Fprintf(w, "Feature: %s", est.Feature)
 		if est.TaskID != "" {
-			fmt.Fprintf(w, " / task %s", est.TaskID)
+			_, _ = fmt.Fprintf(w, " / task %s", est.TaskID)
 		}
-		fmt.Fprintln(w)
+		_, _ = fmt.Fprintln(w)
 	}
-	fmt.Fprintf(w, "Estimation: %s, ~%s, budget %s\n",
+	_, _ = fmt.Fprintf(w, "Estimation: %s, ~%s, budget %s\n",
 		formatMoneyEUR(est.EstimatedCost), est.EstimatedDuration.Round(time.Second), est.BudgetStatus)
 	if len(exec.Executed) > 0 {
-		fmt.Fprintf(w, "Exécuté: %d étape(s)\n", len(exec.Executed))
+		_, _ = fmt.Fprintf(w, "Exécuté: %d étape(s)\n", len(exec.Executed))
 	}
 	if exec.LastRunID != "" {
-		fmt.Fprintf(w, "Dernier run: %s\n", exec.LastRunID)
+		_, _ = fmt.Fprintf(w, "Dernier run: %s\n", exec.LastRunID)
 	}
 }
 

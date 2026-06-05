@@ -109,7 +109,7 @@ func (c *CloudEmbedder) Embed(ctx context.Context, text string) ([]float32, erro
 	if err != nil {
 		return nil, fmt.Errorf("cloud embed: %w", err)
 	}
-	defer res.Body.Close()
+	defer func() { _ = res.Body.Close() }()
 	raw, err := io.ReadAll(res.Body)
 	if err != nil {
 		return nil, err

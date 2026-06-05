@@ -27,7 +27,7 @@ func ResolveScopeFromGraph(ctx context.Context, repoRoot string, opts GraphScope
 	if store == nil {
 		return ContextPack{}, knowledge.ErrNotFound
 	}
-	defer store.Close()
+	defer func() { _ = store.Close() }()
 
 	scope, err := knowledge.ResolveFlowScope(ctx, store, knowledge.FlowScopeRequest{
 		Flow:   opts.Flow,

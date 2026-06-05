@@ -29,16 +29,16 @@ func Render(vm ViewModel) string {
 		if i >= 8 {
 			break
 		}
-		b.WriteString(fmt.Sprintf("\n[%s] %s (%s)\n", value(agent.Role, "agent"), value(agent.AgentRef, "-"), value(agent.Status, "unknown")))
-		b.WriteString(fmt.Sprintf("Task: %s\n", value(agent.Task, "-")))
+		fmt.Fprintf(&b, "\n[%s] %s (%s)\n", value(agent.Role, "agent"), value(agent.AgentRef, "-"), value(agent.Status, "unknown"))
+		fmt.Fprintf(&b, "Task: %s\n", value(agent.Task, "-"))
 		if agent.FilesActive > 0 {
-			b.WriteString(fmt.Sprintf("Files: %d\n", agent.FilesActive))
+			fmt.Fprintf(&b, "Files: %d\n", agent.FilesActive)
 		}
 		if agent.Hypothesis != "" {
 			b.WriteString("Hypothesis: " + agent.Hypothesis + "\n")
 		}
 		if agent.TokensEstimated > 0 || agent.CostEUR > 0 {
-			b.WriteString(fmt.Sprintf("Tokens: %d  Cost: €%.2f\n", agent.TokensEstimated, agent.CostEUR))
+			fmt.Fprintf(&b, "Tokens: %d  Cost: €%.2f\n", agent.TokensEstimated, agent.CostEUR)
 		}
 		if agent.Duration > 0 {
 			b.WriteString("Duration: " + formatDuration(agent.Duration) + "\n")
@@ -47,7 +47,7 @@ func Render(vm ViewModel) string {
 			b.WriteString("Last output: " + agent.LastOutput + "\n")
 		}
 		if agent.Confidence > 0 {
-			b.WriteString(fmt.Sprintf("Confidence: %.0f%%\n", agent.Confidence*100))
+			fmt.Fprintf(&b, "Confidence: %.0f%%\n", agent.Confidence*100)
 		}
 		if vm.ShowCLI {
 			b.WriteString("CLI: asa agents watch\n")

@@ -20,7 +20,7 @@ func (RuntimeExtractor) Extract(ctx context.Context, repoRoot, _ string) ([]know
 	if err != nil {
 		return nil, nil, []string{"runtime: " + err.Error()}, nil
 	}
-	defer store.Close()
+	defer func() { _ = store.Close() }()
 
 	events, err := store.ListEvents(runtimeEventLimit)
 	if err != nil {

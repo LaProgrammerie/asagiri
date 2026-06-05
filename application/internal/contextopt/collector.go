@@ -34,9 +34,7 @@ func Collect(repoRoot, feature string, cfg *config.Config, opts CollectOpts) ([]
 			filepath.Join(".asagiri", "specs", feature),
 		)
 	}
-	for _, p := range cfg.Sources.Local.Paths {
-		paths = append(paths, p)
-	}
+	paths = append(paths, cfg.Sources.Local.Paths...)
 	// de-dup path list
 	uniqPaths := make([]string, 0)
 	up := map[string]struct{}{}

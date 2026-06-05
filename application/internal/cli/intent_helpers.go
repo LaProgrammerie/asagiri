@@ -26,7 +26,7 @@ func isInteractive() bool {
 }
 
 func confirmPrompt(w io.Writer, r io.Reader, msg string) (bool, error) {
-	fmt.Fprintf(w, "%s [y/N]: ", msg)
+	_, _ = fmt.Fprintf(w, "%s [y/N]: ", msg)
 	sc := bufio.NewScanner(r)
 	if !sc.Scan() {
 		return false, sc.Err()

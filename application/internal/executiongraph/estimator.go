@@ -186,11 +186,11 @@ func FormatEstimateSummary(est GraphEstimate) string {
 	var b strings.Builder
 	b.WriteString("Execution Graph Estimate\n")
 	b.WriteString("────────────────────────\n")
-	fmt.Fprintf(&b, "Nodes:              %d\n", est.Nodes)
-	fmt.Fprintf(&b, "Parallel groups:    %d\n", est.ParallelGroups)
-	fmt.Fprintf(&b, "Estimated duration: %s\n", est.EstimatedDuration)
-	fmt.Fprintf(&b, "Estimated cost:     €%.2f\n", est.EstimatedCost)
-	fmt.Fprintf(&b, "Highest risk:       %s\n", est.HighestRisk)
-	fmt.Fprintf(&b, "Budget status:      %s\n", est.BudgetStatus)
+	_, _ = fmt.Fprintf(&b, "Nodes:              %d\n", est.Nodes)
+	_, _ = fmt.Fprintf(&b, "Parallel groups:    %d\n", est.ParallelGroups)
+	_, _ = fmt.Fprintf(&b, "Estimated duration: %s\n", est.EstimatedDuration)
+	_, _ = fmt.Fprintf(&b, "Estimated cost:     €%.2f\n", est.EstimatedCost)
+	_, _ = fmt.Fprintf(&b, "Highest risk:       %s\n", est.HighestRisk)
+	_, _ = fmt.Fprintf(&b, "Budget status:      %s\n", est.BudgetStatus)
 	return b.String()
 }

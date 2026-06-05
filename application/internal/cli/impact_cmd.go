@@ -39,7 +39,7 @@ func newImpactAnalyzeCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			defer store.Close()
+			defer func() { _ = store.Close() }()
 
 			analyzer := knowledge.NewImpactAnalyzer(store)
 			result, err := analyzer.Analyze(cmd.Context(), knowledge.ImpactRequest{
@@ -55,7 +55,7 @@ func newImpactAnalyzeCmd() *cobra.Command {
 				enc.SetIndent("", "  ")
 				return enc.Encode(result)
 			}
-			fmt.Fprint(cmd.OutOrStdout(), knowledge.FormatImpactAnalysis(result))
+			_, _ = fmt.Fprint(cmd.OutOrStdout(), knowledge.FormatImpactAnalysis(result))
 			return nil
 		},
 	}

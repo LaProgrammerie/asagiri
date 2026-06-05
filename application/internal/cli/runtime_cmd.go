@@ -27,7 +27,7 @@ func newDaemonCmd(dryRun *bool) *cobra.Command {
 				return err
 			}
 			if *dryRun {
-				fmt.Fprintln(cmd.OutOrStdout(), "dry-run: daemon start skipped")
+				_, _ = fmt.Fprintln(cmd.OutOrStdout(), "dry-run: daemon start skipped")
 				return nil
 			}
 			if detach {
@@ -35,14 +35,14 @@ func newDaemonCmd(dryRun *bool) *cobra.Command {
 				if err != nil {
 					return err
 				}
-				fmt.Fprintf(cmd.OutOrStdout(), "daemon detached (pid %d)\n", pid)
+				_, _ = fmt.Fprintf(cmd.OutOrStdout(), "daemon detached (pid %d)\n", pid)
 				return nil
 			}
 			st, err := runtime.StartDaemon(root)
 			if err != nil {
 				return err
 			}
-			fmt.Fprint(cmd.OutOrStdout(), runtime.FormatStatusPlain(st))
+			_, _ = fmt.Fprint(cmd.OutOrStdout(), runtime.FormatStatusPlain(st))
 			return nil
 		},
 	}
@@ -58,7 +58,7 @@ func newDaemonCmd(dryRun *bool) *cobra.Command {
 				return err
 			}
 			if *dryRun {
-				fmt.Fprintln(cmd.OutOrStdout(), "dry-run: daemon run skipped")
+				_, _ = fmt.Fprintln(cmd.OutOrStdout(), "dry-run: daemon run skipped")
 				return nil
 			}
 			_, _ = runtime.StartDaemon(root)
@@ -66,7 +66,7 @@ func newDaemonCmd(dryRun *bool) *cobra.Command {
 				go func() {
 					_ = runtimeapi.Serve(cmd.Context(), runtimeapi.Options{RepoRoot: root, Port: apiPort})
 				}()
-				fmt.Fprintf(cmd.OutOrStdout(), "runtime API: http://%s\n", apiAddr(apiPort))
+				_, _ = fmt.Fprintf(cmd.OutOrStdout(), "runtime API: http://%s\n", apiAddr(apiPort))
 			}
 			return runtime.RunWorker(cmd.Context(), root)
 		},
@@ -86,20 +86,20 @@ func newDaemonCmd(dryRun *bool) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			defer store.Close()
+			defer func() { _ = store.Close() }()
 			if richStatus {
 				view, err := store.BuildStatusView()
 				if err != nil {
 					return err
 				}
-				fmt.Fprint(cmd.OutOrStdout(), runtime.FormatStatusRich(view))
+				_, _ = fmt.Fprint(cmd.OutOrStdout(), runtime.FormatStatusRich(view))
 				return nil
 			}
 			st, err := store.Status()
 			if err != nil {
 				return err
 			}
-			fmt.Fprint(cmd.OutOrStdout(), runtime.FormatStatusPlain(st))
+			_, _ = fmt.Fprint(cmd.OutOrStdout(), runtime.FormatStatusPlain(st))
 			return nil
 		},
 	}
@@ -113,13 +113,13 @@ func newDaemonCmd(dryRun *bool) *cobra.Command {
 				return err
 			}
 			if *dryRun {
-				fmt.Fprintln(cmd.OutOrStdout(), "dry-run: daemon stop skipped")
+				_, _ = fmt.Fprintln(cmd.OutOrStdout(), "dry-run: daemon stop skipped")
 				return nil
 			}
 			if err := runtime.StopDaemon(root); err != nil {
 				return err
 			}
-			fmt.Fprintln(cmd.OutOrStdout(), "runtime stopped")
+			_, _ = fmt.Fprintln(cmd.OutOrStdout(), "runtime stopped")
 			return nil
 		},
 	}
@@ -145,7 +145,7 @@ func newSkillsCmd() *cobra.Command {
 				return err
 			}
 			for _, s := range all {
-				fmt.Fprintf(cmd.OutOrStdout(), "%s\t%s\t%v\n", s.ID, s.Name, s.Scope)
+				_, _ = fmt.Fprintf(cmd.OutOrStdout(), "%s\t%s\t%v\n", s.ID, s.Name, s.Scope)
 			}
 			return nil
 		},
@@ -177,7 +177,7 @@ func newMemoryCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			defer store.Close()
+			defer func() { _ = store.Close() }()
 			eng := memory.NewEngine(store)
 			var entries []runtime.MemoryEntry
 			if query != "" {
@@ -189,7 +189,7 @@ func newMemoryCmd() *cobra.Command {
 				return err
 			}
 			for _, e := range entries {
-				fmt.Fprintf(cmd.OutOrStdout(), "%.2f\t%s\t%s\n", e.Relevance, e.Scope, e.Summary)
+				_, _ = fmt.Fprintf(cmd.OutOrStdout(), "%.2f\t%s\t%s\n", e.Relevance, e.Scope, e.Summary)
 			}
 			return nil
 		},
@@ -207,12 +207,12 @@ func newMemoryCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			defer store.Close()
+			defer func() { _ = store.Close() }()
 			n, err := memory.NewEngine(store).Consolidate()
 			if err != nil {
 				return err
 			}
-			fmt.Fprintf(cmd.OutOrStdout(), "consolidated: %d\n", n)
+			_, _ = fmt.Fprintf(cmd.OutOrStdout(), "consolidated: %d\n", n)
 			return nil
 		},
 	}
@@ -242,12 +242,12 @@ func newSessionCmd(dryRun *bool) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			defer store.Close()
+			defer func() { _ = store.Close() }()
 			sess, err := store.CreateSession(args[0], productID, flowID)
 			if err != nil {
 				return err
 			}
-			fmt.Fprintf(cmd.OutOrStdout(), "session créée: %s (%s)\n", sess.ID, sess.Name)
+			_, _ = fmt.Fprintf(cmd.OutOrStdout(), "session créée: %s (%s)\n", sess.ID, sess.Name)
 			return nil
 		},
 	}
@@ -266,13 +266,13 @@ func newSessionCmd(dryRun *bool) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			defer store.Close()
+			defer func() { _ = store.Close() }()
 			sessions, err := store.ListSessions()
 			if err != nil {
 				return err
 			}
 			for _, s := range sessions {
-				fmt.Fprintf(cmd.OutOrStdout(), "%s\t%s\t%s\n", s.ID, s.Name, s.Status)
+				_, _ = fmt.Fprintf(cmd.OutOrStdout(), "%s\t%s\t%s\n", s.ID, s.Name, s.Status)
 			}
 			return nil
 		},
@@ -291,12 +291,12 @@ func newSessionCmd(dryRun *bool) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			defer store.Close()
+			defer func() { _ = store.Close() }()
 			sess, err := store.GetSession(args[0])
 			if err != nil {
 				return err
 			}
-			fmt.Fprintf(cmd.OutOrStdout(), "attached session: %s (%s) product=%s flow=%s\n",
+			_, _ = fmt.Fprintf(cmd.OutOrStdout(), "attached session: %s (%s) product=%s flow=%s\n",
 				sess.Name, sess.ID, sess.ProductID, sess.FlowID)
 			return nil
 		},
@@ -320,12 +320,12 @@ func newSessionCmd(dryRun *bool) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			defer store.Close()
+			defer func() { _ = store.Close() }()
 			b, err := store.CreateBranch(args[0], name, runtime.BranchType(branchType), "")
 			if err != nil {
 				return err
 			}
-			fmt.Fprintf(cmd.OutOrStdout(), "branch créée: %s (%s)\n", b.ID, b.Name)
+			_, _ = fmt.Fprintf(cmd.OutOrStdout(), "branch créée: %s (%s)\n", b.ID, b.Name)
 			return nil
 		},
 	}
@@ -344,18 +344,18 @@ func newSessionCmd(dryRun *bool) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			defer store.Close()
+			defer func() { _ = store.Close() }()
 			g, err := store.BuildStateGraph()
 			if err != nil {
 				return err
 			}
-			fmt.Fprintf(cmd.OutOrStdout(), "Sessions: %d\nBranches: %d\nRecent events: %d\n",
+			_, _ = fmt.Fprintf(cmd.OutOrStdout(), "Sessions: %d\nBranches: %d\nRecent events: %d\n",
 				len(g.Sessions), len(g.Branches), len(g.Events))
 			for _, s := range g.Sessions {
-				fmt.Fprintf(cmd.OutOrStdout(), "  session %s (%s)\n", s.Name, s.Status)
+				_, _ = fmt.Fprintf(cmd.OutOrStdout(), "  session %s (%s)\n", s.Name, s.Status)
 			}
 			for _, e := range g.Events {
-				fmt.Fprintf(cmd.OutOrStdout(), "  event %s %s\n", e.Type, e.CreatedAt.Format(time.RFC3339))
+				_, _ = fmt.Fprintf(cmd.OutOrStdout(), "  event %s %s\n", e.Type, e.CreatedAt.Format(time.RFC3339))
 			}
 			return nil
 		},
@@ -379,7 +379,7 @@ func newRuntimeEventsCmd(dryRun *bool) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			defer store.Close()
+			defer func() { _ = store.Close() }()
 			if follow {
 				since := time.Now().UTC()
 				for i := 0; i < 3; i++ {
@@ -388,7 +388,7 @@ func newRuntimeEventsCmd(dryRun *bool) *cobra.Command {
 						return err
 					}
 					for _, e := range events {
-						fmt.Fprintf(cmd.OutOrStdout(), "%s\t%s\t%s\n", e.CreatedAt.Format(time.RFC3339), e.Type, e.SessionID)
+						_, _ = fmt.Fprintf(cmd.OutOrStdout(), "%s\t%s\t%s\n", e.CreatedAt.Format(time.RFC3339), e.Type, e.SessionID)
 						since = e.CreatedAt
 					}
 					time.Sleep(200 * time.Millisecond)
@@ -400,7 +400,7 @@ func newRuntimeEventsCmd(dryRun *bool) *cobra.Command {
 				return err
 			}
 			for _, e := range events {
-				fmt.Fprintf(cmd.OutOrStdout(), "%s\t%s\t%s\n", e.CreatedAt.Format(time.RFC3339), e.Type, e.SessionID)
+				_, _ = fmt.Fprintf(cmd.OutOrStdout(), "%s\t%s\t%s\n", e.CreatedAt.Format(time.RFC3339), e.Type, e.SessionID)
 			}
 			return nil
 		},
@@ -425,12 +425,12 @@ func newRuntimeCmd(dryRun *bool) *cobra.Command {
 				return err
 			}
 			if *dryRun {
-				fmt.Fprintf(cmd.OutOrStdout(), "dry-run: runtime serve on 127.0.0.1:%d\n", port)
+				_, _ = fmt.Fprintf(cmd.OutOrStdout(), "dry-run: runtime serve on 127.0.0.1:%d\n", port)
 				return nil
 			}
 			opts := runtimeapi.Options{RepoRoot: root, Port: port, SocketPath: socketPath}
 			if socketPath != "" {
-				fmt.Fprintf(cmd.OutOrStdout(), "runtime API listening on unix://%s\n", socketPath)
+				_, _ = fmt.Fprintf(cmd.OutOrStdout(), "runtime API listening on unix://%s\n", socketPath)
 				if port > 0 {
 					go func() {
 						_ = runtimeapi.Serve(cmd.Context(), opts)
@@ -438,7 +438,7 @@ func newRuntimeCmd(dryRun *bool) *cobra.Command {
 				}
 				return runtimeapi.ServeUnix(cmd.Context(), opts)
 			}
-			fmt.Fprintf(cmd.OutOrStdout(), "runtime API listening on http://%s\n", apiAddr(port))
+			_, _ = fmt.Fprintf(cmd.OutOrStdout(), "runtime API listening on http://%s\n", apiAddr(port))
 			return runtimeapi.Serve(cmd.Context(), opts)
 		},
 	}

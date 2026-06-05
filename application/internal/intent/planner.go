@@ -39,6 +39,10 @@ func (p *DefaultPlanner) BuildPlan(ctx context.Context, intent ResolvedIntent, s
 	if reviewer == "" {
 		reviewer = "codex"
 	}
+	specAgent := "kiro"
+	if cfg != nil && cfg.Work.DefaultSpecAgent != "" {
+		specAgent = cfg.Work.DefaultSpecAgent
+	}
 	enricher := "ollama"
 	if cfg != nil && cfg.Work.DefaultEnricher != "" {
 		enricher = cfg.Work.DefaultEnricher
@@ -78,7 +82,7 @@ func (p *DefaultPlanner) BuildPlan(ctx context.Context, intent ResolvedIntent, s
 			add("sync", []string{"notion", "--feature", feat}, "source_requires_sync", "sync before work")
 		}
 		if !fs.HasLocalSpec {
-			add("spec", []string{feat, "--agent", "kiro"}, "no_local_spec", "create local spec")
+			add("spec", []string{feat, "--agent", specAgent}, "no_local_spec", "create local spec")
 		}
 		if !fs.HasTasks {
 			add("plan", []string{feat}, "no_tasks", "generate tasks")
@@ -219,7 +223,7 @@ func RecommendNext(snap StateSnapshot, feature string) (NextRecommendation, erro
 		cmd := fmt.Sprintf("asa verify %s --task %s --force", feature, taskID)
 		return NextRecommendation{Feature: feature, TaskID: taskID, Action: "verify", Reason: "verification failed", Primitive: cmd}, nil
 	default:
-		cmd := fmt.Sprintf("asa status")
+		cmd := "asa status"
 		return NextRecommendation{Feature: feature, Action: "status", Reason: "inspect current state", Primitive: cmd}, nil
 	}
 }

@@ -96,7 +96,7 @@ FROM nodes`
 	if err != nil {
 		return nil, fmt.Errorf("list nodes: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	var nodes []knowledge.GraphNode
 	for rows.Next() {
@@ -161,7 +161,7 @@ FROM edges`
 	if err != nil {
 		return nil, fmt.Errorf("list edges: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	var edges []knowledge.GraphEdge
 	for rows.Next() {
@@ -281,7 +281,7 @@ func loadProperties(ctx context.Context, db *sql.DB, query, id string) (map[stri
 	if err != nil {
 		return nil, fmt.Errorf("load properties: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 	props := make(map[string]any)
 	for rows.Next() {
 		var key, raw string

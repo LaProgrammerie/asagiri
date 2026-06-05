@@ -21,7 +21,7 @@ func AssessTrustFromRepo(ctx context.Context, repoRoot, flow, action string) (kn
 		}
 		return knowledge.TrustGraphAssessment{}, false, err
 	}
-	defer store.Close()
+	defer func() { _ = store.Close() }()
 	return knowledge.AssessTrustFromGraph(ctx, store, flow, action)
 }
 
@@ -52,7 +52,7 @@ func BlastRadiusFromGraph(ctx context.Context, repoRoot string, req knowledge.Im
 	if err != nil {
 		return nil, knowledge.ImpactResult{}, err
 	}
-	defer store.Close()
+	defer func() { _ = store.Close() }()
 
 	result, err := knowledge.NewImpactAnalyzer(store).Analyze(ctx, req)
 	if err != nil {

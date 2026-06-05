@@ -126,10 +126,10 @@ func newPlanGraphCmd() *cobra.Command {
 				if err != nil {
 					return err
 				}
-				fmt.Fprint(out, md)
+				_, _ = fmt.Fprint(out, md)
 			} else {
-				fmt.Fprint(out, executiongraph.FormatTerminalSummary(result.Graph, result.Schedule, result.Estimate))
-				fmt.Fprintf(out, "\nArtifacts: %s\n", result.Artifacts.Dir)
+				_, _ = fmt.Fprint(out, executiongraph.FormatTerminalSummary(result.Graph, result.Schedule, result.Estimate))
+				_, _ = fmt.Fprintf(out, "\nArtifacts: %s\n", result.Artifacts.Dir)
 			}
 
 			stopOn := executiongraph.RiskLevel(cfg.ExecutionGraph.StopOnRisk)
@@ -181,7 +181,7 @@ func newPlanExplainCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			fmt.Fprint(cmd.OutOrStdout(), executiongraph.FormatExplain(result.Graph, result.Schedule))
+			_, _ = fmt.Fprint(cmd.OutOrStdout(), executiongraph.FormatExplain(result.Graph, result.Schedule))
 			return nil
 		},
 	}
@@ -253,11 +253,11 @@ func newGraphRunCmd() *cobra.Command {
 					return fmt.Errorf("encode graph run result: %w", err)
 				}
 			} else {
-				fmt.Fprint(out, executiongraph.FormatTerminalSummary(result.Graph, result.Schedule, result.Estimate))
-				fmt.Fprintf(out, "\nRun status: %s\n", runResult.Status)
-				fmt.Fprintf(out, "Artifacts: %s\n", result.Artifacts.Dir)
+				_, _ = fmt.Fprint(out, executiongraph.FormatTerminalSummary(result.Graph, result.Schedule, result.Estimate))
+				_, _ = fmt.Fprintf(out, "\nRun status: %s\n", runResult.Status)
+				_, _ = fmt.Fprintf(out, "Artifacts: %s\n", result.Artifacts.Dir)
 				if dryRun {
-					fmt.Fprintln(out, "Dry-run: no agents executed")
+					_, _ = fmt.Fprintln(out, "Dry-run: no agents executed")
 				}
 			}
 
@@ -314,15 +314,15 @@ func newGraphStatusCmd() *cobra.Command {
 				return nil
 			}
 
-			fmt.Fprintf(out, "Graph: %s\n", graph.ID)
-			fmt.Fprintf(out, "Product: %s\n", graph.Product)
-			fmt.Fprintf(out, "Flow: %s\n", graph.Flow)
-			fmt.Fprintf(out, "Status: %s\n", graph.Status)
-			fmt.Fprintf(out, "Nodes: %d\n", len(graph.Nodes))
-			fmt.Fprintf(out, "Edges: %d\n", len(graph.Edges))
-			fmt.Fprintf(out, "Checkpoints: %d\n", len(graph.Checkpoints))
-			fmt.Fprintf(out, "Estimated cost: €%.2f\n", est.EstimatedCost)
-			fmt.Fprintf(out, "Highest risk: %s\n", est.HighestRisk)
+			_, _ = fmt.Fprintf(out, "Graph: %s\n", graph.ID)
+			_, _ = fmt.Fprintf(out, "Product: %s\n", graph.Product)
+			_, _ = fmt.Fprintf(out, "Flow: %s\n", graph.Flow)
+			_, _ = fmt.Fprintf(out, "Status: %s\n", graph.Status)
+			_, _ = fmt.Fprintf(out, "Nodes: %d\n", len(graph.Nodes))
+			_, _ = fmt.Fprintf(out, "Edges: %d\n", len(graph.Edges))
+			_, _ = fmt.Fprintf(out, "Checkpoints: %d\n", len(graph.Checkpoints))
+			_, _ = fmt.Fprintf(out, "Estimated cost: €%.2f\n", est.EstimatedCost)
+			_, _ = fmt.Fprintf(out, "Highest risk: %s\n", est.HighestRisk)
 			return nil
 		},
 	}
@@ -362,11 +362,11 @@ func newGraphRollbackCmd(dryRun *bool) *cobra.Command {
 					Result executiongraph.GraphRollbackResult `json:"result"`
 				}{impact, result})
 			}
-			fmt.Fprintf(out, "%s\n", impact.Title)
+			_, _ = fmt.Fprintf(out, "%s\n", impact.Title)
 			for _, line := range impact.ImpactLines {
-				fmt.Fprintf(out, "- %s\n", line)
+				_, _ = fmt.Fprintf(out, "- %s\n", line)
 			}
-			fmt.Fprintf(out, "Graph %s: status=%s nodes_rolled_back=%d dry_run=%t\n", result.GraphID, result.Status, result.NodesRolledBack, result.DryRun)
+			_, _ = fmt.Fprintf(out, "Graph %s: status=%s nodes_rolled_back=%d dry_run=%t\n", result.GraphID, result.Status, result.NodesRolledBack, result.DryRun)
 			return nil
 		},
 	}
@@ -411,7 +411,7 @@ func newGraphResumeCmd() *cobra.Command {
 				}
 				return nil
 			}
-			fmt.Fprintf(out, "Graph %s resumed: status=%s\n", result.GraphID, result.Status)
+			_, _ = fmt.Fprintf(out, "Graph %s resumed: status=%s\n", result.GraphID, result.Status)
 			return nil
 		},
 	}
@@ -446,9 +446,9 @@ func newGraphVisualizeCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			fmt.Fprint(cmd.OutOrStdout(), body)
+			_, _ = fmt.Fprint(cmd.OutOrStdout(), body)
 			if renderFormat != executiongraph.RenderFormatJSON && !strings.HasSuffix(body, "\n") {
-				fmt.Fprintln(cmd.OutOrStdout())
+				_, _ = fmt.Fprintln(cmd.OutOrStdout())
 			}
 			return nil
 		},

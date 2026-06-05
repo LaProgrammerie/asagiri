@@ -267,7 +267,7 @@ func (s *Store) QuerySince(ctx context.Context, since time.Time) ([]telemetry.Ru
 	if err != nil {
 		return nil, fmt.Errorf("query run metrics: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 	return scanRunMetrics(rows)
 }
 
@@ -288,7 +288,7 @@ func (s *Store) GetDurationHistory(ctx context.Context, limit int) ([]telemetry.
 	if err != nil {
 		return nil, fmt.Errorf("query duration history: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	var out []telemetry.DurationSample
 	for rows.Next() {
@@ -382,7 +382,7 @@ func (s *Store) DurationSamples(stepName, model string, limit int) ([]time.Durat
 	if err != nil {
 		return nil, fmt.Errorf("duration samples: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 	var out []time.Duration
 	for rows.Next() {
 		var ms int

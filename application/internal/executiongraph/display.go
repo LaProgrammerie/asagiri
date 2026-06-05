@@ -10,25 +10,25 @@ func FormatTerminalSummary(graph ExecutionGraph, schedule ExecutionSchedule, est
 	var b strings.Builder
 	b.WriteString("Asagiri Execution Graph\n")
 	b.WriteString("═══════════════════════\n")
-	fmt.Fprintf(&b, "Product: %s\n", graph.Product)
+	_, _ = fmt.Fprintf(&b, "Product: %s\n", graph.Product)
 	if graph.Flow != "" {
-		fmt.Fprintf(&b, "Flow:    %s\n", graph.Flow)
+		_, _ = fmt.Fprintf(&b, "Flow:    %s\n", graph.Flow)
 	}
-	fmt.Fprintf(&b, "Graph ID: %s\n\n", graph.ID)
+	_, _ = fmt.Fprintf(&b, "Graph ID: %s\n\n", graph.ID)
 
 	b.WriteString("Graph\n")
 	b.WriteString("─────\n")
-	fmt.Fprintf(&b, "Nodes:             %d\n", est.Nodes)
-	fmt.Fprintf(&b, "Dependencies:      %d\n", len(graph.Edges))
-	fmt.Fprintf(&b, "Parallel groups:   %d\n", est.ParallelGroups)
-	fmt.Fprintf(&b, "Checkpoints:       %d\n", len(graph.Checkpoints))
-	fmt.Fprintf(&b, "Highest risk:      %s\n", est.HighestRisk)
-	fmt.Fprintf(&b, "Estimated cost:    €%.2f\n", est.EstimatedCost)
-	fmt.Fprintf(&b, "Estimated duration: %s\n", est.EstimatedDuration)
+	_, _ = fmt.Fprintf(&b, "Nodes:             %d\n", est.Nodes)
+	_, _ = fmt.Fprintf(&b, "Dependencies:      %d\n", len(graph.Edges))
+	_, _ = fmt.Fprintf(&b, "Parallel groups:   %d\n", est.ParallelGroups)
+	_, _ = fmt.Fprintf(&b, "Checkpoints:       %d\n", len(graph.Checkpoints))
+	_, _ = fmt.Fprintf(&b, "Highest risk:      %s\n", est.HighestRisk)
+	_, _ = fmt.Fprintf(&b, "Estimated cost:    €%.2f\n", est.EstimatedCost)
+	_, _ = fmt.Fprintf(&b, "Estimated duration: %s\n", est.EstimatedDuration)
 
 	for i, group := range schedule.ParallelGroups {
 		b.WriteString("\n")
-		fmt.Fprintf(&b, "Parallel group %d\n", i+1)
+		_, _ = fmt.Fprintf(&b, "Parallel group %d\n", i+1)
 		b.WriteString("────────────────\n")
 		for _, id := range group {
 			node := nodeByID(graph.Nodes, id)
@@ -46,7 +46,7 @@ func FormatTerminalSummary(graph ExecutionGraph, schedule ExecutionSchedule, est
 			if i == 0 {
 				marker = "✓"
 			}
-			fmt.Fprintf(&b, "%s %-30s %-12s %5.2f€\n", marker, truncateLabel(label, 30), agent, cost)
+			_, _ = fmt.Fprintf(&b, "%s %-30s %-12s %5.2f€\n", marker, truncateLabel(label, 30), agent, cost)
 		}
 	}
 
@@ -55,7 +55,7 @@ func FormatTerminalSummary(graph ExecutionGraph, schedule ExecutionSchedule, est
 		b.WriteString("───────\n")
 		for _, blocked := range schedule.Blocked {
 			waitFor := strings.Join(blocked.WaitFor, ", ")
-			fmt.Fprintf(&b, "%s waits for %s\n", blocked.NodeID, waitFor)
+			_, _ = fmt.Fprintf(&b, "%s waits for %s\n", blocked.NodeID, waitFor)
 		}
 	}
 

@@ -130,7 +130,7 @@ func Render(vm ViewModel) string {
 	} else {
 		b.WriteString("Metrics    n/a\n")
 	}
-	b.WriteString(fmt.Sprintf("Trust      %.0f%%\n", selected.TrustScore*100))
+	fmt.Fprintf(&b, "Trust      %.0f%%\n", selected.TrustScore*100)
 	b.WriteString("Risk       " + value(selected.Risk, "unknown") + "\n")
 	b.WriteString("\nKeys: ↑↓ select step  Enter open\n")
 	if vm.ShowCLI {

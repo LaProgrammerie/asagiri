@@ -22,13 +22,13 @@ type ImpactRequest struct {
 
 // ImpactReport summarises blast radius for a proposed change.
 type ImpactReport struct {
-	ID        string    `json:"id"`
-	CreatedAt time.Time `json:"created_at"`
+	ID        string        `json:"id"`
+	CreatedAt time.Time     `json:"created_at"`
 	Request   ImpactRequest `json:"request"`
-	Affected  []string  `json:"affected_files"`
-	Flows     []string  `json:"related_flows"`
-	Contracts []string  `json:"related_contracts"`
-	Risks     []string  `json:"risks"`
+	Affected  []string      `json:"affected_files"`
+	Flows     []string      `json:"related_flows"`
+	Contracts []string      `json:"related_contracts"`
+	Risks     []string      `json:"risks"`
 }
 
 // RunImpact performs local impact analysis without cloud calls.
@@ -105,8 +105,8 @@ func WriteImpactReport(repoRoot string, rep ImpactReport) (string, error) {
 	path := filepath.Join(dir, "impact-report.md")
 	var b strings.Builder
 	b.WriteString("# Impact Analysis\n\n")
-	b.WriteString(fmt.Sprintf("- Flow: %s\n", rep.Request.Flow))
-	b.WriteString(fmt.Sprintf("- Change: %s\n", rep.Request.Change))
+	fmt.Fprintf(&b, "- Flow: %s\n", rep.Request.Flow)
+	fmt.Fprintf(&b, "- Change: %s\n", rep.Request.Change)
 	b.WriteString("\n## Affected files\n\n")
 	for _, f := range rep.Affected {
 		b.WriteString("- " + f + "\n")

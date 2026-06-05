@@ -166,7 +166,7 @@ func countActiveSessions(repoRoot string) int {
 	if err != nil {
 		return 0
 	}
-	defer store.Close()
+	defer func() { _ = store.Close() }()
 	sessions, err := store.ListSessions()
 	if err != nil {
 		return 0
@@ -188,7 +188,7 @@ func emitGraphRollbackEvent(repoRoot, graphID string, nodes int) {
 	if err != nil {
 		return
 	}
-	defer store.Close()
+	defer func() { _ = store.Close() }()
 	emitter := &runtime.GraphEmitter{Store: store}
 	_ = emitter.Emit(runtime.EventGraphBlocked, graphID, "", map[string]any{
 		"action": "rollback",

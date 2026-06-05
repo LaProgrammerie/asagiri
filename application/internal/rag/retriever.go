@@ -76,7 +76,7 @@ func (r *Retriever) searchKeyword(query string, limit int) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 	var paths []string
 	for rows.Next() {
 		var p string
@@ -99,7 +99,7 @@ func (r *Retriever) searchSemantic(ctx context.Context, query string, limit int)
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	type scored struct {
 		path  string

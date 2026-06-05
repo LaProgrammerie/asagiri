@@ -21,9 +21,9 @@ type ShellContext struct {
 	Online       bool
 }
 
-// renderEOSCenterHeader builds a strong two-line header: brand + section on the
-// first line with the step pill, and the current step title on the second.
-func renderEOSCenterHeader(st theme.Styles, step onbdomain.WizardStep, idx, total, innerW int) string {
+// renderEOSCenterHeader builds the wizard header: brand + onboarding subtitle and
+// the step pill. The step name is not repeated here (FR-5.3: pill only).
+func renderEOSCenterHeader(st theme.Styles, _ onbdomain.WizardStep, idx, total, innerW int) string {
 	brand := st.Brand.Render("ASAGIRI")
 	subtitle := st.Muted.Render("Project Onboarding")
 	left := brand + "  " + subtitle
@@ -32,9 +32,7 @@ func renderEOSCenterHeader(st theme.Styles, step onbdomain.WizardStep, idx, tota
 	if gap < 1 {
 		gap = 1
 	}
-	line1 := left + strings.Repeat(" ", gap) + pill
-	line2 := st.HeroTitle.Render(strings.ToUpper(StepLabel(step)))
-	return line1 + "\n" + line2
+	return left + strings.Repeat(" ", gap) + pill
 }
 
 func renderEOSStepContent(vm ViewModel, st theme.Styles, boxW int) string {
@@ -58,39 +56,6 @@ func welcomeChecklist() []string {
 		"Créer spec Kiro initiale",
 		"Évaluer la readiness",
 	}
-}
-
-func renderStepper(step onbdomain.WizardStep, st theme.Styles, w int) string {
-	return renderStepperVisual(step, st, w)
-}
-
-func wizardStepLabels() []string {
-	out := make([]string, len(onbdomain.TUIStepOrder))
-	for i, s := range onbdomain.TUIStepOrder {
-		out[i] = StepLabel(s)
-	}
-	return out
-}
-
-func renderStepperCompact(active int, st theme.Styles, w int) string {
-	var parts []string
-	for i := range onbdomain.TUIStepOrder {
-		n := fmt.Sprintf("%d", i+1)
-		switch {
-		case i == active:
-			parts = append(parts, st.PanelTitle.Render(n))
-		case i < active:
-			parts = append(parts, st.Success.Render(n))
-		default:
-			parts = append(parts, st.Muted.Render(n))
-		}
-	}
-	sep := st.Muted.Render("─")
-	line := strings.Join(parts, sep)
-	if lipgloss.Width(line) > w {
-		line = st.Muted.Render(fmt.Sprintf("Étape %d / %d", active+1, len(onbdomain.TUIStepOrder)))
-	}
-	return line
 }
 
 func renderEOSFooter(m Model, st theme.Styles, w int) string {
@@ -144,43 +109,6 @@ func lineCount(s string) int {
 		return 0
 	}
 	return len(strings.Split(strings.TrimRight(s, "\n"), "\n"))
-}
-
-func nextStepTitle(step onbdomain.WizardStep) string {
-	idx := stepIndex(step)
-	order := onbdomain.TUIStepOrder
-	if idx+1 >= len(order) {
-		return "Application finale"
-	}
-	return StepLabel(order[idx+1])
-}
-
-func nextStepDesc(step onbdomain.WizardStep) string {
-	switch step {
-	case onbdomain.StepWelcome:
-		return "Configuration du projet (nom, branche, tagline)."
-	case onbdomain.StepProject:
-		return "Détection et validation de la stack."
-	case onbdomain.StepStack:
-		return "Agents par défaut et reviewer."
-	case onbdomain.StepAgents:
-		return "Bootstrap docs/ai/ canon."
-	case onbdomain.StepDocs:
-		return "Première feature Kiro."
-	case onbdomain.StepFeature:
-		return "Récapitulatif et application."
-	case onbdomain.StepReview:
-		return "Score readiness et corrections auto."
-	default:
-		return ""
-	}
-}
-
-func fieldOr(m Model, key, fallback string) string {
-	if v := strings.TrimSpace(m.Fields[key]); v != "" {
-		return v
-	}
-	return fallback
 }
 
 func fallbackStr(values ...string) string {

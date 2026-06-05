@@ -40,7 +40,7 @@ func newContinueCmd(dryRun *bool) *cobra.Command {
 				}
 			}
 			if feature == "" {
-				fmt.Fprintln(cmd.OutOrStdout(), "Aucune feature à reprendre. Utilisez: asa inbox")
+				_, _ = fmt.Fprintln(cmd.OutOrStdout(), "Aucune feature à reprendre. Utilisez: asa inbox")
 				return nil
 			}
 

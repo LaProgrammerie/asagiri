@@ -167,7 +167,7 @@ func RenderEventFeed(vm EventFeedViewModel) string {
 	if vm.Focused {
 		focus = " [focused]"
 	}
-	b.WriteString(fmt.Sprintf("Filter: %s  Search: %s  [%s]%s\n", filter, search, mode, focus))
+	fmt.Fprintf(&b, "Filter: %s  Search: %s  [%s]%s\n", filter, search, mode, focus)
 	if vm.ShowCLIHints {
 		b.WriteString("Keys: f filter  / search  p pause  x export  o open  e focus  ↑↓ select\n")
 		b.WriteString("CLI: asa runtime events --type <filter> --search <query> --export\n")
@@ -195,10 +195,10 @@ func RenderEventFeed(vm EventFeedViewModel) string {
 		if idx == cursor && vm.Focused {
 			prefix = ">"
 		}
-		b.WriteString(fmt.Sprintf("%s %s  %s\n", prefix, ev.CreatedAt.Format("15:04:05"), ev.Type))
+		fmt.Fprintf(&b, "%s %s  %s\n", prefix, ev.CreatedAt.Format("15:04:05"), ev.Type)
 	}
 	if win.Total > win.Limit {
-		b.WriteString(fmt.Sprintf("… %d more (virtual)\n", win.Total-win.Limit))
+		fmt.Fprintf(&b, "… %d more (virtual)\n", win.Total-win.Limit)
 	}
 	count := len(visible)
 	if count == 0 {

@@ -233,10 +233,6 @@ func listIncidentEdges(ctx context.Context, store GraphStore, nodeID string) ([]
 	return append(out, in...), nil
 }
 
-func scopeFromNodes(nodes []GraphNode) FlowScopeResult {
-	return scopeFromNodesWithEdges(nodes, nil)
-}
-
 func scopeFromNodesWithEdges(nodes []GraphNode, edges []GraphEdge) FlowScopeResult {
 	var result FlowScopeResult
 	fileSet := map[string]struct{}{}
