@@ -185,3 +185,67 @@ func min(a, b int) int {
 	}
 	return b
 }
+
+// CostEfficiencyCard renders the Local-First AI Orchestration efficiency summary.
+// Savings section is omitted when PremiumReferenceModel is empty.
+func CostEfficiencyCard(eff bus.CostEfficiencySnapshot) string {
+	cur := eff.Currency
+	if cur == "" {
+		cur = "EUR"
+	}
+	lines := []string{
+		fmt.Sprintf("Actual spend:       %s", fmtCents(eff.ActualCostCents, cur)),
+	}
+	if eff.PremiumReferenceModel != "" {
+		lines = append(lines,
+			fmt.Sprintf("Premium equiv:      %s  (vs %s)", fmtCents(eff.PremiumEquivCents, cur), eff.PremiumReferenceModel),
+			fmt.Sprintf("Savings:            %s  (%.1f%%)", fmtCents(eff.SavingsCents, cur), eff.SavingsRate*100),
+		)
+	}
+	lines = append(lines,
+		"",
+		fmt.Sprintf("Local-first:        %.0f%%", eff.LocalPct),
+		fmt.Sprintf("Cloud/premium:      %.0f%%", eff.CloudPct),
+		fmt.Sprintf("Strategy score:     %s", scoreLabel(eff.StrategyScore)),
+	)
+	if eff.TotalSteps > 0 {
+		lines = append(lines,
+			"",
+			fmt.Sprintf("Steps total:        %d", eff.TotalSteps),
+			fmt.Sprintf("Local (no cost):    %d", eff.LocalSteps),
+			fmt.Sprintf("Premium escalations:%d  (%.0f%%)", eff.PremiumEscalations, eff.EscalationRate*100),
+		)
+	}
+	return strings.Join(lines, "\n")
+}
+
+func fmtCents(cents int64, currency string) string {
+	sym := "€"
+	switch currency {
+	case "USD":
+		sym = "$"
+	case "GBP":
+		sym = "£"
+	}
+	neg := ""
+	if cents < 0 {
+		neg = "-"
+		cents = -cents
+	}
+	return fmt.Sprintf("%s%s%d.%02d", neg, sym, cents/100, cents%100)
+}
+
+func scoreLabel(grade string) string {
+	switch grade {
+	case "A":
+		return "A — strong local-first"
+	case "B":
+		return "B — balanced"
+	case "C":
+		return "C — cloud-heavy"
+	case "D":
+		return "D — almost all premium"
+	default:
+		return "? — no data"
+	}
+}

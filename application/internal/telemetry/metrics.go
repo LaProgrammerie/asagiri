@@ -47,3 +47,11 @@ type DurationSample struct {
 	Local    bool
 	Duration time.Duration
 }
+
+// StepTokenTotals aggregates token usage split by local/cloud steps for savings computation.
+type StepTokenTotals struct {
+	LocalInputTokens  int64
+	LocalOutputTokens int64
+	CloudInputTokens  int64
+	CloudOutputTokens int64
+}

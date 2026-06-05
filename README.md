@@ -106,6 +106,69 @@ asa work "my feature" --plan-only --yes
 
 ---
 
+## Local-First AI Orchestration
+
+Asagiri routes tasks to the cheapest capable model and escalates to premium only when necessary.
+
+### Cost intelligence
+
+```bash
+asa cost report          # actual spend + local/cloud ratio + savings (if baseline configured)
+asa cost trends          # evolution over two 15-day windows
+```
+
+**Without baseline:**
+```
+Local / cheap:   78% (82,000 tokens) — no LLM cost
+Cloud / premium: 22% (23,000 tokens)
+Strategy score:  A — strong local-first routing
+```
+
+**With `pricing.premium_reference_model: "gpt-4o"` in config.yaml:**
+```
+Savings (vs gpt-4o)
+Premium equivalent: €4.90
+Savings:            €4.48
+Savings rate:       91.4%
+```
+
+### Agent Strategy Score
+
+| Grade | Local token % | Meaning |
+|-------|--------------|---------|
+| A | ≥ 70% | Strong local-first |
+| B | 50–70% | Balanced, room to improve |
+| C | 30–50% | Cloud-heavy |
+| D | < 30% | Almost all premium |
+
+Score is computed from `step_metrics.local` — no heuristics, no ML.
+
+### Escalation metrics
+
+```
+Steps total:         42
+Local (no cost):     39
+Premium escalations: 3   (7%)
+```
+
+"Premium escalation" = any step that ran on a cloud model. Asagiri aims to minimize this.
+
+### Configuration
+
+```yaml
+pricing:
+  premium_reference_model: "gpt-4o"  # optional — enables savings computation
+  models:
+    gpt-4o:
+      input_per_1m_tokens: 5.0
+      output_per_1m_tokens: 15.0
+```
+
+Without `premium_reference_model`, only local/cloud ratio and strategy score are shown.
+No baseline is invented by default.
+
+---
+
 ## Advanced Tools
 
 ```bash

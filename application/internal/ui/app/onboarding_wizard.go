@@ -82,6 +82,7 @@ func wizardFromResult(res bus.OnboardingWizardResult, mouse bool) onboardscreen.
 	form.DetectedStacks = res.DetectedStacks
 	form.SkippedFields = res.SkippedFields
 	form.Errors = res.Errors
+	form.HasAsagiriConfig = res.HasAsagiriConfig
 	return onboardscreen.NewModelFromForm(form, mouse)
 }
 

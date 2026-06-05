@@ -365,6 +365,26 @@ type PrototypePipelineResult struct {
 	Warning          string
 }
 
+
+// CostEfficiencySnapshot is the cost intelligence summary for dashboard display.
+// All fields are zero/empty when no metrics data is available.
+// PremiumEquivCents and SavingsCents are zero when PremiumReferenceModel is empty.
+type CostEfficiencySnapshot struct {
+	ActualCostCents     int64
+	PremiumEquivCents   int64  // 0 when no reference model configured
+	SavingsCents        int64  // 0 when no reference model configured
+	SavingsRate         float64 // 0..1
+	LocalPct            float64 // 0..100, fraction of tokens processed locally
+	CloudPct            float64 // 0..100
+	StrategyScore       string  // "A", "B", "C", "D", or "?"
+	EscalationRate      float64 // 0..1
+	LocalSteps          int
+	PremiumEscalations  int
+	TotalSteps          int
+	PremiumReferenceModel string // empty = no baseline
+	Currency             string
+}
+
 // MissionControlSnapshotResult aggregates lot-2 Mission/Dashboard data.
 type MissionControlSnapshotResult struct {
 	Workspace     string
@@ -386,6 +406,7 @@ type MissionControlSnapshotResult struct {
 	Prototype     PrototypePipelineResult
 	CostTodayEUR       float64
 	CostMonthEUR       float64
+	CostEfficiency     CostEfficiencySnapshot
 	RecommendedActions []RecommendedAction
 	Readiness          ReadinessResult
 	UpdatedAt          time.Time
@@ -459,6 +480,7 @@ type OnboardingWizardResult struct {
 	DetectedStacks    []string
 	Errors            map[string]string
 	SkippedFields     []string
+	HasAsagiriConfig  bool
 }
 
 // GetReadinessQuery loads project readiness report.

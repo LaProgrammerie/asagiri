@@ -2,6 +2,7 @@ package bus
 
 import (
 	"context"
+	"time"
 
 	"github.com/LaProgrammerie/asagiri/application/internal/config"
 	"github.com/LaProgrammerie/asagiri/application/internal/env"
@@ -25,6 +26,12 @@ type stateStore interface {
 	GetRun(id string) (*sqlite.Run, error)
 	ListTasksByRun(runID string) ([]sqlite.Task, error)
 	GetRunMetric(runID string) (*telemetry.RunMetric, error)
+	QuerySince(ctx context.Context, since time.Time) ([]telemetry.RunMetric, error)
+	SummarizeStepsSince(ctx context.Context, since time.Time) (telemetry.StepTotals, error)
+	QueryStepTokens(ctx context.Context, since time.Time) (telemetry.StepTokenTotals, error)
+	QueryRunsBetween(ctx context.Context, since, until time.Time) ([]telemetry.RunMetric, error)
+	SummarizeStepsBetween(ctx context.Context, since, until time.Time) (telemetry.StepTotals, error)
+	QueryStepTokensBetween(ctx context.Context, since, until time.Time) (telemetry.StepTokenTotals, error)
 }
 
 type startWorkHandler func(ctx context.Context, deps Deps, cmd StartWorkCommand) (CommandResult, error)

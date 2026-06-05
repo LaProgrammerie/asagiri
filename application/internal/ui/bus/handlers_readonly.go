@@ -11,7 +11,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/LaProgrammerie/asagiri/application/internal/cost"
 	"github.com/LaProgrammerie/asagiri/application/internal/executiongraph"
+	"github.com/LaProgrammerie/asagiri/application/internal/telemetry"
 	"github.com/LaProgrammerie/asagiri/application/internal/knowledge"
 	"github.com/LaProgrammerie/asagiri/application/internal/product"
 	"github.com/LaProgrammerie/asagiri/application/internal/replay"
@@ -1077,6 +1079,42 @@ func (b *queryBus) handleGetMissionControlSnapshot(ctx context.Context, q GetMis
 		prototypeRes.Warning,
 	)
 	costToday, costMonth := deriveCosts(eventsRes.Events)
+
+	// Cost efficiency snapshot — 7-day window; gracefully degrades on errors.
+	var efficiencySnap CostEfficiencySnapshot
+	if effStore, errEff := b.deps.StateOpen(b.deps.StateDBPath); errEff == nil {
+		_ = effStore.Migrate()
+		sinceEff := time.Now().AddDate(0, 0, -7)
+		if tokens, err := effStore.QueryStepTokens(ctx, sinceEff); err == nil {
+			if steps, err := effStore.SummarizeStepsSince(ctx, sinceEff); err == nil {
+				if runs, err := effStore.QuerySince(ctx, sinceEff); err == nil {
+					tot := telemetry.SummarizeRuns(runs)
+					actualCents := int64(0)
+					for _, r := range runs {
+						actualCents += r.ActualCostCents
+					}
+					cTot := telemetry.CostTotals{RunCount: tot.RunCount, ActualCostCents: actualCents}
+					w := cost.BuildWindowReport("7d", cTot, tokens, steps, b.deps.Config)
+					efficiencySnap = CostEfficiencySnapshot{
+						ActualCostCents:       w.ActualCostCents,
+						PremiumEquivCents:     w.Savings.PremiumEquivCents,
+						SavingsCents:          w.Savings.SavingsCents,
+						SavingsRate:           w.Savings.SavingsRate,
+						LocalPct:              w.Savings.LocalPct(),
+						CloudPct:              100 - w.Savings.LocalPct(),
+						StrategyScore:         w.Strategy.Grade,
+						EscalationRate:        w.Escalations.EscalationRate,
+						LocalSteps:            w.Escalations.LocalSteps,
+						PremiumEscalations:    w.Escalations.PremiumEscalations,
+						TotalSteps:            w.Escalations.TotalSteps,
+						PremiumReferenceModel: w.Savings.PremiumReferenceModel,
+						Currency:              w.Savings.Currency,
+					}
+				}
+			}
+		}
+		_ = effStore.Close()
+	}
 	workspace := filepath.Base(b.deps.RepoRoot)
 	branch := "-"
 	if len(runsRes.Runs) > 0 && runsRes.Runs[0].Feature != "" {
@@ -1106,6 +1144,7 @@ func (b *queryBus) handleGetMissionControlSnapshot(ctx context.Context, q GetMis
 		Prototype:          prototypeRes,
 		CostTodayEUR:       costToday,
 		CostMonthEUR:       costMonth,
+		CostEfficiency:     efficiencySnap,
 		RecommendedActions: recommendedRes.Actions,
 		Readiness:          readinessRes,
 		UpdatedAt:          time.Now().UTC(),

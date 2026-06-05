@@ -12,6 +12,10 @@ const (
 	DefaultAgentEnrich   = "ollama"
 )
 
+// DefaultPremiumReferenceModel is intentionally empty: no baseline invented by default.
+// Users must explicitly set pricing.premium_reference_model in config.yaml to enable savings.
+const DefaultPremiumReferenceModel = ""
+
 
 // IsTemplateDefaultProjectName reports whether the project name is unset or still the template default.
 func IsTemplateDefaultProjectName(name string) bool {

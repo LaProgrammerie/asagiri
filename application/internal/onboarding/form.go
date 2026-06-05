@@ -30,6 +30,7 @@ type Form struct {
 	KnownAgentKeys    []string
 	Errors            map[string]string
 	SkippedFields     []string
+	HasAsagiriConfig  bool // true when a real .asagiri/config.yaml was loaded
 }
 
 // TUIStepOrder is the interactive wizard flow (review then apply via command).
@@ -56,6 +57,7 @@ func BuildForm(repoRoot string, st State, cfg *config.Config) Form {
 	form.Answers = MergeAnswers(State{Answers: form.Answers}, Options{}, repoRoot).Answers
 
 	if cfg != nil {
+		form.HasAsagiriConfig = !config.IsTemplateDefaultProjectName(cfg.Project.Name) || cfg.Work.DefaultAgent != ""
 		form = overlayConfig(form, cfg)
 		form.Advanced = advancedFromConfig(cfg)
 	}

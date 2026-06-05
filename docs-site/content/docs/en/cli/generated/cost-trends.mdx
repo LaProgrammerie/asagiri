@@ -1,20 +1,20 @@
 ---
-title: Cost Models · Asagiri CLI
-description: Lister modèles et pricing configurés
+title: Cost Trends · Asagiri CLI
+description: 'Compare deux fenêtres strictement disjointes : J-30→J-15 (précédente) et J-15→maintenant (actuelle).'
 ---
 
-CLI path: **`asa cost models`**
+CLI path: **`asa cost trends`**
 
 ## When to use
 
 Use **cost** when reconciling SQLite-backed telemetry with pricing tables declared in **.asagiri/config.yaml** or when slicing spend over a bounded recency window.
 
-> Original CLI synopsis: Lister modèles et pricing configurés
+> Original CLI synopsis: Évolution de l'efficience sur deux fenêtres disjointes
 
 ## Usage
 
 ```bash
-asa cost models [flags]
+asa cost trends [flags]
 ```
 
 ## Options
@@ -26,14 +26,14 @@ asa cost models [flags]
 ## Examples
 
 ```bash
-asa cost models
+asa cost trends
 ```
 
 > Wire richer samples through **cobra.Command.Example** when the happy path warrants copy/paste-friendly automation beyond this scaffold.
 
 ## What happens internally
 
-- Streams configured pricing slabs and YAML-defined model mappings to stdout strictly for auditing; no datastore mutation occurs during display.
+- Focuses on interpreting persisted telemetry and declared pricing artefacts for finance debugging.
 
 ## Failure modes
 
@@ -44,5 +44,5 @@ asa cost models
 
 ## Related commands
 
+- [Cost Models](./cost-models.mdx)
 - [Cost Report](./cost-report.mdx)
-- [Cost Trends](./cost-trends.mdx)

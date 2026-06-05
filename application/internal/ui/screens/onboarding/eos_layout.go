@@ -74,7 +74,7 @@ func renderEOSFooter(m Model, st theme.Styles, w int) string {
 	next := st.RenderButton(nextLabel, nextFocused)
 	buttons := prev + "  " + next
 	if m.Step != onbdomain.StepWelcome {
-		adv := st.RenderButton("Advanced", m.FocusFooter == FooterAdvanced && m.ShowAdvanced)
+		adv := st.RenderButton(advancedButtonLabel(m), m.FocusFooter == FooterAdvanced && m.ShowAdvanced)
 		buttons += "  " + adv
 	}
 	gap := w - lipgloss.Width(buttons)

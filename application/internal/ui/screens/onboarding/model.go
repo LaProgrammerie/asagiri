@@ -52,6 +52,8 @@ type Model struct {
 	MouseEnabled      bool
 	Initialized       bool
 	AgentChoices      []string
+	ExistingConfig    bool     // true when .asagiri/config.yaml already exists
+	ArtefactsPreview  []string // files that will be created on Apply
 	fieldRows         []FieldDef
 }
 
@@ -79,6 +81,8 @@ func NewModelFromForm(form onbdomain.Form, mouseEnabled bool) Model {
 	m.MouseEnabled = mouseEnabled
 	m.Initialized = true
 	m.AgentChoices = append([]string(nil), form.KnownAgentKeys...)
+	m.ExistingConfig = form.HasAsagiriConfig
+	m.ArtefactsPreview = defaultArtefactsPreview(form.Answers.FeatureSlug)
 	m.RefreshFieldRows()
 	return m
 }
@@ -95,6 +99,8 @@ func (m *Model) SyncForm(form onbdomain.Form) {
 		m.Errors = form.Errors
 	}
 	m.AgentChoices = append([]string(nil), form.KnownAgentKeys...)
+	m.ExistingConfig = form.HasAsagiriConfig
+	m.ArtefactsPreview = defaultArtefactsPreview(form.Answers.FeatureSlug)
 	m.RefreshFieldRows()
 }
 
@@ -605,4 +611,29 @@ func StepProgress(step onbdomain.WizardStep) string {
 		return ""
 	}
 	return fmt.Sprintf("%d/%d", idx+1, len(onbdomain.TUIStepOrder))
+}
+
+// defaultArtefactsPreview returns the list of files that will be created on Apply.
+func defaultArtefactsPreview(featureSlug string) []string {
+	artefacts := []string{
+		".asagiri/config.yaml",
+		"docs/ai/",
+		"docs/ai/01-product.md",
+		"docs/ai/02-architecture.md",
+	}
+	if slug := strings.TrimSpace(featureSlug); slug != "" {
+		artefacts = append(artefacts, ".kiro/specs/"+slug+"/")
+		artefacts = append(artefacts, ".kiro/specs/"+slug+"/requirements.md")
+	}
+	return artefacts
+}
+
+// advancedButtonLabel returns the footer label for the Advanced toggle,
+// showing the parameter count and open/closed state.
+func advancedButtonLabel(m Model) string {
+	const nParams = 6 // work_stop_after, budget, verification, coordination, theme, mcp
+	if m.ShowAdvanced {
+		return fmt.Sprintf("Mode expert (%d) ▼", nParams)
+	}
+	return fmt.Sprintf("Mode expert (%d)", nParams)
 }

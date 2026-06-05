@@ -203,8 +203,9 @@ type BudgetPolicies struct {
 
 // PricingConfig holds per-provider model token prices; no hardcoded defaults (specv3 §6.1).
 type PricingConfig struct {
-	Currency string                  `yaml:"currency"`
-	Models   map[string]ModelPricing `yaml:"models"`
+	Currency              string                  `yaml:"currency"`
+	Models                map[string]ModelPricing `yaml:"models"`
+	PremiumReferenceModel string                  `yaml:"premium_reference_model"` // optional: enables savings computation
 }
 
 // ModelPricing is price sheet entry for a cloud model id (key = model name as used by API).

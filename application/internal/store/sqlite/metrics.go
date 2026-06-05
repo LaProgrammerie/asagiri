@@ -396,3 +396,107 @@ func (s *Store) DurationSamples(stepName, model string, limit int) ([]time.Durat
 
 // Compile-time check: Store implements telemetry.MetricsStore.
 var _ telemetry.MetricsStore = (*Store)(nil)
+
+// QueryStepTokens returns token totals split by local/cloud for savings computation.
+// Uses existing step_metrics data — no schema change required.
+func (s *Store) QueryStepTokens(ctx context.Context, since time.Time) (telemetry.StepTokenTotals, error) {
+	_ = ctx
+	sinceStr := timeToText(since)
+	var t telemetry.StepTokenTotals
+	var li, lo, ci, co sql.NullInt64
+	err := s.db.QueryRow(
+		`SELECT
+		   COALESCE(SUM(CASE WHEN sm.local = 1 THEN sm.actual_input_tokens  ELSE 0 END), 0),
+		   COALESCE(SUM(CASE WHEN sm.local = 1 THEN sm.actual_output_tokens ELSE 0 END), 0),
+		   COALESCE(SUM(CASE WHEN sm.local = 0 THEN sm.actual_input_tokens  ELSE 0 END), 0),
+		   COALESCE(SUM(CASE WHEN sm.local = 0 THEN sm.actual_output_tokens ELSE 0 END), 0)
+		 FROM step_metrics sm
+		 JOIN run_metrics rm ON sm.run_id = rm.run_id
+		 WHERE rm.started_at IS NOT NULL AND rm.started_at >= ?`,
+		sinceStr,
+	).Scan(&li, &lo, &ci, &co)
+	if err != nil {
+		return t, fmt.Errorf("query step tokens: %w", err)
+	}
+	t.LocalInputTokens = li.Int64
+	t.LocalOutputTokens = lo.Int64
+	t.CloudInputTokens = ci.Int64
+	t.CloudOutputTokens = co.Int64
+	return t, nil
+}
+
+// QueryRunsBetween lists run_metrics with started_at in [since, until).
+// Bounds: started_at >= since AND started_at < until.
+func (s *Store) QueryRunsBetween(ctx context.Context, since, until time.Time) ([]telemetry.RunMetric, error) {
+	_ = ctx
+	rows, err := s.db.Query(
+		`SELECT run_id, feature, task_id, started_at, finished_at,
+			estimated_input_tokens, estimated_output_tokens,
+			actual_input_tokens, actual_output_tokens,
+			estimated_cost_cents, actual_cost_cents,
+			estimated_duration_ms, actual_duration_ms, status
+		 FROM run_metrics
+		 WHERE started_at IS NOT NULL AND started_at >= ? AND started_at < ?
+		 ORDER BY started_at DESC`,
+		timeToText(since), timeToText(until),
+	)
+	if err != nil {
+		return nil, fmt.Errorf("query runs between: %w", err)
+	}
+	defer func() { _ = rows.Close() }()
+	return scanRunMetrics(rows)
+}
+
+// SummarizeStepsBetween aggregates step_metrics for runs in [since, until).
+// Bounds: rm.started_at >= since AND rm.started_at < until.
+func (s *Store) SummarizeStepsBetween(ctx context.Context, since, until time.Time) (telemetry.StepTotals, error) {
+	_ = ctx
+	var t telemetry.StepTotals
+	sinceStr, untilStr := timeToText(since), timeToText(until)
+	row := s.db.QueryRow(
+		`SELECT COUNT(*),
+		 SUM(CASE WHEN local = 1 THEN 1 ELSE 0 END),
+		 SUM(CASE WHEN local = 0 THEN 1 ELSE 0 END)
+		 FROM step_metrics
+		 WHERE id IN (
+		   SELECT sm.id FROM step_metrics sm
+		   JOIN run_metrics rm ON sm.run_id = rm.run_id
+		   WHERE rm.started_at IS NOT NULL AND rm.started_at >= ? AND rm.started_at < ?
+		 )`,
+		sinceStr, untilStr,
+	)
+	var local, cloud sql.NullInt64
+	if err := row.Scan(&t.StepCount, &local, &cloud); err != nil {
+		return t, fmt.Errorf("summarize steps between: %w", err)
+	}
+	t.LocalSteps = int(local.Int64)
+	t.CloudSteps = int(cloud.Int64)
+	return t, nil
+}
+
+// QueryStepTokensBetween returns token totals for runs in [since, until).
+// Bounds: rm.started_at >= since AND rm.started_at < until.
+func (s *Store) QueryStepTokensBetween(ctx context.Context, since, until time.Time) (telemetry.StepTokenTotals, error) {
+	_ = ctx
+	var t telemetry.StepTokenTotals
+	var li, lo, ci, co sql.NullInt64
+	err := s.db.QueryRow(
+		`SELECT
+		   COALESCE(SUM(CASE WHEN sm.local = 1 THEN sm.actual_input_tokens  ELSE 0 END), 0),
+		   COALESCE(SUM(CASE WHEN sm.local = 1 THEN sm.actual_output_tokens ELSE 0 END), 0),
+		   COALESCE(SUM(CASE WHEN sm.local = 0 THEN sm.actual_input_tokens  ELSE 0 END), 0),
+		   COALESCE(SUM(CASE WHEN sm.local = 0 THEN sm.actual_output_tokens ELSE 0 END), 0)
+		 FROM step_metrics sm
+		 JOIN run_metrics rm ON sm.run_id = rm.run_id
+		 WHERE rm.started_at IS NOT NULL AND rm.started_at >= ? AND rm.started_at < ?`,
+		timeToText(since), timeToText(until),
+	).Scan(&li, &lo, &ci, &co)
+	if err != nil {
+		return t, fmt.Errorf("query step tokens between: %w", err)
+	}
+	t.LocalInputTokens = li.Int64
+	t.LocalOutputTokens = lo.Int64
+	t.CloudInputTokens = ci.Int64
+	t.CloudOutputTokens = co.Int64
+	return t, nil
+}

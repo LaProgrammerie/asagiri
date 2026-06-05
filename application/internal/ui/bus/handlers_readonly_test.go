@@ -107,6 +107,30 @@ func (m *mockStateStore) ListTasksByRun(runID string) ([]sqlite.Task, error) {
 func (m *mockStateStore) GetRunMetric(runID string) (*telemetry.RunMetric, error) {
 	return m.metric, nil
 }
+func (m *mockStateStore) QuerySince(_ context.Context, _ time.Time) ([]telemetry.RunMetric, error) {
+	return nil, nil
+}
+
+func (m *mockStateStore) SummarizeStepsSince(_ context.Context, _ time.Time) (telemetry.StepTotals, error) {
+	return telemetry.StepTotals{}, nil
+}
+
+func (m *mockStateStore) QueryStepTokens(_ context.Context, _ time.Time) (telemetry.StepTokenTotals, error) {
+	return telemetry.StepTokenTotals{}, nil
+}
+
+func (m *mockStateStore) QueryRunsBetween(_ context.Context, _, _ time.Time) ([]telemetry.RunMetric, error) {
+	return nil, nil
+}
+
+func (m *mockStateStore) SummarizeStepsBetween(_ context.Context, _, _ time.Time) (telemetry.StepTotals, error) {
+	return telemetry.StepTotals{}, nil
+}
+
+func (m *mockStateStore) QueryStepTokensBetween(_ context.Context, _, _ time.Time) (telemetry.StepTokenTotals, error) {
+	return telemetry.StepTokenTotals{}, nil
+}
+
 
 func TestQueryBusRuntimeStatusOpenFailureReturnsWarning(t *testing.T) {
 	t.Parallel()

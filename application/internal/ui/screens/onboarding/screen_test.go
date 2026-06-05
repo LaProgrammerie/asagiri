@@ -193,3 +193,121 @@ func TestRenderWizardFullscreen(t *testing.T) {
 	require.Contains(t, got, "chatbot")
 	require.NotContains(t, got, "Screen: onboarding")
 }
+
+func TestExistingConfigDetectedInWelcomeStep(t *testing.T) {
+	// HasAsagiriConfig comes from the domain Form — simulate a repo with existing config
+	m := onboarding.NewModelFromForm(onbdomain.Form{
+		Step:             onbdomain.StepWelcome,
+		HasAsagiriConfig: true,
+		Answers: onbdomain.Answers{
+			ProjectName:   "myapp",
+			DefaultBranch: "main",
+		},
+	}, false)
+	require.True(t, m.ExistingConfig, "ExistingConfig should mirror Form.HasAsagiriConfig")
+	got := onboarding.Render(onboarding.ViewModel{Model: m})
+	require.Contains(t, got, "détectée")
+}
+
+func TestProjectStepShowsDetectionBlock(t *testing.T) {
+	m := onboarding.NewModelFromForm(onbdomain.Form{
+		Step:           onbdomain.StepProject,
+		DetectedStacks: []string{"go", "node"},
+		Answers: onbdomain.Answers{
+			ProjectName:   "chatbot",
+			DefaultBranch: "main",
+		},
+	}, false)
+	got := onboarding.Render(onboarding.ViewModel{Model: m})
+	require.Contains(t, got, "DÉTECTÉ")
+	require.Contains(t, got, "go")
+}
+
+func TestStackStepShowsCapabilities(t *testing.T) {
+	m := onboarding.NewModelFromForm(onbdomain.Form{
+		Step:              onbdomain.StepStack,
+		DetectedStacks:    []string{"go"},
+		ValidationPreview: []string{"go test: go test ./... (required)"},
+		Answers:           onbdomain.Answers{Stack: "go"},
+	}, false)
+	got := onboarding.Render(onboarding.ViewModel{Model: m, WizardMode: true, FullScreen: true, Width: 120, Height: 40, Theme: theme.Default()})
+	require.Contains(t, got, "VALIDATIONS ACTIVÉES")
+	require.Contains(t, got, "CAPACITÉS ACTIVÉES")
+}
+
+func TestAgentsStepShowsPipeline(t *testing.T) {
+	m := onboarding.NewModelFromForm(onbdomain.Form{
+		Step: onbdomain.StepAgents,
+		Answers: onbdomain.Answers{
+			DefaultSpecAgent: "kiro",
+			DefaultEnricher:  "ollama",
+			DefaultAgent:     "cursor",
+			DefaultReviewer:  "codex",
+		},
+	}, false)
+	got := onboarding.Render(onboarding.ViewModel{Model: m, WizardMode: true, FullScreen: true, Width: 120, Height: 40, Theme: theme.Default()})
+	require.Contains(t, got, "PIPELINE GÉNÉRÉ")
+	require.Contains(t, got, "kiro")
+	require.Contains(t, got, "cursor")
+}
+
+func TestFeatureStepShowsPathPreview(t *testing.T) {
+	m := onboarding.NewModelFromForm(onbdomain.Form{
+		Step:    onbdomain.StepFeature,
+		Answers: onbdomain.Answers{FeatureSlug: "stripe-mvp"},
+	}, false)
+	got := onboarding.Render(onboarding.ViewModel{Model: m, WizardMode: true, FullScreen: true, Width: 120, Height: 40, Theme: theme.Default()})
+	require.Contains(t, got, ".kiro/specs/stripe-mvp/")
+}
+
+func TestReviewStepShowsArtefacts(t *testing.T) {
+	m := onboarding.NewModelFromForm(onbdomain.Form{
+		Step:    onbdomain.StepReview,
+		Answers: onbdomain.Answers{ProjectName: "chatbot", DefaultBranch: "main", Stack: "go", FeatureSlug: "chatbot-mvp"},
+	}, false)
+	got := onboarding.Render(onboarding.ViewModel{Model: m, WizardMode: true, FullScreen: true, Width: 120, Height: 40, Theme: theme.Default()})
+	require.Contains(t, got, "CE QUI VA ÊTRE CRÉÉ")
+	require.Contains(t, got, ".asagiri/config.yaml")
+	require.Contains(t, got, ".kiro/specs/chatbot-mvp/")
+}
+
+func TestAdvancedButtonLabelShowsCount(t *testing.T) {
+	m := onboarding.NewModelFromForm(onbdomain.Form{Step: onbdomain.StepProject}, false)
+	got := onboarding.Render(onboarding.ViewModel{Model: m})
+	require.Contains(t, got, "Mode expert")
+	require.Contains(t, got, "6")
+}
+
+func TestDocsStepShowsDocsAIFiles(t *testing.T) {
+	m := onboarding.NewModelFromForm(onbdomain.Form{
+		Step:    onbdomain.StepDocs,
+		Answers: onbdomain.Answers{ProductOneLiner: "AI coding assistant"},
+	}, false)
+	got := onboarding.Render(onboarding.ViewModel{Model: m})
+	require.Contains(t, got, "docs/ai/01-product.md")
+	require.Contains(t, got, "FICHIERS QUI SERONT CRÉÉS")
+}
+
+func TestFeatureStepShowsWorkflowSteps(t *testing.T) {
+	m := onboarding.NewModelFromForm(onbdomain.Form{
+		Step:    onbdomain.StepFeature,
+		Answers: onbdomain.Answers{FeatureSlug: "stripe-mvp"},
+	}, false)
+	got := onboarding.Render(onboarding.ViewModel{Model: m})
+	require.Contains(t, got, "WORKFLOW SUIVANT")
+	require.Contains(t, got, "asa work")
+	require.Contains(t, got, "stripe-mvp")
+	require.Contains(t, got, ".kiro/specs/stripe-mvp/")
+}
+
+func TestNoExistingConfigShowsNeutralWelcome(t *testing.T) {
+	m := onboarding.NewModelFromForm(onbdomain.Form{
+		Step: onbdomain.StepWelcome,
+		Answers: onbdomain.Answers{ProjectName: "fresh", DefaultBranch: "main"},
+		// HasAsagiriConfig: false (zero value)
+	}, false)
+	require.False(t, m.ExistingConfig)
+	got := onboarding.Render(onboarding.ViewModel{Model: m})
+	// Neutral message — no "existante détectée"
+	require.NotContains(t, got, "existante détectée")
+}

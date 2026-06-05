@@ -65,6 +65,7 @@ func (b *queryBus) handleGetOnboardingWizard(_ context.Context, _ GetOnboardingW
 		DetectedStacks:    form.DetectedStacks,
 		Errors:            form.Errors,
 		SkippedFields:     form.SkippedFields,
+		HasAsagiriConfig:  form.HasAsagiriConfig,
 	}, nil
 }
 

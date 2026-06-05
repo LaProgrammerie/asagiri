@@ -230,6 +230,7 @@ budgets:
 
 pricing:
   currency: EUR
+  # premium_reference_model: "gpt-4o"  # enables savings report in asa cost report
   models:
     gemini-3-flash-preview:
       input_per_1m_tokens: 0.00  # configurer manuellement

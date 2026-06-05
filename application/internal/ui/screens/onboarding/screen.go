@@ -90,14 +90,84 @@ func renderWizardPanelBody(vm ViewModel, st theme.Styles) string {
 	switch m.Step {
 	case onbdomain.StepWelcome:
 		body.WriteString(st.PanelTitle.Render(StepLabel(m.Step)) + "\n\n")
-		body.WriteString(st.Fg.Render("Asagiri prépare config, validation, docs et première spec Kiro.") + "\n")
-		body.WriteString(st.Muted.Render("L'onboarding ne remplace pas la spec produit ni le handoff.") + "\n")
+		if m.ExistingConfig {
+			body.WriteString(st.Success.Render("✓ Configuration existante détectée — mode vérification") + "\n")
+		} else {
+			body.WriteString(st.Fg.Render("Asagiri prépare config, validation, docs et première spec Kiro.") + "\n")
+			body.WriteString(st.Muted.Render("L'onboarding ne remplace pas la spec produit ni le handoff.") + "\n")
+		}
+	case onbdomain.StepProject:
+		for _, line := range renderProjectDetection(m, st) {
+			body.WriteString(line + "\n")
+		}
+		for i, row := range m.fieldRows {
+			focused := m.FocusFooter < 0 && i == m.FocusField
+			body.WriteString(st.RenderField(row.Label, m.fieldValue(row.Key), focused) + "\n")
+			if errMsg := m.Errors[row.Key]; errMsg != "" {
+				body.WriteString(st.Error.Render("    ! "+errMsg) + "\n")
+			}
+		}
+	case onbdomain.StepStack:
+		for _, line := range renderStackDetection(m, st) {
+			body.WriteString(line + "\n")
+		}
+		for i, row := range m.fieldRows {
+			focused := m.FocusFooter < 0 && i == m.FocusField
+			body.WriteString(st.RenderField(row.Label, m.fieldValue(row.Key), focused) + "\n")
+		}
+	case onbdomain.StepAgents:
+		for _, line := range renderAgentPipeline(m, st) {
+			body.WriteString(line + "\n")
+		}
+		body.WriteString("\n")
+		for i, row := range m.fieldRows {
+			focused := m.FocusFooter < 0 && i == m.FocusField
+			body.WriteString(st.RenderField(row.Label, m.fieldValue(row.Key), focused) + "\n")
+		}
+	case onbdomain.StepDocs:
+		body.WriteString(st.Muted.Render("Cette phrase sera écrite dans docs/ai/01-product.md — pas le nom saisi à l'étape Projet.") + "\n\n")
+		body.WriteString(st.SectionHead.Render("FICHIERS QUI SERONT CRÉÉS") + "\n")
+		for _, f := range docsAIFiles() {
+			body.WriteString(st.Success.Render("✓") + " " + st.Muted.Render(f) + "\n")
+		}
+		body.WriteString("\n")
+		for i, row := range m.fieldRows {
+			focused := m.FocusFooter < 0 && i == m.FocusField
+			body.WriteString(st.RenderField(row.Label, m.fieldValue(row.Key), focused) + "\n")
+		}
+	case onbdomain.StepFeature:
+		slug := strings.TrimSpace(m.Fields["feature_slug"])
+		if slug != "" {
+			body.WriteString(st.SectionHead.Render("SPEC QUI SERA CRÉÉE") + "\n")
+			body.WriteString(st.Success.Render("✓") + " " + st.Muted.Render(".kiro/specs/"+slug+"/") + "\n")
+			body.WriteString(st.Success.Render("✓") + " " + st.Muted.Render(".kiro/specs/"+slug+"/requirements.md") + "\n\n")
+			body.WriteString(st.SectionHead.Render("WORKFLOW SUIVANT") + "\n")
+			for _, step := range nextWorkflowSteps(slug) {
+				body.WriteString(st.Muted.Render("  $ "+step) + "\n")
+			}
+			body.WriteString("\n")
+		}
+		for i, row := range m.fieldRows {
+			focused := m.FocusFooter < 0 && i == m.FocusField
+			body.WriteString(st.RenderField(row.Label, m.fieldValue(row.Key), focused) + "\n")
+			if errMsg := m.Errors[row.Key]; errMsg != "" {
+				body.WriteString(st.Error.Render("    ! "+errMsg) + "\n")
+			}
+		}
+		if slug != "" {
+			body.WriteString(st.Muted.Render("  → .kiro/specs/"+slug+"/") + "\n")
+		}
 	default:
 		for i, row := range m.fieldRows {
 			focused := m.FocusFooter < 0 && i == m.FocusField
 			body.WriteString(st.RenderField(row.Label, m.fieldValue(row.Key), focused) + "\n")
 			if errMsg := m.Errors[row.Key]; errMsg != "" {
 				body.WriteString(st.Error.Render("    ! "+errMsg) + "\n")
+			}
+		}
+		if m.Step == onbdomain.StepReview {
+			for _, line := range renderArtefactsSection(m, st) {
+				body.WriteString(line + "\n")
 			}
 		}
 	}
@@ -128,8 +198,8 @@ func renderFooterStyled(m Model, st theme.Styles) string {
 	parts := make([]string, 0, len(buttons))
 	for _, b := range buttons {
 		label := b.label
-		if b.id == FooterAdvanced && m.ShowAdvanced {
-			label = "Advanced ▼"
+		if b.id == FooterAdvanced {
+			label = advancedButtonLabel(m)
 		}
 		parts = append(parts, st.RenderButton(label, m.FocusFooter == b.id))
 	}
