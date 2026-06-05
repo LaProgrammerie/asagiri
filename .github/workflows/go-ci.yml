@@ -1,0 +1,76 @@
+name: Go CI
+
+# Quality_Gate (R2/R8) + Regeneration_Check (R1) + secrets scan (R8.4).
+# Déclenché sur push / pull_request — matérialise la readiness production :
+# make build, go vet, go test, golangci-lint (binaire pinné v2 bâti go >= 1.25),
+# la régénération sans diff de la doc CLI, et un scan de secrets en clair.
+on: [push, pull_request]
+
+concurrency:
+  group: go-ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  quality-gate:
+    name: Quality gate + regeneration check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod # toolchain alignée sur la cible go.mod (go 1.25.0)
+          cache: true
+
+      - name: Build
+        run: make build
+
+      - name: Vet
+        run: go vet ./...
+
+      - name: Test
+        run: go test ./...
+
+      - name: Install pinned golangci-lint (v2)
+        # Binaire officiel pinné, bâti avec une toolchain Go >= 1.25 (évite l'erreur
+        # "Go language version is lower than the targeted Go version"). On évite
+        # `go install` qui recompile avec le Go local (reproductibilité non garantie).
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh \
+            | sh -s -- -b "$(go env GOPATH)/bin" v2.12.2
+          echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
+          "$(go env GOPATH)/bin/golangci-lint" --version
+
+      - name: golangci-lint
+        run: golangci-lint run
+
+      - name: CLI docs regeneration check
+        # Régénère la référence CLI vers un dossier temporaire et compare au committé.
+        # `diff` retourne != 0 s'il existe une page manquante/divergente (hors meta.json,
+        # maintenu à la main et non émis par docgen).
+        run: |
+          go run ./application/cmd/asa docs generate-cli --output /tmp/cli-regen
+          diff -ruq /tmp/cli-regen docs-site/content/docs/en/cli/generated \
+            --exclude=meta.json
+
+      - name: Scan for plaintext secrets
+        # Échoue (exit != 0) si un secret en clair est détecté dans les fichiers
+        # suivis, en ne listant que les chemins (les valeurs ne sont jamais ré-émises).
+        # Les fichiers de test sont exclus : ils portent des valeurs synthétiques
+        # servant à tester la rédaction (faux positifs).
+        run: |
+          set -uo pipefail
+          patterns='(AKIA[0-9A-Z]{16}|-----BEGIN ([A-Z]+ )?PRIVATE KEY-----|ghp_[0-9A-Za-z]{36}|github_pat_[0-9A-Za-z_]{50,}|xox[baprs]-[0-9A-Za-z-]{10,}|AIza[0-9A-Za-z_-]{35}|sk-[0-9A-Za-z]{20,})'
+          files=$(git grep -lIE "$patterns" -- . \
+            ':(exclude).github/workflows/go-ci.yml' \
+            ':(exclude)*_test.go' \
+            ':(exclude)**/*_test.go') || true
+          if [ -n "$files" ]; then
+            echo "::error::Secret(s) en clair potentiel(s) détecté(s) dans le(s) fichier(s) suivant(s) (valeurs non affichées) :"
+            echo "$files"
+            exit 1
+          fi
+          echo "Aucun secret en clair détecté."

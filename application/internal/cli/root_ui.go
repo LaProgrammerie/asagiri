@@ -1,12 +1,15 @@
 package cli
 
 import (
+	"encoding/json"
+	"fmt"
 	"os"
 	"strings"
 
 	"github.com/LaProgrammerie/asagiri/application/internal/bootstrap"
 	"github.com/LaProgrammerie/asagiri/application/internal/config"
 	"github.com/LaProgrammerie/asagiri/application/internal/env"
+	"github.com/LaProgrammerie/asagiri/application/internal/routing"
 	"github.com/LaProgrammerie/asagiri/application/internal/tui"
 	uiapp "github.com/LaProgrammerie/asagiri/application/internal/ui/app"
 	"github.com/LaProgrammerie/asagiri/application/internal/ui/bus"
@@ -116,11 +119,103 @@ func newAgentsCmd(dryRun *bool) *cobra.Command {
 }
 
 func newExplainCmd(dryRun *bool) *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:   "explain",
 		Short: "Ouvrir le panel Explain",
 		RunE:  runUIScreenCommand(dryRun, uiapp.ScreenExplain),
 	}
+	cmd.AddCommand(newExplainRoutingCmd())
+	return cmd
+}
+
+// RoutingExplanation is the presentation DTO for `asa explain routing`. It is a
+// pure presentation projection of a routing.Decision (no business logic lives in
+// the CLI; the decision stays in the routing package — ADR-027). It is rendered
+// in plain/json parity: every information field is present in both modes
+// (Requirement 4.8).
+type RoutingExplanation struct {
+	StepClass string `json:"step_class"`
+	Agent     string `json:"agent"`
+	Model     string `json:"model"`
+	Local     bool   `json:"local"`
+	Reason    string `json:"reason"`
+}
+
+// newExplainRoutingCmd adds the non-interactive routing explanation mode:
+//
+//	asa explain routing --step-class <cls> [--prefer-local --no-cloud --allow-cloud --json]
+//
+// It calls routing.Route for the given step class and names the selected
+// Agent_Backend and the reason, without requiring the user to know the
+// underlying backends (Requirement 4.8). The TUI rendering remains unchanged
+// (ADR-027).
+func newExplainRoutingCmd() *cobra.Command {
+	var (
+		stepClass   string
+		preferLocal bool
+		noCloud     bool
+		allowCloud  bool
+		jsonOut     bool
+	)
+	cmd := &cobra.Command{
+		Use:   "routing",
+		Short: "Expliquer le routage d'agent pour une classe d'étape (mode non interactif)",
+		Example: "  asa explain routing --step-class implement\n" +
+			"  asa explain routing --step-class review --prefer-local\n" +
+			"  asa explain routing --step-class implement --no-cloud --json",
+		Args: cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, _ []string) error {
+			repoRoot, err := bootstrap.GitRoot(mustWd())
+			if err != nil {
+				return err
+			}
+			cfg, err := config.Load(config.ConfigPath(repoRoot), repoRoot)
+			if err != nil {
+				return err
+			}
+
+			decision, err := routing.Route(cfg, stepClass, preferLocal, noCloud, allowCloud)
+			if err != nil {
+				return err
+			}
+
+			explanation := RoutingExplanation{
+				StepClass: decision.StepClass,
+				Agent:     decision.Agent,
+				Model:     decision.Model,
+				Local:     decision.Local,
+				Reason:    decision.Reason,
+			}
+
+			out := cmd.OutOrStdout()
+			if jsonOut {
+				enc := json.NewEncoder(out)
+				enc.SetIndent("", "  ")
+				return enc.Encode(explanation)
+			}
+			_, _ = fmt.Fprint(out, formatRoutingExplanation(explanation))
+			return nil
+		},
+	}
+	cmd.Flags().StringVar(&stepClass, "step-class", "", "Classe d'étape à expliquer (ex. implement, review)")
+	cmd.Flags().BoolVar(&preferLocal, "prefer-local", false, "Préférer un backend local")
+	cmd.Flags().BoolVar(&noCloud, "no-cloud", false, "Interdire le cloud (prévaut sur les autres flags)")
+	cmd.Flags().BoolVar(&allowCloud, "allow-cloud", false, "Autoriser le cloud")
+	cmd.Flags().BoolVar(&jsonOut, "json", false, "Sortie JSON")
+	return cmd
+}
+
+// formatRoutingExplanation renders the plain-text view of a RoutingExplanation.
+// It names the backend and the reason, in parity with the JSON output: every
+// field present in RoutingExplanation is emitted here too (Requirement 4.8).
+func formatRoutingExplanation(e RoutingExplanation) string {
+	var b strings.Builder
+	_, _ = fmt.Fprintf(&b, "step_class: %s\n", e.StepClass)
+	_, _ = fmt.Fprintf(&b, "agent: %s\n", e.Agent)
+	_, _ = fmt.Fprintf(&b, "model: %s\n", e.Model)
+	_, _ = fmt.Fprintf(&b, "local: %t\n", e.Local)
+	_, _ = fmt.Fprintf(&b, "reason: %s\n", e.Reason)
+	return b.String()
 }
 
 func newFlowCmd(dryRun *bool) *cobra.Command {

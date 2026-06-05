@@ -1,0 +1,72 @@
+---
+title: Camino guiado
+description: El camino guiado único, desde la incorporación hasta el trabajo y los hitos de validación.
+---
+
+# Camino guiado
+
+Asagiri expone un único camino guiado que lo lleva de un repositorio nuevo a una ejecución de desarrollo validada: **incorporación → trabajo → hitos de validación**. Es el punto de entrada recomendado y se mantiene visible desde `asa --help`. Cada comando unitario (`asa spec`, `plan`, `enrich`, `dev`, `verify`, `review`) sigue siendo utilizable por separado: el camino guiado destaca una ruta sin quitar nada.
+
+```bash
+asa onboard                  # 1. preparar el repositorio (estado listo)
+asa work "<su necesidad>"    # 2. describir → producir → validar en los hitos
+```
+
+## 1. Incorporación
+
+La incorporación lleva el repositorio a un estado listo antes de que se ejecute cualquier agente. Lance el asistente y luego confirme la preparación:
+
+```bash
+asa onboard
+asa ready
+```
+
+`onboard` detecta su stack y escribe la configuración sin bajar una puntuación de preparación existente. Use `asa onboard --check-only` para evaluar la preparación sin crear, modificar ni eliminar ningún archivo. Si falta una herramienta, una configuración o una dependencia requerida, Asagiri se detiene sin `panic`, devuelve un código de salida distinto de cero y nombra el elemento ausente junto con al menos una acción de resolución; nunca deja una configuración parcial.
+
+Consulte [Instalación](/docs/es/getting-started/installation) e [Inicio rápido](/docs/es/getting-started/quickstart) para los pasos subyacentes.
+
+## 2. Trabajo
+
+`work` es el comando de alto nivel: usted describe una necesidad en lenguaje natural y Asagiri la convierte en un plan ejecutable, y luego recorre el pipeline (resolver la intención → planificar y enriquecer el contexto → desarrollar en un worktree → verificar → revisión opcional → informe).
+
+```bash
+asa work "develop billing-v2" --estimate-only   # primero la puerta de coste
+asa work "develop billing-v2"                    # confirmación guiada por defecto
+```
+
+Ensaye sin riesgo antes de gastar: `--dry-run` simula cada paso sin invocar un agente real, ejecutar un comando externo ni modificar el estado persistente del repositorio. `--plan-only` y `--estimate-only` se detienen tras la planificación y la estimación de coste respectivamente.
+
+## 3. Hitos de validación
+
+El camino guiado se detiene en hitos de validación humana en lugar de ejecutarse sin supervisión. Asagiri exige una respuesta afirmativa explícita antes de ejecutar el paso cuando:
+
+- se requiere una **confirmación de plan** (`work.require_plan_confirmation`),
+- una ejecución **superaría su presupuesto**,
+- está implicada una **acción sensible** (pago, datos personales, autenticación, permisos, eliminación, exportación, migración de datos).
+
+En contextos no interactivos (CI o `--non-interactive`) donde se requiere confirmación y falta `--yes`, Asagiri se detiene sin esperar entrada, devuelve un código de salida distinto de cero y nombra el flag que debe proporcionarse.
+
+## Los comandos unitarios siguen disponibles
+
+El camino guiado nunca quita un comando. Cuando quiera conducir un solo paso usted mismo, cada comando unitario se ejecuta de forma autónoma:
+
+```bash
+asa spec my-feature
+asa plan my-feature
+asa enrich my-feature
+asa dev my-feature
+asa verify my-feature
+asa review my-feature
+```
+
+Las salidas de texto y JSON se mantienen en paridad de información: los campos de los que depende nunca quedan condicionados por el modo de renderizado.
+
+## Lecturas relacionadas
+
+- [Primer flujo de trabajo](/docs/es/getting-started/first-workflow)
+- [Referencia de la CLI](/docs/es/cli/generated)
+
+<Callout type="warning">
+  Asagiri no demuestra la corrección del código. La validación y la revisión
+  humana siguen siendo obligatorias para los cambios críticos.
+</Callout>

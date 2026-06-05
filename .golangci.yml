@@ -1,6 +1,9 @@
+version: "2"            # requis par golangci-lint v2
+
 run:
   timeout: 5m
   tests: true
+  go: "1.25"            # aligne l'analyse sur go.mod (go 1.25.0)
 
 linters:
   enable:
@@ -9,6 +12,3 @@ linters:
     - ineffassign
     - staticcheck
     - unused
-
-issues:
-  exclude-use-default: false

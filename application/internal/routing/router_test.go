@@ -13,18 +13,30 @@ func TestRoutePreferLocal(t *testing.T) {
 		"cost_aware": {PreferLocalFor: []string{"enrich"}},
 	}
 	cfg.Work.DefaultEnricher = "ollama"
-	d := Route(cfg, "enrich", true, false, false)
+	cfg.Agents["ollama"] = config.Agent{Endpoint: "http://localhost:11434"}
+	d, err := Route(cfg, "enrich", true, false, false)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 	if !d.Local {
 		t.Fatalf("expected local, got %+v", d)
 	}
 	if d.Reason != "prefer_local" {
 		t.Fatalf("reason: %q", d.Reason)
 	}
+	if d.Agent != "ollama" {
+		t.Fatalf("agent: %q", d.Agent)
+	}
 }
 
 func TestRouteNoCloud(t *testing.T) {
 	cfg := config.NewTestConfig("t")
-	d := Route(cfg, "dev", false, true, false)
+	cfg.Work.DefaultEnricher = "ollama"
+	cfg.Agents["ollama"] = config.Agent{Endpoint: "http://localhost:11434"}
+	d, err := Route(cfg, "dev", false, true, false)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 	if !d.Local || d.Reason != "no_cloud" {
 		t.Fatalf("got %+v", d)
 	}
@@ -35,8 +47,16 @@ func TestRouteCloudHeavy(t *testing.T) {
 	cfg.Routing.Strategies = map[string]config.RoutingStrategy{
 		"cost_aware": {UseCloudHeavyFor: []string{"review"}},
 	}
-	d := Route(cfg, "review", false, false, true)
+	cfg.Work.DefaultAgent = "cursor"
+	cfg.Agents["cursor"] = config.Agent{Command: "cursor"}
+	d, err := Route(cfg, "review", false, false, true)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 	if d.Reason != "cloud_heavy" {
 		t.Fatalf("reason: %q got %+v", d.Reason, d)
+	}
+	if d.Agent != "cursor" {
+		t.Fatalf("agent: %q", d.Agent)
 	}
 }

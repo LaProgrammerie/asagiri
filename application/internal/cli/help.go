@@ -5,7 +5,15 @@ const rootLong = `Asagiri — orchestrateur CLI local pour workflows de dévelop
 Transforme une spec en tâches exécutables, isole le travail dans des git worktrees,
 trace chaque run et enchaîne validation + review avant une PR.
 
-Prérequis : dépôt Git. Première utilisation : asa init puis asa doctor.`
+Prérequis : dépôt Git. Première utilisation : asa init puis asa doctor.
+
+Pour commencer (chemin guidé) :
+  1. asa onboard           # préparer le dépôt (état prêt)
+  2. asa work "<besoin>"   # décrire → produire → valider aux jalons
+  3. (jalons) confirmation de plan, budget, actions sensibles → validation humaine
+
+Commandes unitaires (toujours disponibles) : asa spec | plan | enrich | dev | verify | review …
+Aide détaillée : asa <commande> --help`
 
 const rootExample = `  Exemple — développer une feature de bout en bout
   ─────────────────────────────────────────────

@@ -180,7 +180,7 @@ func buildMDX(rel, slug string, cmd *cobra.Command, root *cobra.Command) ([]byte
 	body.Write(fmBuf.Bytes())
 	body.WriteString("\n\n")
 
-	fmt.Fprintf(&body, "CLI path: **`%s %s`**\n\n", root.Name(), rel)
+	_, _ = fmt.Fprintf(&body, "CLI path: **`%s %s`**\n\n", root.Name(), rel)
 
 	body.WriteString("## When to use\n\n")
 	body.WriteString(strings.TrimSpace(englishWhen(rel, cmd)))
@@ -398,7 +398,7 @@ func optionsSection(cmd *cobra.Command) string {
 	buf.WriteString("| Flag | Scope | Default | Description |\n| --- | --- | --- | --- |\n")
 
 	for _, fr := range rows {
-		fmt.Fprintf(&buf, "| `%s` | %s | %s | %s |\n",
+		_, _ = fmt.Fprintf(&buf, "| `%s` | %s | %s | %s |\n",
 			fr.display, fr.scope, mdCell(fr.defValueQuoted), mdCell(fr.usageRaw))
 	}
 	buf.WriteByte('\n')
@@ -645,7 +645,7 @@ func restAfter(rel, prefixSpace string) string {
 
 func englishFailureModes(rel string) string {
 	write := func(b *strings.Builder, line string) {
-		fmt.Fprintf(b, "- %s\n", line)
+		_, _ = fmt.Fprintf(b, "- %s\n", line)
 	}
 	var b strings.Builder
 	write(&b, "Cobra rejects unknown flags or arity mismatches before any repository side effects occur.")

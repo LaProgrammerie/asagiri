@@ -24,9 +24,7 @@ func AssessReadiness(repoRoot string, cfg *config.Config, strict bool) (Report, 
 			report.Score -= scoreWarn
 		}
 	}
-	if report.Score < 0 {
-		report.Score = 0
-	}
+	report.Score = clampScore(report.Score)
 	report.Ready = true
 	for _, c := range checks {
 		if c.Status == StatusFail {
@@ -48,17 +46,31 @@ func deriveNextActions(checks []Check) []Action {
 		if c.Status == StatusOK {
 			continue
 		}
-		title := c.Message
+		title := strings.TrimSpace(c.Message)
 		if title == "" {
-			title = c.ID
+			title = strings.TrimSpace(c.ID)
 		}
-		cli := c.FixCLI
+		if title == "" {
+			title = "vérification onboarding"
+		}
+		cli := strings.TrimSpace(c.FixCLI)
 		if cli == "" {
 			cli = "asa onboard --step " + stepForCheck(c.ID)
 		}
 		actions = append(actions, Action{Title: title, CLI: cli})
 	}
 	return actions
+}
+
+// clampScore bounds a readiness score to the valid [minScore, maxScore] range.
+func clampScore(score int) int {
+	if score < minScore {
+		return minScore
+	}
+	if score > maxScore {
+		return maxScore
+	}
+	return score
 }
 
 func stepForCheck(id string) string {
@@ -168,37 +180,82 @@ func checkAgents(cfg *config.Config) []Check {
 	if cfg == nil {
 		return nil
 	}
-	agentName := cfg.Work.DefaultAgent
+	var checks []Check
+	for _, ref := range []struct {
+		id   string
+		name string
+	}{
+		{"work.default_spec_agent", cfg.Work.DefaultSpecAgent},
+		{"work.default_enricher", cfg.Work.DefaultEnricher},
+		{"work.default_agent", cfg.Work.DefaultAgent},
+		{"work.default_reviewer", cfg.Work.DefaultReviewer},
+	} {
+		checks = append(checks, checkAgentRef(cfg, ref.id, ref.name)...)
+	}
+	return checks
+}
+
+func checkAgentRef(cfg *config.Config, workID, agentName string) []Check {
+	agentName = strings.TrimSpace(agentName)
 	if agentName == "" {
-		agentName = "cursor"
+		return []Check{{
+			ID:      workID,
+			Status:  StatusWarn,
+			Message: fmt.Sprintf("%s non défini — renseigner un agent dans config.work", workID),
+			FixCLI:  "asa onboard --step agents",
+		}}
 	}
 	agent, ok := cfg.Agents[agentName]
 	if !ok {
 		return []Check{{
 			ID:      "agents." + agentName,
 			Status:  StatusWarn,
-			Message: fmt.Sprintf("agent %q absent de config.agents", agentName),
+			Message: fmt.Sprintf("agent %q absent de config.agents (%s)", agentName, workID),
 			FixCLI:  "asa onboard --step agents",
 		}}
 	}
 	cmd := strings.TrimSpace(agent.Command)
+	endpoint := strings.TrimSpace(agent.Endpoint)
 	if cmd == "" {
+		if endpoint != "" {
+			return []Check{{
+				ID:      workID + " → " + agentName,
+				Status:  StatusOK,
+				Message: fmt.Sprintf("API %s (%s)", agentName, endpoint),
+			}}
+		}
 		return []Check{{
 			ID:      "agents." + agentName,
 			Status:  StatusWarn,
-			Message: fmt.Sprintf("agents.%s.command vide", agentName),
-			FixCLI:  "asa onboard --step agents",
+			Message: agentCommandHelp(agentName, workID),
+			FixCLI:  agentCommandFixCLI(agentName),
 		}}
 	}
 	if _, err := exec.LookPath(cmd); err != nil {
 		return []Check{{
 			ID:      "agents." + agentName,
 			Status:  StatusWarn,
-			Message: fmt.Sprintf("%s not in PATH", cmd),
-			FixCLI:  "asa onboard --step agents",
+			Message: fmt.Sprintf("%q introuvable dans PATH (%s) — installer l’outil ou corriger agents.%s.command", cmd, workID, agentName),
+			FixCLI:  agentCommandFixCLI(agentName),
 		}}
 	}
-	return []Check{{ID: "agents." + agentName, Status: StatusOK}}
+	return []Check{{ID: workID + " → " + agentName, Status: StatusOK}}
+}
+
+func agentCommandHelp(agentName, workID string) string {
+	switch agentName {
+	case "ollama":
+		return "Ollama (enrich) : installer https://ollama.com · puis agents.ollama.command: ollama (ou endpoint) — voir .asagiri/config.yaml.example"
+	default:
+		return fmt.Sprintf("agents.%s.command manquant (%s) — copier l’entrée depuis .asagiri/config.yaml.example", agentName, workID)
+	}
+}
+
+func agentCommandFixCLI(agentName string) string {
+	if agentName == "ollama" {
+		return "Éditer .asagiri/config.yaml (section agents.ollama)"
+	}
+	return "Éditer .asagiri/config.yaml (section agents)"
 }
 
 func checkDocsPlaceholders(repoRoot string) []Check {
@@ -268,8 +325,8 @@ func checkMacOSAsaConflict() []Check {
 		return []Check{{
 			ID:      "system.asa_conflict",
 			Status:  StatusWarn,
-			Message: "binaire système /usr/bin/asa détecté — peut masquer le CLI Asagiri",
-			FixCLI:  "which asa",
+			Message: "/usr/bin/asa (macOS) peut masquer le CLI du projet — préférer ./bin/asa ou ajuster PATH",
+			FixCLI:  "which -a asa",
 		}}
 	}
 	return []Check{{ID: "system.asa_conflict", Status: StatusOK}}

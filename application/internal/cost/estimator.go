@@ -78,14 +78,23 @@ func BuildEstimate(ctx context.Context, plan intent.ExecutionPlan, inv investiga
 	for _, s := range plan.Steps {
 		step := estimatedFromPlanStep(s, cfg, agent, reviewer, enricher, packText, invText, outSplit)
 		if stepUsesCloudModel(s.Command) {
-			rd := routing.Route(cfg, s.Command, opts.PreferLocal, opts.NoCloud, opts.AllowCloud)
-			if step.Reason == "" {
-				step.Reason = rd.Reason
+			// routing.Route returns an error as a value (Requirements 4.2, 4.7):
+			// a routing failure for one step is non-fatal and attenuated like the
+			// pricing errors below — we keep the step's existing Agent/Reason and
+			// record a warning rather than aborting the whole estimation or
+			// panicking.
+			rd, err := routing.Route(cfg, s.Command, opts.PreferLocal, opts.NoCloud, opts.AllowCloud)
+			if err != nil {
+				est.Warnings = append(est.Warnings, fmt.Sprintf("routing %s: %v", s.Command, err))
 			} else {
-				step.Reason = step.Reason + "; routing=" + rd.Reason
-			}
-			if rd.Agent != "" && step.Agent == agent {
-				step.Agent = rd.Agent
+				if step.Reason == "" {
+					step.Reason = rd.Reason
+				} else {
+					step.Reason = step.Reason + "; routing=" + rd.Reason
+				}
+				if rd.Agent != "" && step.Agent == agent {
+					step.Agent = rd.Agent
+				}
 			}
 		}
 		hist := RunHistory{}
