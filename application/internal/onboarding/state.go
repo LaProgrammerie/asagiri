@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+
+	"github.com/LaProgrammerie/asagiri/application/internal/config"
 )
 
 // WizardStep identifies one onboarding step.
@@ -134,22 +136,22 @@ func MergeAnswers(st State, opts Options, repoRoot string) State {
 	if opts.DefaultSpecAgent != "" {
 		a.DefaultSpecAgent = opts.DefaultSpecAgent
 	} else if a.DefaultSpecAgent == "" {
-		a.DefaultSpecAgent = "kiro"
+		a.DefaultSpecAgent = config.DefaultAgentSpec
 	}
 	if opts.DefaultAgent != "" {
 		a.DefaultAgent = opts.DefaultAgent
 	} else if a.DefaultAgent == "" {
-		a.DefaultAgent = "cursor"
+		a.DefaultAgent = config.DefaultAgentDev
 	}
 	if opts.DefaultReviewer != "" {
 		a.DefaultReviewer = opts.DefaultReviewer
 	} else if a.DefaultReviewer == "" {
-		a.DefaultReviewer = "codex"
+		a.DefaultReviewer = config.DefaultAgentReviewer
 	}
 	if opts.DefaultEnricher != "" {
 		a.DefaultEnricher = opts.DefaultEnricher
 	} else if a.DefaultEnricher == "" {
-		a.DefaultEnricher = "ollama"
+		a.DefaultEnricher = config.DefaultAgentEnrich
 	}
 	if opts.FeatureSlug != "" {
 		a.FeatureSlug = opts.FeatureSlug

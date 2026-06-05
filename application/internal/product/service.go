@@ -8,7 +8,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/LaProgrammerie/asagiri/application/internal/product/derivation"
+"github.com/LaProgrammerie/asagiri/application/internal/config"
+		"github.com/LaProgrammerie/asagiri/application/internal/product/derivation"
 	"github.com/LaProgrammerie/asagiri/application/pkg/asagiri"
 	"gopkg.in/yaml.v3"
 )
@@ -287,7 +288,7 @@ func (s *Service) GenerateSpecFromProduct(product string, dryRun bool) error {
 					"contract alignment verified",
 					"analytics/metrics linked",
 				},
-				Agents: asagiri.TaskAgents{Implementer: "cursor", Reviewer: "codex", Enricher: "ollama"},
+				Agents: asagiri.TaskAgents{Implementer: config.DefaultAgentDev, Reviewer: config.DefaultAgentReviewer, Enricher: config.DefaultAgentEnrich},
 			}
 			task.TouchMetadata(time.Now().UTC())
 			generatedTasks = append(generatedTasks, task)

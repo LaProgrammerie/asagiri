@@ -1,20 +1,20 @@
 ---
-title: Inbox · Asagiri CLI
-description: Lister les specs candidates depuis les sources
+title: Tools · Asagiri CLI
+description: Répertoire des outils avancés disponibles dans asa.
 ---
 
-CLI path: **`asa inbox`**
+CLI path: **`asa tools`**
 
 ## When to use
 
 Orchestration commands coordinate higher-order Asagiri workloads such as ingestion, syncing, backlog triage, investigative passes, hydrated context payloads, coarse estimates, and workspace-specific automation.
 
-> Original CLI synopsis: Lister les specs candidates depuis les sources
+> Original CLI synopsis: Répertoire des outils avancés
 
 ## Usage
 
 ```bash
-asa inbox [flags]
+asa tools [flags]
 ```
 
 ## Options
@@ -22,12 +22,11 @@ asa inbox [flags]
 | Flag | Scope | Default | Description |
 | --- | --- | --- | --- |
 | `--dry-run` | Inherited | `false` | Simuler les exécutions sans lancer d'agent ni commandes externes |
-| `--source` | Local | `(empty)` | Filtrer: notion\|local |
 
 ## Examples
 
 ```bash
-asa inbox
+asa tools
 ```
 
 > Wire richer samples through **cobra.Command.Example** when the happy path warrants copy/paste-friendly automation beyond this scaffold.
@@ -66,6 +65,7 @@ asa inbox
 - [Graph](./graph.mdx)
 - [Help](./help.mdx)
 - [Impact](./impact.mdx)
+- [Inbox](./inbox.mdx)
 - [Index](./index.mdx)
 - [Init](./init.mdx)
 - [Inspect](./inspect.mdx)
@@ -92,7 +92,6 @@ asa inbox
 - [Spec](./spec.mdx)
 - [Status](./status.mdx)
 - [Sync](./sync.mdx)
-- [Tools](./tools.mdx)
 - [Trust](./trust.mdx)
 - [Verify](./verify.mdx)
 - [Version](./version.mdx)

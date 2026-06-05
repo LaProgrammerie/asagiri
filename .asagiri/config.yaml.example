@@ -82,6 +82,13 @@ agents:
   claude:
     command: claude
     timeout: 3600
+  # Claude Code non-interactive preset — see application/internal/agent/claudecode/
+  # Use this when you want --print + stream-json output (recommended for asa workflows).
+  # Set work.default_agent: claude-code to route all dev tasks here.
+  claude-code:
+    command: claude
+    args: ["--print", "--output-format", "stream-json"]
+    timeout: 600
   ollama:
     command: ollama
     args: ["run", "qwen2.5-coder:14b"]

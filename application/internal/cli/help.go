@@ -13,6 +13,7 @@ Pour commencer (chemin guidé) :
   3. (jalons) confirmation de plan, budget, actions sensibles → validation humaine
 
 Commandes unitaires (toujours disponibles) : asa spec | plan | enrich | dev | verify | review …
+Outils avancés : asa tools  (répertoire)  — trust · replay · knowledge · graph · investigate …
 Aide détaillée : asa <commande> --help`
 
 const rootExample = `  Exemple — développer une feature de bout en bout

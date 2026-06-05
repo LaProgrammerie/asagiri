@@ -660,16 +660,16 @@ func (c *Config) applyIntentDefaults() {
 		c.Intent.Resolver.AskWhenBelowConfidence = true
 	}
 	if c.Work.DefaultSpecAgent == "" {
-		c.Work.DefaultSpecAgent = "kiro"
+		c.Work.DefaultSpecAgent = DefaultAgentSpec
 	}
 	if c.Work.DefaultAgent == "" {
-		c.Work.DefaultAgent = "cursor"
+		c.Work.DefaultAgent = DefaultAgentDev
 	}
 	if c.Work.DefaultReviewer == "" {
-		c.Work.DefaultReviewer = "codex"
+		c.Work.DefaultReviewer = DefaultAgentReviewer
 	}
 	if c.Work.DefaultEnricher == "" {
-		c.Work.DefaultEnricher = "ollama"
+		c.Work.DefaultEnricher = DefaultAgentEnrich
 	}
 	if c.Work.StopAfter == "" {
 		c.Work.StopAfter = "report"

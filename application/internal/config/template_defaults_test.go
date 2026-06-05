@@ -25,3 +25,18 @@ func TestIsTemplateDefaultValidationCommands(t *testing.T) {
 		{Name: "test", Command: "castor qa:phpunit", Required: true},
 	}))
 }
+
+func TestDefaultAgentConstants(t *testing.T) {
+	require.Equal(t, "kiro", config.DefaultAgentSpec)
+	require.Equal(t, "cursor", config.DefaultAgentDev)
+	require.Equal(t, "codex", config.DefaultAgentReviewer)
+	require.Equal(t, "ollama", config.DefaultAgentEnrich)
+}
+
+func TestApplyDefaultsUsesConstants(t *testing.T) {
+	cfg := config.NewTestConfig("myproject")
+	require.Equal(t, config.DefaultAgentSpec, cfg.Work.DefaultSpecAgent)
+	require.Equal(t, config.DefaultAgentDev, cfg.Work.DefaultAgent)
+	require.Equal(t, config.DefaultAgentReviewer, cfg.Work.DefaultReviewer)
+	require.Equal(t, config.DefaultAgentEnrich, cfg.Work.DefaultEnricher)
+}

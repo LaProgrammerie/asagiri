@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/LaProgrammerie/asagiri/application/internal/config"
 	"github.com/LaProgrammerie/asagiri/application/internal/plan"
 	"github.com/LaProgrammerie/asagiri/application/internal/store/sqlite"
 	"github.com/LaProgrammerie/asagiri/application/pkg/asagiri"
@@ -30,9 +31,9 @@ func planToCanonical(feature string, t plan.Task) asagiri.Task {
 		},
 		Acceptance: t.Checks,
 		Agents: asagiri.TaskAgents{
-			Implementer: "cursor",
-			Reviewer:      "codex",
-			Enricher:      "ollama",
+			Implementer: config.DefaultAgentDev,
+			Reviewer:      config.DefaultAgentReviewer,
+			Enricher:      config.DefaultAgentEnrich,
 		},
 	}
 	task.TouchMetadata(now)

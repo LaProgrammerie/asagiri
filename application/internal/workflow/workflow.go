@@ -334,7 +334,7 @@ func defaultEnrichment(repoRoot string, task sqlite.Task, agentName string, res 
 		"task_id":             task.ID,
 		"type":                "implementation",
 		"risk":                "medium",
-		"recommended_agent":   "cursor",
+		"recommended_agent":   config.DefaultAgentDev,
 		"files_scope":         []string{"application/"},
 		"validation_commands": validationLinesForRepo(repoRoot),
 		"title":               title,
@@ -648,16 +648,16 @@ func (s *Service) executeResumeStep(ctx context.Context, run *sqlite.Run, step s
 		_, _, err := s.PlanFeature(run.Feature)
 		return err
 	case "enrich":
-		_, err := s.EnrichFeature(ctx, run.Feature, "", "ollama", force)
+		_, err := s.EnrichFeature(ctx, run.Feature, "", config.DefaultAgentEnrich, force)
 		return err
 	case "dev":
-		_, err := s.DevFeature(ctx, run.Feature, "", "cursor", force)
+		_, err := s.DevFeature(ctx, run.Feature, "", config.DefaultAgentDev, force)
 		return err
 	case "verify":
 		_, err := s.VerifyFeature(ctx, run.Feature, "", force)
 		return err
 	case "review":
-		_, err := s.ReviewFeature(ctx, run.Feature, "", "codex", force)
+		_, err := s.ReviewFeature(ctx, run.Feature, "", config.DefaultAgentReviewer, force)
 		return err
 	case "report":
 		_, _, err := s.GenerateReport(run.ID)

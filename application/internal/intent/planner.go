@@ -31,20 +31,20 @@ func (p *DefaultPlanner) BuildPlan(ctx context.Context, intent ResolvedIntent, s
 		agent = cfg.Work.DefaultAgent
 	}
 	if agent == "" {
-		agent = "cursor"
+		agent = config.DefaultAgentDev
 	}
 	reviewer := opts.Reviewer
 	if reviewer == "" && cfg != nil {
 		reviewer = cfg.Work.DefaultReviewer
 	}
 	if reviewer == "" {
-		reviewer = "codex"
+		reviewer = config.DefaultAgentReviewer
 	}
-	specAgent := "kiro"
+	specAgent := config.DefaultAgentSpec
 	if cfg != nil && cfg.Work.DefaultSpecAgent != "" {
 		specAgent = cfg.Work.DefaultSpecAgent
 	}
-	enricher := "ollama"
+	enricher := config.DefaultAgentEnrich
 	if cfg != nil && cfg.Work.DefaultEnricher != "" {
 		enricher = cfg.Work.DefaultEnricher
 	}
@@ -189,11 +189,11 @@ func EvaluateCondition(cond string, intent ResolvedIntent, fs FeatureState, opts
 
 // RecommendNext computes next primitive for `asa next`.
 func RecommendNext(snap StateSnapshot, feature string, cfg *config.Config) (NextRecommendation, error) {
-	devAgent := "cursor"
+	devAgent := config.DefaultAgentDev
 	if cfg != nil && cfg.Work.DefaultAgent != "" {
 		devAgent = cfg.Work.DefaultAgent
 	}
-	reviewAgent := "codex"
+	reviewAgent := config.DefaultAgentReviewer
 	if cfg != nil && cfg.Work.DefaultReviewer != "" {
 		reviewAgent = cfg.Work.DefaultReviewer
 	}

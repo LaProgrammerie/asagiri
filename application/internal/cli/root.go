@@ -6,6 +6,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/LaProgrammerie/asagiri/application/internal/config"
 	"github.com/LaProgrammerie/asagiri/application/internal/investigation"
 	"github.com/LaProgrammerie/asagiri/application/internal/version"
 	"github.com/LaProgrammerie/asagiri/application/internal/workflow"
@@ -34,66 +35,81 @@ func newRootCmd() *cobra.Command {
 	}
 	root.PersistentFlags().BoolVar(&dryRun, "dry-run", false, "Simuler les exécutions sans lancer d'agent ni commandes externes")
 
-	root.AddCommand(
+	// ── Groupes visuels (progressive disclosure) ────────────────────────────
+	root.AddGroup(
+		&cobra.Group{ID: "start",    Title: "Pour commencer"},
+		&cobra.Group{ID: "workflow", Title: "Workflow unitaire"},
+		&cobra.Group{ID: "tools",   Title: "Outils avancés"},
+		&cobra.Group{ID: "system",  Title: "Système"},
+	)
+	root.AddCommand(inGroup("start",
+		newOnboardCmd(),
+		newWorkCmd(&dryRun),
+		newContinueCmd(&dryRun),
+		newNextCmd(&dryRun),
+		newStatusCmd(&dryRun),
+		newInboxCmd(&dryRun),
+	)...)
+	root.AddCommand(inGroup("workflow",
 		newInitCmd(),
 		newDoctorCmd(),
-		newOnboardCmd(),
-		newReadyCmd(),
 		newSpecCmd(&dryRun),
 		newPlanCmd(&dryRun),
 		newEnrichCmd(&dryRun),
 		newDevCmd(&dryRun),
 		newVerifyCmd(&dryRun),
-		newTrustCmd(&dryRun),
 		newReviewCmd(&dryRun),
-		newStatusCmd(&dryRun),
+		newPRCmd(&dryRun),
 		newResumeCmd(&dryRun),
 		newReportCmd(&dryRun),
-		newCleanCmd(&dryRun),
-		newPRCmd(&dryRun),
-		newIndexCmd(&dryRun),
-		newWorkCmd(&dryRun),
-		newContinueCmd(&dryRun),
-		newNextCmd(&dryRun),
-		newInboxCmd(&dryRun),
 		newSyncCmd(&dryRun),
 		newEstimateCmd(&dryRun),
+	)...)
+	root.AddCommand(inGroup("tools",
+		newToolsCmd(&dryRun),
+		newTrustCmd(&dryRun),
+		newReplayCmd(&dryRun),
+		newKnowledgeCmd(&dryRun),
+		newGraphCmd(&dryRun),
 		newInvestigateCmd(&dryRun),
-		newContextCmd(&dryRun),
-		newCostCmd(&dryRun),
-		newInspectCmd(&dryRun),
-		newMcpCmd(&dryRun),
-		newPrototypeCmd(&dryRun),
+		newAnalysisCmd(),
 		newFlowsCmd(&dryRun),
 		newContractsCmd(&dryRun),
 		newArchitectureCmd(&dryRun),
+		newImpactCmd(),
+		newInspectCmd(&dryRun),
+		newContextCmd(&dryRun),
 		newProductCmd(&dryRun),
+	)...)
+	versionCmd := &cobra.Command{
+		Use:   "version",
+		Short: "Afficher la version",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			_, _ = fmt.Fprintln(cmd.OutOrStdout(), version.String())
+			return nil
+		},
+	}
+	root.AddCommand(inGroup("system",
+		newReadyCmd(),
+		newIndexCmd(&dryRun),
+		newCostCmd(&dryRun),
+		newMcpCmd(&dryRun),
+		newPrototypeCmd(&dryRun),
 		newDaemonCmd(&dryRun),
 		newSessionCmd(&dryRun),
 		newRuntimeCmd(&dryRun),
 		newSkillsCmd(),
 		newMemoryCmd(),
-		newAnalysisCmd(),
-		newGraphCmd(&dryRun),
-		newFlowCmd(&dryRun),
-		newKnowledgeCmd(&dryRun),
-		newReplayCmd(&dryRun),
-		newImpactCmd(),
 		newDocsCmd(),
+		newCleanCmd(&dryRun),
 		newMissionCmd(&dryRun),
 		newDashboardCmd(&dryRun),
 		newRunsCmd(&dryRun),
 		newAgentsCmd(&dryRun),
+		newFlowCmd(&dryRun),
 		newExplainCmd(&dryRun),
-		&cobra.Command{
-			Use:   "version",
-			Short: "Afficher la version",
-			RunE: func(cmd *cobra.Command, args []string) error {
-				_, _ = fmt.Fprintln(cmd.OutOrStdout(), version.String())
-				return nil
-			},
-		},
-	)
+		versionCmd,
+	)...)
 
 	return root
 }
@@ -122,7 +138,7 @@ func newSpecCmd(dryRun *bool) *cobra.Command {
 			return nil
 		},
 	}
-	cmd.Flags().StringVar(&agentName, "agent", "kiro", "Agent utilisé pour la phase spec")
+	cmd.Flags().StringVar(&agentName, "agent", config.DefaultAgentSpec, "Agent utilisé pour la phase spec")
 	cmd.AddCommand(newSpecGenerateFromProductCmd(dryRun))
 	return cmd
 }
@@ -181,7 +197,7 @@ func newEnrichCmd(dryRun *bool) *cobra.Command {
 		},
 	}
 	cmd.Flags().StringVar(&taskID, "task", "", "ID de tâche à enrichir")
-	cmd.Flags().StringVar(&agentName, "agent", "ollama", "Agent d'enrichissement")
+	cmd.Flags().StringVar(&agentName, "agent", config.DefaultAgentEnrich, "Agent d'enrichissement")
 	cmd.Flags().BoolVar(&force, "force", false, "Relancer une étape déjà réussie")
 	return cmd
 }
@@ -213,7 +229,7 @@ func newDevCmd(dryRun *bool) *cobra.Command {
 		},
 	}
 	cmd.Flags().StringVar(&taskID, "task", "", "ID de tâche à implémenter")
-	cmd.Flags().StringVar(&agentName, "agent", "cursor", "Agent d'implémentation")
+	cmd.Flags().StringVar(&agentName, "agent", config.DefaultAgentDev, "Agent d'implémentation")
 	cmd.Flags().BoolVar(&force, "force", false, "Relancer une étape déjà réussie")
 	return cmd
 }
@@ -293,7 +309,7 @@ func newReviewCmd(dryRun *bool) *cobra.Command {
 		},
 	}
 	cmd.Flags().StringVar(&taskID, "task", "", "ID de tâche à reviewer")
-	cmd.Flags().StringVar(&agentName, "agent", "codex", "Agent de review")
+	cmd.Flags().StringVar(&agentName, "agent", config.DefaultAgentReviewer, "Agent de review")
 	cmd.Flags().BoolVar(&force, "force", false, "Relancer une étape déjà réussie")
 	return cmd
 }
@@ -454,6 +470,47 @@ func newPRCmd(dryRun *bool) *cobra.Command {
 			}
 			_, _ = fmt.Fprintf(cmd.OutOrStdout(), "checklist PR: %s\n", checklist)
 			return nil
+		},
+	}
+}
+
+
+// inGroup assigns GroupID to each command and returns the slice.
+func inGroup(id string, cmds ...*cobra.Command) []*cobra.Command {
+	for _, c := range cmds {
+		c.GroupID = id
+	}
+	return cmds
+}
+
+// newToolsCmd is a discovery index for advanced tools — not a wrapper.
+func newToolsCmd(dryRun *bool) *cobra.Command {
+	_ = dryRun
+	return &cobra.Command{
+		Use:   "tools",
+		Short: "Répertoire des outils avancés",
+		Long: `Répertoire des outils avancés disponibles dans asa.
+
+Ces commandes restent accessibles directement (asa trust, asa replay, …).
+Ce répertoire facilite leur découverte.
+
+  asa trust        — Moteur de confiance (gates, replay sécurisé)
+  asa replay       — Capturer, rejouer, comparer des workflows
+  asa knowledge    — Graphe de connaissance engineering
+  asa graph        — Graphes d'exécution multi-agents
+  asa investigate  — Investigation structurée locale
+  asa analysis     — Couche d'analyse structurelle (graphes)
+  asa flows        — Extraire et inspecter les flows produit
+  asa contracts    — Extraire les contrats système
+  asa architecture — Projeter les implications système
+  asa impact       — Analyser l'impact des changements
+  asa inspect      — Inspection locale (symbol, tests, diff)
+  asa context      — Afficher ou optimiser le contexte prévu
+  asa product      — Review produit
+
+Aide détaillée : asa <outil> --help`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return cmd.Help()
 		},
 	}
 }

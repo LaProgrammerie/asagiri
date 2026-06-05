@@ -11,12 +11,12 @@ import (
 func newAnalysisCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "analysis",
-		Short: "Engineering analysis layer (structural graphs)",
+		Short: "Analyse structurelle du code (graphes de dépendances)",
 	}
 	var productID string
 	buildCmd := &cobra.Command{
 		Use:   "build",
-		Short: "Build and write analysis graphs for a product",
+		Short: "Construire les graphes d'analyse pour un produit",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			root, err := os.Getwd()
 			if err != nil {

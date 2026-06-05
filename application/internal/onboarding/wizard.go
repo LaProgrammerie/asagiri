@@ -7,7 +7,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/LaProgrammerie/asagiri/application/internal/onboarding/detect"
+"github.com/LaProgrammerie/asagiri/application/internal/config"
+		"github.com/LaProgrammerie/asagiri/application/internal/onboarding/detect"
 )
 
 // RunWizard executes onboarding steps; non-interactive mode uses defaults only.
@@ -68,16 +69,16 @@ func runStep(repoRoot string, st *State, opts Options, interactive bool, in io.R
 	case StepAgents:
 		if interactive {
 			if st.Answers.DefaultSpecAgent == "" {
-				st.Answers.DefaultSpecAgent = promptString(in, out, "Agent spec (asa spec)", "kiro")
+				st.Answers.DefaultSpecAgent = promptString(in, out, "Agent spec (asa spec)", config.DefaultAgentSpec)
 			}
 			if st.Answers.DefaultEnricher == "" {
-				st.Answers.DefaultEnricher = promptString(in, out, "Agent enrich (asa enrich)", "ollama")
+				st.Answers.DefaultEnricher = promptString(in, out, "Agent enrich (asa enrich)", config.DefaultAgentEnrich)
 			}
 			if st.Answers.DefaultAgent == "" {
-				st.Answers.DefaultAgent = promptString(in, out, "Agent dev (asa dev)", "cursor")
+				st.Answers.DefaultAgent = promptString(in, out, "Agent dev (asa dev)", config.DefaultAgentDev)
 			}
 			if st.Answers.DefaultReviewer == "" {
-				st.Answers.DefaultReviewer = promptString(in, out, "Agent review (asa review)", "codex")
+				st.Answers.DefaultReviewer = promptString(in, out, "Agent review (asa review)", config.DefaultAgentReviewer)
 			}
 		}
 	case StepSources, StepDocs:

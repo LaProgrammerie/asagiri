@@ -1,5 +1,7 @@
 package executiongraph
 
+import "github.com/LaProgrammerie/asagiri/application/internal/config"
+
 // AgentAssigner selects an execution agent for a graph node (spec §12).
 type AgentAssigner interface {
 	Assign(node GraphNode, binding *TaskBinding) string
@@ -20,10 +22,10 @@ func DefaultAgentFor(node GraphNode, binding *TaskBinding) string {
 		NodeTypeArchitectureDerivation, NodeTypeContractGeneration:
 		return "local"
 	case NodeTypeEnrichment, NodeTypeDocumentation:
-		return "ollama"
+		return config.DefaultAgentEnrich
 	case NodeTypeReview:
 		if riskRank(node.Risk) >= riskRank(RiskLevelHigh) {
-			return "codex"
+			return config.DefaultAgentReviewer
 		}
 		return "local"
 	case NodeTypeImplementation:
@@ -34,7 +36,7 @@ func DefaultAgentFor(node GraphNode, binding *TaskBinding) string {
 		case RiskLevelCritical, RiskLevelHigh:
 			return "claude"
 		default:
-			return "cursor"
+			return config.DefaultAgentDev
 		}
 	default:
 		return "local"

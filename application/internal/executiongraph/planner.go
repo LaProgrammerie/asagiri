@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/LaProgrammerie/asagiri/application/internal/config"
 	"github.com/LaProgrammerie/asagiri/application/internal/product"
 	"github.com/LaProgrammerie/asagiri/application/pkg/asagiri"
 	"gopkg.in/yaml.v3"
@@ -280,7 +281,7 @@ func buildBaseNodes(req GraphPlanRequest, flowID string, bindings []TaskBinding)
 			Type:  NodeTypeImplementation,
 			Title: fmt.Sprintf("Implement %s", strings.ReplaceAll(b.Action, "_", " ")),
 			Task:  b.TaskID,
-			Agent: "cursor",
+			Agent: config.DefaultAgentDev,
 			Risk:  riskForBinding(b),
 			RequiredChecks: []string{
 				"tests",
@@ -361,7 +362,7 @@ func appendStubNodes(nodes []GraphNode, flow product.Flow, bindings []TaskBindin
 			ID:    "security-review",
 			Type:  NodeTypeReview,
 			Title: "Security review for sensitive actions",
-			Agent: "codex",
+			Agent: config.DefaultAgentReviewer,
 			Risk:  RiskLevelHigh,
 			RequiredChecks: []string{
 				"security",

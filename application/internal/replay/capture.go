@@ -191,8 +191,8 @@ func cfgAgents(repoRoot string) map[string]string {
 func defaultAgents(from map[string]string) map[string]string {
 	if len(from) == 0 {
 		return map[string]string{
-			"implementer": "cursor",
-			"reviewer":    "codex",
+			"implementer": config.DefaultAgentDev,
+			"reviewer":    config.DefaultAgentReviewer,
 			"validator":   "local",
 		}
 	}

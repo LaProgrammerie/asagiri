@@ -84,11 +84,11 @@ func (e *Executor) runStep(ctx context.Context, step PlanStep, intent ResolvedIn
 	if reviewer == "" {
 		reviewer = e.Config.Work.DefaultReviewer
 	}
-	specAgent := "kiro"
+	specAgent := config.DefaultAgentSpec
 	if e.Config != nil && e.Config.Work.DefaultSpecAgent != "" {
 		specAgent = e.Config.Work.DefaultSpecAgent
 	}
-	enricher := "ollama"
+	enricher := config.DefaultAgentEnrich
 	if e.Config != nil && e.Config.Work.DefaultEnricher != "" {
 		enricher = e.Config.Work.DefaultEnricher
 	}
