@@ -4,11 +4,28 @@ set -euo pipefail
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "${REPO_ROOT}"
 
-echo "pre-push: PHPUnit unit"
-castor qa:phpunit -- --testsuite unit
+# Template Go : orchestration via Makefile (cf. AGENTS.md, docs/ai/03-standards.md).
+# Quality_Gate complet avant push : build + vet + test (+ lint si présent),
+# et Regeneration_Without_Diff de la doc CLI (garde-fou anti-dérive, R1/R8).
 
-echo "pre-push: PHPUnit functional"
-castor qa:phpunit -- --testsuite functional
+echo "pre-push: go build"
+make build
 
-echo "pre-push: Cypress"
-castor cypress:test-all
+echo "pre-push: go vet"
+go vet ./...
+
+echo "pre-push: go test"
+go test ./...
+
+if command -v golangci-lint >/dev/null 2>&1; then
+  echo "pre-push: golangci-lint"
+  golangci-lint run
+else
+  echo "pre-push: golangci-lint absent (skip local ; requis en CI)"
+fi
+
+echo "pre-push: CLI docs regeneration check"
+regen_dir="$(mktemp -d)"
+trap 'rm -rf "${regen_dir}"' EXIT
+go run ./application/cmd/asa docs generate-cli --output "${regen_dir}"
+diff -ruq "${regen_dir}" docs-site/content/docs/en/cli/generated --exclude=meta.json
