@@ -1,48 +1,60 @@
-# Current spec — cockpit-consolidation (active)
+# Current spec — audit-coherence-consolidation (active)
 
-**Phase :** Direction 4 « Asagiri Operations Cockpit » — consolidation de
-l'Experience Platform sur l'infrastructure existante — **livré** (`2026-05-31`,
-ADR-029 ; `go test ./...` vert, `make build` ok).
+**Phase :** Correction & simplification (audit `AUD-001 … AUD-007`) — **livré**
+(`2026-06-05`, ADR-030 ; Quality_Gate complet vert, Regeneration_Without_Diff
+sans divergence).
 **Handoff :** [`handoff.md`](handoff.md)
 
 ## Objet
 
-Corriger l'inversion d'effort UI : Mission Control (écran quotidien par défaut)
-est rendu en texte brut alors que le wizard d'onboarding (one-shot) a reçu le
-chrome premium « EOS ». Consolider sur les briques déjà livrées (layout engine,
-widgets, palette, event feed, design system, bus, explorers) ; ajouter le seul
-manque réel : l'écran **Runs** + sa requête `RunDetail`.
+Appliquer les **corrections concrètes** des sept constats d'audit `AUD-001 …
+AUD-007`, **simplifier** la couche d'orchestration perçue comme opaque, et poser
+les **garde-fous** anti-régression — sans nouvelle couche ni moteur d'audit
+runtime. Cause unique de la dérive : la commande `runs` (ADR-029) n'a pas été
+suivie d'une régénération de la doc CLI.
 
 ## Spec
 
-- **Kiro :** `.kiro/specs/cockpit-consolidation/` (requirements, design, tasks)
-- **Canon UI :** [`06-spec-ui.md`](../06-spec-ui.md) (ADR-027, Experience Platform)
-- **Code cible :** `application/internal/ui/` (app, screens/mission, screens/runs,
-  bus, components, screens/onboarding)
+- **Kiro :** `.kiro/specs/audit-coherence-consolidation/` (requirements, design, tasks)
+- **Audit source :** `.kiro/specs/audit-coherence-consolidation/audit-report.md`
+- **Code cible :** fichiers existants — `cli/docgen`, `internal/routing`,
+  `internal/policy`, `internal/cli` (help, explain), `internal/onboarding`,
+  `problems.md`, `.golangci.yml`, `.github/workflows/go-ci.yml`, `docs/ai/03-standards.md`
 
-## Phasage
+## Constats → corrections (livrés)
 
-| Phase | Focus | Donnée bus | Statut |
-|-------|-------|-----------|--------|
-| 0 | Fondation visuelle partagée (`PanelSized`, rail/status-bar helpers) | inchangée | livré |
-| 1 | Mission Control panelisé (MVP cockpit) | inchangée | livré |
-| 2 | Rail de navigation persistant + badges d'état | inchangée | livré |
-| 3 | Écran Runs + `GetRunDetailQuery`/`RunDetail` | **nouvelle** | livré |
-| 4 | Fusion onboarding dans le shell + suppression second shell | inchangée | livré |
+| Constat | Sévérité | Correction (plus petit changement) | Statut |
+|---------|----------|-------------------------------------|--------|
+| AUD-001 | error | Régénérer la doc CLI → ajoute `runs.mdx` | clôturé |
+| AUD-002 | error | Même régénération → lien fratrie `> - [Runs](./runs.mdx)` | clôturé |
+| AUD-003 | error | `golangci-lint` v2 pinné + `.golangci.yml` v2 + workflow Go CI | clôturé |
+| AUD-004 | warn | `problems.md` = Remediation_Register (automate de statut) | clôturé |
+| AUD-005 | warn | Routing config-driven : `Route → (Decision, error)`, précédence `no_cloud`, `asa explain routing` | clôturé |
+| AUD-006 | info | Rôles Ollama reliés au canon courant + check de cohérence | clôturé |
+| AUD-007 | info | Guided_Path mis en avant (help + page docs 4 locales), sans retrait | clôturé |
 
-MVP cockpit = Phases 0–2 (aucun changement de données). Phase 3 = seul vrai
-développement neuf. Phase 4 = nettoyage du shell parallèle.
+## Garde-fous (prouvés verts)
+
+- **Quality_Gate** : `make build` ∧ `go vet ./...` ∧ `go test ./...` ∧
+  `golangci-lint run` (binaire v2.12.2 pinné), tous exit 0.
+- **Regeneration_Without_Diff** : `asa docs generate-cli` → tmp +
+  `diff --exclude=meta.json`, aucune divergence.
+- **Go CI** : `.github/workflows/go-ci.yml` (push/PR) = Quality_Gate +
+  Regeneration_Check + scan secrets en clair.
+- **PBT** : propriétés `P1 … P21` (docgen, routing, policy, onboarding, locales).
 
 ## Invariants
 
+- Aucune nouvelle couche, aucun package `internal/audit`, aucune commande `asa audit`.
 - UI = client du bus (ADR-027) ; aucune logique métier dans `internal/ui`.
-- Pas de régression `internal/tui` (specv3 rich/plain/json).
-- Équivalents CLI conservés ; parité plain/json.
+- Moteur local-first et déterministe (sorties identiques pour entrées identiques).
+- Toutes les Unitary_Command préservées (`asa spec | plan | enrich | dev | verify | review`).
 
 ## Précédent (livré)
 
-- **project-onboarding** — Project Onboarding & Readiness + TUI wizard — FULL
-  livré (`2026-05-30`).
-- **spec-ui** — Experience Platform FULL FEATURE — livré (`2026-05-29`).
+- **cockpit-consolidation** — Operations Cockpit Direction 4 — livré
+  (`2026-05-31`, ADR-029).
+- **project-onboarding** — Project Onboarding & Readiness + TUI wizard — livré
+  (`2026-05-30`).
 
 Branding : **Asagiri** / **`asa`**.

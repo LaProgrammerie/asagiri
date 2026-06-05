@@ -1,69 +1,82 @@
 # Handoff — execution
 
 > **Contrat d'exécution** Cursor / Copilot / humain.
-> **Tranche active :** **cockpit-consolidation** — Direction 4 « Asagiri
-> Operations Cockpit ». **Livré** (`2026-05-31`, ADR-029) — Phases 0→4 ;
-> `go test ./...` vert, `go vet` propre, `make build` ok.
-> **Précédent :** project-onboarding — TUI wizard interactif — FULL (`2026-05-30`).
+> **Tranche active :** **audit-coherence-consolidation** — correction &
+> simplification des constats d'audit `AUD-001 … AUD-007`. **Livré**
+> (`2026-06-05`, ADR-030) — Quality_Gate complet vert (`make build` ∧ `go vet` ∧
+> `go test` ∧ `golangci-lint run`, tous exit 0) ; Regeneration_Without_Diff sans
+> divergence ; `problems.md` registre clôturé.
+> **Précédent :** cockpit-consolidation — Operations Cockpit Direction 4 — livré
+> (`2026-05-31`, ADR-029).
 
 ## Objectif
 
-Consolider l'Experience Platform (ADR-027) sur l'infrastructure UI existante.
-Corriger l'inversion d'effort : Mission Control (écran quotidien) est en texte
-brut ; le wizard onboarding (one-shot) porte le chrome premium « EOS ». Aucune
-grosse refonte : ~75 % des briques existent (layout engine, 13 widgets, palette,
-event feed, design system, explorers, bus). Seul vrai développement neuf :
-l'écran **Runs** + la requête bus `RunDetail`.
+Appliquer le **plus petit changement correct** par constat (pas de refonte), sur
+des **fichiers existants** uniquement. Cause unique de la dérive : `asa runs`
+(ADR-029) enregistrée sans régénération de la doc CLI. Poser les garde-fous qui
+empêchent la régression (tests + étape CI), sans moteur d'audit runtime.
 
-## Scope (autorisé)
+## Scope (livré)
 
-- `application/internal/ui/components/` — `PanelSized`.
-- `application/internal/ui/app/` — rail persistant dans `View()`, helpers shell,
-  route Runs, onboarding via shell commun.
-- `application/internal/ui/screens/mission/` — panelisation.
-- `application/internal/ui/screens/runs/` — **nouveau** (liste + détail).
-- `application/internal/ui/bus/` — `RunDetail`, `RunPipelineStep`,
-  `GetRunDetailQuery` + handler d'agrégation.
-- `application/internal/ui/screens/onboarding/` — réduction `eos_*` aux helpers
-  partagés, suppression télémétrie fictive.
-- `application/internal/ui/app/router.go`, `palette*.go` — `ScreenRuns` + entrée.
+- `application/internal/cli/docgen/` — tests régénération (bijection,
+  déterminisme, Regeneration_Check hors `meta.json`, no-diff).
+- `application/internal/routing/router.go` — `Route(...) (Decision, error)` +
+  `ErrNoDeclaredBackend`, config-driven, précédence `no_cloud`, raison exposée.
+- `application/internal/cost/estimator.go` — adapté à la nouvelle signature.
+- `application/internal/cli/root_ui.go` — `asa explain routing` (DTO
+  `RoutingExplanation`, parité plain/json).
+- `application/internal/policy/ollama.go` — source canonique unique + check de
+  cohérence.
+- `application/internal/cli/help.go` — bloc « Pour commencer » (Guided_Path),
+  sans retrait de commande.
+- `application/internal/onboarding/doctor.go` — clamp score `[0,100]`,
+  innocuité `--check-only`, Guided_Remediation.
+- `docs-site/content/docs/{en,fr,de,es}/guided-path.mdx` — page d'entrée 4 locales.
+- `docs-site/content/docs/en/cli/generated/` — régénérée (`runs.mdx` + liens).
+- `.golangci.yml` (v2), `.github/workflows/go-ci.yml` (nouveau),
+  `docs/ai/03-standards.md`, `problems.md` (Remediation_Register).
 
 ## Hors scope (interdit sans MAJ spec)
 
-- Nouveau moteur d'orchestration ; toute logique métier dans `internal/ui`.
-- `internal/tui` (specv3) ; `internal/onboarding/form.go` (logique onboarding).
-- UI web/desktop.
-
-## Ordre d'exécution
-
-| Phase | Tâches | Donnée bus | DoD partiel | Statut |
-|-------|--------|-----------|-------------|--------|
-| 0 | CK-0.1 → CK-0.3 | inchangée | `PanelSized` + helpers shell testés | ✅ |
-| 1 | CK-1.1 → CK-1.4 | inchangée | Mission Control panelisé responsive | ✅ |
-| 2 | CK-2.1 → CK-2.5 | inchangée | rail persistant + nav sans régression | ✅ |
-| 3 | RUN-3.1 → RUN-3.7 | **nouvelle** | écran Runs + `RunDetail` | ✅ |
-| 4 | CK-4.1 → CK-4.6 | inchangée | shell unique, `eos_*` mort supprimé | ✅ |
-
-MVP livrable après Phase 2 (cockpit crédible sans changement de données).
+- Tout nouveau package `internal/audit` ; toute commande `asa audit`.
+- Logique métier dans `internal/ui` (ADR-027) ; refonte de docgen/onboarding.
+- Retrait d'une Unitary_Command.
 
 ## Definition of Done
 
-- [x] Mission Control panelisé + responsive ; rail persistant et state-aware
-- [x] Runs écran de premier rang adossé à `RunDetail`
-- [x] Onboarding dans le shell commun, sans télémétrie fictive, bascule Mission
-- [x] Un seul chemin de rendu ; code `eos_*` mort supprimé
-- [x] `go test ./... -count=1` vert ; `make build` ok ; équivalents CLI conservés
-- [x] `06-spec-ui.md` + ADR (ADR-029) mis à jour ; `current-spec.md` / `handoff.md` synchro
+- [x] Regeneration_Without_Diff vrai (garde-fou docgen vert)
+- [x] Quality_Gate vert (`build`/`test`/`vet`/`lint` exit 0)
+- [x] Routing config-driven, explicable, sans `panic` (erreur guidée)
+- [x] Policy Ollama reliée au canon courant + check de cohérence
+- [x] Guided_Path mis en avant (help + docs 4 locales), Unitary_Command préservées
+- [x] Garde-fous onboarding (monotonie readiness, `--check-only`, resume round-trip)
+- [x] `problems.md` registre : `AUD-001…007` clôturés ; zéro `blocking` ouvert
+- [x] Go CI ajouté (Quality_Gate + Regeneration_Check + scan secrets)
+- [x] ADR-030 enregistrée ; `current-spec.md` / `handoff.md` synchro
 
 ## Garde-fous
 
-- UI = client du bus (ADR-027). Pas de logique trust/workflow/runtime dans les écrans.
-- Parité plain/json : fallback plat conservé, jamais conditionné au rendu panelisé.
-- Landing Phases 0–2 (sans changement de données) avant de toucher l'onboarding.
+- Pas de `panic` aux frontières CLI : erreurs retournées comme valeurs (`03-standards.md`).
+- Déterminisme local-first (ADR-002, ADR-022) : sorties identiques pour entrées identiques.
+- UI = client du bus (ADR-027). Routing/policy restent hors `internal/ui`.
+- Parité Plain_Output / JSON_Output, jamais conditionnée au mode de rendu.
+
+## Quality_Gate (commande reproductible)
+
+```bash
+make build && go vet ./... && go test ./...
+# golangci-lint v2 pinné (binaire officiel bâti go >= 1.25) :
+curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh \
+  | sh -s -- -b "$(go env GOPATH)/bin" v2.12.2
+golangci-lint run
+# Regeneration_Without_Diff :
+go run ./application/cmd/asa docs generate-cli --output /tmp/cli-regen
+diff -ruq /tmp/cli-regen docs-site/content/docs/en/cli/generated --exclude=meta.json
+```
 
 ## Références
 
-- `.kiro/specs/cockpit-consolidation/` (requirements, design, tasks)
-- [`06-spec-ui.md`](../06-spec-ui.md) — ADR-027 Experience Platform
-- Code : `ui/app/app.go`, `ui/layout/`, `ui/screens/dashboard/widgets.go`,
-  `ui/screens/mission/screen.go`, `ui/bus/bus.go`, `ui/theme/styles.go`
+- `.kiro/specs/audit-coherence-consolidation/` (requirements, design, tasks, audit-report)
+- `docs/ai/05-decisions.md` — ADR-030 (et ADR-027/029 pour le contexte UI)
+- `docs/ai/03-standards.md` — Quality_Gate, install golangci-lint pinné
+- `problems.md` — Remediation_Register (`AUD-001 … AUD-007`)

@@ -66,9 +66,41 @@ bin/asa
 | Build CLI | `make build` |
 | Init / doctor | `./bin/asa init` puis `doctor` |
 | Tests | `make test` ou `go test -race ./...` |
-| Lint | `make lint` (nécessite golangci-lint + Go ≥ version module) |
+| Lint | `make lint` (nécessite golangci-lint pinné — voir ci-dessous) |
 | Dev Docker | `make dev` |
 | Release check | `make release-check` |
+
+## Quality_Gate (readiness production)
+
+Le **Quality_Gate** est l'ensemble des quatre contrôles suivants ; la readiness
+production est atteinte **si et seulement si** les quatre terminent avec un code
+de sortie égal à `0` :
+
+```text
+Quality_Gate = make build  ∧  go test ./...  ∧  go vet ./...  ∧  golangci-lint run
+               (tous exit 0)
+```
+
+### Installation de golangci-lint (binaire pinné, reproductible)
+
+`golangci-lint` doit être bâti avec une toolchain Go **≥ la cible `go.mod`**
+(`go 1.25.0`), sinon il refuse de tourner. On installe donc le **binaire officiel
+pinné** (indépendant du Go local), version **`v2.12.2`** (ligne v2 courante) :
+
+```bash
+# binaire dans $(go env GOPATH)/bin
+curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh \
+  | sh -s -- -b "$(go env GOPATH)/bin" v2.12.2
+golangci-lint --version   # doit afficher "built with go1.25" ou supérieur
+```
+
+> **Éviter `go install …/golangci-lint`** : cette voie compile l'outil avec le Go
+> **local**, ce qui ne garantit pas la reproductibilité ni l'alignement sur la
+> cible `go.mod`. On privilégie le binaire officiel pinné ci-dessus.
+
+Assure-toi que `$(go env GOPATH)/bin` est dans le `PATH`. Une fois installé,
+`make lint` (ou `golangci-lint run`) s'exécute sur le code Go sous
+`application/` via `.golangci.yml` (schéma v2, `run.go: "1.25"`).
 
 ## Tests
 
