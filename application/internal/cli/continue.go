@@ -44,7 +44,7 @@ func newContinueCmd(dryRun *bool) *cobra.Command {
 				return nil
 			}
 
-			rec, err := intent.RecommendNext(snap, feature)
+			rec, err := intent.RecommendNext(snap, feature, ctx.Config)
 			if err != nil {
 				return err
 			}

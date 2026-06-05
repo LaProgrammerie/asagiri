@@ -48,3 +48,44 @@ func TestPlannerDevelopSteps(t *testing.T) {
 	require.Contains(t, commands, "dev")
 	require.Contains(t, commands, "verify")
 }
+
+func TestEvaluateConditionUnknownReturnsFalse(t *testing.T) {
+	require.False(t, EvaluateCondition("nonexistent_condition_xyz", ResolvedIntent{}, FeatureState{}, WorkOptions{}))
+}
+
+func TestRecommendNextReadsAgentFromCfg(t *testing.T) {
+	cfg := &config.Config{Work: config.WorkConfig{DefaultAgent: "claude-code", DefaultReviewer: "kiro-review"}}
+	snap := StateSnapshot{
+		ActiveFeature: "my-feat",
+		Features: []FeatureState{{
+			Name: "my-feat", NextTaskID: "t1", NextTaskStatus: "enriched",
+		}},
+	}
+	rec, err := RecommendNext(snap, "my-feat", cfg)
+	require.NoError(t, err)
+	require.Equal(t, "dev", rec.Action)
+	require.Contains(t, rec.Primitive, "--agent claude-code")
+}
+
+func TestRecommendNextReviewerFromCfg(t *testing.T) {
+	cfg := &config.Config{Work: config.WorkConfig{DefaultReviewer: "my-reviewer"}}
+	snap := StateSnapshot{
+		ActiveFeature: "f",
+		Features: []FeatureState{{Name: "f", NextTaskID: "t1", NextTaskStatus: "verified"}},
+	}
+	rec, err := RecommendNext(snap, "f", cfg)
+	require.NoError(t, err)
+	require.Equal(t, "review", rec.Action)
+	require.Contains(t, rec.Primitive, "--agent my-reviewer")
+}
+
+func TestRecommendNextNilCfgFallback(t *testing.T) {
+	snap := StateSnapshot{
+		ActiveFeature: "f",
+		Features: []FeatureState{{Name: "f", NextTaskID: "t1", NextTaskStatus: "enriched"}},
+	}
+	rec, err := RecommendNext(snap, "f", nil)
+	require.NoError(t, err)
+	require.Equal(t, "dev", rec.Action)
+	require.Contains(t, rec.Primitive, "--agent cursor") // fallback string
+}

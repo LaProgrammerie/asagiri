@@ -30,14 +30,32 @@ func (e *Executor) Execute(ctx context.Context, plan ExecutionPlan, snap StateSn
 	res := ExecuteResult{Intent: plan.Intent, Plan: plan}
 	fs := featureState(snap, plan.Intent.Feature)
 
+	maxTasks := opts.MaxTasks
+	if maxTasks == 0 && e.Config != nil {
+		maxTasks = e.Config.Work.MaxTasksPerRun
+	}
+	if maxTasks == 0 {
+		maxTasks = 1
+	}
+	executed := 0
 	for _, step := range plan.Steps {
 		if step.Condition != "" && !EvaluateCondition(step.Condition, plan.Intent, fs, opts) {
 			res.Skipped = append(res.Skipped, step.Command+": "+step.Condition)
 			continue
 		}
-		if opts.PlanOnly || opts.DryRun {
-			line := formatPrimitive(step)
-			res.Executed = append(res.Executed, "[dry] "+line)
+		if opts.PlanOnly {
+			res.Executed = append(res.Executed, "[plan] "+formatPrimitive(step))
+			continue
+		}
+		if step.Command == "dev" {
+			if executed >= maxTasks {
+				res.Skipped = append(res.Skipped, step.Command+": maxTasks reached")
+				continue
+			}
+			executed++
+		}
+		if opts.DryRun {
+			res.Executed = append(res.Executed, "[dry] "+formatPrimitive(step))
 			continue
 		}
 		runID, err := e.runStep(ctx, step, plan.Intent, opts)

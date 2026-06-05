@@ -3,6 +3,7 @@ package intent
 import (
 	"context"
 	"fmt"
+	"log/slog"
 
 	"github.com/LaProgrammerie/asagiri/application/internal/config"
 	"github.com/LaProgrammerie/asagiri/application/pkg/asagiri"
@@ -111,7 +112,7 @@ func (p *DefaultPlanner) BuildPlan(ctx context.Context, intent ResolvedIntent, s
 	if maxTasks == 0 {
 		maxTasks = 1
 	}
-	_ = maxTasks // enforced at execution
+	// maxTasks is enforced in Executor.Execute — stored in plan for caller use
 
 	return ExecutionPlan{Intent: intent, Steps: steps}, nil
 }
@@ -181,12 +182,21 @@ func EvaluateCondition(cond string, intent ResolvedIntent, fs FeatureState, opts
 	case "requires_human_approval":
 		return intent.RequiresHuman
 	default:
-		return true
+		slog.Warn("EvaluateCondition: unknown condition, blocking step", "condition", cond)
+		return false
 	}
 }
 
 // RecommendNext computes next primitive for `asa next`.
-func RecommendNext(snap StateSnapshot, feature string) (NextRecommendation, error) {
+func RecommendNext(snap StateSnapshot, feature string, cfg *config.Config) (NextRecommendation, error) {
+	devAgent := "cursor"
+	if cfg != nil && cfg.Work.DefaultAgent != "" {
+		devAgent = cfg.Work.DefaultAgent
+	}
+	reviewAgent := "codex"
+	if cfg != nil && cfg.Work.DefaultReviewer != "" {
+		reviewAgent = cfg.Work.DefaultReviewer
+	}
 	fs := featureState(snap, feature)
 	if feature == "" {
 		feature = snap.ActiveFeature
@@ -204,13 +214,13 @@ func RecommendNext(snap StateSnapshot, feature string) (NextRecommendation, erro
 			Reason: "implementation completed but validation missing", Primitive: cmd,
 		}, nil
 	case asagiri.StatusVerified:
-		cmd := fmt.Sprintf("asa review %s --task %s --agent codex", feature, taskID)
+		cmd := fmt.Sprintf("asa review %s --task %s --agent %s", feature, taskID, reviewAgent)
 		return NextRecommendation{
 			Feature: feature, TaskID: taskID, Action: "review",
 			Reason: "verified but review missing", Primitive: cmd,
 		}, nil
 	case asagiri.StatusEnriched, asagiri.StatusPending, asagiri.StatusPlanned, "":
-		cmd := fmt.Sprintf("asa dev %s --task %s --agent cursor", feature, taskID)
+		cmd := fmt.Sprintf("asa dev %s --task %s --agent %s", feature, taskID, devAgent)
 		if taskID == "" {
 			cmd = fmt.Sprintf("asa plan %s", feature)
 			return NextRecommendation{Feature: feature, Action: "plan", Reason: "no tasks planned", Primitive: cmd}, nil

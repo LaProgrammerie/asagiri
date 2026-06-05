@@ -33,7 +33,7 @@ func newNextCmd(dryRun *bool) *cobra.Command {
 			if feature == "" {
 				feature = snap.ActiveFeature
 			}
-			rec, err := intent.RecommendNext(snap, feature)
+			rec, err := intent.RecommendNext(snap, feature, ctx.Config)
 			if err != nil {
 				return err
 			}
