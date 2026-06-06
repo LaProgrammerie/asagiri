@@ -61,16 +61,19 @@ func TestAdvanceTUIStepPrefillsProductFromTagline(t *testing.T) {
 func TestBuildFormPrefillFromConfig(t *testing.T) {
 	repo := t.TempDir()
 	cfg := config.NewTestConfig("my-project")
+	cfg.Providers = nil
+	cfg.Agents = map[string]config.Agent{
+		"kiro":   {Command: "kiro"},
+		"cursor": {Command: "cursor"},
+		"codex":  {Command: "codex"},
+		"ollama": {Command: "ollama"},
+	}
 	cfg.Project.Name = "chatbot-php"
 	cfg.Project.DefaultBranch = "develop"
 	cfg.Work.DefaultSpecAgent = "kiro"
 	cfg.Work.DefaultAgent = "cursor"
 	cfg.Work.DefaultReviewer = "codex"
 	cfg.Work.DefaultEnricher = "ollama"
-	cfg.Agents["kiro"] = config.Agent{Command: "kiro"}
-	cfg.Agents["cursor"] = config.Agent{Command: "cursor"}
-	cfg.Agents["codex"] = config.Agent{Command: "codex"}
-	cfg.Agents["ollama"] = config.Agent{Command: "ollama"}
 	cfg.Verification.DefaultProfile = "staging"
 	cfg.UI.Theme = "asagiri-dark"
 	cfg.Budgets.PerRun.MaxEstimatedCost = 2.5

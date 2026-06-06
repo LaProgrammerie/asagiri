@@ -130,7 +130,8 @@ func newSpecCmd(dryRun *bool) *cobra.Command {
 				return err
 			}
 			defer ctx.Close()
-			runID, err := ctx.Workflow().SpecFeature(cmd.Context(), args[0], agentName)
+			agent := resolveWorkAgent(cmd, agentName, (*config.Config).WorkSpecAgent, ctx.Config)
+			runID, err := ctx.Workflow().SpecFeature(cmd.Context(), args[0], agent)
 			if err != nil {
 				return err
 			}
@@ -188,7 +189,8 @@ func newEnrichCmd(dryRun *bool) *cobra.Command {
 				return err
 			}
 			defer ctx.Close()
-			runID, err := ctx.Workflow().EnrichFeature(context.Background(), args[0], taskID, agentName, force)
+			agent := resolveWorkAgent(cmd, agentName, (*config.Config).WorkEnricherAgent, ctx.Config)
+			runID, err := ctx.Workflow().EnrichFeature(context.Background(), args[0], taskID, agent, force)
 			if err != nil {
 				return err
 			}
@@ -220,7 +222,8 @@ func newDevCmd(dryRun *bool) *cobra.Command {
 				return err
 			}
 			defer ctx.Close()
-			runID, err := ctx.Workflow().DevFeature(context.Background(), args[0], taskID, agentName, force)
+			agent := resolveWorkAgent(cmd, agentName, (*config.Config).WorkDevAgent, ctx.Config)
+			runID, err := ctx.Workflow().DevFeature(context.Background(), args[0], taskID, agent, force)
 			if err != nil {
 				return err
 			}
@@ -300,7 +303,8 @@ func newReviewCmd(dryRun *bool) *cobra.Command {
 				return err
 			}
 			defer ctx.Close()
-			runID, err := ctx.Workflow().ReviewFeature(context.Background(), args[0], taskID, agentName, force)
+			agent := resolveWorkAgent(cmd, agentName, (*config.Config).WorkReviewerAgent, ctx.Config)
+			runID, err := ctx.Workflow().ReviewFeature(context.Background(), args[0], taskID, agent, force)
 			if err != nil {
 				return err
 			}

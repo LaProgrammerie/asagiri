@@ -11,7 +11,7 @@ import (
 )
 
 func TestCanonicalTaskYAMLRoundTrip(t *testing.T) {
-	canonical := planToCanonical("feat", plan.Task{ID: "feat-001", Title: "A"})
+	canonical := planToCanonical("feat", plan.Task{ID: "feat-001", Title: "A"}, nil)
 	body, err := yaml.Marshal(canonical)
 	if err != nil {
 		t.Fatal(err)

@@ -36,6 +36,30 @@ asa work "develop billing-v2"                    # confirmation guidée par déf
 
 Répétez sans risque avant de dépenser : `--dry-run` simule chaque étape sans invoquer d’agent réel, exécuter de commande externe ni modifier l’état persistant du dépôt. `--plan-only` et `--estimate-only` s’arrêtent respectivement après la planification et l’estimation de coût.
 
+### Routage de scope (Product Layer V1)
+
+Chaque instruction est classée de façon déterministe (sans LLM). Priorité : **technical_task** → **feature_work** → **product_level_intent**. En cas de doute, Asagiri reste en **feature_work** et **ne déclenche pas** le Product Layer.
+
+| Scope | Signal typique | Comportement |
+| --- | --- | --- |
+| `technical_task` | bug, test, refactor, CI, lint | Workflow technique normal |
+| `feature_work` | endpoint, page, export, auth | Workflow technique normal |
+| `product_level_intent` | CRM/SaaS/marketplace greenfield | Préparation Product Layer, puis **arrêt contrôlé** |
+
+Les intentions produit suivent un workflow en **deux temps** (V1). Pas d’**auto-enchaînement** préparation → dev dans la même invocation `asa work`.
+
+```bash
+# Étape 1 — préparer les artefacts produit
+asa work "Créer un CRM pour artisans" --dry-run
+asa work "Créer un CRM pour artisans" --yes
+
+# Étape 2 — implémentation (invocation séparée)
+asa work crm-artisans --yes
+asa next --feature crm-artisans
+```
+
+Voir [Executable Product Layer](/docs/fr/concepts/executable-product-layer) et [Workflow produit vers code](/docs/fr/workflows/product-to-code).
+
 ## 3. Jalons de validation
 
 Le chemin guidé s’interrompt à des jalons de validation humaine plutôt que de s’exécuter sans surveillance. Asagiri exige une réponse affirmative explicite avant d’exécuter l’étape lorsque :

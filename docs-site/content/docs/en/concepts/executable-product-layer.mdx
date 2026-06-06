@@ -19,6 +19,33 @@ Intent
   -> work plan
 ```
 
+## `asa work` integration (V1)
+
+`asa work` classifies each instruction without an LLM. Priority: **technical_task** > **feature_work** > **product_level_intent**. When uncertain, classification falls back to **feature_work** so the Product Layer does not run accidentally.
+
+| Scope | Route |
+| --- | --- |
+| `technical_task` | Normal technical workflow |
+| `feature_work` | Normal technical workflow |
+| `product_level_intent` | Product Layer preparation, then **controlled stop** |
+
+### Two-step product workflow (V1)
+
+Product-level intents deliberately split preparation and implementation across **two invocations**. Asagiri does **not** auto-chain into the dev pipeline after generating tasks in the same run.
+
+```bash
+# Step 1 — prepare artifacts
+asa work "Build a CRM for artisans" --yes
+
+# Step 2 — continue implementation
+asa work crm-artisans --yes
+asa next --feature crm-artisans
+```
+
+Slugs are derived heuristically from the intent (e.g. `crm-artisans`); an existing slug under `.asagiri/products/` is preserved. Use `--dry-run` or `--plan-only` to preview the Product Layer plan without writing files.
+
+Expert commands (`asa prototype`, `asa flows`, `asa contracts`, `asa spec generate-from-product`) remain available outside the happy path.
+
 ## Repository structure
 
 For a product named `workspace-saas`, Asagiri stores artifacts under:

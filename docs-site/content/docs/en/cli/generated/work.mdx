@@ -1,6 +1,6 @@
 ---
 title: Work · Asagiri CLI
-description: Exécuter une intention en langage naturel
+description: Exécute une intention en langage naturel (resolve → plan → pipeline technique).
 ---
 
 CLI path: **`asa work`**
@@ -50,10 +50,17 @@ asa work [flags]
 ## Examples
 
 ```bash
-asa work
-```
+# Feature technique
+  asa work "ajoute export CSV" --dry-run
 
-> Wire richer samples through **cobra.Command.Example** when the happy path warrants copy/paste-friendly automation beyond this scaffold.
+  # Intention produit — étape 1 (préparation)
+  asa work "Créer un CRM pour artisans" --dry-run
+  asa work "Créer un CRM pour artisans" --yes
+
+  # Intention produit — étape 2 (implémentation)
+  asa work crm-artisans --yes
+  asa next --feature crm-artisans
+```
 
 ## What happens internally
 

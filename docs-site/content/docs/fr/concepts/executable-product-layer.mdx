@@ -19,6 +19,33 @@ Intent
   -> plan de travail
 ```
 
+## Intégration `asa work` (V1)
+
+`asa work` classe chaque instruction sans LLM. Priorité : **technical_task** > **feature_work** > **product_level_intent**. En cas de doute, repli sur **feature_work** (le Product Layer ne se déclenche pas).
+
+| Scope | Route |
+| --- | --- |
+| `technical_task` | Workflow technique normal |
+| `feature_work` | Workflow technique normal |
+| `product_level_intent` | Préparation Product Layer, puis **arrêt contrôlé** |
+
+### Workflow produit en deux temps (V1)
+
+Les intentions produit séparent volontairement préparation et implémentation sur **deux invocations**. Pas d’auto-enchaînement vers le dev dans la même commande.
+
+```bash
+# Étape 1 — préparer les artefacts
+asa work "Créer un CRM pour artisans" --yes
+
+# Étape 2 — continuer l’implémentation
+asa work crm-artisans --yes
+asa next --feature crm-artisans
+```
+
+Les slugs sont dérivés heuristiquement (ex. `crm-artisans`) ; un slug existant sous `.asagiri/products/` est conservé. `--dry-run` et `--plan-only` prévisualisent le plan Product Layer.
+
+Les commandes expertes (`asa prototype`, `flows`, `contracts`, `spec generate-from-product`) restent disponibles hors happy path.
+
 ## Structure repo
 
 ```text

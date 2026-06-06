@@ -1,60 +1,64 @@
-# Current spec — audit-coherence-consolidation (active)
+# Current spec — task-validation-gates
 
-**Phase :** Correction & simplification (audit `AUD-001 … AUD-007`) — **livré**
-(`2026-06-05`, ADR-030 ; Quality_Gate complet vert, Regeneration_Without_Diff
-sans divergence).
-**Handoff :** [`handoff.md`](handoff.md)
+**Phase :** **task-validation-gates** — **Tranche A livrée** (`2026-06-06`, ADR-031)
+**Handoff :** [`handoff.md`](handoff.md) — clôturé Tranche A ; prochaine spec à définir.
 
 ## Objet
 
-Appliquer les **corrections concrètes** des sept constats d'audit `AUD-001 …
-AUD-007`, **simplifier** la couche d'orchestration perçue comme opaque, et poser
-les **garde-fous** anti-régression — sans nouvelle couche ni moteur d'audit
-runtime. Cause unique de la dérive : la commande `runs` (ADR-029) n'a pas été
-suivie d'une régénération de la doc CLI.
+Gate de gouvernance read-only après chaque tâche dev (`mode: per-task`), verdict structuré
+`PASS | WARN | FAIL`, pour détecter tôt spec drift et violations d'architecture — **sans**
+nouveau rôle métier obligatoire ni nouvelle commande CLI top-level.
 
-## Spec
+## Décisions figées (Tranche A)
 
-- **Kiro :** `.kiro/specs/audit-coherence-consolidation/` (requirements, design, tasks)
-- **Audit source :** `.kiro/specs/audit-coherence-consolidation/audit-report.md`
-- **Code cible :** fichiers existants — `cli/docgen`, `internal/routing`,
-  `internal/policy`, `internal/cli` (help, explain), `internal/onboarding`,
-  `problems.md`, `.golangci.yml`, `.github/workflows/go-ci.yml`, `docs/ai/03-standards.md`
+| # | Sujet | Décision |
+|---|--------|----------|
+| D1 | Config | `work.governance` |
+| D2 | WARN | Advisory par défaut (`warn_is_advisory: true`) — continue avec trace |
+| D3 | Agent default | `reviewer` ; `architect` autorisé si configuré |
 
-## Constats → corrections (livrés)
+## Spec & code
 
-| Constat | Sévérité | Correction (plus petit changement) | Statut |
-|---------|----------|-------------------------------------|--------|
-| AUD-001 | error | Régénérer la doc CLI → ajoute `runs.mdx` | clôturé |
-| AUD-002 | error | Même régénération → lien fratrie `> - [Runs](./runs.mdx)` | clôturé |
-| AUD-003 | error | `golangci-lint` v2 pinné + `.golangci.yml` v2 + workflow Go CI | clôturé |
-| AUD-004 | warn | `problems.md` = Remediation_Register (automate de statut) | clôturé |
-| AUD-005 | warn | Routing config-driven : `Route → (Decision, error)`, précédence `no_cloud`, `asa explain routing` | clôturé |
-| AUD-006 | info | Rôles Ollama reliés au canon courant + check de cohérence | clôturé |
-| AUD-007 | info | Guided_Path mis en avant (help + page docs 4 locales), sans retrait | clôturé |
+- **Kiro :** `.kiro/specs/task-validation-gates/` (requirements, design, tasks)
+- **Code :** `internal/config/governance_config.go`, `internal/workflow/governance*.go`, `dev_task.go`,
+  `pkg/asagiri/types.go` (`TaskGovernance`), `internal/report/report.go`, `.asagiri/config.yaml.example`
 
-## Garde-fous (prouvés verts)
+## Livré (Tranche A)
 
-- **Quality_Gate** : `make build` ∧ `go vet ./...` ∧ `go test ./...` ∧
-  `golangci-lint run` (binaire v2.12.2 pinné), tous exit 0.
-- **Regeneration_Without_Diff** : `asa docs generate-cli` → tmp +
-  `diff --exclude=meta.json`, aucune divergence.
-- **Go CI** : `.github/workflows/go-ci.yml` (push/PR) = Quality_Gate +
-  Regeneration_Check + scan secrets en clair.
-- **PBT** : propriétés `P1 … P21` (docgen, routing, policy, onboarding, locales).
+- Config `work.governance` + defaults (`enabled: false`)
+- Modes `off` | `per-task` ; autres modes ignorés (`EnabledButInactive`)
+- Gate inline dans `DevFeature` (`devTaskWithGovernanceRetries`)
+- Parse YAML/JSON + classify ; dry-run → PASS simulé
+- Retry option A : `retries_used < max_retries` ; passages max = `max_retries + 1`
+- Trace payload, logs, report minimal
+- Tests parse, config, workflow, retry 0/1/2, régression config legacy
+
+## Hors scope (Tranche A — non livré)
+
+- `smart`, `per-step`, `milestone`
+- execution graph / trust graph
+- Commande `asa governance`
+- UI / dashboard
+- Refonte `review` / `verify`
+
+## Sémantique retry (canonique)
+
+| | |
+|---|---|
+| `max_retries` | Relances autorisées après le 1er FAIL governance |
+| `governance.retries` | Relances déjà consommées |
+| `history[].retry` | Tentative governance (0 = première évaluation) |
+| Passages max | `max_retries + 1` |
 
 ## Invariants
 
-- Aucune nouvelle couche, aucun package `internal/audit`, aucune commande `asa audit`.
-- UI = client du bus (ADR-027) ; aucune logique métier dans `internal/ui`.
-- Moteur local-first et déterministe (sorties identiques pour entrées identiques).
-- Toutes les Unitary_Command préservées (`asa spec | plan | enrich | dev | verify | review`).
+- Configs sans `work.governance` ou `enabled: false` : pipeline dev inchangé
+- Unitary_Command préservées (`asa dev`, `asa verify`, `asa review`, …)
+- Pas de panic aux frontières CLI
 
 ## Précédent (livré)
 
-- **cockpit-consolidation** — Operations Cockpit Direction 4 — livré
-  (`2026-05-31`, ADR-029).
-- **project-onboarding** — Project Onboarding & Readiness + TUI wizard — livré
-  (`2026-05-30`).
+- **task-validation-gates Tranche A** — ADR-031 (`2026-06-06`)
+- **audit-coherence-consolidation** — ADR-030 (`2026-06-05`)
 
 Branding : **Asagiri** / **`asa`**.

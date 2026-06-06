@@ -30,7 +30,7 @@ import "github.com/LaProgrammerie/asagiri/application/internal/agent/claudecode"
 cfg := claudecode.DefaultConfig()
 
 // Build an adapter (implements agent.Agent)
-a, err := claudecode.New(cfg, dryRun)
+a, err := claudecode.New("dev", cfg, dryRun)
 ```
 
 ## What it encapsulates

@@ -14,7 +14,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-func planToCanonical(feature string, t plan.Task) asagiri.Task {
+func planToCanonical(feature string, t plan.Task, cfg *config.Config) asagiri.Task {
 	now := time.Now().UTC()
 	task := asagiri.Task{
 		ID:      t.ID,
@@ -32,9 +32,16 @@ func planToCanonical(feature string, t plan.Task) asagiri.Task {
 		Acceptance: t.Checks,
 		Agents: asagiri.TaskAgents{
 			Implementer: config.DefaultAgentDev,
-			Reviewer:      config.DefaultAgentReviewer,
-			Enricher:      config.DefaultAgentEnrich,
+			Reviewer:    config.DefaultAgentReviewer,
+			Enricher:    config.DefaultAgentEnrich,
 		},
+	}
+	if cfg != nil {
+		task.Agents = asagiri.TaskAgents{
+			Implementer: cfg.WorkDevAgent(),
+			Reviewer:    cfg.WorkReviewerAgent(),
+			Enricher:    cfg.WorkEnricherAgent(),
+		}
 	}
 	task.TouchMetadata(now)
 	if t.Status != "" {

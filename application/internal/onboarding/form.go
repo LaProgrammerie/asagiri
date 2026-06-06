@@ -38,6 +38,7 @@ var TUIStepOrder = []WizardStep{
 	StepWelcome,
 	StepProject,
 	StepStack,
+	StepProviders,
 	StepAgents,
 	StepDocs,
 	StepFeature,
@@ -92,16 +93,16 @@ func overlayConfig(form Form, cfg *config.Config) Form {
 	if cfg.Project.DefaultBranch != "" {
 		form.Answers.DefaultBranch = cfg.Project.DefaultBranch
 	}
-	if cfg.Work.DefaultSpecAgent != "" && form.Answers.DefaultSpecAgent == "" {
+	if cfg.Work.DefaultSpecAgent != "" {
 		form.Answers.DefaultSpecAgent = cfg.Work.DefaultSpecAgent
 	}
-	if cfg.Work.DefaultAgent != "" && form.Answers.DefaultAgent == "" {
+	if cfg.Work.DefaultAgent != "" {
 		form.Answers.DefaultAgent = cfg.Work.DefaultAgent
 	}
-	if cfg.Work.DefaultReviewer != "" && form.Answers.DefaultReviewer == "" {
+	if cfg.Work.DefaultReviewer != "" {
 		form.Answers.DefaultReviewer = cfg.Work.DefaultReviewer
 	}
-	if cfg.Work.DefaultEnricher != "" && form.Answers.DefaultEnricher == "" {
+	if cfg.Work.DefaultEnricher != "" {
 		form.Answers.DefaultEnricher = cfg.Work.DefaultEnricher
 	}
 	form.KnownAgentKeys = AgentKeys(cfg)
@@ -141,6 +142,7 @@ func (f Form) FieldsMap() map[string]string {
 		"default_reviewer":   f.Answers.DefaultReviewer,
 		"product_one_liner":  f.Answers.ProductOneLiner,
 		"feature_slug":       f.Answers.FeatureSlug,
+		"enabled_providers":  f.Answers.EnabledProviders,
 	}
 	if len(f.KnownAgentKeys) > 0 {
 		m["agents_available"] = strings.Join(f.KnownAgentKeys, ", ")
@@ -177,6 +179,7 @@ func FormFromMaps(step WizardStep, fields, advanced map[string]string) Form {
 		DefaultReviewer:  strings.TrimSpace(fields["default_reviewer"]),
 		ProductOneLiner:  strings.TrimSpace(fields["product_one_liner"]),
 		FeatureSlug:      strings.TrimSpace(fields["feature_slug"]),
+		EnabledProviders: strings.TrimSpace(fields["enabled_providers"]),
 	}
 	if v := strings.TrimSpace(fields["agents_available"]); v != "" {
 		f.KnownAgentKeys = strings.Split(v, ", ")
@@ -206,6 +209,10 @@ func ValidateStep(step WizardStep, f Form) map[string]string {
 	case StepStack:
 		if strings.TrimSpace(f.Answers.Stack) == "" {
 			errors["stack"] = "stack requise (go, castor, node…)"
+		}
+	case StepProviders:
+		if len(parseEnabledProvidersCSV(f.Answers.EnabledProviders)) == 0 {
+			errors["enabled_providers"] = "au moins un provider (ex. kiro-cli, ollama)"
 		}
 	case StepAgents:
 		known := f.KnownAgentKeys

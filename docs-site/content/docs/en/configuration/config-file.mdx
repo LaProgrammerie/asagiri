@@ -61,19 +61,48 @@ intent:
 
 ## `work`
 
-`work` sets repo-wide defaults for orchestration: which agents run which roles, where the pipeline stops, verification and review toggles, task limits, and whether plan confirmation is required.
+`work` sets repo-wide defaults for orchestration: which **logical agent ids** (keys under `agents:`) run which roles, where the pipeline stops, verification and review toggles, task limits, and whether plan confirmation is required.
 
 ```yaml
 work:
-  default_agent: cursor
-  default_reviewer: codex
-  default_enricher: ollama
+  default_spec_agent: laprogrammerie
+  default_agent: dev
+  default_reviewer: reviewer
+  default_enricher: local-rag
   stop_after: report
   auto_verify: true
   auto_review: false
   max_tasks_per_run: 1
   require_plan_confirmation: true
 ```
+
+## `providers`
+
+External runtimes (CLI tools, local servers). **`providers.<id>.type`** selects the adapter implementation — not the map key and not the agent name.
+
+```yaml
+providers:
+  kiro-cli:
+    type: kiro-cli
+    command: kiro
+    args: ["--cli"]
+  claude-code:
+    type: claude-code
+    command: claude
+    args: ["--print", "--output-format", "stream-json"]
+  ollama:
+    type: ollama
+    command: ollama
+    args: ["run", "qwen2.5-coder:14b"]
+```
+
+See [Agents configuration](/docs/configuration/agents) for the full providers + agents model.
+
+## `agents`
+
+Logical profiles referenced by `work`, `--agent`, and coordination. Prefer `agents.<id>.provider` pointing at `providers:`; legacy inline `command` remains supported.
+
+Dedicated page: [Agents configuration](/docs/configuration/agents).
 
 ## `sources`
 
@@ -118,10 +147,6 @@ worktrees:
   branch_prefix: asa
   cleanup_policy: keep_failed
 ```
-
-## `agents`
-
-Map logical agent ids to subprocess commands and agent-specific options. The dedicated page walks through fields and examples: [Agents configuration](/docs/configuration/agents).
 
 ## `validation`
 

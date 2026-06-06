@@ -5,7 +5,25 @@ description: Enchaînement complet d’une intention produit jusqu’au plan de 
 
 # Workflow produit vers code
 
-Séquence recommandée :
+## Chemin guidé V1 (`asa work`)
+
+Pour une intention produit large, le happy path passe par **deux invocations** de `asa work` (sans auto-enchaînement) :
+
+```bash
+# Étape 1 — préparation Product Layer
+asa work "Créer un CRM pour artisans" --dry-run
+asa work "Créer un CRM pour artisans" --yes
+
+# Étape 2 — implémentation technique
+asa work crm-artisans --yes
+asa next --feature crm-artisans
+```
+
+Classification : `technical_task` et `feature_work` → workflow technique normal ; `product_level_intent` → Product Layer puis arrêt contrôlé.
+
+## Séquence experte (commandes unitaires)
+
+Séquence manuelle équivalente :
 
 ```bash
 asa prototype create "SaaS workspace avec invitations" --product workspace-saas

@@ -115,6 +115,16 @@ func renderWizardPanelBody(vm ViewModel, st theme.Styles) string {
 			focused := m.FocusFooter < 0 && i == m.FocusField
 			body.WriteString(st.RenderField(row.Label, m.fieldValue(row.Key), focused) + "\n")
 		}
+	case onbdomain.StepProviders:
+		body.WriteString(st.Muted.Render("Runtimes externes — l'adapter est choisi par providers.<id>.type, pas par le nom.") + "\n\n")
+		for _, line := range renderProviderCatalog(m, st) {
+			body.WriteString(line + "\n")
+		}
+		body.WriteString("\n")
+		for i, row := range m.fieldRows {
+			focused := m.FocusFooter < 0 && i == m.FocusField
+			body.WriteString(st.RenderField(row.Label, m.fieldValue(row.Key), focused) + "\n")
+		}
 	case onbdomain.StepAgents:
 		for _, line := range renderAgentPipeline(m, st) {
 			body.WriteString(line + "\n")
@@ -318,6 +328,8 @@ func tabShortLabel(step onbdomain.WizardStep) string {
 		return "Project"
 	case onbdomain.StepStack:
 		return "Stack"
+	case onbdomain.StepProviders:
+		return "Providers"
 	case onbdomain.StepAgents:
 		return "Agents"
 	case onbdomain.StepDocs:

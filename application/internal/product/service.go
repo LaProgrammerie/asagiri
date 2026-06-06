@@ -31,10 +31,7 @@ type CreatePrototypeOptions struct {
 }
 
 func (s *Service) CreatePrototype(opts CreatePrototypeOptions) (string, error) {
-	product := Slug(opts.Product)
-	if product == "product" {
-		product = Slug(opts.Intent)
-	}
+	product := ResolveProductID(s.repo.RepoRoot, opts.Intent, opts.Product)
 	if opts.DryRun {
 		return product, nil
 	}

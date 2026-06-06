@@ -121,6 +121,10 @@ func toMarkdown(r RunReport) string {
 			fmt.Fprintf(&sb, "- `%s` [%s] %s\n", task.ID, task.Status, extractTaskTitle(task.PayloadJSON))
 		}
 	}
+	if gov := governanceMarkdown(r.Tasks); gov != "" {
+		sb.WriteString("\n")
+		sb.WriteString(gov)
+	}
 	if r.Cost != nil {
 		sb.WriteString("\n")
 		sb.WriteString(CostPerformanceMarkdown(*r.Cost))
@@ -167,4 +171,62 @@ func extractTaskTitle(payloadJSON string) string {
 	}
 	title, _ := payload["title"].(string)
 	return title
+}
+
+type governanceSnapshot struct {
+	TaskID     string  `json:"-"`
+	Status     string  `json:"status"`
+	Confidence float64 `json:"confidence"`
+	Notes      string  `json:"notes"`
+	AgentHint  string  `json:"-"`
+}
+
+func governanceMarkdown(tasks []sqlite.Task) string {
+	var rows []governanceSnapshot
+	for _, task := range tasks {
+		if snap, ok := lastGovernanceSnapshot(task.PayloadJSON); ok {
+			snap.TaskID = task.ID
+			rows = append(rows, snap)
+		}
+	}
+	if len(rows) == 0 {
+		return ""
+	}
+	var sb strings.Builder
+	sb.WriteString("## Governance\n\n")
+	sb.WriteString("| Task | Status | Confidence | Notes |\n")
+	sb.WriteString("|---|---|---:|---|\n")
+	for _, row := range rows {
+		fmt.Fprintf(&sb, "| `%s` | %s | %.2f | %s |\n", row.TaskID, row.Status, row.Confidence, row.Notes)
+	}
+	return sb.String()
+}
+
+func lastGovernanceSnapshot(payloadJSON string) (governanceSnapshot, bool) {
+	if payloadJSON == "" {
+		return governanceSnapshot{}, false
+	}
+	var payload struct {
+		Governance *struct {
+			History []struct {
+				Status     string   `json:"status"`
+				Confidence float64  `json:"confidence"`
+				Notes      []string `json:"notes"`
+				ParseError string   `json:"parse_error"`
+			} `json:"history"`
+		} `json:"governance"`
+	}
+	if err := json.Unmarshal([]byte(payloadJSON), &payload); err != nil || payload.Governance == nil || len(payload.Governance.History) == 0 {
+		return governanceSnapshot{}, false
+	}
+	last := payload.Governance.History[len(payload.Governance.History)-1]
+	notes := strings.Join(last.Notes, "; ")
+	if notes == "" && last.ParseError != "" {
+		notes = last.ParseError
+	}
+	return governanceSnapshot{
+		Status:     last.Status,
+		Confidence: last.Confidence,
+		Notes:      notes,
+	}, true
 }

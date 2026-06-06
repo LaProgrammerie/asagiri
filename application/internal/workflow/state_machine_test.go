@@ -27,6 +27,12 @@ func TestTransitionTaskAlreadyDone(t *testing.T) {
 	}
 }
 
+func TestTransitionTaskImplementedToRunning(t *testing.T) {
+	if err := TransitionTask(asagiri.StatusImplemented, asagiri.StatusRunning, true); err != nil {
+		t.Fatalf("implemented -> running: %v", err)
+	}
+}
+
 func TestNextWorkflowStep(t *testing.T) {
 	if got := NextWorkflowStep([]string{asagiri.StatusPlanned}); got != "enrich" {
 		t.Fatalf("got %q", got)

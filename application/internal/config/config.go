@@ -29,7 +29,8 @@ type Config struct {
 	Specs          Specs                 `yaml:"specs"`
 	State          State                 `yaml:"state"`
 	Worktrees      Worktrees             `yaml:"worktrees"`
-	Agents         map[string]Agent      `yaml:"agents"`
+	Providers      map[string]ProviderConfig `yaml:"providers"`
+	Agents         map[string]Agent          `yaml:"agents"`
 	Validation     ValidationConfig      `yaml:"validation"`
 	Policies       Policies              `yaml:"policies"`
 	Intent         IntentConfig          `yaml:"intent"`
@@ -296,15 +297,26 @@ type IntentResolverConfig struct {
 
 // WorkConfig defaults for work/continue (specv2 §9).
 type WorkConfig struct {
-	DefaultSpecAgent        string `yaml:"default_spec_agent"`
-	DefaultAgent            string `yaml:"default_agent"`
-	DefaultReviewer         string `yaml:"default_reviewer"`
-	DefaultEnricher         string `yaml:"default_enricher"`
-	StopAfter               string `yaml:"stop_after"`
-	AutoVerify              bool   `yaml:"auto_verify"`
-	AutoReview              bool   `yaml:"auto_review"`
-	MaxTasksPerRun          int    `yaml:"max_tasks_per_run"`
-	RequirePlanConfirmation bool   `yaml:"require_plan_confirmation"`
+	DefaultSpecAgent        string                 `yaml:"default_spec_agent"`
+	DefaultAgent            string                 `yaml:"default_agent"`
+	DefaultReviewer         string                 `yaml:"default_reviewer"`
+	DefaultEnricher         string                 `yaml:"default_enricher"`
+	StopAfter               string                 `yaml:"stop_after"`
+	AutoVerify              bool                   `yaml:"auto_verify"`
+	AutoReview              bool                   `yaml:"auto_review"`
+	MaxTasksPerRun          int                    `yaml:"max_tasks_per_run"`
+	RequirePlanConfirmation bool                   `yaml:"require_plan_confirmation"`
+	Governance              WorkGovernanceConfig   `yaml:"governance"`
+}
+
+// WorkGovernanceConfig controls post-dev governance gates (task-validation-gates Tranche A).
+type WorkGovernanceConfig struct {
+	Enabled        bool     `yaml:"enabled"`
+	Mode           string   `yaml:"mode"` // off | per-task (Tranche A)
+	Agent          string   `yaml:"agent"`
+	FailOn         []string `yaml:"fail_on"`
+	WarnIsAdvisory *bool    `yaml:"warn_is_advisory"`
+	MaxRetries     *int     `yaml:"max_retries"` // relances autorisées après le 1er FAIL ; défaut 2 si omis
 }
 
 // SourcesConfig lists external spec sources (specv2 §9).
@@ -355,13 +367,16 @@ type Worktrees struct {
 }
 
 type Agent struct {
-	Command        string   `yaml:"command"`
-	Args           []string `yaml:"args"`
-	Timeout        int      `yaml:"timeout,omitempty"`
-	DefaultModel   string   `yaml:"default_model,omitempty"`
-	Endpoint       string   `yaml:"endpoint,omitempty"`
-	Model          string   `yaml:"model,omitempty"`
-	EmbeddingModel string   `yaml:"embedding_model,omitempty"`
+	Provider       string            `yaml:"provider,omitempty"`
+	Profile        string            `yaml:"profile,omitempty"`
+	Command        string            `yaml:"command"`
+	Args           []string          `yaml:"args"`
+	Env            map[string]string `yaml:"env,omitempty"`
+	Timeout        int               `yaml:"timeout,omitempty"`
+	DefaultModel   string            `yaml:"default_model,omitempty"`
+	Endpoint       string            `yaml:"endpoint,omitempty"`
+	Model          string            `yaml:"model,omitempty"`
+	EmbeddingModel string            `yaml:"embedding_model,omitempty"`
 }
 
 // ValidationConfig holds named validation commands (spec §7.1).
@@ -681,6 +696,7 @@ func (c *Config) applyIntentDefaults() {
 	if c.Work.MaxTasksPerRun == 0 {
 		c.Work.MaxTasksPerRun = 1
 	}
+	applyWorkGovernanceDefaults(&c.Work.Governance)
 	if !c.Sources.Local.Enabled && len(c.Sources.Local.Paths) == 0 {
 		c.Sources.Local.Enabled = true
 	}
@@ -787,6 +803,9 @@ func (c *Config) Validate(repoRoot string) error {
 	}
 
 	if err := c.validateCoordination(); err != nil {
+		return err
+	}
+	if err := c.validateProvidersAndAgents(); err != nil {
 		return err
 	}
 
@@ -902,6 +921,10 @@ func NewTestConfig(repoDirName string) *Config {
 	c := &Config{}
 	c.applyDefaults(repoDirName)
 	c.applyV3Defaults()
+	ApplyRecommendedRuntimeCatalog(c)
+	if c.Providers == nil {
+		c.Providers = map[string]ProviderConfig{}
+	}
 	if c.Agents == nil {
 		c.Agents = map[string]Agent{}
 	}

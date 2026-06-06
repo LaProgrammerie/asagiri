@@ -73,7 +73,7 @@ func TestHighestRisk(t *testing.T) {
 }
 
 func TestDefaultAgentForImplementationRisk(t *testing.T) {
-	require.Equal(t, "cursor", DefaultAgentFor(GraphNode{
+	require.Equal(t, "dev", DefaultAgentFor(GraphNode{
 		Type: NodeTypeImplementation,
 		Risk: RiskLevelMedium,
 	}, nil))
@@ -81,7 +81,7 @@ func TestDefaultAgentForImplementationRisk(t *testing.T) {
 		Type: NodeTypeImplementation,
 		Risk: RiskLevelHigh,
 	}, nil))
-	require.Equal(t, "codex", DefaultAgentFor(GraphNode{
+	require.Equal(t, "reviewer", DefaultAgentFor(GraphNode{
 		Type: NodeTypeReview,
 		Risk: RiskLevelHigh,
 	}, nil))

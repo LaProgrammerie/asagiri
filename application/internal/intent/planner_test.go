@@ -87,5 +87,5 @@ func TestRecommendNextNilCfgFallback(t *testing.T) {
 	rec, err := RecommendNext(snap, "f", nil)
 	require.NoError(t, err)
 	require.Equal(t, "dev", rec.Action)
-	require.Contains(t, rec.Primitive, "--agent cursor") // fallback string
+	require.Contains(t, rec.Primitive, "--agent dev")
 }

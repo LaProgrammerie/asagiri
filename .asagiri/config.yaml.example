@@ -1,6 +1,10 @@
 # Exemple Asagiri (spec.md §7.1). Après copie vers config.yaml, adaptez au dépôt.
 # Template Go : les commandes validation par défaut sont injectées si go.mod est présent
 # (go test ./..., go vet ./..., golangci-lint run). Surchargez validation.commands ci-dessous.
+#
+# Modèle mental : Provider (runtime externe) → Agent (profil logique) → work.* (rôle) → workflow
+# L'adapter est choisi par providers.<id>.type — jamais par le nom du provider ou de l'agent.
+# Plusieurs agents peuvent partager le même provider (ex. dev + architect → kiro-cli).
 
 project:
   name: my-project
@@ -31,15 +35,26 @@ intent:
     ask_when_below_confidence: true
 
 work:
-  default_spec_agent: kiro
-  default_agent: cursor
-  default_reviewer: codex
-  default_enricher: ollama
+  # work.* référence des clés agents: (profils logiques), pas des providers.
+  default_spec_agent: laprogrammerie
+  default_agent: dev
+  default_reviewer: reviewer
+  default_enricher: local-rag
   stop_after: report
   auto_verify: true
   auto_review: false
   max_tasks_per_run: 1
   require_plan_confirmation: true
+  governance:
+    enabled: false
+    mode: per-task
+    agent: reviewer
+    fail_on:
+      - spec_drift
+      - architecture_violation
+      - unexpected_design_change
+    warn_is_advisory: true
+    max_retries: 2
 
 sources:
   local:
@@ -68,34 +83,53 @@ worktrees:
   branch_prefix: asagiri
   cleanup_policy: keep_failed
 
-agents:
-  kiro:
+# --- Runtimes externes (CLI, API locale, etc.) ---
+providers:
+  kiro-cli:
+    type: kiro-cli
     command: kiro
     args: ["--cli"]
-  cursor:
+  cursor-cli:
+    type: cursor-cli
     command: cursor-agent
-    default_model: auto
     timeout: 3600
-  codex:
-    command: codex
-    timeout: 3600
-  claude:
-    command: claude
-    timeout: 3600
-  # Claude Code non-interactive preset — see application/internal/agent/claudecode/
-  # Use this when you want --print + stream-json output (recommended for asa workflows).
-  # Set work.default_agent: claude-code to route all dev tasks here.
   claude-code:
+    type: claude-code
     command: claude
     args: ["--print", "--output-format", "stream-json"]
     timeout: 600
+  codex-cli:
+    type: codex-cli
+    command: codex
+    timeout: 3600
   ollama:
+    type: ollama
     command: ollama
     args: ["run", "qwen2.5-coder:14b"]
+    timeout: 300
+
+# --- Profils logiques (référencés par work.*, flags --agent, coordination) ---
+agents:
+  laprogrammerie:
+    provider: kiro-cli
+    profile: laprogrammerie   # hint métier — ne sélectionne PAS l'adapter
+  dev:
+    provider: kiro-cli
+  architect:
+    provider: kiro-cli        # même provider que dev — cas d'usage courant
+  reviewer:
+    provider: claude-code
+  local-rag:
+    provider: ollama
     endpoint: http://localhost:11434
     model: qwen2.5-coder:14b
     embedding_model: nomic-embed-text
-    timeout: 300
+
+# --- Format legacy (toujours supporté) : agent sans provider = type exec implicite ---
+# agents:
+#   claude:
+#     command: claude
+#     timeout: 3600
 
 validation:
   commands:
@@ -136,14 +170,14 @@ coordination:
     - payments
   assignment:
     investigation: local
-    architecture_review: claude
-    implementation.medium: cursor
-    implementation.high: claude
-    security_review: codex
+    architecture_review: architect
+    implementation.medium: dev
+    implementation.high: reviewer
+    security_review: reviewer
     validation: local
   profiles:
-    cursor-implementer:
-      agent: cursor
+    dev-implementer:
+      agent: dev
       role: implementer
       capabilities:
         - implementation
@@ -151,8 +185,8 @@ coordination:
         - no_git_push
       max_context_tokens: 128000
       isolation: isolated_worktree
-    codex-reviewer:
-      agent: codex
+    claude-reviewer:
+      agent: reviewer
       role: reviewer
       capabilities:
         - architecture_review
@@ -163,8 +197,8 @@ coordination:
         - no_git_push
       max_context_tokens: 32000
       isolation: readonly
-    claude-architect:
-      agent: claude
+    kiro-architect:
+      agent: architect
       role: architect
       capabilities:
         - architecture_review

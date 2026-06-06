@@ -1,70 +1,120 @@
 ---
 title: Agents configuration
-description: Map agent ids to CLI commands and timeouts in config.yaml.
+description: Map logical agent profiles to providers and work roles in config.yaml.
 ---
 
 # Agents configuration
 
-Asagiri does not talk to agent APIs directly. It starts each agent as a **subprocess without a shell** (`application/internal/agent/exec`), passing a plain `argv` built from your config. Every key under `agents:` is a logical id you reference from flags (`--agent`), from `work.default_agent`, and from routing rules.
+Asagiri orchestrates **logical agents** (profiles you name in `agents:`) that run on **providers** (external runtimes declared in `providers:`). The adapter is selected by **`providers.<id>.type`** — never by the provider or agent map key. The `profile` field on an agent is a business hint only; it does not pick an adapter.
 
-The block below is a realistic shape: several ids point at different executables, with optional `args`, models, timeouts, and an Ollama-style HTTP endpoint where that agent type expects it.
+Several logical agents may share the same provider (for example `dev` and `architect` both using `kiro-cli`).
 
-## Example
+## Mental model
+
+```
+Provider  →  Agent  →  Work role  →  Workflow
+```
+
+- **Provider** — Kiro CLI, Claude Code, Cursor Agent, Ollama, … (`command`, `args`, `type`)
+- **Agent** — `laprogrammerie`, `dev`, `reviewer`, … referenced by `work.default_*` and `--agent`
+- **Work role** — `work.default_agent`, `work.default_reviewer`, …
+- **Workflow** — `asa spec`, `asa dev`, `asa review`, …
+
+## Recommended example
 
 ```yaml
-agents:
-  kiro:
+providers:
+  kiro-cli:
+    type: kiro-cli
     command: kiro
     args: ["--cli"]
-  cursor:
-    command: cursor-agent
-    default_model: auto
-    timeout: 3600
-  codex:
-    command: codex
-    timeout: 3600
-  claude:
+  claude-code:
+    type: claude-code
     command: claude
-    timeout: 3600
+    args: ["--print", "--output-format", "stream-json"]
+    timeout: 600
   ollama:
+    type: ollama
+    command: ollama
+    args: ["run", "qwen2.5-coder:14b"]
+    timeout: 300
+
+agents:
+  laprogrammerie:
+    provider: kiro-cli
+    profile: laprogrammerie
+  dev:
+    provider: kiro-cli
+  architect:
+    provider: kiro-cli
+  reviewer:
+    provider: claude-code
+  local-rag:
+    provider: ollama
     endpoint: http://localhost:11434
     model: qwen2.5-coder:14b
     embedding_model: nomic-embed-text
-    timeout: 300
+
+work:
+  default_spec_agent: laprogrammerie
+  default_agent: dev
+  default_reviewer: reviewer
+  default_enricher: local-rag
 ```
 
-## Fields
+## Legacy format (still supported)
 
-The table is a quick map from config field to how the exec layer uses it. Nothing here is implicit: if you omit `timeout`, defaults elsewhere apply; Ollama-specific keys only matter for an agent that uses that protocol.
+When an agent has no `provider` field, Asagiri treats it as **`exec`** and uses inline `command` / `args`:
 
-| Field | Used by |
+```yaml
+agents:
+  claude:
+    command: claude
+    timeout: 3600
+```
+
+Do **not** infer `provider.type` from names like `claude` — declare `type: claude-code` explicitly under `providers:` when you want the dedicated adapter.
+
+## Provider fields
+
+| Field | Role |
 | --- | --- |
-| `command` | Executable name on `PATH` |
-| `args` | Extra argv (Kiro, wrappers) |
-| `default_model` | Passed when agent supports model flags |
+| `type` | Adapter selection (`kiro-cli`, `claude-code`, `cursor-cli`, `ollama`, …) |
+| `command` | Executable on `PATH` |
+| `args` | Default argv for this runtime |
+| `env` | Extra environment variables |
 | `timeout` | Seconds before kill |
-| `endpoint` | Ollama HTTP base URL |
-| `model` / `embedding_model` | Ollama model tags |
+
+## Agent fields
+
+| Field | Role |
+| --- | --- |
+| `provider` | Reference to `providers.<id>` (optional in legacy mode) |
+| `profile` | Logical / business label (orchestration metadata — **not** adapter selection) |
+| `command`, `args`, … | Override provider defaults per profile |
+| `endpoint`, `model`, `embedding_model` | Ollama-specific overrides on the agent |
 
 ## Defaults in `work`
 
-The `work` block chooses which logical ids run when a command does not override them. Adjust these when your default implementation, reviewer, or enricher should change repo-wide.
+The `work` block chooses which **logical agent ids** run when a command does not override them:
 
 ```yaml
 work:
-  default_agent: cursor
-  default_reviewer: codex
-  default_enricher: ollama
+  default_spec_agent: laprogrammerie
+  default_agent: dev
+  default_reviewer: reviewer
+  default_enricher: local-rag
 ```
 
-You can still override per invocation, for example `asa dev feat --agent cursor` or `asa review feat --agent codex`.
+Override per invocation: `asa dev feat --agent dev` or `asa review feat --agent reviewer`.
 
 ## Dry-run
 
-With `--dry-run`, the exec layer does not spawn real subprocesses. That is useful in CI when you only want to validate wiring, and for rehearsing docs or scripts that would otherwise wait on long-running agents.
+With `--dry-run`, agents are not spawned as real subprocesses — useful for CI wiring checks and docs rehearsal.
 
 ## Related
 
 - [Agents overview](/docs/agents)
+- [Configuration file](/docs/configuration/config-file)
 - [Ollama](/docs/agents/ollama)
 - [CLI: dev](/docs/cli/generated/dev)

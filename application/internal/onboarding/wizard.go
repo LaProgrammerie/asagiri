@@ -7,8 +7,8 @@ import (
 	"os"
 	"strings"
 
-"github.com/LaProgrammerie/asagiri/application/internal/config"
-		"github.com/LaProgrammerie/asagiri/application/internal/onboarding/detect"
+	"github.com/LaProgrammerie/asagiri/application/internal/config"
+	"github.com/LaProgrammerie/asagiri/application/internal/onboarding/detect"
 )
 
 // RunWizard executes onboarding steps; non-interactive mode uses defaults only.
@@ -66,19 +66,32 @@ func runStep(repoRoot string, st *State, opts Options, interactive bool, in io.R
 		if interactive {
 			_, _ = fmt.Fprintf(out, "Stack détectée: %s\n", st.Answers.Stack)
 		}
+	case StepProviders:
+		if strings.TrimSpace(st.Answers.EnabledProviders) == "" {
+			st.Answers.EnabledProviders = formatEnabledProvidersCSV(DefaultEnabledProviders())
+		}
+		if interactive {
+			_, _ = fmt.Fprintln(out, "Étape 1 — Select providers (runtimes externes, adapter = provider.type)")
+			for _, p := range ProviderCatalog() {
+				_, _ = fmt.Fprintf(out, "  • %s (%s)\n", p.Label, p.ID)
+			}
+			st.Answers.EnabledProviders = promptString(in, out, "Providers activés (csv)", st.Answers.EnabledProviders)
+		}
 	case StepAgents:
 		if interactive {
+			_, _ = fmt.Fprintln(out, "Étape 2 — Create logical agents (profils dans config.agents, référencés par work.*)")
+			_, _ = fmt.Fprintf(out, "  Exemples: %s\n", strings.Join(DefaultLogicalAgentNames(), ", "))
 			if st.Answers.DefaultSpecAgent == "" {
-				st.Answers.DefaultSpecAgent = promptString(in, out, "Agent spec (asa spec)", config.DefaultAgentSpec)
+				st.Answers.DefaultSpecAgent = promptString(in, out, "Agent spec (work.default_spec_agent)", config.DefaultAgentSpec)
 			}
 			if st.Answers.DefaultEnricher == "" {
-				st.Answers.DefaultEnricher = promptString(in, out, "Agent enrich (asa enrich)", config.DefaultAgentEnrich)
+				st.Answers.DefaultEnricher = promptString(in, out, "Agent enrich (work.default_enricher)", config.DefaultAgentEnrich)
 			}
 			if st.Answers.DefaultAgent == "" {
-				st.Answers.DefaultAgent = promptString(in, out, "Agent dev (asa dev)", config.DefaultAgentDev)
+				st.Answers.DefaultAgent = promptString(in, out, "Agent dev (work.default_agent)", config.DefaultAgentDev)
 			}
 			if st.Answers.DefaultReviewer == "" {
-				st.Answers.DefaultReviewer = promptString(in, out, "Agent review (asa review)", config.DefaultAgentReviewer)
+				st.Answers.DefaultReviewer = promptString(in, out, "Agent review (work.default_reviewer)", config.DefaultAgentReviewer)
 			}
 		}
 	case StepSources, StepDocs:

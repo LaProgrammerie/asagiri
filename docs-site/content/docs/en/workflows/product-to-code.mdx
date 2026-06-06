@@ -5,9 +5,25 @@ description: End-to-end workflow from product intent to executable work plan.
 
 # Product to code workflow
 
-This workflow maps product intent to an implementation plan using the Executable Product Layer.
+## Guided path V1 (`asa work`)
 
-## Recommended sequence
+For a broad product intent, the happy path uses **two separate** `asa work` invocations (no auto-chain):
+
+```bash
+# Step 1 — Product Layer preparation
+asa work "Build a CRM for artisans" --dry-run
+asa work "Build a CRM for artisans" --yes
+
+# Step 2 — technical implementation
+asa work crm-artisans --yes
+asa next --feature crm-artisans
+```
+
+Classification: `technical_task` and `feature_work` → normal technical workflow; `product_level_intent` → Product Layer then controlled stop.
+
+## Expert sequence (unitary commands)
+
+Manual equivalent:
 
 ```bash
 asa prototype create "Workspace SaaS with team invites" --product workspace-saas

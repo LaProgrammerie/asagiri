@@ -38,6 +38,12 @@ func setupResumeTestRepo(t *testing.T) (*Service, string) {
 			"ollama": {Command: "ollama", Args: []string{"run", "qwen2.5-coder:7b"}},
 			"codex":  {Command: "codex", Args: []string{"exec"}},
 		},
+		Work: config.WorkConfig{
+			DefaultSpecAgent: "kiro",
+			DefaultAgent:     "cursor",
+			DefaultReviewer:  "codex",
+			DefaultEnricher:  "ollama",
+		},
 	}
 
 	dbPath := filepath.Join(repo, ".asagiri", "state.sqlite")

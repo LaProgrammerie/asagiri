@@ -45,9 +45,9 @@ func TestDefaultAssignerDelegatesAndOverrides(t *testing.T) {
 				"implementation.medium": "cursor",
 			},
 			Profiles: map[string]coordination.AgentProfile{
-				"codex-reviewer": {
+				"reviewer-profile": {
 					Role:      coordination.RoleReviewer,
-					Agent:     "codex",
+					Agent:     "reviewer",
 					Isolation: coordination.IsolationReadonly,
 				},
 			},
@@ -78,8 +78,8 @@ func TestDefaultAssignerDelegatesAndOverrides(t *testing.T) {
 		Risk: executiongraph.RiskLevelHigh,
 	})
 	require.NoError(t, err)
-	require.Equal(t, "codex", review.AgentRef)
+	require.Equal(t, "reviewer", review.AgentRef)
 	require.Equal(t, coordination.RoleReviewer, review.Role)
 	require.Equal(t, coordination.IsolationReadonly, review.Isolation)
-	require.Equal(t, "codex-reviewer", review.ProfileID)
+	require.Equal(t, "reviewer-profile", review.ProfileID)
 }

@@ -12,7 +12,7 @@ import (
 	"time"
 
 	"github.com/LaProgrammerie/asagiri/application/internal/agent"
-	agentexec "github.com/LaProgrammerie/asagiri/application/internal/agent/exec"
+	agentfactory "github.com/LaProgrammerie/asagiri/application/internal/agent/factory"
 	"github.com/LaProgrammerie/asagiri/application/internal/config"
 	"github.com/LaProgrammerie/asagiri/application/internal/plan"
 	"github.com/LaProgrammerie/asagiri/application/internal/policy"
@@ -34,13 +34,14 @@ type StepState struct {
 }
 
 type Service struct {
-	repoRoot     string
-	cfg          *config.Config
-	store        *sqlite.Store
-	specReader   *spec.Reader
-	reportWriter *report.Writer
-	worktreeMngr *worktree.Manager
-	dryRun       bool
+	repoRoot              string
+	cfg                   *config.Config
+	store                 *sqlite.Store
+	specReader            *spec.Reader
+	reportWriter          *report.Writer
+	worktreeMngr          *worktree.Manager
+	dryRun                bool
+	governanceAgentHook   governanceAgentHook
 }
 
 func NewService(repoRoot string, cfg *config.Config, store *sqlite.Store, dryRun bool) *Service {
@@ -67,11 +68,10 @@ func (s *Service) ensureAgent(name string) (agent.Agent, error) {
 	if name == "" {
 		return nil, fmt.Errorf("agent requis")
 	}
-	cfgAgent, ok := s.cfg.Agents[name]
-	if !ok {
+	if _, ok := s.cfg.Agents[name]; !ok {
 		return nil, fmt.Errorf("agent %q non défini dans config", name)
 	}
-	return agentexec.New(name, cfgAgent, s.dryRun)
+	return agentfactory.NewFromConfig(name, s.cfg, s.dryRun)
 }
 
 func newRunID(feature string) string {
@@ -167,7 +167,7 @@ func (s *Service) PlanFeature(feature string) (string, []plan.Task, error) {
 	}
 	canonicalTasks := make([]asagiri.Task, 0, len(tasks))
 	for _, task := range tasks {
-		canonical := planToCanonical(feature, task)
+		canonical := planToCanonical(feature, task, s.cfg)
 		canonical.Status = asagiri.StatusPlanned
 		canonical.Validation.Commands = s.cfg.ValidationCommandLines()
 		payload, marshalErr := canonicalToPayload(canonical)
@@ -388,59 +388,10 @@ func (s *Service) DevFeature(ctx context.Context, feature, taskID, agentName str
 		_ = s.updateStep(run, "dev", sqlite.StatusFailed, err.Error())
 		return run.ID, err
 	}
+	s.warnGovernanceInactiveMode(feature)
 
 	for _, task := range tasks {
-		if st := normalizeStatus(task.Status); st == asagiri.StatusPlanned || st == asagiri.StatusPending {
-			if err := s.transitionTask(task, asagiri.StatusEnriched, true); err != nil {
-				_ = s.updateStep(run, "dev", sqlite.StatusFailed, err.Error())
-				return run.ID, err
-			}
-			if fresh, getErr := s.store.GetTask(task.ID); getErr == nil {
-				task = *fresh
-			}
-		}
-		if err := s.transitionTask(task, asagiri.StatusRunning, force); err != nil {
-			_ = s.updateStep(run, "dev", sqlite.StatusFailed, err.Error())
-			return run.ID, err
-		}
-		worktreePath, _, err := s.worktreeMngr.Create(ctx, feature, task.ID)
-		if err != nil {
-			_ = s.transitionTask(task, asagiri.StatusFailed, true)
-			_ = s.updateStep(run, "dev", sqlite.StatusFailed, err.Error())
-			return run.ID, err
-		}
-		if err := s.store.UpdateTask(&sqlite.Task{ID: task.ID, WorktreePath: worktreePath}); err != nil {
-			_ = s.updateStep(run, "dev", sqlite.StatusFailed, err.Error())
-			return run.ID, err
-		}
-
-		canonical, _ := payloadToCanonical(task.PayloadJSON)
-		agentCtx := agent.BuildContext(run.ID, &canonical, s.contextFilesForTask(feature, canonical))
-		res, runErr := a.Run(ctx, agent.RunRequest{
-			Feature:    feature,
-			TaskID:     task.ID,
-			Prompt:     "Implémente la task " + task.ID,
-			WorkingDir: worktreePath,
-		})
-		agentRes := agent.DryRunResult("implémentation simulée")
-		if parsed, ok := agent.ParseResult(res.Stdout); ok {
-			agentRes = parsed
-		}
-		_ = agent.WriteLogs(s.repoRoot, task.ID, agentCtx, agentRes)
-		if runErr != nil {
-			_ = s.transitionTask(task, asagiri.StatusFailed, true)
-			_ = s.updateStep(run, "dev", sqlite.StatusFailed, runErr.Error())
-			return run.ID, runErr
-		}
-
-		if err := s.writeTaskLog(task.ID, "dev.log", res.Stdout+"\n"+res.Stderr); err != nil {
-			_ = s.updateStep(run, "dev", sqlite.StatusFailed, err.Error())
-			return run.ID, err
-		}
-		if fresh, getErr := s.store.GetTask(task.ID); getErr == nil {
-			task = *fresh
-		}
-		if err := s.transitionTask(task, asagiri.StatusImplemented, force); err != nil {
+		if err := s.devTaskWithGovernanceRetries(ctx, run, feature, task, a, force); err != nil {
 			_ = s.updateStep(run, "dev", sqlite.StatusFailed, err.Error())
 			return run.ID, err
 		}
@@ -648,16 +599,16 @@ func (s *Service) executeResumeStep(ctx context.Context, run *sqlite.Run, step s
 		_, _, err := s.PlanFeature(run.Feature)
 		return err
 	case "enrich":
-		_, err := s.EnrichFeature(ctx, run.Feature, "", config.DefaultAgentEnrich, force)
+		_, err := s.EnrichFeature(ctx, run.Feature, "", s.cfg.WorkEnricherAgent(), force)
 		return err
 	case "dev":
-		_, err := s.DevFeature(ctx, run.Feature, "", config.DefaultAgentDev, force)
+		_, err := s.DevFeature(ctx, run.Feature, "", s.cfg.WorkDevAgent(), force)
 		return err
 	case "verify":
 		_, err := s.VerifyFeature(ctx, run.Feature, "", force)
 		return err
 	case "review":
-		_, err := s.ReviewFeature(ctx, run.Feature, "", config.DefaultAgentReviewer, force)
+		_, err := s.ReviewFeature(ctx, run.Feature, "", s.cfg.WorkReviewerAgent(), force)
 		return err
 	case "report":
 		_, _, err := s.GenerateReport(run.ID)

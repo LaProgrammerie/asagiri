@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/LaProgrammerie/asagiri/application/internal/config"
 	onbdomain "github.com/LaProgrammerie/asagiri/application/internal/onboarding"
 	"github.com/LaProgrammerie/asagiri/application/internal/ui/bus"
 	tea "github.com/charmbracelet/bubbletea"
@@ -455,6 +456,11 @@ func stepFields(step onbdomain.WizardStep, advanced bool, preview, stacks, agent
 				Key: fmt.Sprintf("validation_%d", i), Label: "Validation", ReadOnly: true,
 			})
 		}
+	case onbdomain.StepProviders:
+		rows = []FieldDef{
+			{Key: "enabled_providers", Label: "Providers activés (csv)", Kind: FieldText},
+			{Key: "provider_hint", Label: "Exemples", Kind: FieldManaged, ReadOnly: true},
+		}
 	case onbdomain.StepAgents:
 		rows = []FieldDef{
 			{Key: "default_spec_agent", Label: "Spec", Kind: FieldSelect, Choices: choices},
@@ -511,6 +517,8 @@ func (m Model) fieldValue(key string) string {
 		return "Géré par Asagiri"
 	case "pipeline_verify":
 		return "Géré par Asagiri"
+	case "provider_hint":
+		return "kiro-cli, cursor-cli, claude-code, ollama"
 	}
 	if isAdvancedKey(key) {
 		return m.Advanced[key]
@@ -550,7 +558,7 @@ type OnboardingFooterMsg struct {
 }
 
 func defaultAgentChoices() []string {
-	return []string{"cursor", "codex", "kiro", "ollama", "claude"}
+	return config.DefaultLogicalAgentIDs()
 }
 
 func defaultStackChoices() []string {
@@ -585,8 +593,10 @@ func StepLabel(step onbdomain.WizardStep) string {
 		return "Projet"
 	case onbdomain.StepStack:
 		return "Stack"
+	case onbdomain.StepProviders:
+		return "Providers"
 	case onbdomain.StepAgents:
-		return "Agents"
+		return "Agents logiques"
 	case onbdomain.StepDocs:
 		return "Docs"
 	case onbdomain.StepFeature:

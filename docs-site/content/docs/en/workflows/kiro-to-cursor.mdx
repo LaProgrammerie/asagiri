@@ -42,18 +42,19 @@ asa report <run-id>
 Use `--dry-run` on any step while rehearsing:
 
 ```bash
-asa dev billing-v2 --agent cursor --dry-run
+asa dev billing-v2 --agent dev --dry-run
 ```
 
 ## Configuration defaults
 
-From `.asagiri/config.yaml.example`:
+From `.asagiri/config.yaml.example` (logical agent ids; legacy tool-named agents still work):
 
 ```yaml
 work:
-  default_agent: cursor
-  default_reviewer: codex
-  default_enricher: ollama
+  default_spec_agent: laprogrammerie
+  default_agent: dev
+  default_reviewer: reviewer
+  default_enricher: local-rag
   auto_verify: true
   auto_review: false
 ```

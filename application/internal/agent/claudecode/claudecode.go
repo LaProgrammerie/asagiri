@@ -35,25 +35,34 @@ func DefaultConfig() config.Agent {
 
 // Adapter wraps exec.Executor with Claude-specific output handling.
 type Adapter struct {
+	name    string
 	inner   *exec.Executor
 	timeout time.Duration
 }
 
 // New returns an Adapter for the given config.Agent.
 // Pass DefaultConfig() to use Claude Code with recommended defaults.
-func New(cfg config.Agent, dryRun bool) (*Adapter, error) {
+// name is the logical agents: key (e.g. dev); when empty, AgentName is used.
+func New(name string, cfg config.Agent, dryRun bool) (*Adapter, error) {
+	if strings.TrimSpace(name) == "" {
+		name = AgentName
+	}
 	if cfg.Command == "" {
 		cfg.Command = DefaultCommand
 	}
-	e, err := exec.New(AgentName, cfg, dryRun)
+	e, err := exec.New(name, cfg, dryRun)
 	if err != nil {
 		return nil, err
 	}
-	return &Adapter{inner: e, timeout: DefaultTimeout}, nil
+	timeout := DefaultTimeout
+	if cfg.Timeout > 0 {
+		timeout = time.Duration(cfg.Timeout) * time.Second
+	}
+	return &Adapter{name: name, inner: e, timeout: timeout}, nil
 }
 
 // Name implements agent.Agent.
-func (a *Adapter) Name() string { return AgentName }
+func (a *Adapter) Name() string { return a.name }
 
 // Capabilities reports Claude Code's supported features.
 func (a *Adapter) Capabilities() agent.Capabilities {

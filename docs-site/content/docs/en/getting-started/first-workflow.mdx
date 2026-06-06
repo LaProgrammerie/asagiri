@@ -9,7 +9,7 @@ This page follows the same end-to-end contract as `spec-doc` §11.1: initialize 
 
 ## Prerequisites
 
-You need Asagiri built and on `PATH`, a git repository whose specs live under `.kiro/specs/<feature>/` or `.asagiri/specs/`, and a `.asagiri/config.yaml` whose agent commands actually exist on your machine. Without those three, later steps will fail for obvious reasons—missing binary, missing spec, or a subprocess that cannot start.
+You need Asagiri built and on `PATH`, a git repository whose specs live under `.kiro/specs/<feature>/` or `.asagiri/specs/`, and a `.asagiri/config.yaml` whose **providers** resolve on your machine and whose **logical agents** referenced by `work.*` exist under `agents:`. Without those, later steps fail — missing binary, missing spec, or a subprocess that cannot start.
 
 ## Steps
 

@@ -2,15 +2,56 @@ package config
 
 import "strings"
 
-// Default agent names — single source of truth for fallback values throughout
-// the codebase. All packages should reference these constants instead of
-// hard-coding agent name strings.
+// Default agent names are logical ids in config.agents (not provider ids).
+// Onboarding, CLI flag defaults, and empty-config fallbacks use these keys for
+// work.default_* until the operator defines their own profiles.
+// ApplyRecommendedRuntimeCatalog seeds matching providers/agents for new configs.
+// Legacy configs may still use tool-named agents (kiro, cursor, ollama, …).
 const (
-	DefaultAgentSpec     = "kiro"
-	DefaultAgentDev      = "cursor"
-	DefaultAgentReviewer = "codex"
-	DefaultAgentEnrich   = "ollama"
+	DefaultAgentSpec     = "laprogrammerie"
+	DefaultAgentDev      = "dev"
+	DefaultAgentReviewer = "reviewer"
+	DefaultAgentEnrich   = "local-rag"
 )
+
+func workAgentOr(configured, fallback string) string {
+	if v := strings.TrimSpace(configured); v != "" {
+		return v
+	}
+	return fallback
+}
+
+// WorkSpecAgent returns work.default_spec_agent or the template default logical agent id.
+func (c *Config) WorkSpecAgent() string {
+	if c == nil {
+		return DefaultAgentSpec
+	}
+	return workAgentOr(c.Work.DefaultSpecAgent, DefaultAgentSpec)
+}
+
+// WorkDevAgent returns work.default_agent or the template default logical agent id.
+func (c *Config) WorkDevAgent() string {
+	if c == nil {
+		return DefaultAgentDev
+	}
+	return workAgentOr(c.Work.DefaultAgent, DefaultAgentDev)
+}
+
+// WorkReviewerAgent returns work.default_reviewer or the template default logical agent id.
+func (c *Config) WorkReviewerAgent() string {
+	if c == nil {
+		return DefaultAgentReviewer
+	}
+	return workAgentOr(c.Work.DefaultReviewer, DefaultAgentReviewer)
+}
+
+// WorkEnricherAgent returns work.default_enricher or the template default logical agent id.
+func (c *Config) WorkEnricherAgent() string {
+	if c == nil {
+		return DefaultAgentEnrich
+	}
+	return workAgentOr(c.Work.DefaultEnricher, DefaultAgentEnrich)
+}
 
 // DefaultPremiumReferenceModel is intentionally empty: no baseline invented by default.
 // Users must explicitly set pricing.premium_reference_model in config.yaml to enable savings.

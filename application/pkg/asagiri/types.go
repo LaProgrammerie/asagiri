@@ -32,7 +32,34 @@ type Task struct {
 	Acceptance []string       `yaml:"acceptance,omitempty" json:"acceptance,omitempty"`
 	Validation TaskValidation `yaml:"validation,omitempty" json:"validation,omitempty"`
 	Agents     TaskAgents     `yaml:"agents,omitempty" json:"agents,omitempty"`
+	Governance *TaskGovernance `yaml:"governance,omitempty" json:"governance,omitempty"`
 	Metadata   TaskMetadata   `yaml:"metadata,omitempty" json:"metadata,omitempty"`
+}
+
+// TaskGovernance stores governance gate history on a task payload.
+type TaskGovernance struct {
+	History []GovernanceRecord `yaml:"history,omitempty" json:"history,omitempty"`
+	Retries int                `yaml:"retries,omitempty" json:"retries,omitempty"`
+}
+
+// GovernanceRecord is one governance gate evaluation persisted on the task.
+type GovernanceRecord struct {
+	At         string              `yaml:"at" json:"at"`
+	Status     string              `yaml:"status" json:"status"`
+	Confidence float64             `yaml:"confidence" json:"confidence"`
+	Notes      []string            `yaml:"notes,omitempty" json:"notes,omitempty"`
+	Findings   []GovernanceFinding `yaml:"findings,omitempty" json:"findings,omitempty"`
+	Retry      int                 `yaml:"retry,omitempty" json:"retry,omitempty"`
+	DryRun     bool                `yaml:"dry_run,omitempty" json:"dry_run,omitempty"`
+	ParseError string              `yaml:"parse_error,omitempty" json:"parse_error,omitempty"`
+}
+
+// GovernanceFinding is a single governance finding from the validator agent.
+type GovernanceFinding struct {
+	Code     string   `yaml:"code" json:"code"`
+	Severity string   `yaml:"severity" json:"severity"`
+	Message  string   `yaml:"message" json:"message"`
+	Actions  []string `yaml:"actions,omitempty" json:"actions,omitempty"`
 }
 
 type TaskSource struct {

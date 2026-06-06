@@ -60,6 +60,11 @@ agents:
   claude:
     command: claude
     args: ["code"]
+work:
+  default_spec_agent: kiro
+  default_agent: cursor
+  default_reviewer: codex
+  default_enricher: ollama
 `)
 	writeFile(t, filepath.Join(repo, ".kiro", "specs", "agentflow-test", "requirements.md"), "# Requirements")
 	writeFile(t, filepath.Join(repo, ".kiro", "specs", "agentflow-test", "tasks.md"), "- [ ] Build plan\n- [ ] Run dev\n")

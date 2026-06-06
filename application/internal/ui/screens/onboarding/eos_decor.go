@@ -49,6 +49,10 @@ func renderStepPanel(vm ViewModel, st theme.Styles, boxW int) string {
 	case onbdomain.StepStack:
 		rows = append(rows, renderStackDetection(m, st)...)
 
+	case onbdomain.StepProviders:
+		rows = append(rows, renderProviderCatalog(m, st)...)
+		rows = append(rows, "")
+
 	case onbdomain.StepAgents:
 		rows = append(rows, renderAgentPipeline(m, st)...)
 		rows = append(rows, "")
@@ -168,6 +172,22 @@ func renderStackDetection(m Model, st theme.Styles) []string {
 	return rows
 }
 
+// renderProviderCatalog lists external runtimes for the providers onboarding step.
+func renderProviderCatalog(m Model, st theme.Styles) []string {
+	var rows []string
+	rows = append(rows, st.SectionHead.Render("PROVIDERS DISPONIBLES"))
+	for _, p := range onbdomain.ProviderCatalog() {
+		rows = append(rows, st.Muted.Render("  • ")+st.Fg.Render(p.Label)+" "+st.Muted.Render("("+p.ID+")"))
+	}
+	enabled := strings.TrimSpace(m.Fields["enabled_providers"])
+	if enabled != "" {
+		rows = append(rows, "")
+		rows = append(rows, st.SectionHead.Render("SÉLECTION"))
+		rows = append(rows, st.Success.Render("✓")+" "+st.Muted.Render(enabled))
+	}
+	return rows
+}
+
 // renderAgentPipeline renders the full pipeline with arrows and local/cloud indicators.
 func renderAgentPipeline(m Model, st theme.Styles) []string {
 	type step struct {
@@ -242,7 +262,7 @@ func renderArtefactsSection(m Model, st theme.Styles) []string {
 // isLocalAgentName reports whether an agent name suggests a local backend.
 func isLocalAgentName(name string) bool {
 	switch strings.ToLower(name) {
-	case config.DefaultAgentEnrich, "local":  // DefaultAgentEnrich == "ollama"
+	case config.DefaultAgentEnrich, "local":
 		return true
 	}
 	return false

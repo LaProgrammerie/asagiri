@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/LaProgrammerie/asagiri/application/internal/config"
 )
@@ -15,8 +16,9 @@ type WizardStep string
 const (
 	StepWelcome  WizardStep = "welcome"
 	StepProject  WizardStep = "project"
-	StepStack    WizardStep = "stack"
-	StepAgents   WizardStep = "agents"
+	StepStack     WizardStep = "stack"
+	StepProviders WizardStep = "providers"
+	StepAgents    WizardStep = "agents"
 	StepSources  WizardStep = "sources"
 	StepDocs     WizardStep = "docs"
 	StepFeature  WizardStep = "feature"
@@ -28,6 +30,7 @@ var stepOrder = []WizardStep{
 	StepWelcome,
 	StepProject,
 	StepStack,
+	StepProviders,
 	StepAgents,
 	StepSources,
 	StepDocs,
@@ -97,10 +100,10 @@ func StepIndex(step WizardStep) int {
 // ParseStep validates a step name from CLI.
 func ParseStep(name string) (WizardStep, error) {
 	switch WizardStep(name) {
-	case StepWelcome, StepProject, StepStack, StepAgents, StepSources, StepDocs, StepFeature, StepReview, StepValidate:
+	case StepWelcome, StepProject, StepStack, StepProviders, StepAgents, StepSources, StepDocs, StepFeature, StepReview, StepValidate:
 		return WizardStep(name), nil
 	default:
-		return "", fmt.Errorf("step inconnu %q (project|stack|agents|docs|feature|validate)", name)
+		return "", fmt.Errorf("step inconnu %q (project|stack|providers|agents|docs|feature|validate)", name)
 	}
 }
 
@@ -152,6 +155,9 @@ func MergeAnswers(st State, opts Options, repoRoot string) State {
 		a.DefaultEnricher = opts.DefaultEnricher
 	} else if a.DefaultEnricher == "" {
 		a.DefaultEnricher = config.DefaultAgentEnrich
+	}
+	if strings.TrimSpace(a.EnabledProviders) == "" {
+		a.EnabledProviders = formatEnabledProvidersCSV(DefaultEnabledProviders())
 	}
 	if opts.FeatureSlug != "" {
 		a.FeatureSlug = opts.FeatureSlug

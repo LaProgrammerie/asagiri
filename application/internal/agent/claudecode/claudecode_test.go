@@ -24,7 +24,7 @@ func TestDefaultConfigHasNonInteractiveFlags(t *testing.T) {
 }
 
 func TestAdapterDryRun(t *testing.T) {
-	a, err := claudecode.New(claudecode.DefaultConfig(), true /* dryRun */)
+	a, err := claudecode.New("", claudecode.DefaultConfig(), true /* dryRun */)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -38,14 +38,18 @@ func TestAdapterDryRun(t *testing.T) {
 }
 
 func TestAdapterName(t *testing.T) {
-	a, _ := claudecode.New(claudecode.DefaultConfig(), true)
-	if a.Name() != claudecode.AgentName {
-		t.Fatalf("Name() = %q, want %q", a.Name(), claudecode.AgentName)
+	a, _ := claudecode.New("dev", claudecode.DefaultConfig(), true)
+	if a.Name() != "dev" {
+		t.Fatalf("Name() = %q, want %q", a.Name(), "dev")
+	}
+	aDefault, _ := claudecode.New("", claudecode.DefaultConfig(), true)
+	if aDefault.Name() != claudecode.AgentName {
+		t.Fatalf("Name() = %q, want %q", aDefault.Name(), claudecode.AgentName)
 	}
 }
 
 func TestAdapterCapabilities(t *testing.T) {
-	a, _ := claudecode.New(claudecode.DefaultConfig(), true)
+	a, _ := claudecode.New("", claudecode.DefaultConfig(), true)
 	caps := a.Capabilities()
 	if !caps.SupportsJSON {
 		t.Error("SupportsJSON should be true for stream-json output")

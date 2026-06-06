@@ -100,7 +100,7 @@ func TestShellLayoutStepProject(t *testing.T) {
 		Shell:      onboarding.ShellContext{Workspace: "chatbot", Branch: "main"},
 	}))
 	require.Contains(t, got, "chatbot")
-	require.Contains(t, got, "Étape 2 / 7")
+	require.Contains(t, got, "Étape 2 / 8")
 	require.Contains(t, got, "Nom")
 	require.NotContains(t, got, "PROJET")
 }

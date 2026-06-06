@@ -12,12 +12,12 @@ func TestValidateStepAgentsRequiresKnownKeys(t *testing.T) {
 	form := onboarding.Form{
 		Step: onboarding.StepAgents,
 		Answers: onboarding.Answers{
-			DefaultSpecAgent: "kiro",
-			DefaultEnricher:  "ollama",
-			DefaultAgent:     "cursor",
-			DefaultReviewer:  "codex",
+			DefaultSpecAgent: config.DefaultAgentSpec,
+			DefaultEnricher:  config.DefaultAgentEnrich,
+			DefaultAgent:     config.DefaultAgentDev,
+			DefaultReviewer:  config.DefaultAgentReviewer,
 		},
-		KnownAgentKeys: []string{"kiro", "cursor", "codex", "ollama"},
+		KnownAgentKeys: config.DefaultLogicalAgentIDs(),
 	}
 	require.Empty(t, onboarding.ValidateStep(onboarding.StepAgents, form))
 
@@ -28,8 +28,10 @@ func TestValidateStepAgentsRequiresKnownKeys(t *testing.T) {
 
 func TestAgentKeysFromConfig(t *testing.T) {
 	cfg := config.NewTestConfig("x")
-	cfg.Agents["cursor"] = config.Agent{Command: "cursor"}
-	cfg.Agents["codex"] = config.Agent{Command: "codex"}
+	cfg.Agents = map[string]config.Agent{
+		"cursor": {Command: "cursor"},
+		"codex":  {Command: "codex"},
+	}
 	keys := onboarding.AgentKeys(cfg)
 	require.Equal(t, []string{"codex", "cursor"}, keys)
 }

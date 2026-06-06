@@ -113,6 +113,11 @@ Sources externes (Notion) : **sync obligatoire** avant exécution — jamais de 
 spec/plan → enrich → dev (worktree + agent) → verify → review → report / pr
 ```
 
+**Gouvernance post-dev (Tranche A, opt-in)** : si `work.governance.enabled` et `mode: per-task`,
+chaque tâche passe une gate read-only **après** `implemented` dans `DevFeature` (verdict
+`pass|warn|fail`, agent default `reviewer`, retry dev sur FAIL selon `max_retries` — voir ADR-031).
+Sinon le pipeline est inchangé.
+
 État persistant : `runs.steps_json`, tâches `tasks.payload_json` + fichiers `.asagiri/tasks/<feature>/*.json`.
 
 ## Contrat Makefile

@@ -86,6 +86,7 @@ type Answers struct {
 	FeatureSlug      string `json:"feature_slug,omitempty"`
 	ProductOneLiner  string `json:"product_one_liner,omitempty"`
 	ProductUsers     string `json:"product_users,omitempty"`
+	EnabledProviders string `json:"enabled_providers,omitempty"` // comma-separated provider ids
 }
 
 // PlannedChange describes one file write during dry-run.

@@ -22,7 +22,8 @@ var allowedTransitions = map[string][]string{
 	asagiri.StatusPlanned:      {asagiri.StatusEnriched, asagiri.StatusAborted},
 	asagiri.StatusEnriched:     {asagiri.StatusRunning, asagiri.StatusAborted},
 	asagiri.StatusRunning:      {asagiri.StatusImplemented, asagiri.StatusFailed, asagiri.StatusAborted},
-	asagiri.StatusImplemented:  {asagiri.StatusVerified, asagiri.StatusVerifyFailed, asagiri.StatusAborted},
+	// implemented → running : uniquement pour relancer dev après un FAIL governance (Tranche A.2).
+	asagiri.StatusImplemented: {asagiri.StatusVerified, asagiri.StatusVerifyFailed, asagiri.StatusFailed, asagiri.StatusRunning, asagiri.StatusAborted},
 	asagiri.StatusVerifyFailed: {asagiri.StatusImplemented, asagiri.StatusAborted},
 	asagiri.StatusVerified:     {asagiri.StatusReviewed, asagiri.StatusReviewFailed, asagiri.StatusAborted},
 	asagiri.StatusReviewFailed: {asagiri.StatusVerified, asagiri.StatusAborted},

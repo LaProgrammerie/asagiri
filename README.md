@@ -27,6 +27,86 @@ asa status
 
 That's the core loop. Everything else builds on top of it.
 
+### Providers vs Agents
+
+Asagiri separates **external runtimes** from **logical profiles**:
+
+| Concept | Config block | Meaning |
+| --- | --- | --- |
+| **Provider** | `providers:` | External runtime (Kiro CLI, Claude Code, Ollama, …). Adapter selection uses **`provider.type` only** — never the map key. |
+| **Agent** | `agents:` | Logical profile referenced by `work.default_*`, `--agent`, and coordination. May point at a provider via `agents.<id>.provider`. |
+| **Work role** | `work:` | Which logical agent runs spec, dev, review, enrich by default. |
+| **Workflow** | CLI commands | `asa spec`, `asa dev`, `asa review`, … orchestrate the pipeline. |
+
+```
+Provider  →  Agent  →  Work role  →  Workflow
+kiro-cli  →  dev     →  default_agent  →  asa dev
+```
+
+Several logical agents can share one provider:
+
+```yaml
+providers:
+  kiro-cli:
+    type: kiro-cli
+    command: kiro
+    args: ["--cli"]
+
+agents:
+  dev:
+    provider: kiro-cli
+  architect:
+    provider: kiro-cli
+  reviewer:
+    provider: claude-code
+
+work:
+  default_agent: dev
+  default_reviewer: reviewer
+```
+
+Legacy inline agents remain supported (no `provider` field → implicit `exec` adapter):
+
+```yaml
+agents:
+  claude:
+    command: claude
+```
+
+See `.asagiri/config.yaml.example` and [Agents configuration](/docs/configuration/agents) on the docs site.
+
+### `asa work` — three scope paths (V1)
+
+Every instruction is classified deterministically (no LLM). Priority: **technical_task** > **feature_work** > **product_level_intent**. When uncertain, Asagiri stays on the technical path and does **not** trigger the Product Layer.
+
+| Scope | Example | What happens |
+| --- | --- | --- |
+| `technical_task` | `corrige le bug login` | Normal technical workflow (plan → dev → verify …) |
+| `feature_work` | `ajoute export CSV` | Normal technical workflow |
+| `product_level_intent` | `Créer un CRM pour artisans` | Product Layer preparation, then **controlled stop** (no auto-chain into dev in the same run) |
+
+### Product intentions — two-step workflow (V1)
+
+Broad product intents use a **deliberate two-invocation** flow. Asagiri does **not** auto-chain preparation and implementation in one command.
+
+**Step 1 — prepare product artifacts**
+
+```bash
+asa work "Créer un CRM pour artisans" --dry-run   # preview only
+asa work "Créer un CRM pour artisans" --yes       # writes product model → prototype → flows → contracts → specs → tasks
+```
+
+Product slugs are derived heuristically from the intent (e.g. `crm-artisans`); an existing slug on disk is preserved. `--plan-only` on a product-level intent shows only the Product Layer plan (not the technical workflow plan).
+
+**Step 2 — continue implementation** (separate invocation)
+
+```bash
+asa work crm-artisans --yes
+asa next --feature crm-artisans
+```
+
+Expert commands (`asa prototype`, `asa flows`, `asa contracts`, `asa spec generate-from-product`) remain available but are optional on the happy path.
+
 ---
 
 ## Install

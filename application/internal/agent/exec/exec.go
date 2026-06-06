@@ -18,21 +18,33 @@ import (
 
 // Executor runs one configured agent command as a subprocess.
 type Executor struct {
-	name    string
-	command string
-	args    []string
-	dryRun  bool
+	name       string
+	command    string
+	args       []string
+	defaultEnv map[string]string
+	timeout    time.Duration
+	dryRun     bool
 }
 
 func New(name string, cfg config.Agent, dryRun bool) (*Executor, error) {
 	if cfg.Command == "" {
 		return nil, fmt.Errorf("agent %q: commande manquante", name)
 	}
+	var timeout time.Duration
+	if cfg.Timeout > 0 {
+		timeout = time.Duration(cfg.Timeout) * time.Second
+	}
+	envCopy := map[string]string{}
+	for k, v := range cfg.Env {
+		envCopy[k] = v
+	}
 	return &Executor{
-		name:    name,
-		command: cfg.Command,
-		args:    append([]string{}, cfg.Args...),
-		dryRun:  dryRun || env.DryRunEnabled(),
+		name:       name,
+		command:    cfg.Command,
+		args:       append([]string{}, cfg.Args...),
+		defaultEnv: envCopy,
+		timeout:    timeout,
+		dryRun:     dryRun || env.DryRunEnabled(),
 	}, nil
 }
 
@@ -49,6 +61,12 @@ func (e *Executor) Capabilities() agent.Capabilities {
 }
 
 func (e *Executor) Run(ctx context.Context, req agent.RunRequest) (agent.RunResult, error) {
+	if e.timeout > 0 {
+		var cancel context.CancelFunc
+		ctx, cancel = context.WithTimeout(ctx, e.timeout)
+		defer cancel()
+	}
+
 	started := time.Now().UTC()
 	finalArgs := append([]string{}, e.args...)
 	finalArgs = append(finalArgs, req.Args...)
@@ -72,11 +90,14 @@ func (e *Executor) Run(ctx context.Context, req agent.RunRequest) (agent.RunResu
 		cmd.Dir = req.WorkingDir
 	}
 
-	env := os.Environ()
-	for k, v := range req.Env {
-		env = append(env, k+"="+v)
+	envVars := os.Environ()
+	for k, v := range e.defaultEnv {
+		envVars = appendEnvVar(envVars, k, v)
 	}
-	cmd.Env = env
+	for k, v := range req.Env {
+		envVars = appendEnvVar(envVars, k, v)
+	}
+	cmd.Env = envVars
 
 	if req.Prompt != "" {
 		cmd.Stdin = strings.NewReader(req.Prompt)
@@ -109,4 +130,16 @@ func (e *Executor) Run(ctx context.Context, req agent.RunRequest) (agent.RunResu
 		return result, fmt.Errorf("agent %q: sortie non nulle (%d)", e.name, result.ExitCode)
 	}
 	return result, fmt.Errorf("agent %q: %w", e.name, runErr)
+}
+
+func appendEnvVar(env []string, key, value string) []string {
+	prefix := key + "="
+	out := make([]string, 0, len(env)+1)
+	for _, e := range env {
+		if strings.HasPrefix(e, prefix) {
+			continue
+		}
+		out = append(out, e)
+	}
+	return append(out, prefix+value)
 }

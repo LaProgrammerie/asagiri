@@ -79,8 +79,8 @@ func stepForCheck(id string) string {
 		return "docs"
 	case strings.HasPrefix(id, "spec."):
 		return "feature"
-	case strings.HasPrefix(id, "agents."):
-		return "agents"
+	case strings.HasPrefix(id, "agents."), strings.HasPrefix(id, "providers."):
+		return "providers"
 	case strings.HasPrefix(id, "validation."):
 		return "stack"
 	default:
@@ -201,7 +201,7 @@ func checkAgentRef(cfg *config.Config, workID, agentName string) []Check {
 		return []Check{{
 			ID:      workID,
 			Status:  StatusWarn,
-			Message: fmt.Sprintf("%s non défini — renseigner un agent dans config.work", workID),
+			Message: fmt.Sprintf("%s non défini — renseigner un agent logique dans config.work", workID),
 			FixCLI:  "asa onboard --step agents",
 		}}
 	}
@@ -210,12 +210,30 @@ func checkAgentRef(cfg *config.Config, workID, agentName string) []Check {
 		return []Check{{
 			ID:      "agents." + agentName,
 			Status:  StatusWarn,
-			Message: fmt.Sprintf("agent %q absent de config.agents (%s)", agentName, workID),
+			Message: fmt.Sprintf("Agent logique %q absent de config.agents (%s référence %q)", agentName, workID, agentName),
 			FixCLI:  "asa onboard --step agents",
 		}}
 	}
-	cmd := strings.TrimSpace(agent.Command)
-	endpoint := strings.TrimSpace(agent.Endpoint)
+	providerRef := strings.TrimSpace(agent.Provider)
+	_, merged, err := cfg.MergedAgentRuntime(agentName)
+	if err != nil {
+		if providerRef != "" {
+			return []Check{{
+				ID:      "providers." + providerRef,
+				Status:  StatusWarn,
+				Message: fmt.Sprintf("provider %q introuvable ou invalide pour agents.%s (%s) — vérifier config.providers", providerRef, agentName, workID),
+				FixCLI:  "asa onboard --step providers",
+			}}
+		}
+		return []Check{{
+			ID:      "agents." + agentName,
+			Status:  StatusWarn,
+			Message: fmt.Sprintf("agents.%s: %v", agentName, err),
+			FixCLI:  "asa onboard --step agents",
+		}}
+	}
+	cmd := strings.TrimSpace(merged.Command)
+	endpoint := strings.TrimSpace(merged.Endpoint)
 	if cmd == "" {
 		if endpoint != "" {
 			return []Check{{
@@ -224,36 +242,50 @@ func checkAgentRef(cfg *config.Config, workID, agentName string) []Check {
 				Message: fmt.Sprintf("API %s (%s)", agentName, endpoint),
 			}}
 		}
+		checkID := "agents." + agentName
+		if providerRef != "" {
+			checkID = "providers." + providerRef
+		}
 		return []Check{{
-			ID:      "agents." + agentName,
+			ID:      checkID,
 			Status:  StatusWarn,
-			Message: agentCommandHelp(agentName, workID),
-			FixCLI:  agentCommandFixCLI(agentName),
+			Message: agentCommandHelp(agentName, providerRef, workID),
+			FixCLI:  agentCommandFixCLI(agentName, providerRef),
 		}}
 	}
 	if _, err := exec.LookPath(cmd); err != nil {
+		checkID := "agents." + agentName
+		msg := fmt.Sprintf("%q introuvable dans PATH (%s) — installer l’outil ou corriger agents.%s.command", cmd, workID, agentName)
+		if providerRef != "" {
+			checkID = "providers." + providerRef
+			msg = fmt.Sprintf("Provider %q introuvable dans PATH (command %q) — agents.%s → %s", providerRef, cmd, agentName, workID)
+		}
 		return []Check{{
-			ID:      "agents." + agentName,
+			ID:      checkID,
 			Status:  StatusWarn,
-			Message: fmt.Sprintf("%q introuvable dans PATH (%s) — installer l’outil ou corriger agents.%s.command", cmd, workID, agentName),
-			FixCLI:  agentCommandFixCLI(agentName),
+			Message: msg,
+			FixCLI:  agentCommandFixCLI(agentName, providerRef),
 		}}
 	}
 	return []Check{{ID: workID + " → " + agentName, Status: StatusOK}}
 }
 
-func agentCommandHelp(agentName, workID string) string {
-	switch agentName {
-	case "ollama":
-		return "Ollama (enrich) : installer https://ollama.com · puis agents.ollama.command: ollama (ou endpoint) — voir .asagiri/config.yaml.example"
-	default:
-		return fmt.Sprintf("agents.%s.command manquant (%s) — copier l’entrée depuis .asagiri/config.yaml.example", agentName, workID)
+func agentCommandHelp(agentName, providerRef, workID string) string {
+	if providerRef != "" {
+		return fmt.Sprintf("providers.%s.command manquant (%s via agents.%s) — voir .asagiri/config.yaml.example", providerRef, workID, agentName)
 	}
+	if agentName == "local-rag" || agentName == config.DefaultAgentEnrich {
+		return "Ollama (enrich) : installer https://ollama.com · définir providers.ollama ou agents.<id>.command — voir .asagiri/config.yaml.example"
+	}
+	return fmt.Sprintf("agents.%s.command manquant (%s) — copier l’entrée depuis .asagiri/config.yaml.example", agentName, workID)
 }
 
-func agentCommandFixCLI(agentName string) string {
-	if agentName == "ollama" {
-		return "Éditer .asagiri/config.yaml (section agents.ollama)"
+func agentCommandFixCLI(agentName, providerRef string) string {
+	if providerRef != "" {
+		return "Éditer .asagiri/config.yaml (section providers." + providerRef + ")"
+	}
+	if agentName == config.DefaultAgentEnrich || agentName == "local-rag" {
+		return "Éditer .asagiri/config.yaml (providers.ollama ou agents." + agentName + ")"
 	}
 	return "Éditer .asagiri/config.yaml (section agents)"
 }

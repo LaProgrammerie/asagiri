@@ -49,6 +49,38 @@ func newWorkCmd(dryRun *bool) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   `work "<instruction>"`,
 		Short: "Exécuter une intention en langage naturel",
+		Long: `Exécute une intention en langage naturel (resolve → plan → pipeline technique).
+
+Classification V1 (déterministe, sans LLM) — priorité : technical_task > feature_work > product_level_intent.
+En cas de doute, feature_work : le Product Layer ne se déclenche pas.
+
+  technical_task      → workflow technique normal (bug, test, refactor, CI, …)
+  feature_work        → workflow technique normal (endpoint, page, export, …)
+  product_level_intent → Product Layer puis arrêt contrôlé (pas d’auto-enchaînement)
+
+Workflow produit en deux temps (V1) :
+
+  Étape 1 — préparation produit (une invocation) :
+    asa work "Créer un CRM pour artisans" --yes
+    → product model, prototype, flows, contracts, specs, tasks
+    → arrêt après génération (pas de dev automatique dans la même commande)
+
+  Étape 2 — implémentation (invocation séparée) :
+    asa work crm-artisans --yes
+    ou asa next --feature crm-artisans
+
+Prévisualisation : --dry-run (plan Product Layer) ; --plan-only (plan produit uniquement, sans plan technique).
+Commandes expertes (asa prototype, flows, contracts, spec generate-from-product) restent optionnelles.`,
+		Example: `  # Feature technique
+  asa work "ajoute export CSV" --dry-run
+
+  # Intention produit — étape 1 (préparation)
+  asa work "Créer un CRM pour artisans" --dry-run
+  asa work "Créer un CRM pour artisans" --yes
+
+  # Intention produit — étape 2 (implémentation)
+  asa work crm-artisans --yes
+  asa next --feature crm-artisans`,
 		Args:  cobra.MinimumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			instruction = args[0]
@@ -115,6 +147,18 @@ func newWorkCmd(dryRun *bool) *cobra.Command {
 			}
 			if sourceName != "" {
 				resolved.Source = sourceName
+			}
+
+			scope := intent.ClassifyIntentScope(instruction)
+			layerOut, layerErr := handleProductLayer(cmd.OutOrStdout(), instruction, scope, resolved, opts, actx.RepoRoot)
+			if layerErr != nil {
+				return layerErr
+			}
+			if layerOut.ResolvedPatch.Feature != "" {
+				resolved.Feature = layerOut.ResolvedPatch.Feature
+			}
+			if layerOut.StopWorkFlow {
+				return nil
 			}
 
 			planner := &intent.DefaultPlanner{}
