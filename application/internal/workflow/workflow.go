@@ -42,9 +42,13 @@ type Service struct {
 	worktreeMngr          *worktree.Manager
 	dryRun                bool
 	governanceAgentHook   governanceAgentHook
+	planGateAgentHook     planGateAgentHook
 }
 
 func NewService(repoRoot string, cfg *config.Config, store *sqlite.Store, dryRun bool) *Service {
+	if cfg != nil {
+		config.NormalizeWorkGates(&cfg.Work)
+	}
 	worktreesPath := cfg.Resolve(repoRoot, cfg.Worktrees.BasePath)
 	return &Service{
 		repoRoot:     repoRoot,
@@ -170,6 +174,14 @@ func (s *Service) PlanFeature(feature string) (string, []plan.Task, error) {
 		canonical := planToCanonical(feature, task, s.cfg)
 		canonical.Status = asagiri.StatusPlanned
 		canonical.Validation.Commands = s.cfg.ValidationCommandLines()
+		canonicalTasks = append(canonicalTasks, canonical)
+	}
+	if err := s.processPlanGate(context.Background(), run, feature, doc, canonicalTasks); err != nil {
+		_ = s.updateStep(run, "plan", sqlite.StatusFailed, err.Error())
+		return run.ID, tasks, err
+	}
+	for i, task := range tasks {
+		canonical := canonicalTasks[i]
 		payload, marshalErr := canonicalToPayload(canonical)
 		if marshalErr != nil {
 			_ = s.updateStep(run, "plan", sqlite.StatusFailed, marshalErr.Error())
@@ -185,7 +197,6 @@ func (s *Service) PlanFeature(feature string) (string, []plan.Task, error) {
 			_ = s.updateStep(run, "plan", sqlite.StatusFailed, err.Error())
 			return run.ID, nil, err
 		}
-		canonicalTasks = append(canonicalTasks, canonical)
 	}
 	if err := s.persistCanonicalTaskFiles(feature, canonicalTasks); err != nil {
 		_ = s.updateStep(run, "plan", sqlite.StatusFailed, err.Error())

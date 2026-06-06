@@ -77,11 +77,11 @@ func TestGovernanceDryRunSimulatedPass(t *testing.T) {
 	err := svc.applyGovernanceAfterDev(context.Background(), "feat", task, "")
 	require.NoError(t, err)
 
-	logPath := filepath.Join(svc.repoRoot, ".asagiri", "logs", "task-1", "governance.json")
+	logPath := gateLogJSONPath(svc.repoRoot, "task-1", "governance")
 	require.FileExists(t, logPath)
 	body, err := os.ReadFile(logPath)
 	require.NoError(t, err)
-	var doc governanceLogDocument
+	var doc gateLogDocument
 	require.NoError(t, json.Unmarshal(body, &doc))
 	require.Equal(t, "pass", doc.Status)
 	require.True(t, doc.DryRun)
@@ -143,7 +143,7 @@ func TestGovernanceDisabledNoAgentCall(t *testing.T) {
 	require.NoError(t, err)
 	require.False(t, called)
 
-	logPath := filepath.Join(svc.repoRoot, ".asagiri", "logs", "task-off", "governance.json")
+	logPath := gateLogJSONPath(svc.repoRoot, "task-off", "governance")
 	require.NoFileExists(t, logPath)
 }
 
@@ -186,9 +186,9 @@ func TestGovernanceLogsWritten(t *testing.T) {
 
 	require.NoError(t, svc.applyGovernanceAfterDev(context.Background(), "feat", task, ""))
 
-	logPath := filepath.Join(svc.repoRoot, ".asagiri", "logs", "task-log", "governance.json")
+	logPath := gateLogJSONPath(svc.repoRoot, "task-log", "governance")
 	require.FileExists(t, logPath)
-	require.FileExists(t, filepath.Join(svc.repoRoot, ".asagiri", "logs", "task-log", "governance.log"))
+	require.FileExists(t, gateLogMarkdownPath(svc.repoRoot, "task-log", "governance"))
 
 	fresh, err := store.GetTask("task-log")
 	require.NoError(t, err)

@@ -2,7 +2,6 @@ package workflow
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"os"
 	"os/exec"
@@ -10,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/LaProgrammerie/asagiri/application/internal/agent"
+	"github.com/LaProgrammerie/asagiri/application/internal/gates"
 	"github.com/LaProgrammerie/asagiri/application/internal/store/sqlite"
 	"github.com/LaProgrammerie/asagiri/application/pkg/asagiri"
 	"gopkg.in/yaml.v3"
@@ -43,54 +42,53 @@ governance:
 %s
 `
 
-// governanceAgentHook replaces the governance agent Run in tests when set.
-type governanceAgentHook func(ctx context.Context, prompt string) (stdout string, err error)
+const governanceGateName = "governance"
 
-func (s *Service) runGovernanceGate(ctx context.Context, feature string, task sqlite.Task, worktreePath string) (governanceVerdict, string, error) {
+func (s *Service) runGovernanceGate(ctx context.Context, feature string, task sqlite.Task, worktreePath string) (gates.Result, string, error) {
+	evidence := governanceEvidenceRefs(feature, task, worktreePath, s.repoRoot)
 	if s.dryRun {
-		return governanceVerdict{
-			Status:     "pass",
-			Confidence: 1,
-			Notes:      []string{"governance dry-run: simulated pass"},
-			DryRun:     true,
-		}, "", nil
+		return s.gateDryRunResult("governance", "governance", task.ID, "governance dry-run: simulated pass", evidence), "", nil
 	}
 
 	prompt, err := s.buildGovernancePrompt(feature, task, worktreePath)
 	if err != nil {
-		return governanceVerdict{}, "", err
+		return gates.Result{}, "", err
 	}
 
-	var stdout string
-	if s.governanceAgentHook != nil {
-		stdout, err = s.governanceAgentHook(ctx, prompt)
-		if err != nil {
-			return governanceVerdict{}, stdout, fmt.Errorf("governance agent: %w", err)
-		}
-	} else {
-		agentName := s.cfg.GovernanceAgent()
-		a, err := s.ensureAgent(agentName)
-		if err != nil {
-			return governanceVerdict{}, "", err
-		}
-		res, runErr := a.Run(ctx, agent.RunRequest{
-			Feature:    feature,
-			TaskID:     task.ID,
-			Prompt:     prompt,
-			WorkingDir: worktreePath,
-		})
-		if runErr != nil {
-			return governanceVerdict{}, res.Stdout, fmt.Errorf("governance agent run: %w", runErr)
-		}
-		stdout = res.Stdout
-		if stdout == "" {
-			stdout = res.Stderr
-		}
+	stdout, err := s.executeGateAgent(ctx, s.cfg.GovernanceAgent(), feature, task.ID, worktreePath, prompt, s.governanceAgentHook)
+	if err != nil {
+		return gates.Result{}, stdout, err
 	}
 
 	parsed := parseGovernanceVerdict(stdout)
-	parsed.Status = classifyGovernanceVerdict(parsed, s.cfg.Work.Governance.FailOn)
-	return parsed, stdout, nil
+	parsed.GateID = "governance"
+	parsed.GateType = "governance"
+	parsed.Scope = task.ID
+	parsed.Evidence = evidence
+	return gates.ClassifyResult(parsed, s.cfg.Work.Gates.Governance.FailOn), stdout, nil
+}
+
+func governanceEvidenceRefs(feature string, task sqlite.Task, worktreePath, repoRoot string) []gates.EvidenceRef {
+	refs := []gates.EvidenceRef{
+		{Kind: "task_payload", Path: task.ID, Note: "canonical task YAML in gate prompt"},
+		{Kind: "spec", Path: feature, Note: "feature spec excerpt"},
+	}
+	if strings.TrimSpace(worktreePath) != "" {
+		refs = append(refs, gates.EvidenceRef{
+			Kind: "diff",
+			Path: worktreePath,
+			Note: "git diff excerpt from worktree",
+		})
+	}
+	archPath := filepath.Join(repoRoot, "docs", "ai", "02-architecture.md")
+	if _, err := os.Stat(archPath); err == nil {
+		refs = append(refs, gates.EvidenceRef{
+			Kind: "architecture_doc",
+			Path: archPath,
+			Note: "architecture excerpt when present",
+		})
+	}
+	return refs
 }
 
 func (s *Service) buildGovernancePrompt(feature string, task sqlite.Task, worktreePath string) (string, error) {
@@ -151,19 +149,10 @@ func governanceRetries(task sqlite.Task) int {
 	return canonical.Governance.Retries
 }
 
-func (s *Service) persistGovernanceVerdict(feature string, task sqlite.Task, v governanceVerdict, agentStdout string) error {
+func (s *Service) persistGovernanceVerdict(feature string, task sqlite.Task, v gates.Result, agentStdout string) error {
 	at := time.Now().UTC().Format(time.RFC3339)
 	retry := governanceRetries(task)
-	record := asagiri.GovernanceRecord{
-		At:         at,
-		Status:     v.Status,
-		Confidence: v.Confidence,
-		Notes:      v.Notes,
-		Findings:   v.Findings,
-		Retry:      retry,
-		DryRun:     v.DryRun,
-		ParseError: v.ParseError,
-	}
+	record := governanceRecordFromResult(v, at, retry)
 
 	canonical, err := payloadToCanonical(task.PayloadJSON)
 	if err != nil {
@@ -183,58 +172,10 @@ func (s *Service) persistGovernanceVerdict(feature string, task sqlite.Task, v g
 		return err
 	}
 
-	doc := governanceLogDocument{
-		TaskID:     task.ID,
-		Feature:    feature,
-		At:         at,
-		Status:     v.Status,
-		Confidence: v.Confidence,
-		Notes:      v.Notes,
-		Findings:   v.Findings,
-		DryRun:     v.DryRun,
-		ParseError: v.ParseError,
-		Agent:      s.cfg.GovernanceAgent(),
-	}
-	body, err := json.MarshalIndent(doc, "", "  ")
-	if err != nil {
-		return err
-	}
-	if err := s.writeTaskLog(task.ID, "governance.json", string(body)+"\n"); err != nil {
-		return err
-	}
-	return s.writeGovernanceAgentLog(task.ID, agentStdout, v)
-}
-
-func (s *Service) writeGovernanceAgentLog(taskID, agentStdout string, v governanceVerdict) error {
-	var sb strings.Builder
-	sb.WriteString("# Governance gate\n\n")
-	sb.WriteString("## Agent stdout\n\n")
-	if strings.TrimSpace(agentStdout) == "" {
-		sb.WriteString("(empty)\n\n")
-	} else {
-		sb.WriteString(agentStdout)
-		if !strings.HasSuffix(agentStdout, "\n") {
-			sb.WriteString("\n")
-		}
-		sb.WriteString("\n")
-	}
-	sb.WriteString("## Verdict\n\n")
-	verdictYAML, err := yaml.Marshal(map[string]any{
-		"governance": map[string]any{
-			"status":      v.Status,
-			"confidence":  v.Confidence,
-			"notes":       v.Notes,
-			"findings":    v.Findings,
-			"dry_run":     v.DryRun,
-			"parse_error": v.ParseError,
-		},
-	})
-	if err != nil {
-		sb.WriteString(fmt.Sprintf("status: %s\n", v.Status))
-	} else {
-		sb.Write(verdictYAML)
-	}
-	return s.writeTaskLog(taskID, "governance.log", sb.String())
+	return s.persistGateLogs(
+		task.ID, "task", governanceGateName, feature, s.cfg.GovernanceAgent(),
+		"governance", "Governance gate", agentStdout, v,
+	)
 }
 
 func (s *Service) incrementGovernanceRetries(task sqlite.Task) (int, sqlite.Task, error) {
@@ -266,19 +207,19 @@ func (s *Service) maxGovernanceRetries() int {
 	if s.cfg == nil {
 		return 2
 	}
-	return s.cfg.Work.Governance.MaxRetriesValue()
+	return s.cfg.Work.Gates.Governance.MaxRetriesValue()
 }
 
 func (s *Service) processGovernanceAfterDev(ctx context.Context, feature string, task sqlite.Task) (governanceOutcome, sqlite.Task, error) {
-	if s.cfg == nil || !s.cfg.Work.Governance.IsActive() {
+	if s.cfg == nil || !s.cfg.Work.Gates.Governance.IsActive() {
 		return governanceOK, task, nil
 	}
 
 	worktreePath := strings.TrimSpace(task.WorktreePath)
 	verdict, agentStdout, runErr := s.runGovernanceGate(ctx, feature, task, worktreePath)
 	if runErr != nil {
-		verdict = governanceVerdict{
-			Status: "fail",
+		verdict = gates.Result{
+			Status: gates.VerdictFail,
 			Notes:  []string{runErr.Error()},
 		}
 	}
@@ -290,19 +231,17 @@ func (s *Service) processGovernanceAfterDev(ctx context.Context, feature string,
 	}
 
 	switch verdict.Status {
-	case "pass":
+	case gates.VerdictPass:
 		return governanceOK, task, nil
-	case "warn":
-		if s.cfg.Work.Governance.WarnAdvisory() {
+	case gates.VerdictWarn:
+		if s.cfg.Work.Gates.Governance.WarnAdvisory() {
 			return governanceOK, task, nil
 		}
 		if err := s.transitionTask(task, asagiri.StatusFailed, true); err != nil {
 			return governanceOK, task, err
 		}
-		return governanceOK, task, fmt.Errorf("governance gate warn (non-advisory): %s", formatGovernanceFailure(verdict))
-	case "fail":
-		// retries_used = relances déjà consommées ; max_retries = relances autorisées après le 1er FAIL.
-		// Boucle : used < max → consommer une relance et reboucler dev ; sinon failed (anti-boucle : max fini).
+		return governanceOK, task, fmt.Errorf("governance gate warn (non-advisory): %s", gates.FormatFailure(verdict))
+	case gates.VerdictFail:
 		used := governanceRetries(task)
 		max := s.maxGovernanceRetries()
 		if used < max {
@@ -329,7 +268,7 @@ func (s *Service) processGovernanceAfterDev(ctx context.Context, feature string,
 			"governance gate failed after %d retries (max %d): %s",
 			used,
 			max,
-			formatGovernanceFailure(verdict),
+			gates.FormatFailure(verdict),
 		)
 	default:
 		return governanceOK, task, fmt.Errorf("governance gate unknown status %q", verdict.Status)
@@ -351,12 +290,12 @@ func (s *Service) applyGovernanceAfterDev(ctx context.Context, feature string, t
 }
 
 func (s *Service) warnGovernanceInactiveMode(feature string) {
-	if s.cfg == nil || !s.cfg.Work.Governance.EnabledButInactive() {
+	if s.cfg == nil || !s.cfg.Work.Gates.Governance.EnabledButInactive() {
 		return
 	}
 	msg := fmt.Sprintf(
 		"governance: enabled=true but mode=%q is inactive (only per-task runs); gate skipped for feature %s",
-		s.cfg.Work.Governance.Mode,
+		s.cfg.Work.Gates.Governance.Mode,
 		feature,
 	)
 	_ = s.writeTaskLog("_config", "governance-warn.log", msg+"\n")

@@ -3,7 +3,7 @@ package workflow
 import (
 	"testing"
 
-	"github.com/LaProgrammerie/asagiri/application/pkg/asagiri"
+	"github.com/LaProgrammerie/asagiri/application/internal/gates"
 )
 
 func TestParseGovernanceVerdictPass(t *testing.T) {
@@ -75,9 +75,9 @@ func TestParseGovernanceMissingBlockIsFail(t *testing.T) {
 }
 
 func TestClassifyFindingSeverityFailOverridesPass(t *testing.T) {
-	v := governanceVerdict{
-		Status: "pass",
-		Findings: []asagiri.GovernanceFinding{
+	v := gates.Result{
+		Status: gates.VerdictPass,
+		Findings: []gates.Finding{
 			{Code: "spec_drift", Severity: "fail", Message: "drift"},
 		},
 	}
@@ -88,9 +88,9 @@ func TestClassifyFindingSeverityFailOverridesPass(t *testing.T) {
 }
 
 func TestClassifyFailOnFilter(t *testing.T) {
-	v := governanceVerdict{
-		Status: "pass",
-		Findings: []asagiri.GovernanceFinding{
+	v := gates.Result{
+		Status: gates.VerdictPass,
+		Findings: []gates.Finding{
 			{Code: "architecture_violation", Severity: "fail", Message: "violation"},
 		},
 	}
@@ -154,5 +154,25 @@ func TestParseGovernanceVerdictJSONFailFinding(t *testing.T) {
 	got := classifyGovernanceVerdict(v, []string{"spec_drift"})
 	if got != "fail" {
 		t.Fatalf("json fail: got %q want fail", got)
+	}
+}
+
+func TestGovernanceRecordFromResult(t *testing.T) {
+	r := gates.Result{
+		GateID:     "governance",
+		Status:     gates.VerdictWarn,
+		Confidence: 0.5,
+		Notes:      []string{"note"},
+		Findings: []gates.Finding{
+			{Code: "spec_drift", Severity: "warn", Message: "drift"},
+		},
+		DryRun: true,
+	}
+	rec := governanceRecordFromResult(r, "2026-06-06T12:00:00Z", 2)
+	if rec.Status != "warn" || rec.Retry != 2 || !rec.DryRun {
+		t.Fatalf("record: %+v", rec)
+	}
+	if len(rec.Findings) != 1 || rec.Findings[0].Code != "spec_drift" {
+		t.Fatalf("findings: %+v", rec.Findings)
 	}
 }

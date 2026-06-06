@@ -297,26 +297,37 @@ type IntentResolverConfig struct {
 
 // WorkConfig defaults for work/continue (specv2 §9).
 type WorkConfig struct {
-	DefaultSpecAgent        string                 `yaml:"default_spec_agent"`
-	DefaultAgent            string                 `yaml:"default_agent"`
-	DefaultReviewer         string                 `yaml:"default_reviewer"`
-	DefaultEnricher         string                 `yaml:"default_enricher"`
-	StopAfter               string                 `yaml:"stop_after"`
-	AutoVerify              bool                   `yaml:"auto_verify"`
-	AutoReview              bool                   `yaml:"auto_review"`
-	MaxTasksPerRun          int                    `yaml:"max_tasks_per_run"`
-	RequirePlanConfirmation bool                   `yaml:"require_plan_confirmation"`
-	Governance              WorkGovernanceConfig   `yaml:"governance"`
+	DefaultSpecAgent        string               `yaml:"default_spec_agent"`
+	DefaultAgent            string               `yaml:"default_agent"`
+	DefaultReviewer         string               `yaml:"default_reviewer"`
+	DefaultEnricher         string               `yaml:"default_enricher"`
+	StopAfter               string               `yaml:"stop_after"`
+	AutoVerify              bool                 `yaml:"auto_verify"`
+	AutoReview              bool                 `yaml:"auto_review"`
+	MaxTasksPerRun          int                  `yaml:"max_tasks_per_run"`
+	RequirePlanConfirmation bool                 `yaml:"require_plan_confirmation"`
+	Gates                   WorkGatesConfig      `yaml:"gates"`
+	Governance              WorkGovernanceConfig `yaml:"governance"` // legacy: work.governance (+ plan_gate)
 }
 
-// WorkGovernanceConfig controls post-dev governance gates (task-validation-gates Tranche A).
+// WorkGovernanceConfig is the legacy YAML block under work.governance (including plan_gate).
+// Runtime reads work.gates after normalizeWorkGates.
 type WorkGovernanceConfig struct {
+	Enabled        bool               `yaml:"enabled"`
+	Mode           string             `yaml:"mode"` // off | per-task (Tranche A)
+	Agent          string             `yaml:"agent"`
+	FailOn         []string           `yaml:"fail_on"`
+	WarnIsAdvisory *bool              `yaml:"warn_is_advisory"`
+	MaxRetries     *int               `yaml:"max_retries"` // relances autorisées après le 1er FAIL ; défaut 2 si omis
+	PlanGate       WorkPlanGateConfig `yaml:"plan_gate"`
+}
+
+// WorkPlanGateConfig controls the read-only plan validation gate after PlanFeature.
+type WorkPlanGateConfig struct {
 	Enabled        bool     `yaml:"enabled"`
-	Mode           string   `yaml:"mode"` // off | per-task (Tranche A)
 	Agent          string   `yaml:"agent"`
 	FailOn         []string `yaml:"fail_on"`
 	WarnIsAdvisory *bool    `yaml:"warn_is_advisory"`
-	MaxRetries     *int     `yaml:"max_retries"` // relances autorisées après le 1er FAIL ; défaut 2 si omis
 }
 
 // SourcesConfig lists external spec sources (specv2 §9).
@@ -697,6 +708,7 @@ func (c *Config) applyIntentDefaults() {
 		c.Work.MaxTasksPerRun = 1
 	}
 	applyWorkGovernanceDefaults(&c.Work.Governance)
+	normalizeWorkGates(&c.Work)
 	if !c.Sources.Local.Enabled && len(c.Sources.Local.Paths) == 0 {
 		c.Sources.Local.Enabled = true
 	}

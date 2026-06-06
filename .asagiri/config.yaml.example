@@ -45,16 +45,26 @@ work:
   auto_review: false
   max_tasks_per_run: 1
   require_plan_confirmation: true
-  governance:
-    enabled: false
-    mode: per-task
-    agent: reviewer
-    fail_on:
-      - spec_drift
-      - architecture_violation
-      - unexpected_design_change
-    warn_is_advisory: true
-    max_retries: 2
+  # Validation gates (plan, governance, future gates). Legacy work.governance (+ plan_gate) still supported.
+  gates:
+    plan:
+      enabled: false
+      agent: reviewer
+      fail_on:
+        - missing_requirement_coverage
+        - oversized_task
+        - invalid_dependency
+      warn_is_advisory: true
+    governance:
+      enabled: false
+      mode: per-task
+      agent: reviewer
+      fail_on:
+        - spec_drift
+        - architecture_violation
+        - unexpected_design_change
+      warn_is_advisory: true
+      max_retries: 2
 
 sources:
   local:
