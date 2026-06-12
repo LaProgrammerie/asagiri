@@ -1,0 +1,48 @@
+{
+  "report_version": "doctor-v1",
+  "ready": true,
+  "warnings": [],
+  "failures": [],
+  "repository": {
+    "config_loaded": false
+  },
+  "state": {
+    "sqlite_present": false,
+    "run_count": 0,
+    "task_count": 0
+  },
+  "gates": null,
+  "agents": null,
+  "agent_registry": {
+    "path": "/repo/.asagiri/agents",
+    "present": true,
+    "file_count": 1,
+    "using_embedded_defaults": false,
+    "status": "ok",
+    "detail": "1 fichier(s) AgentSpec"
+  },
+  "agent_specs": [
+    {
+      "config_key": "dev",
+      "spec_id": "dev",
+      "spec_version": "1.0.0",
+      "role": "dev",
+      "content_hash": "abc123def456",
+      "prompt_source": "disk",
+      "output_format": "asagiri-v1",
+      "provider_type": "exec",
+      "provider_support": "inline_prompt",
+      "status": "ok"
+    }
+  ],
+  "agent_drift": [],
+  "last_orchestrated": {
+    "task_id": "task-1",
+    "agent_id": "dev",
+    "feature": "feat",
+    "phase": "dev",
+    "log_path": ".asagiri/logs/task-1/agents/dev/context.json"
+  },
+  "checks": null,
+  "next_actions": null
+}

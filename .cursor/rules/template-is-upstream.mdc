@@ -1,0 +1,10 @@
+---
+description: Ce dépôt est le template Go — impact sur les projets dérivés
+globs: .githooks/**,scripts/install-git-hooks.sh,.cursor/**,.kiro/**,Makefile,go.mod
+alwaysApply: false
+---
+
+# Template amont
+
+- Toute modif ici peut être **consommée par les projets clonés** (hooks, Makefile, règles Cursor/Kiro). Évite domaine métier d’un client précis et tout secret.
+- Après changement notable : mention dans **CHANGELOG** ou procédure interne pour que les dépôts dérivés importent / diffent (`diff -rq`, cherry-pick).

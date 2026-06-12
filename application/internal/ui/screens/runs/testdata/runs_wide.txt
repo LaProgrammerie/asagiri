@@ -1,0 +1,30 @@
+╭────────────────────────────────╮ ╭───────────────────────────────────────────────────────────────────────────────────╮
+│ Runs                           │ │ Run detail                                                                        │
+│ ▸ • cockpit  running           │ │ Run: run-1                                                                        │
+│   ✓ spec-ui  completed         │ │ Feature: cockpit  Status: running                                                 │
+│                                │ │ Worktree: .asagiri/worktrees/run-1                                                │
+│                                │ │                                                                                   │
+│                                │ │ Pipeline                                                                          │
+│                                │ │ ✓ spec  →  • verify                                                               │
+│                                │ │                                                                                   │
+│                                │ │ Validation: verify: running                                                       │
+│                                │ │                                                                                   │
+│                                │ │ Trust gate                                                                        │
+│                                │ │ Overall    ████████████░░░░  80%                                                  │
+│                                │ │                                                                                   │
+│                                │ │ Cost: €1.42                                                                       │
+│                                │ │                                                                                   │
+│                                │ │ Agents                                                                            │
+│                                │ │ - implementer • cursor                                                            │
+│                                │ │                                                                                   │
+│                                │ │ Recent events                                                                     │
+│                                │ │ - runtime.started                                                                 │
+│                                │ │                                                                                   │
+│                                │ │ Actions                                                                           │
+│                                │ │ - enter open   t trust   g graph   r replay                                       │
+│                                │ │                                                                                   │
+│                                │ │                                                                                   │
+│                                │ │                                                                                   │
+│                                │ │                                                                                   │
+│                                │ │                                                                                   │
+╰────────────────────────────────╯ ╰───────────────────────────────────────────────────────────────────────────────────╯

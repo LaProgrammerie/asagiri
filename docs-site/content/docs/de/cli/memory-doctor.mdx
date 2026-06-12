@@ -1,0 +1,28 @@
+---
+title: memory doctor
+description: Ollama-Erreichbarkeit, Embedding-Dimensionen und verwaiste Einträge prüfen.
+---
+
+# `asa memory doctor`
+
+Führt Gesundheitschecks der Laufzeit-Memory aus (Phase finale **PF-A-01**): Embedder-Erreichbarkeit, Dimensionskonsistenz, verwaiste Einträge.
+
+## Verwendung
+
+```bash
+asa memory doctor
+```
+
+## Prüfungen
+
+| Prüfung | Wann |
+| --- | --- |
+| **ollama** | `runtime.memory.embedder: ollama` — API erreichbar |
+| **dimensions** | Gespeicherte Vektoren = Embedder-Ausgabegröße |
+| **orphans** | Einträge ohne gültige Embedding-Metadaten |
+
+## Siehe auch
+
+- [Generierte Referenz](/docs/cli/generated/memory-doctor)
+- [memory reindex](/docs/cli/generated/memory-reindex)
+- [Runtime-Memory](/docs/de/configuration/config-file) — `runtime.memory.embedder`

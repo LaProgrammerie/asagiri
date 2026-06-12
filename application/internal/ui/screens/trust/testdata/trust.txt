@@ -1,0 +1,11 @@
+Trust Summary
+Overall: 74%  Residual risk: medium
+Gate: warn
+Gate reason: security confidence below profile target
+
+Dimensions
+Dimension  Score
+────────────────
+> Security  71%
+Keys: ↑↓ select  Enter drill-down  b back
+CLI: asa verify trust <flow>

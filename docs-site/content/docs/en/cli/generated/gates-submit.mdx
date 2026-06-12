@@ -1,0 +1,49 @@
+---
+title: Gates Submit · Asagiri CLI
+description: Write a human review verdict file for a task
+---
+
+CLI path: **`asa gates submit`**
+
+## When to use
+
+Orchestration commands coordinate higher-order Asagiri workloads such as ingestion, syncing, backlog triage, investigative passes, hydrated context payloads, coarse estimates, and workspace-specific automation.
+
+> Original CLI synopsis: Write a human review verdict file for a task
+
+## Usage
+
+```bash
+asa gates submit [flags]
+```
+
+## Options
+
+| Flag | Scope | Default | Description |
+| --- | --- | --- | --- |
+| `--dry-run` | Inherited | `false` | Simuler les exécutions sans lancer d'agent ni commandes externes |
+| `--file` | Local | `(empty)` | Path to a full verdict YAML file |
+| `--note` | Local | `(empty)` | Optional note when using --verdict |
+| `--task` | Local | `(empty)` | Task ID (required) |
+| `--verdict` | Local | `(empty)` | Verdict: pass, warn, or fail |
+
+## Examples
+
+```bash
+asa gates submit human_review --task task-1 --verdict pass
+  asa gates submit human_review --task task-1 --file ./review.yaml
+```
+
+## What happens internally
+
+- Hydrates contextual services resolved from **$PWD**, coordinating git-bound automation, ingestion pipelines, syncing, backlog triage, investigations, MCP hooks, contextual hydration, coarse estimates, and similar orchestrations for this subtree.
+
+## Failure modes
+
+- Cobra rejects unknown flags or arity mismatches before any repository side effects occur.
+- Asagiri cannot resolve scaffolding when the command is invoked outside an initialised checkout.
+- Downstream automation may fail whenever credentials, network endpoints, or cached prerequisites drift from expectations.
+
+## Related commands
+
+_No sibling commands at this depth (Gates Submit)._

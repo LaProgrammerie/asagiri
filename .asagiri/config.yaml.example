@@ -1,0 +1,374 @@
+# Exemple Asagiri (spec.md §7.1). Après copie vers config.yaml, adaptez au dépôt.
+# Template Go : les commandes validation par défaut sont injectées si go.mod est présent
+# (go test ./..., go vet ./..., golangci-lint run). Surchargez validation.commands ci-dessous.
+#
+# Modèle mental : Provider (runtime externe) → Agent (profil logique) → work.* (rôle) → workflow
+# L'adapter est choisi par providers.<id>.type — jamais par le nom du provider ou de l'agent.
+# Plusieurs agents peuvent partager le même provider (ex. dev + architect → kiro-cli).
+
+project:
+  name: my-project
+  default_branch: main
+
+runtime:
+  mode: guided
+  api:
+    port: 8765
+    socket: .asagiri/runtime/runtime.sock
+  memory:
+    embedder: hash   # hash | ollama | cloud
+    ollama:
+      base_url: http://127.0.0.1:11434
+      model: nomic-embed-text
+    cloud:
+      enabled: false
+      provider: openai
+      model: text-embedding-3-small
+      token_env: OPENAI_API_KEY
+
+intent:
+  enabled: true
+  default_mode: guided
+  resolver:
+    use_ollama_fallback: true
+    min_confidence: 0.75
+    ask_when_below_confidence: true
+
+work:
+  # work.* référence des clés agents: (profils logiques), pas des providers.
+  default_spec_agent: laprogrammerie
+  default_agent: dev
+  default_reviewer: reviewer
+  default_enricher: local-rag
+  stop_after: report
+  auto_verify: true
+  auto_review: false
+  max_tasks_per_run: 1
+  require_plan_confirmation: true
+  # Gates de validation (canonique). Compat legacy : work.governance (+ plan_gate).
+  gates:
+    plan:
+      enabled: false
+      agent: reviewer
+      fail_on:
+        - missing_requirement_coverage
+        - oversized_task
+        - invalid_dependency
+      warn_is_advisory: true
+    governance:
+      enabled: false
+      mode: per-task
+      agent: reviewer
+      fail_on:
+        - spec_drift
+        - architecture_violation
+        - unexpected_design_change
+      warn_is_advisory: true
+      max_retries: 2
+    human_review:
+      enabled: false
+      mode: per-task
+      warn_is_advisory: true
+      fail_on: []
+      verdict_file: ""
+    enrich:
+      enabled: false
+      mode: off
+      agent: reviewer
+      fail_on:
+        - missing_files_scope
+        - invalid_validation_commands
+        - enrichment_not_actionable
+        - enrich_gate_parse_error
+      warn_is_advisory: true
+    verify_evidence:
+      enabled: false
+      mode: off
+      agent: reviewer
+      fail_on:
+        - missing_validation_commands
+        - validation_output_missing
+        - verification_not_actionable
+        - verify_evidence_gate_parse_error
+      warn_is_advisory: true
+
+sources:
+  local:
+    enabled: true
+    paths:
+      - .asagiri/specs
+      - .kiro/specs
+      - docs/ai/active
+  notion:
+    enabled: false
+    token_env: NOTION_TOKEN
+    specs_database_id: ""
+    import_path: .asagiri/specs
+
+specs:
+  kiro_path: .kiro/specs
+  active_spec_path: docs/ai/active/current-spec.md
+  handoff_path: docs/ai/active/handoff.md
+
+state:
+  backend: sqlite
+  path: .asagiri/state.sqlite
+
+worktrees:
+  base_path: .asagiri/worktrees
+  branch_prefix: asagiri
+  cleanup_policy: keep_failed
+
+# --- Runtimes externes (CLI, API locale, etc.) ---
+providers:
+  kiro-cli:
+    type: kiro-cli
+    command: kiro
+    args: ["--cli"]
+  cursor-cli:
+    type: cursor-cli
+    command: cursor-agent
+    timeout: 3600
+  claude-code:
+    type: claude-code
+    command: claude
+    args: ["--print", "--output-format", "stream-json"]
+    timeout: 600
+  codex-cli:
+    type: codex-cli
+    command: codex
+    timeout: 3600
+  ollama:
+    type: ollama
+    command: ollama
+    args: ["run", "qwen2.5-coder:14b"]
+    timeout: 300
+
+# --- AgentSpec sémantique (source de vérité prompts) : .asagiri/agents/<id>.yaml ---
+# config.agents ci-dessous = transport runtime (provider, command, timeout).
+# external_path (optionnel) = chemin explicite vers un profil outil (ex. ~/.cursor/agents/dev.md).
+# Asagiri ne scanne pas $HOME : seuls spec.external.path et external_path sont résolus (audit T21).
+# Si .asagiri/agents/ est absent, Asagiri charge les templates embarqués (dev, reviewer, enricher, governance).
+
+# --- Profils logiques (référencés par work.*, flags --agent, coordination) ---
+agents:
+  laprogrammerie:
+    provider: kiro-cli
+    profile: laprogrammerie   # hint métier — ne sélectionne PAS l'adapter
+  dev:
+    provider: kiro-cli
+  architect:
+    provider: kiro-cli        # même provider que dev — cas d'usage courant
+  reviewer:
+    provider: claude-code
+  local-rag:
+    provider: ollama
+    endpoint: http://localhost:11434
+    model: qwen2.5-coder:14b
+    embedding_model: nomic-embed-text
+
+# --- Format legacy (toujours supporté) : agent sans provider = type exec implicite ---
+# agents:
+#   claude:
+#     command: claude
+#     timeout: 3600
+
+validation:
+  commands:
+    - name: tests
+      command: go test ./...
+      required: true
+    - name: vet
+      command: go vet ./...
+      required: true
+    - name: lint
+      command: golangci-lint run
+      required: false
+
+# Trust & verification gates (spec-my-B §19)
+verification:
+  default_profile: production
+  gates:
+    production:
+      min_confidence:
+        architecture: 0.8
+        implementation: 0.75
+        security: 0.85
+      required_checks:
+        - contracts
+        - flows
+        - observability
+        - security
+
+# Multi-agent coordination (spec-my-D §11)
+coordination:
+  max_parallel_agents: 2
+  default_isolation: isolated_worktree
+  require_independent_review: true
+  allow_self_review: false
+  require_security_review_for:
+    - auth
+    - permissions
+    - payments
+  assignment:
+    investigation: local
+    architecture_review: architect
+    implementation.medium: dev
+    implementation.high: reviewer
+    security_review: reviewer
+    validation: local
+  profiles:
+    dev-implementer:
+      agent: dev
+      role: implementer
+      capabilities:
+        - implementation
+      restrictions:
+        - no_git_push
+      max_context_tokens: 128000
+      isolation: isolated_worktree
+    claude-reviewer:
+      agent: reviewer
+      role: reviewer
+      capabilities:
+        - architecture_review
+        - flow_review
+        - contract_review
+      restrictions:
+        - no_direct_write
+        - no_git_push
+      max_context_tokens: 32000
+      isolation: readonly
+    kiro-architect:
+      agent: architect
+      role: architect
+      capabilities:
+        - architecture_review
+      isolation: isolated_worktree
+  pipeline:
+    - investigator
+    - architect
+    - implementer
+    - reviewer
+    - validator
+
+# Execution graph planner (spec-my-C §24)
+execution_graph:
+  enabled: true
+  max_parallel: 2
+  default_strategy: risk_aware
+  require_checkpoints: true
+  stop_on_risk: high
+  allow_parallel_agents: true
+  require_isolated_worktrees: true
+  gates:
+    trust_required_for_high_risk: true
+    human_approval_for:
+      - migration
+      - security_sensitive
+      - public_contract_change
+  rollback:
+    require_strategy_for_high_risk: true
+    preserve_failed_worktrees: true
+
+# --- specv3 : coût / performance / tokens ---
+models:
+  ollama_local_qwen:
+    provider: ollama
+    class: local
+    model: qwen2.5-coder:14b
+    input_cost_per_1m_tokens: 0
+    output_cost_per_1m_tokens: 0
+    typical_latency_ms_per_1k_tokens: 120
+    max_context_tokens: 32000
+    usage: [summarize, classify, pre_review, context_selection]
+  gemini_flash:
+    provider: ollama_cloud
+    class: cloud_fast
+    model: gemini-3-flash-preview
+    usage: [implementation, intermediate_review]
+
+budgets:
+  default_currency: EUR
+  per_run:
+    max_estimated_cost: 1.00
+    max_estimated_tokens: 500000
+    require_confirmation_above_cost: 0.20
+  per_task:
+    max_estimated_cost: 0.30
+    max_estimated_tokens: 150000
+  daily:
+    max_estimated_cost: 10.00
+  policies:
+    block_when_over_budget: true
+    allow_override_with_flag: true
+    override_flag: "--allow-over-budget"
+
+pricing:
+  currency: EUR
+  # premium_reference_model: "gpt-4o"  # enables savings report in asa cost report
+  models:
+    gemini-3-flash-preview:
+      input_per_1m_tokens: 0.00  # configurer manuellement
+      output_per_1m_tokens: 0.00
+      source: manual
+      updated_at: "2026-05-17"
+
+token_estimation:
+  default_chars_per_token: 4.0
+  code_chars_per_token: 3.2
+  markdown_chars_per_token: 4.2
+  json_chars_per_token: 3.6
+
+routing:
+  default_strategy: cost_aware
+  strategies:
+    cost_aware:
+      prefer_local_for: [summarize, classify, context_selection, pre_review, log_analysis]
+      use_cloud_fast_for: [implementation_medium, review_medium, planning_complex]
+      use_cloud_heavy_for: [architecture_critical, security_sensitive, large_refactor]
+      local_failures_before_cloud: 1
+      cloud_fast_failures_before_heavy: 1
+
+ui:
+  mode: auto  # auto | rich | plain | json
+  live_logs: true
+  progress_bars: true
+  compact: false
+  default_screen: mission
+  theme: asagiri-dark
+  mouse: true
+  animations: true
+  refresh_interval_ms: 500
+  compact_threshold: 100
+  show_cli_equivalents: true
+  confirm_destructive_actions: true
+
+mcp:
+  enabled: false
+  max_output_bytes: 1048576
+  command_timeout_seconds: 120
+  secret_path_denylist: [".env", "credentials.json", "id_rsa"]
+  investigation:
+    large_file_bytes: 524288
+    max_grep_output_bytes: 262144
+    command_timeout_seconds: 120
+    sensitive_globs: ["*.pem", ".git/*"]
+
+policies:
+  require_clean_git: true
+  forbid_untracked_secret_files: true
+  max_files_changed_per_task: 20
+  allow_network: false
+  require_human_approval_for:
+    - database_migration
+    - security_sensitive_change
+    - dependency_upgrade
+
+replay:
+  capture_prompts: true
+  capture_runtime_events: true
+  capture_agent_outputs: true
+  redact_secrets: true
+  offline_mode_default: false
+  compress_threshold_bytes: 4096

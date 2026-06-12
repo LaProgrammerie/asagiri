@@ -1,0 +1,19 @@
+---
+title: impact-Befehl
+description: Änderungsauswirkungen über den Knowledge Graph analysieren.
+---
+
+# `asa impact analyze`
+
+Impact-Analyse (`spec-my-E` §14).
+
+```bash
+asa impact analyze --file internal/invitation/invitation_service.go
+asa impact analyze --flow onboarding --action invite_member --json
+```
+
+Erfordert einen gebauten Graphen (zuerst `asa knowledge build`).
+
+Listet betroffene Flows, API-Operationen, Events, Tests, Risikoniveau und empfohlene Checks.
+
+Siehe [Engineering Knowledge Graph](/docs/de/concepts/engineering-knowledge-graph).

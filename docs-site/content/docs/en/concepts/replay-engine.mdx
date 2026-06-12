@@ -1,0 +1,42 @@
+---
+title: Replay engine
+description: Capture, re-run, compare, and audit engineering workflows with deterministic context.
+---
+
+# Replay engine
+
+`spec-my-F` — builds **replay packages** under `.asagiri/replays/` so you can audit agent workflows, reproduce failures, and compare runs without relying on LLM determinism.
+
+## Principles
+
+- **Practical determinism** — pins Git commit, config, graph state, and captured artefacts; does not guarantee identical LLM outputs.
+- **Local-first** — packages live in the repo under `.asagiri/replays/<replay-id>/`.
+- **Secret-safe** — `redact_secrets` and path exclusions; never stores raw tokens or full `.env` files.
+- **Distinct from trust replay** — `asa trust replay` replays a **verification** from `.asagiri/trust/<id>/`; `asa replay` captures whole **engineering workflows**.
+
+## Pipeline
+
+```text
+run / execution graph / investigation
+  → asa replay create
+  → replay.yaml + graph/ trust/ investigations/ runtime/ …
+  → asa replay run (--offline | --simulation | --strict)
+  → compare / explain divergences
+  → snapshot --name
+```
+
+## Modes
+
+| Mode | CLI | Behaviour |
+|------|-----|-----------|
+| Full | default `replay run` | Re-executes workflow (agents unless offline) |
+| Simulation | `--simulation` | Replays graph/events/outputs without calling agents |
+| Offline | `--offline` or config default | Blocks cloud and external API calls |
+| Compare | `replay compare` or `run --compare` | Structured diff (cost, trust, graph, artefacts) |
+| Audit | validation paths | Package integrity and provenance |
+
+## Divergences
+
+`replay compare` and `replay explain` report trust score deltas, missing validations, graph node changes, missing artefacts, and stale knowledge warnings.
+
+See [Configuration — `replay`](/docs/configuration/config-file#replay) and [`asa replay`](/docs/cli/replay).

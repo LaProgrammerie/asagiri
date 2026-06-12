@@ -1,0 +1,172 @@
+{
+  "nodes": [
+    {
+      "id": "action:invite_member",
+      "type": "action",
+      "name": "invite_member",
+      "source": {
+        "kind": "flow",
+        "path": ".asagiri/products/workspace-saas/flows/onboarding.flow.yaml",
+        "extractor": "flows"
+      },
+      "confidence": 0.96,
+      "created_at": "2026-05-29T10:00:00Z",
+      "updated_at": "2026-05-29T10:00:00Z"
+    },
+    {
+      "id": "api_operation:POST_invitations",
+      "type": "api_operation",
+      "name": "POST /invitations",
+      "path": "contracts/invitations.openapi.yaml",
+      "source": {
+        "kind": "contract",
+        "path": "contracts/invitations.openapi.yaml",
+        "extractor": "contracts"
+      },
+      "confidence": 0.94,
+      "created_at": "2026-05-29T10:00:00Z",
+      "updated_at": "2026-05-29T10:00:00Z"
+    },
+    {
+      "id": "event:member.invited",
+      "type": "event",
+      "name": "member.invited",
+      "source": {
+        "kind": "events",
+        "path": ".asagiri/products/workspace-saas/events.yaml",
+        "extractor": "events"
+      },
+      "confidence": 0.92,
+      "created_at": "2026-05-29T10:00:00Z",
+      "updated_at": "2026-05-29T10:00:00Z"
+    },
+    {
+      "id": "flow:onboarding",
+      "type": "flow",
+      "name": "onboarding",
+      "path": ".asagiri/products/workspace-saas/flows/onboarding.flow.yaml",
+      "source": {
+        "kind": "flow",
+        "path": ".asagiri/products/workspace-saas/flows/onboarding.flow.yaml",
+        "extractor": "flows"
+      },
+      "confidence": 0.98,
+      "created_at": "2026-05-29T10:00:00Z",
+      "updated_at": "2026-05-29T10:00:00Z"
+    },
+    {
+      "id": "symbol:InvitationService_invite",
+      "type": "symbol",
+      "name": "InvitationService::invite",
+      "path": "internal/invitation/invitation_service.go",
+      "source": {
+        "kind": "code",
+        "path": "internal/invitation/invitation_service.go",
+        "extractor": "code"
+      },
+      "confidence": 0.88,
+      "created_at": "2026-05-29T10:00:00Z",
+      "updated_at": "2026-05-29T10:00:00Z"
+    },
+    {
+      "id": "test:InvitationServiceTest",
+      "type": "test",
+      "name": "InvitationServiceTest",
+      "path": "internal/invitation/invitation_service_test.go",
+      "source": {
+        "kind": "test",
+        "path": "internal/invitation/invitation_service_test.go",
+        "extractor": "tests"
+      },
+      "confidence": 0.9,
+      "created_at": "2026-05-29T10:00:00Z",
+      "updated_at": "2026-05-29T10:00:00Z"
+    }
+  ],
+  "edges": [
+    {
+      "id": "emits:symbol_InvitationService_invite>event_member.invited",
+      "from": "symbol:InvitationService_invite",
+      "to": "event:member.invited",
+      "type": "emits",
+      "source": {
+        "kind": "code",
+        "path": "internal/invitation/invitation_service.go",
+        "extractor": "code"
+      },
+      "confidence": 0.85,
+      "created_at": "2026-05-29T10:00:00Z",
+      "updated_at": "2026-05-29T10:00:00Z"
+    },
+    {
+      "id": "implements:action_invite_member>symbol_InvitationService_invite",
+      "from": "action:invite_member",
+      "to": "symbol:InvitationService_invite",
+      "type": "implements",
+      "source": {
+        "kind": "flow",
+        "path": ".asagiri/products/workspace-saas/flows/onboarding.flow.yaml",
+        "extractor": "flows"
+      },
+      "confidence": 0.87,
+      "created_at": "2026-05-29T10:00:00Z",
+      "updated_at": "2026-05-29T10:00:00Z"
+    },
+    {
+      "id": "implements:api_operation_POST_invitations>symbol_InvitationService_invite",
+      "from": "api_operation:POST_invitations",
+      "to": "symbol:InvitationService_invite",
+      "type": "implements",
+      "source": {
+        "kind": "contract",
+        "path": "contracts/invitations.openapi.yaml",
+        "extractor": "contracts"
+      },
+      "confidence": 0.87,
+      "created_at": "2026-05-29T10:00:00Z",
+      "updated_at": "2026-05-29T10:00:00Z"
+    },
+    {
+      "id": "requires:action_invite_member>api_operation_POST_invitations",
+      "from": "action:invite_member",
+      "to": "api_operation:POST_invitations",
+      "type": "requires",
+      "source": {
+        "kind": "flow",
+        "path": ".asagiri/products/workspace-saas/flows/onboarding.flow.yaml",
+        "extractor": "flows"
+      },
+      "confidence": 0.91,
+      "created_at": "2026-05-29T10:00:00Z",
+      "updated_at": "2026-05-29T10:00:00Z"
+    },
+    {
+      "id": "requires:flow_onboarding>action_invite_member",
+      "from": "flow:onboarding",
+      "to": "action:invite_member",
+      "type": "requires",
+      "source": {
+        "kind": "flow",
+        "path": ".asagiri/products/workspace-saas/flows/onboarding.flow.yaml",
+        "extractor": "flows"
+      },
+      "confidence": 0.95,
+      "created_at": "2026-05-29T10:00:00Z",
+      "updated_at": "2026-05-29T10:00:00Z"
+    },
+    {
+      "id": "tests:symbol_InvitationService_invite>test_InvitationServiceTest",
+      "from": "symbol:InvitationService_invite",
+      "to": "test:InvitationServiceTest",
+      "type": "tests",
+      "source": {
+        "kind": "test",
+        "path": "internal/invitation/invitation_service_test.go",
+        "extractor": "tests"
+      },
+      "confidence": 0.9,
+      "created_at": "2026-05-29T10:00:00Z",
+      "updated_at": "2026-05-29T10:00:00Z"
+    }
+  ]
+}

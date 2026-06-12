@@ -1,0 +1,60 @@
+---
+title: Workflow CI
+description: Utiliser Asagiri en CI avec dry-run, validation et vérifications doc.
+---
+
+# Workflow CI
+
+L’intégration continue doit piloter Asagiri **sans prompts bloquants**, idéalement en **dry-run** quand cette lecture correspond à votre intention, et sans rejouer de secrets dans les journaux CI.
+
+## Schéma recommandé
+
+Un couloir type compile la CLI, initialise les métadonnées projet, lance `doctor`, puis passe un **`work` dry-run + plan-only** afin que la pipeline demeure rapide et reproductible. Adaptez chemins caches à votre plateforme ; ci-dessous l’ordonnancement type :
+
+```yaml
+# extrait — à adapter à votre CI
+- run: go build -o bin/asa ./application/cmd/asa
+- run: bin/asa init
+  working-directory: ${{ github.workspace }}
+- run: bin/asa doctor
+- run: bin/asa work "smoke feature" --dry-run --plan-only
+- run: go test -race ./...
+```
+
+## Variables d’environnement
+
+Quand vous préférez l’ENV aux drapeaux, Asagiri respecte ces miroirs :
+
+| Variable | Effet |
+| --- | --- |
+| `ASA_DRY_RUN=1` | Équivalent global `--dry-run` |
+| `ASA_YES=1` | Confirme les invites automatiquement (CI prudente seulement) |
+| `NOTION_TOKEN` | Requis uniquement pour jobs Notion-sync |
+
+Voir [Variables d’environnement](/docs/fr/reference/environment-variables).
+
+## Docs CI
+
+Ce repo valide également que docs publique buildent encore et CLI référence reste synchro :
+
+```bash
+cd docs-site && npm ci && npm run build
+go run ./application/cmd/asa docs generate-cli --output docs-site/content/docs/en/cli/generated
+go test ./application/internal/cli/docgen/...
+```
+
+Fichier orchestrateur : `.github/workflows/docs.yml`.
+
+## À éviter en CI
+
+Considérez CI comme mise en boucle et hygienics, pas prod non surveillée sauf pinning agents scopes secrets définitifs :
+
+- Jamais `dev`/`review` réels sans agents figés scopes secrets circonscris
+- Ne committez pas `config.yaml` avec jetons vivants dedans
+- Ne remplacez pas `go test` par `--estimate-only` tout seul
+
+## Voir aussi
+
+- [Contribuer](/docs/fr/contributing)
+- [Sécurité](/docs/fr/security)
+- [CLI : verify](/docs/fr/cli/generated/verify)

@@ -1,0 +1,45 @@
+---
+title: Limits
+description: What Asagiri does not guarantee and known product boundaries.
+---
+
+# Limits
+
+Asagiri excels at scaffolding disciplined automation, yet it inherits the same brittle edges as every orchestrator that sits atop large language models. The sections below articulate the **explicit trust boundaries** captured in **`spec-doc` §17.1**, pairing crisp denials with the capabilities you can lean on confidently.
+
+## Asagiri does not
+
+- **Guarantee correctness** of generated code
+- **Replace your test suite** — validation runs commands you configure; failures are yours to fix
+- **Replace human review** for security, compliance, or architecture
+- **Prevent all prompt injection** — malicious specs or Notion content can steer agents
+- **Provide provider-exact token billing**
+- **Offer production SLA** — OSS orchestration CLI
+
+Staying truthful about unreliability—notably around adversarial prompts, fiscal precision, or operational uptime—helps teams allocate manual validation where deterministic tooling ends.
+
+## What it does do
+
+- Enforce a **state machine** for pipeline steps
+- **Isolate** tasks in git worktrees
+- **Estimate** cost/tokens before runs
+- **Block** some policy violations (dirty git, secret filenames, budget caps)
+- **Record** runs for audit (`report`, SQLite)
+
+Those guarantees target **workflow hygiene** rather than asserting that every synthesized patch is inherently safe once tests pass locally.
+
+## Experimental capabilities
+
+Marked separately in docs — including full MCP surface, Notion sync, auto context compression tuning, non-dry-run auto-resume, and vector RAG.
+
+Capabilities flagged as experimental may ship behind toggles or fast iteration lanes; bake them into production runbooks only after you consciously accept regressions tied to heuristic automation.
+
+<Callout type="warning">
+Passing `verify` means configured commands exited 0 — not that the change is safe to ship.
+</Callout>
+
+## Related
+
+- [Philosophy](/docs/concepts/philosophy)
+- [Security overview](/docs/security)
+- [Roadmap](/docs/roadmap)

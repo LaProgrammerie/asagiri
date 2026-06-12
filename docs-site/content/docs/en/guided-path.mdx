@@ -1,0 +1,98 @@
+---
+title: Guided path
+description: The single guided path from onboarding through work to validation milestones.
+---
+
+# Guided path
+
+Asagiri exposes one guided path that takes you from a fresh repository to a validated development run: **onboarding → work → validation milestones**. It is the recommended entry point and stays discoverable from `asa --help`. Every unitary command (`asa spec`, `plan`, `enrich`, `dev`, `verify`, `review`) remains available on its own—the guided path highlights a route without removing anything.
+
+```bash
+asa onboard               # 1. prepare the repository (ready state)
+asa work "<your need>"    # 2. describe → produce → validate at milestones
+```
+
+## 1. Onboarding
+
+Onboarding brings the repository to a ready state before any agent runs. Run the wizard, then confirm readiness:
+
+```bash
+asa onboard
+asa ready
+```
+
+`onboard` detects your stack and writes configuration without lowering an existing readiness score. Use `asa onboard --check-only` to evaluate readiness without creating, modifying, or deleting any file. If a required tool, configuration, or dependency is missing, Asagiri stops without a panic, returns a non-zero exit code, and names the missing element along with at least one resolution action—it never leaves a partial configuration behind.
+
+See [Installation](/docs/getting-started/installation) and [Quickstart](/docs/getting-started/quickstart) for the underlying steps.
+
+## 2. Work
+
+`work` is the high-level command: you describe a need in natural language and Asagiri turns it into an executable plan, then runs the pipeline (resolve intent → plan and enrich context → develop in a worktree → verify → optional review → report).
+
+```bash
+asa work "develop billing-v2" --estimate-only   # cost gate first
+asa work "develop billing-v2"                    # guided confirmation by default
+```
+
+Rehearse safely before spending: `--dry-run` simulates every step without invoking a real agent, running an external command, or modifying persistent repository state. `--plan-only` and `--estimate-only` stop after planning and cost estimation respectively.
+
+### Scope routing (Product Layer V1)
+
+Each instruction is classified deterministically (no LLM). Priority: **technical_task** → **feature_work** → **product_level_intent**. When classification is uncertain, Asagiri defaults to **feature_work** and does **not** run the Product Layer.
+
+| Scope | Typical signal | Behaviour |
+| --- | --- | --- |
+| `technical_task` | bug, test, refactor, CI, lint | Normal technical workflow |
+| `feature_work` | endpoint, page, export, auth | Normal technical workflow |
+| `product_level_intent` | greenfield CRM/SaaS/marketplace intent | Product Layer preparation, then **controlled stop** |
+
+Product-level intents use a **two-step** workflow (V1). There is **no auto-chain** from product preparation into coding in the same `asa work` invocation.
+
+```bash
+# Step 1 — prepare product artifacts (single run)
+asa work "Build a CRM for artisans" --dry-run
+asa work "Build a CRM for artisans" --yes
+
+# Step 2 — implementation (separate run)
+asa work crm-artisans --yes
+asa next --feature crm-artisans
+```
+
+See [Executable Product Layer](/docs/concepts/executable-product-layer) and [Product to code workflow](/docs/workflows/product-to-code).
+
+## 3. Validation milestones
+
+The guided path pauses at human validation milestones rather than running unattended. Asagiri requires an explicit affirmative answer before executing the step when:
+
+- a **plan confirmation** is required (`work.require_plan_confirmation`),
+- a run would **exceed its budget**,
+- a **sensitive action** is involved (payment, personal data, authentication, permissions, deletion, export, data migration).
+
+In non-interactive contexts (CI or `--non-interactive`) where confirmation is required and `--yes` is absent, Asagiri stops without waiting for input, returns a non-zero exit code, and names the flag to supply.
+
+## Unitary commands stay available
+
+The guided path never removes a command. When you want to drive a single step yourself, each unitary command runs standalone:
+
+```bash
+asa spec my-feature
+asa plan my-feature
+asa enrich my-feature
+asa dev my-feature
+asa verify my-feature
+asa review my-feature
+```
+
+Plain and JSON output stay at information parity, so the fields you rely on never depend on the render mode.
+
+## Related reading
+
+- [Mental model](/docs/concepts/mental-model)
+- [Daily workflow](/docs/workflows/daily-workflow)
+- [First workflow](/docs/getting-started/first-workflow)
+- [CLI reference](/docs/cli/generated)
+
+<Callout type="warning">
+  Asagiri does not prove correctness. Validation and human review remain
+  mandatory for critical changes.
+</Callout>

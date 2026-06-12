@@ -1,0 +1,81 @@
+---
+title: Inicio rápido
+description: Recorrer Asagiri de extremo a extremo en menos de diez minutos con la seguridad del dry-run.
+---
+
+# Inicio rápido
+
+Esta guía recorre Asagiri en menos de diez minutos usando **`--dry-run`**. Verá cómo la intención se resuelve en un plan y en una estimación de coste sin invocar agentes externos ni *shells* de validación: una forma segura de explorar la orquestación sobre un repositorio real.
+
+Cuando domine el flujo, quite `--dry-run` solo después de tener configurados los agentes y los comandos de validación.
+
+## 1. Compilar e inicializar
+
+Parta de un binario compilado y de un árbol de proyecto limpio:
+
+```bash
+make build
+export PATH="$PWD/bin:$PATH"
+cd your-repo
+asa init
+asa doctor
+```
+
+El comando `doctor` muestra lagunas de configuración (agentes ausentes, ajustes de MCP, archivos de presupuesto) antes de gastar tokens en una ejecución completa.
+
+## 2. Probar en dry-run un flujo en lenguaje natural
+
+El comando `work` con lenguaje natural es el punto de entrada de más alto nivel. Los siguientes comandos muestran planificación y estimación sin efectos secundarios:
+
+```bash
+asa work "develop my-feature" --dry-run --plan-only
+asa work "develop my-feature" --dry-run --estimate-only
+```
+
+`--plan-only` resuelve la intención e imprime el plan de ejecución. `--estimate-only` recorre el pipeline V3 hasta la estimación de coste y de contexto **sin** llamar a las CLIs de agentes externos.
+
+## 3. Inspeccionar comandos aislados del pipeline
+
+Si ya mantiene una carpeta de especificaciones Kiro (por ejemplo `.kiro/specs/my-feature/`), puede ejecutar cada paso del pipeline de forma aislada:
+
+```bash
+asa plan my-feature --dry-run
+asa enrich my-feature --dry-run
+asa dev my-feature --dry-run
+asa verify my-feature --dry-run
+asa review my-feature --dry-run
+asa status --dry-run
+```
+
+En este contexto, *dry-run* significa que la orquestación y el registro se ejecutan en local; no se lanzan procesos externos.
+
+## 4. Leer los informes de ejecución
+
+Tras un `work` en *dry-run* que cree metadatos de corrida, inspeccione los artefactos:
+
+```bash
+asa status --dry-run
+asa report <run-id> --dry-run
+```
+
+Los informes se escriben bajo `.asagiri/runs/<run-id>/report.md`, con JSON complementario para herramientas.
+
+## Ejecución real
+
+Cuando la configuración esté lista y acepte la ejecución de procesos externos, escale de forma deliberada:
+
+```bash
+asa work "develop my-feature" --estimate-only   # primero la compuerta de coste
+asa work "develop my-feature"                   # confirmación guiada por defecto
+```
+
+Use `--estimate-only` como compuerta económica antes de pagar tiempo de agente. La ruta por defecto de `work` sigue pidiendo confirmación a menos que opte por los indicadores no interactivos documentados en la referencia de la CLI.
+
+<Callout type="warning">
+El *dry-run* simula la orquestación; no garantiza la calidad de la salida de los agentes. En cambios reales, ejecute siempre la validación del proyecto (`go test`, linters, revisión humana).
+</Callout>
+
+## Lecturas relacionadas
+
+- [Primer flujo de trabajo](/docs/es/getting-started/first-workflow)
+- [Referencia de la CLI](/docs/es/cli/generated)

@@ -1,0 +1,31 @@
+---
+title: Flujo producto a codigo
+description: Flujo completo desde intención de producto hasta plan ejecutable.
+---
+
+# Flujo producto a codigo
+
+Secuencia recomendada:
+
+```bash
+asa prototype create "SaaS de workspaces con invitaciones" --product workspace-saas
+asa prototype run workspace-saas
+asa flows extract workspace-saas
+asa flows inspect workspace-saas
+asa flows review workspace-saas
+asa contracts extract workspace-saas
+asa architecture derive workspace-saas
+asa spec generate-from-product workspace-saas
+asa product review workspace-saas
+asa work "develop workspace-saas" --plan-only
+```
+
+## Salidas
+
+- prototipo local clicable;
+- YAML de flujos/pantallas;
+- review de flujos business-aware (métricas/obs/seguridad);
+- contratos técnicos;
+- proyección de arquitectura (API/async/seguridad/infra);
+- specs/tareas generadas;
+- plan de ejecución con `work`.

@@ -1,0 +1,106 @@
+---
+title: Runtime commands
+description: Persistent local runtime, daemon, sessions, events, and memory.
+---
+
+# Runtime commands
+
+The runtime layer (`spec-my-A` §24) adds a local-first persistent engineering environment on top of the stateless CLI.
+
+## Daemon
+
+```bash
+asa daemon start
+asa daemon start --detach
+asa daemon run
+asa daemon status
+asa daemon status --rich
+asa daemon stop
+```
+
+- `start` initializes SQLite state under `.asagiri/runtime/`
+- `--detach` launches `asa daemon run` in the background (worker loop + hook queue)
+- `run` is the long-running worker (event bus, hook execution)
+
+## Sessions and branches
+
+```bash
+asa session create onboarding-redesign --product workspace-saas --flow onboarding
+asa session list
+asa session attach onboarding-redesign
+asa session branch onboarding-redesign --name onboarding-enterprise
+asa session graph
+```
+
+## Events
+
+```bash
+asa runtime events
+asa runtime events --follow
+```
+
+## Memory
+
+```bash
+asa memory list
+asa memory list --scope feature
+asa memory list --query "onboarding failure"
+asa memory consolidate
+```
+
+Scoped memory is stored in `runtime.db` (`memory_entries` table) with scoring, aging, and consolidation.
+
+## Skills
+
+```bash
+asa skills list
+```
+
+Skills live under `.asagiri/skills/**/*.yaml` and are injected contextually by scope tags.
+
+## Hooks
+
+Configure `.asagiri/runtime/hooks.yaml`:
+
+```yaml
+hooks:
+  on:
+    session.created:
+      - run: asa version
+```
+
+Only `asa …` commands are executed by the worker for safety.
+
+## Local HTTP API
+
+```bash
+asa runtime serve --port 8765
+```
+
+See [runtime serve](/docs/cli/runtime-serve) for REST endpoints, auth token, and SDKs.
+
+## SDK
+
+In-process (Go):
+
+```go
+rt, _ := asagiri.Connect(repoRoot)
+defer rt.Close()
+sess, _ := rt.StartSession("my-session", "workspace-saas", "onboarding")
+_ = rt.RunFlow(sess.ID, "onboarding")
+```
+
+HTTP (Go or TypeScript):
+
+```go
+client := asagiri.ConnectHTTP(asagiri.HTTPOptions{BaseURL: "http://127.0.0.1:8765"})
+```
+
+```ts
+import { AsagiriClient } from "@laprogrammerie/asagiri";
+```
+
+## Related
+
+- [Investigation CLI](/docs/cli/investigate)
+- [Executable Product Layer](/docs/concepts/executable-product-layer)

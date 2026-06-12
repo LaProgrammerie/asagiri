@@ -1,0 +1,32 @@
+---
+title: trust replay
+description: Re-run a trust verification from a saved replay manifest.
+---
+
+# `asa trust replay`
+
+Replays a prior trust run from `.asagiri/trust/<trust-id>/replay.yaml` (`spec-my-B` §21). Useful for auditing what was verified before a merge or comparing results after a rebase.
+
+## Usage
+
+```bash
+asa trust replay trust-2026-05-29-aefcf60d
+asa trust replay trust-2026-05-29-aefcf60d --json
+```
+
+## Manifest
+
+`replay.yaml` captures:
+
+- check types executed
+- repository commit
+- flow and branch context
+- associated validation commands
+
+After replay, fresh `report.md` / `report.json` are written for the new run id when checks are re-executed.
+
+## Related
+
+- Initial run: [`asa verify trust`](/docs/cli/verify-trust)
+- Gate thresholds: [`asa trust gates`](/docs/cli/trust-gates)
+- Concept: [Trust engine](/docs/concepts/trust-engine)

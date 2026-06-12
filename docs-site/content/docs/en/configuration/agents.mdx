@@ -1,0 +1,120 @@
+---
+title: Agents configuration
+description: Map logical agent profiles to providers and work roles in config.yaml.
+---
+
+# Agents configuration
+
+Asagiri orchestrates **logical agents** (profiles you name in `agents:`) that run on **providers** (external runtimes declared in `providers:`). The adapter is selected by **`providers.<id>.type`** — never by the provider or agent map key. The `profile` field on an agent is a business hint only; it does not pick an adapter.
+
+Several logical agents may share the same provider (for example `dev` and `architect` both using `kiro-cli`).
+
+## Mental model
+
+```
+Provider  →  Agent  →  Work role  →  Workflow
+```
+
+- **Provider** — Kiro CLI, Claude Code, Cursor Agent, Ollama, … (`command`, `args`, `type`)
+- **Agent** — `laprogrammerie`, `dev`, `reviewer`, … referenced by `work.default_*` and `--agent`
+- **Work role** — `work.default_agent`, `work.default_reviewer`, …
+- **Workflow** — `asa spec`, `asa dev`, `asa review`, …
+
+## Recommended example
+
+```yaml
+providers:
+  kiro-cli:
+    type: kiro-cli
+    command: kiro
+    args: ["--cli"]
+  claude-code:
+    type: claude-code
+    command: claude
+    args: ["--print", "--output-format", "stream-json"]
+    timeout: 600
+  ollama:
+    type: ollama
+    command: ollama
+    args: ["run", "qwen2.5-coder:14b"]
+    timeout: 300
+
+agents:
+  laprogrammerie:
+    provider: kiro-cli
+    profile: laprogrammerie
+  dev:
+    provider: kiro-cli
+  architect:
+    provider: kiro-cli
+  reviewer:
+    provider: claude-code
+  local-rag:
+    provider: ollama
+    endpoint: http://localhost:11434
+    model: qwen2.5-coder:14b
+    embedding_model: nomic-embed-text
+
+work:
+  default_spec_agent: laprogrammerie
+  default_agent: dev
+  default_reviewer: reviewer
+  default_enricher: local-rag
+```
+
+## Legacy format (still supported)
+
+When an agent has no `provider` field, Asagiri treats it as **`exec`** and uses inline `command` / `args`:
+
+```yaml
+agents:
+  claude:
+    command: claude
+    timeout: 3600
+```
+
+Do **not** infer `provider.type` from names like `claude` — declare `type: claude-code` explicitly under `providers:` when you want the dedicated adapter.
+
+## Provider fields
+
+| Field | Role |
+| --- | --- |
+| `type` | Adapter selection (`kiro-cli`, `claude-code`, `cursor-cli`, `ollama`, …) |
+| `command` | Executable on `PATH` |
+| `args` | Default argv for this runtime |
+| `env` | Extra environment variables |
+| `timeout` | Seconds before kill |
+
+## Agent fields
+
+| Field | Role |
+| --- | --- |
+| `provider` | Reference to `providers.<id>` (optional in legacy mode) |
+| `profile` | Logical / business label (orchestration metadata — **not** adapter selection) |
+| `command`, `args`, … | Override provider defaults per profile |
+| `endpoint`, `model`, `embedding_model` | Ollama-specific overrides on the agent |
+
+## Defaults in `work`
+
+The `work` block chooses which **logical agent ids** run when a command does not override them:
+
+```yaml
+work:
+  default_spec_agent: laprogrammerie
+  default_agent: dev
+  default_reviewer: reviewer
+  default_enricher: local-rag
+```
+
+Override per invocation: `asa dev feat --agent dev` or `asa review feat --agent reviewer`.
+
+## Dry-run
+
+With `--dry-run`, agents are not spawned as real subprocesses — useful for CI wiring checks and docs rehearsal.
+
+## Related
+
+- [Agents overview](/docs/agents)
+- [Configuration file](/docs/configuration/config-file)
+- [Ollama](/docs/agents/ollama)
+- [CLI: dev](/docs/cli/generated/dev)

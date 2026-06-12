@@ -1,0 +1,68 @@
+---
+title: commande replay
+description: Créer, exécuter, comparer, expliquer et snapshotter des packages replay.
+---
+
+# `asa replay`
+
+Replay et exécution déterministe (`spec-my-F`). Distinct de [`asa trust replay`](/docs/fr/cli/trust-replay) (manifestes de vérification trust uniquement).
+
+## `create`
+
+```bash
+asa replay create --from-graph graph-2026-05-29-abc12345 \
+  --include-runtime \
+  --include-prompts \
+  --include-events \
+  --json
+```
+
+Sources (une seule obligatoire) :
+
+- `--from-run <run-id>`
+- `--from-graph <graph-id>`
+- `--from-investigation <investigation-id>`
+
+Écrit `.asagiri/replays/replay-YYYY-MM-DD-<suffix>/` avec `replay.yaml` et sous-arbres capturés.
+
+## `run`
+
+```bash
+asa replay run replay-2026-05-29-abc12345 --offline --dry-run
+asa replay run replay-2026-05-29-abc12345 --simulation
+asa replay run replay-2026-05-29-abc12345 --strict --compare
+```
+
+| Flag | Effet |
+|------|--------|
+| `--dry-run` | Valide le package sans réexécution |
+| `--offline` | Pas d'appels cloud ni externes |
+| `--simulation` | Rejoue graphe/events uniquement |
+| `--strict` | Échec si divergence |
+| `--compare` | Comparaison vs session précédente |
+
+## `compare`
+
+```bash
+asa replay compare replay-2026-05-29-aaa replay-2026-05-29-bbb --json
+```
+
+Affiche delta coût, diff trust, changements de graphe et liste de divergences.
+
+## `explain`
+
+```bash
+asa replay explain replay-2026-05-29-aaa replay-2026-05-29-bbb
+```
+
+Détail lisible des divergences (même moteur que `compare`).
+
+## `snapshot`
+
+```bash
+asa replay snapshot replay-2026-05-29-abc12345 --name before-review
+```
+
+Copie le package sous `snapshots/before-review/` dans le répertoire replay.
+
+Voir [Moteur de replay](/docs/fr/concepts/replay-engine).

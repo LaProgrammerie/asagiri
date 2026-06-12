@@ -1,0 +1,22 @@
+Asagiri Multi-Agent Runtime
+═══════════════════════════
+Pipeline
+────────
+✓ investigator
+✓ architect
+⠋ implementer
+○ reviewer
+○ validator
+Agents
+──────
+implementer: cursor
+reviewer: claude
+validator: local
+Costs
+─────
+Current: 0.11€
+Budget:  1.00€
+Warnings
+────────
+- reviewer pending
+- trust validation required before merge

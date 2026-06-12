@@ -1,0 +1,35 @@
+---
+title: Esquema flow
+description: Estructura de archivos .flow.yaml extraídos del prototipo.
+---
+
+# Esquema flow
+
+Cada `.flow.yaml` describe un recorrido de usuario.
+
+## Forma minima
+
+```yaml
+id: onboarding
+name: Onboarding
+status: draft
+entrypoint:
+  route: /onboarding
+  screen: onboarding_welcome
+steps:
+  - id: create_workspace
+    screen: create_workspace
+    actions:
+      - id: submit_workspace
+        type: command
+        command: workspace.create
+        requires_api: true
+exitpoints:
+  - route: /dashboard
+```
+
+## Señales de calidad
+
+- estados loading/error faltantes;
+- contratos no resueltos;
+- acciones sensibles sin confirmación explícita.

@@ -1,0 +1,51 @@
+# OS / env
+.DS_Store
+*.log
+.env
+.env.*
+!.env.example
+
+# Go
+/bin/
+/dist/
+coverage/
+coverage.out
+*.test
+*.out
+vendor/
+tmp/
+
+# Node / front build
+node_modules/
+.next/
+.turbo/
+*.tsbuildinfo
+
+# Archives & dumps
+*.zip
+*.tar.gz
+!scripts/**/*.tar.gz
+
+# Local databases
+*.sqlite
+*.sqlite3
+*.db
+*.tmp
+
+# Asagiri runtime (local only — keep config.yaml.example)
+.asagiri/*
+!.asagiri/config.yaml.example
+
+# Kiro cache
+.kiro/cache/
+
+# Kiro local construction specs
+.kiro/specs/
+.kiro/cache/
+
+# Local Asagiri workspace state
+.asagiri/
+!.asagiri/config.yaml.example
+
+# Cursor local pointer to template repository (not versioned)
+.cursor/template-sync.env

@@ -1,0 +1,48 @@
+---
+title: Flows E2e · Asagiri CLI
+description: Générer un squelette de test E2E depuis un flow YAML
+---
+
+CLI path: **`asa flows e2e`**
+
+## When to use
+
+Orchestration commands coordinate higher-order Asagiri workloads such as ingestion, syncing, backlog triage, investigative passes, hydrated context payloads, coarse estimates, and workspace-specific automation.
+
+> Original CLI synopsis: Générer un squelette de test E2E depuis un flow YAML
+
+## Usage
+
+```bash
+asa flows e2e [flags]
+```
+
+## Options
+
+| Flag | Scope | Default | Description |
+| --- | --- | --- | --- |
+| `--dry-run` | Inherited | `false` | Simuler les exécutions sans lancer d'agent ni commandes externes |
+| `--flow` | Local | `(empty)` | Flow id (fichier .asagiri/products/<product>/flows/<id>.flow.yaml) |
+| `--runner` | Local | `playwright` | Runner cible: playwright ou cypress |
+
+## Examples
+
+```bash
+asa flows e2e workspace-saas --flow workspace-onboarding
+```
+
+## What happens internally
+
+- Hydrates contextual services resolved from **$PWD**, coordinating git-bound automation, ingestion pipelines, syncing, backlog triage, investigations, MCP hooks, contextual hydration, coarse estimates, and similar orchestrations for this subtree.
+
+## Failure modes
+
+- Cobra rejects unknown flags or arity mismatches before any repository side effects occur.
+- Asagiri cannot resolve scaffolding when the command is invoked outside an initialised checkout.
+- Downstream automation may fail whenever credentials, network endpoints, or cached prerequisites drift from expectations.
+
+## Related commands
+
+- [Flows Extract](./flows-extract.mdx)
+- [Flows Inspect](./flows-inspect.mdx)
+- [Flows Review](./flows-review.mdx)

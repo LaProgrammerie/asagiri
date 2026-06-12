@@ -1,0 +1,47 @@
+---
+title: MCP tools
+description: Tools exposed when mcp.enabled is true.
+---
+
+# MCP tools
+
+With `mcp.enabled: true`, `mcp-serve` registers tools that delegate to the same investigation and context optimization packages the CLI uses. Names and JSON schemas are not hard-coded in this page — call `tools/list` after every upgrade to see the live surface.
+
+## Typical capabilities
+
+The table is descriptive, not exhaustive: investigation keeps repo reads bounded like CLI `investigate`, context helpers assemble or summarize packs, and cost helpers reuse token heuristics so clients can preview payloads.
+
+| Area | Purpose |
+| --- | --- |
+| Investigation | Bounded grep / repo scan consistent with CLI `investigate` |
+| Context | Build or summarize context packs |
+| Cost | Approximate token/cost for a payload |
+
+Exact tool IDs may change between releases — always call `tools/list` after upgrade.
+
+## Limits
+
+Configuration mirrors CLI safety rails: global `max_output_bytes` and `command_timeout_seconds`, plus `investigation.*` caps shared with non-MCP investigation paths.
+
+- `max_output_bytes` — cap RPC payload size
+- `command_timeout_seconds` — per-tool execution
+- `investigation.*` — grep/file scan caps (shared with non-MCP investigation)
+
+## Example client flow
+
+Start the server, attach your MCP client over stdio, then issue a `tools/list` request exactly as JSON-RPC expects.
+
+```bash
+asa mcp-serve
+# Editor MCP client connects via stdio, sends:
+# {"jsonrpc":"2.0","id":1,"method":"tools/list"}
+```
+
+<Callout type="experimental">
+Tool surface is minimal and evolving. Do not depend on undocumented tools in production automation without pinning Asagiri version.
+</Callout>
+
+## Related
+
+- [Local investigation](/docs/cost-performance/local-investigation)
+- [MCP security](/docs/mcp/security)

@@ -1,0 +1,10 @@
+graph TD
+  implement_ui_onboarding[Implement onboarding UI screens]
+  implement_workspace_create[Implement workspace creation endpoint]
+  investigate_onboarding[Investigate onboarding flow]
+  verify_onboarding_flow[Verify onboarding flow integrity]
+  implement_ui_onboarding -->|must_run_after| verify_onboarding_flow
+  implement_workspace_create -->|parallel_with| implement_ui_onboarding
+  implement_workspace_create -->|must_run_after| verify_onboarding_flow
+  investigate_onboarding -->|produces_context_for| implement_ui_onboarding
+  investigate_onboarding -->|produces_context_for| implement_workspace_create

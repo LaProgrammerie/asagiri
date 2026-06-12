@@ -1,0 +1,41 @@
+---
+title: Exit-Codes
+description: CLI-Exit-Verhalten bei Erfolg oder Fehler.
+---
+
+# Exit-Codes
+
+Asagiri folgt üblichen Go-/Cobra-Konventionen, damit Shell-Skripte und CI an `$?` ohne eigene Wrapper erkennen können, ob ein Befehl erfolgreich war.
+
+| Code | Bedeutung |
+| --- | --- |
+| **0** | Befehl ohne Fehler beendet |
+| **1** | Allgemeiner Fehler (`RunE` meldet einen Fehler — Konfiguration, Git, Workflow, Budgetblock, Agentfehler) |
+| **2** | Cobra-Nutzungsfehler (unbekanntes Flag, falsche Argumentzahl) — typisch bei falscher Aufrufsyntax |
+
+## Beispiele
+
+Die folgenden Zeilen illustrieren den Unterschied zwischen Syntaxfehlern (**Exit 2**), erfolgreichen Pfaden (**Exit 0** bei `doctor` oder erfolgreicher Nur-Schätzung) und operativen Fehlern (**Exit 1** bei Budget oder Validierung, mit Kontext auf stderr).
+
+```bash
+asa work                    # Exit 2 — Pflichtargument für die Anweisung fehlt
+asa doctor                  # Exit 0, wenn alle Prüfungen bestehen
+asa work "x" --estimate-only # Exit 0, wenn die Schätzung erfolgreich ist
+```
+
+Budgets und Validierung melden sich typischerweise mit **Exit 1** und einer Meldung auf stderr.
+
+## Skripte
+
+Mit `||` in Shell-Skripten kombinieren; `--dry-run` nutzen, wenn nur die Verdrahtung getestet werden soll und fehlende Agent-Binärdateien keinen Fehler auslösen sollen.
+
+```bash
+asa verify my-feature || echo "verify failed"
+```
+
+In CI hilft `--dry-run`, wenn nur das Orchestrierungsgerüst geprüft wird und nicht die echte Agentenausführung.
+
+## Verwandtes
+
+- [CLI-Überblick](/docs/de/cli)
+- [Recovery bei Fehlern](/docs/de/workflows/failure-recovery)

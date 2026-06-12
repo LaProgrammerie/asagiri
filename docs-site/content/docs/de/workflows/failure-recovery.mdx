@@ -1,0 +1,82 @@
+---
+title: Recovery bei Fehlern
+description: Wiederanlauf nach fehlgeschlagener Verifikation, Review oder unterbrochenem Lauf.
+---
+
+# Recovery bei Fehlern
+
+Asagiri speichert **explizite Aufgabenstatus** statt Fortschritt aus verstreuten Dateien zu rekonstruieren. Sauberes Wiederanlaufen bedeutet, diese Übergänge zu respektieren — oder dokumentierte Ausnahmen wie `--force` und Hilfsbefehle zur Wiederaufnahme zu nutzen, wo der Orchestrator Wiederholungen erlaubt.
+
+## Zustandsautomat
+
+Aufgaben durchlaufen klare Statuswerte in `workflow/state_machine.go`:
+
+```mermaid
+stateDiagram-v2
+  [*] --> pending
+  pending --> planned
+  planned --> enriched
+  enriched --> running
+  running --> implemented
+  implemented --> verified
+  verified --> reviewed
+  reviewed --> ready_for_pr
+  running --> failed
+  implemented --> verify_failed
+  verified --> review_failed
+  verify_failed --> implemented
+  review_failed --> verified
+```
+
+Ungültige Übergänge liefern Fehler, es sei denn, der jeweilige Befehl erlaubt `--force` für diese Transition.
+
+## Häufige Wiederanlauf-Rezepte
+
+### Verifikation fehlgeschlagen
+
+Code im zugehörigen Worktree korrigieren, dann erneut verifizieren:
+
+```bash
+asa verify billing-v2 --force
+```
+
+### Review fehlgeschlagen
+
+```bash
+asa review billing-v2 --agent codex --force
+```
+
+### Unterbrochener Lauf
+
+```bash
+asa status
+asa resume <run-id>          # gibt den nächsten Schritt aus: plan | enrich | dev | verify | review
+asa continue "resume billing-v2"
+```
+
+<Callout type="experimental">
+`asa resume <run-id> --execute` verkettet verbleibende Steps (echte Agenten ohne globales `--dry-run`). Ohne `--execute` den angezeigten Step manuell ausführen oder `continue`. Siehe [resume CLI](/docs/de/cli/resume).
+</Callout>
+
+### Veraltete Worktrees entfernen
+
+```bash
+asa clean
+```
+
+Entfernt Worktrees gemäß `worktrees.cleanup_policy` (`keep_failed` behält Trees fehlgeschlagener Aufgaben).
+
+## Reports für die Nachbereitung
+
+Für Analyse im Nachhinein oder Abgleich mit Reviewern stehen **`report`** und zusammenfassende **`investigate`**-Ausgaben zur Verfügung:
+
+```bash
+asa report <run-id>
+asa investigate billing-v2
+```
+
+## Verwandtes
+
+- [Worktree-Isolation](/docs/de/reliability/worktree-isolation)
+- [CLI: resume](/docs/de/cli/generated/resume)
+- [CLI: continue](/docs/de/cli/generated/continue)

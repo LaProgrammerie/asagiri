@@ -1,0 +1,56 @@
+---
+title: Notion sources
+description: Configure Notion sync into local spec snapshots.
+---
+
+# Notion sources
+
+Notion integration lives in `application/internal/source/notion`. The important invariant: after sync, execution and indexing read **local files** on disk, not the Notion API on every step. Think of sync as a snapshot step that pulls pages into your repo’s spec tree.
+
+## Configuration
+
+Property names must match your workspace schema; Asagiri does not guess Notion layouts for you.
+
+```yaml
+sources:
+  notion:
+    enabled: true
+    token_env: NOTION_TOKEN
+    default_database_id: ""
+    specs_database_id: "<database-id>"
+    tasks_database_id: ""
+    status_property: Status
+    title_property: Name
+    updated_time_property: Last edited time
+    import_path: .asagiri/specs
+```
+
+The API token is read from whatever environment variable `token_env` names (by convention `NOTION_TOKEN`).
+
+## Commands
+
+Export the token, point `sync` at a page URL or run a full sync, then consume imported specs through `inbox` like any other source.
+
+```bash
+export NOTION_TOKEN="..."
+asa sync notion --page "https://notion.so/..."
+asa sync all
+asa inbox --source notion
+```
+
+## Safety
+
+Notion stays **off** unless you set `enabled: true`. For rehearsal, `asa --dry-run sync notion --page ...` exercises the path without committing side effects you did not intend. When a local spec already exists and stdin is a TTY, you get overwrite prompts so imports do not silently clobber work.
+
+<Callout type="experimental">
+Notion API schemas differ per workspace. Validate property names (`status_property`, etc.) before relying on sync in production.
+</Callout>
+
+<Callout type="security">
+Store tokens in environment or secret manager — never in committed YAML.
+</Callout>
+
+## Related
+
+- [Notion → code workflow](/docs/workflows/notion-to-code)
+- [CLI: sync](/docs/cli/generated/sync)

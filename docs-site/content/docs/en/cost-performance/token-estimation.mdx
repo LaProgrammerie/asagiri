@@ -1,0 +1,45 @@
+---
+title: Token estimation
+description: Heuristic token counts and pricing for pre-run cost displays.
+---
+
+# Token estimation
+
+Implementation lives in `application/internal/cost/token_counter.go` and `estimator.go`. The estimator exists so Asagiri can show **order-of-magnitude** token and cost figures before it shells out to agents—useful for comparing against budgets and for logging what a plan roughly implied, without pretending to be a hosted provider's billing API.
+
+## How it works
+
+The flow is deterministic: measure character counts for files or text blobs, classify each slice by extension into a content kind (`code`, `markdown`, `json`, `default`), then divide by the configured `token_estimation.*_chars_per_token` values and round up.
+
+```yaml
+token_estimation:
+  default_chars_per_token: 4.0
+  code_chars_per_token: 3.2
+  markdown_chars_per_token: 4.2
+  json_chars_per_token: 3.6
+```
+
+## Cost display
+
+Estimated tokens are multiplied by `pricing.models.<model-id>` rates to produce an estimated EUR amount—or whatever `budgets.default_currency` declares. That multiplication is transparent YAML math on your side, not a hidden rate table in the binary.
+
+<Callout type="cost">
+**Not provider-exact.** OpenAI, Anthropic, and Google bill with their own tokenizers. Treat numbers as order-of-magnitude guardrails.
+</Callout>
+
+## Commands
+
+```bash
+asa estimate billing-v2 --task task-003
+asa work "develop billing-v2" --estimate-only
+asa cost billing-v2
+```
+
+## Golden tests
+
+The estimator's shape is pinned by golden tests in `application/internal/cost/`. Update goldens with `UPDATE_GOLDEN=1` only when you intentionally change the algorithms—otherwise you risk masking regressions in how prompts are sized or costed.
+
+## Related
+
+- [Budgets](/docs/configuration/budgets)
+- [Context optimization](/docs/cost-performance/context-optimization)

@@ -1,0 +1,7 @@
+id: duplicate-id
+version: "1.0.0"
+role: dev
+system_prompt: |
+  first
+output_contract:
+  format: text

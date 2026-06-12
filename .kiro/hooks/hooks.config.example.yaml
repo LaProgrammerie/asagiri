@@ -1,0 +1,29 @@
+# Logical example — NOT guaranteed to match official Kiro syntax.
+# Replace with configuration supported by your Kiro installation.
+#
+# Target uses:
+# - refresh handoff after spec / tasks change
+# - design ↔ architecture consistency check
+# - checklist reminder before sensitive task (migrations, prod, secrets)
+
+version: 1
+hooks:
+  - id: sync-handoff-after-tasks
+    trigger: spec_tasks_updated
+    actions:
+      - type: notify
+        message: "Update docs/ai/active/handoff.md (and current-spec.md if scope changed) from Kiro tasks."
+
+  - id: architecture-check-after-design
+    trigger: spec_design_completed
+    actions:
+      - type: notify
+        message: "Check design alignment with docs/ai/02-architecture.md and docs/ai/context-map.md."
+
+  - id: sensitive-task-checklist
+    trigger: before_spec_task_execution
+    matcher:
+      taskTags: [migration, production, secrets, destructive]
+    actions:
+      - type: notify
+        message: "Checklist: backup, rollback, no secrets in plain text, pair review if required — before running this task."

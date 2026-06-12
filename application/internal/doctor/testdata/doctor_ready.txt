@@ -1,0 +1,30 @@
+Asagiri Doctor
+──────────────
+
+Repository
+  Git:    /repo
+  Config: /repo/.asagiri/config.yaml (chargée)
+
+State
+  SQLite: /repo/.asagiri/state.sqlite (présent, schema v1)
+  Runs: 2  Tasks: 5  Active: onboarding
+
+Gates (work)
+  plan             disabled — gate désactivée
+  enrich           active — mode per-task
+
+Agents
+  dev:       developer ✓ cursor
+
+Trust
+  Feature: onboarding  Verdict: Acceptable  (1 task à risque)
+  1 task à risque
+
+Checks
+  ✓ git
+  ✓ config
+
+Prochaines actions
+  → asa next --feature onboarding
+     Continuer le workflow
+Asagiri est prêt.

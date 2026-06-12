@@ -1,0 +1,59 @@
+---
+title: Filosofía
+description: Orquestación determinista, validación antes de confiar y límites honestos.
+---
+
+# Filosofía
+
+## El problema de ingeniería
+
+Los agentes de codificación con IA son potentes, pero sus salidas no son deterministas. Los equipos siguen necesitando flujos **reproducibles**: pasos conocidos, ramas aisladas, validación externa, coste visible y trazas de auditoría; no ejecuciones opacas en las que nadie pueda explicar qué ocurrió ni por qué.
+
+Asagiri existe para hacer explícita la orquestación. Usted configura el pipeline, los comandos de validación y las salvaguardas económicas; la herramienta coordina la ejecución y deja constancia de lo ejecutado.
+
+## Enfoque de Asagiri
+
+El modelo mental por defecto es **spec → plan → implement → verify → review → report**. Cada fase tiene un lugar definido en la máquina de estados y en los informes bajo `.asagiri/runs/`.
+
+**Estado explícito**: las corridas y las tareas se guardan en SQLite con una máquina de estados documentada. Puede inspeccionar el estado, reanudar y relacionar informes con identificadores de corrida sin inferir el progreso únicamente desde el historial del chat.
+
+**Investigación local primero** ejecuta *grep*, recorridos del sistema de archivos y empaquetado de contexto en su máquina antes de las llamadas a la nube. El objetivo son *prompts* más pequeños y pertinentes, no enviar el repositorio completo porque resulte cómodo.
+
+**Conciencia del coste** aplica estimaciones heurísticas de tokens y presupuestos configurables **antes** de la ejecución. Las estimaciones son aproximadas, pero resultan preferibles a descubrir el gasto al final de una sesión larga con agentes.
+
+**Aislamiento con *git worktree*** mantiene una tarea en una rama y un árbol de trabajo. El trabajo en paralelo queda separado de su *checkout* principal.
+
+**Validación con sus comandos** significa `go test`, linters y scripts en los que confía; no que el agente declare éxito. Asagiri programa esas comprobaciones; no sustituye su batería de pruebas.
+
+**Informes reproducibles** conservan artefactos en Markdown y JSON para auditar una corrida días después.
+
+## Lo que no afirmamos
+
+<Callout type="warning">
+Asagiri no garantiza corrección, seguridad ni idoneidad para producción. Coordina herramientas; las personas y su suite de pruebas siguen siendo la autoridad.
+</Callout>
+
+## Compromisos que conviene comprender
+
+| Ventaja | Coste |
+| --- | --- |
+| Pasos de pipeline predecibles | Menos «magia de un solo paso» que en *chats* ad hoc |
+| Estimación de coste por adelantado | Cifras aproximadas (heurísticas carácter/token) |
+| Seguridad de los *worktrees* | Más uso de disco y complejidad en *git* |
+| Agentes intercambiables | Debe instalar y configurar cada CLI |
+
+Estos compromisos son intencionados. Asagiri favorece el **control y la auditabilidad** frente a la ilusión de una codificación totalmente autónoma.
+
+## Palancas de configuración
+
+Una vez aceptado ese modelo, unas pocas palancas concentran la mayor parte del efecto:
+
+- `work.auto_verify`, `work.auto_review`: equilibrio entre automatización y compuertas manuales
+- `policies.require_clean_git`: bloqueo de árboles «sucios» cuando la política lo exige
+- `budgets`: límites económicos antes de pasos costosos
+
+## Lecturas relacionadas
+
+- [Local primero](/docs/es/concepts/local-first)
+- [Flujos conscientes del coste](/docs/es/concepts/cost-aware-workflows)
+- [Límites](/docs/es/security/limits)

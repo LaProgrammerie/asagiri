@@ -1,0 +1,22 @@
+---
+title: Couche d'analyse
+description: Graphes d'ingénierie locaux pour les agents.
+---
+
+# Couche d'analyse (§24.16)
+
+Construit sept graphes locaux exploitables par les agents :
+
+- symbol, dependency, flow, event, api, migration, ownership
+
+## Commande
+
+```bash
+asa analysis build --product workspace-saas
+```
+
+Sortie : `.asagiri/analysis/workspace-saas/graphs.json`
+
+## Structure code
+
+`internal/analysis/` — `ast/`, `symbols/`, `dependencies/`, `events/`, `flows/`, `ownership/`, `architecture/`, `engine.go`.

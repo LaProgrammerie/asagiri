@@ -1,0 +1,48 @@
+---
+title: Cost Trends · Asagiri CLI
+description: 'Compare deux fenêtres strictement disjointes : J-30→J-15 (précédente) et J-15→maintenant (actuelle).'
+---
+
+CLI path: **`asa cost trends`**
+
+## When to use
+
+Use **cost** when reconciling SQLite-backed telemetry with pricing tables declared in **.asagiri/config.yaml** or when slicing spend over a bounded recency window.
+
+> Original CLI synopsis: Évolution de l'efficience sur deux fenêtres disjointes
+
+## Usage
+
+```bash
+asa cost trends [flags]
+```
+
+## Options
+
+| Flag | Scope | Default | Description |
+| --- | --- | --- | --- |
+| `--dry-run` | Inherited | `false` | Simuler les exécutions sans lancer d'agent ni commandes externes |
+
+## Examples
+
+```bash
+asa cost trends
+```
+
+> Wire richer samples through **cobra.Command.Example** when the happy path warrants copy/paste-friendly automation beyond this scaffold.
+
+## What happens internally
+
+- Focuses on interpreting persisted telemetry and declared pricing artefacts for finance debugging.
+
+## Failure modes
+
+- Cobra rejects unknown flags or arity mismatches before any repository side effects occur.
+- Asagiri cannot resolve scaffolding when the command is invoked outside an initialised checkout.
+- SQLite contention or corrupted telemetry prevent summarisation queries from completing.
+- Malformed **--since** payloads fail fast before aggregates are queried.
+
+## Related commands
+
+- [Cost Models](./cost-models.mdx)
+- [Cost Report](./cost-report.mdx)

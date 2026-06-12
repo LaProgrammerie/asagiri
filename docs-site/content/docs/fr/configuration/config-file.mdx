@@ -1,0 +1,413 @@
+---
+title: Fichier de configuration
+description: Référence complète des blocs et valeurs par défaut de .asagiri/config.yaml.
+---
+
+# Fichier de configuration
+
+Le fichier canonique est **`.asagiri/config.yaml`**, créé par `asa init` à partir de `config.yaml.example`. Sauf chemin absolu, Asagiri le résout depuis la racine du dépôt. Pour une validation lisible par machine, le schéma JSON généré est publié sur le site docs à `/schemas/config.schema.json`.
+
+Les sections qui suivent reprennent la disposition du fichier : chaque bloc pilote une facette du comportement (intention, paramètres d’exécution par défaut, sources, persistance, agents, validation, modèles, coût, routage, interface, MCP et politiques de dépôt).
+
+## `project`
+
+`project` porte un nom lisible pour l’humain et la branche par défaut utilisée dans les flux orientés worktree.
+
+```yaml
+project:
+  name: my-project
+  default_branch: main
+```
+
+## `runtime`
+
+Runtime d'ingénierie persistant (`spec-my-A` §24.17). Modes : `guided`, `interactive`, `headless`, `ci`, `review`, `exploration`.
+
+```yaml
+runtime:
+  mode: guided
+  api:
+    port: 8765
+    socket: .asagiri/runtime/runtime.sock
+  memory:
+    embedder: hash   # hash | ollama | cloud
+    ollama:
+      base_url: http://127.0.0.1:11434
+      model: nomic-embed-text
+    cloud:
+      enabled: false
+      provider: openai
+      model: text-embedding-3-small
+      token_env: OPENAI_API_KEY
+```
+
+`runtime.memory.embedder` choisit le backend de vecteurs pour la mémoire persistante et `asa memory list --query`. `hash` = hors ligne ; `ollama` = sémantique local ; `cloud` uniquement si `cloud.enabled: true`. Après changement : `asa memory reindex`.
+
+Voir [Commandes runtime](/docs/fr/cli/runtime) et [runtime serve](/docs/fr/cli/runtime-serve).
+
+## `intent`
+
+Le bloc `intent` configure la résolution en langage naturel pour `work` et `continue` (`application/internal/intent`) : si le résolveur s’exécute, le mode utilisé et le comportement quand la confiance est faible ou qu’Ollama est disponible en repli.
+
+```yaml
+intent:
+  enabled: true
+  default_mode: guided   # guided | auto
+  resolver:
+    use_ollama_fallback: true
+    min_confidence: 0.75
+    ask_when_below_confidence: true
+```
+
+## `work`
+
+`work` fixe les paramètres transverses d’orchestration : quels agents assument quels rôles, où le pipeline s’arrête, les bascules de vérification et de revue, les limites de tâches, et si une confirmation du plan est exigée.
+
+```yaml
+work:
+  default_spec_agent: laprogrammerie
+  default_agent: dev
+  default_reviewer: reviewer
+  default_enricher: local-rag
+  stop_after: report
+  auto_verify: true
+  auto_review: false
+  max_tasks_per_run: 1
+  require_plan_confirmation: true
+```
+
+## `sources`
+
+Les sources locales parcourent des chemins fixes pour les specs et le handoff actif ; Notion est optionnel et tire des instantanés vers l’arbre local. Le tableau résume les deux blocs ; le YAML montre des chemins typiques et les espaces réservés Notion.
+
+| Bloc | Rôle |
+| --- | --- |
+| `sources.local` | Balayer `.asagiri/specs`, `.kiro/specs`, `docs/ai/active` |
+| `sources.notion` | Import facultatif Notion → local (voir [Notion](/docs/fr/configuration/notion)) |
+
+```yaml
+sources:
+  local:
+    enabled: true
+    paths:
+      - .asagiri/specs
+      - .kiro/specs
+      - docs/ai/active
+  notion:
+    enabled: false
+    token_env: NOTION_TOKEN
+    specs_database_id: ""
+    import_path: .asagiri/specs
+```
+
+## `specs`, `state`, `worktrees`
+
+Ces blocs raccordent les chemins de style Kiro vers les specs, l’état SQLite et la mise en page des worktrees. `cleanup_policy` fixe ce qu’il advient lorsqu’une exécution laisse des résidus sous `worktrees.base_path`.
+
+```yaml
+specs:
+  kiro_path: .kiro/specs
+  active_spec_path: docs/ai/active/current-spec.md
+  handoff_path: docs/ai/active/handoff.md
+
+state:
+  backend: sqlite
+  path: .asagiri/state.sqlite
+
+worktrees:
+  base_path: .asagiri/worktrees
+  branch_prefix: asa
+  cleanup_policy: keep_failed
+```
+
+## `agents`
+
+Le mappage des identifiants d’agents logiques vers des commandes en sous-processus et des options spécifiques tient dans ce bloc ; la page dédiée décrit les champs et exemples : [configuration des agents](/docs/fr/configuration/agents).
+
+## `validation`
+
+`validation.commands` liste les contrôles que le pipeline peut exiger (tests, linter, scripts personnalisés). Pour les dépôts Go, l’initialisation propose souvent des valeurs pertinentes lorsque `go.mod` est présent.
+
+```yaml
+validation:
+  commands:
+    - name: tests
+      command: go test ./...
+      required: true
+```
+
+## `verification`
+
+Gates de confiance et vérification (`spec-my-B` §19). Chaque profil définit des seuils de confiance minimaux par dimension et les checks obligatoires avant livraison ou promotion CI.
+
+```yaml
+verification:
+  default_profile: production
+  gates:
+    production:
+      min_confidence:
+        architecture: 0.8
+        implementation: 0.75
+        security: 0.85
+      required_checks:
+        - contracts
+        - flows
+        - observability
+        - security
+```
+
+- `default_profile` — jeu de gates utilisé par `asa trust gates` et `asa verify trust --ci`
+- `min_confidence` — seuils bloquants sur les scores agrégés (0.0–1.0)
+- `required_checks` — identifiants de checks du registre trust (ex. `contracts`, `flows`, `security`)
+
+Voir [Moteur de confiance](/docs/fr/concepts/trust-engine), [`asa verify trust`](/docs/fr/cli/verify-trust) et [`asa trust gates`](/docs/fr/cli/trust-gates).
+
+## `coordination`
+
+Défauts de coordination multi-agents (`spec-my-D` §11). Contrôle le parallélisme, les politiques de revue, l'assignation rôle→agent, les profils et l'ordre du pipeline au-dessus du graphe d'exécution.
+
+```yaml
+coordination:
+  max_parallel_agents: 2
+  default_isolation: isolated_worktree
+  require_independent_review: true
+  allow_self_review: false
+  require_security_review_for:
+    - auth
+    - permissions
+    - payments
+  assignment:
+    investigation: local
+    architecture_review: claude
+    implementation.medium: cursor
+    implementation.high: claude
+    security_review: codex
+    validation: local
+  profiles:
+    cursor-implementer:
+      agent: cursor
+      role: implementer
+      capabilities:
+        - implementation
+      restrictions:
+        - no_git_push
+      max_context_tokens: 128000
+      isolation: isolated_worktree
+    codex-reviewer:
+      agent: codex
+      role: reviewer
+      capabilities:
+        - architecture_review
+        - flow_review
+        - contract_review
+      restrictions:
+        - no_direct_write
+        - no_git_push
+      max_context_tokens: 32000
+      isolation: readonly
+    claude-architect:
+      agent: claude
+      role: architect
+      capabilities:
+        - architecture_review
+      isolation: isolated_worktree
+  pipeline:
+    - investigator
+    - architect
+    - implementer
+    - reviewer
+    - validator
+```
+
+- `max_parallel_agents` — plafond d'agents coordonnés en parallèle (cohérent avec `execution_graph.max_parallel`)
+- `default_isolation` — `shared`, `isolated_worktree`, `readonly` ou `sandbox`
+- `require_independent_review` / `allow_self_review` — règles de validation croisée implementer/reviewer
+- `require_security_review_for` — sous-chaînes d'id de flow déclenchant une revue sécurité
+- `assignment` — surcharge catégorie de tâche → clé `agents`
+- `profiles` — rôle, capacités, restrictions, isolation ; `profiles.*.agent` doit exister sous `agents`
+- `pipeline` — ordre des rôles pour l'UX terminal et le rejeu
+
+Voir [Coordination multi-agents](/docs/fr/concepts/multi-agent-coordination).
+
+## `knowledge`
+
+Défauts du graphe de connaissance ingénierie (`spec-my-E`). Contrôle les extracteurs suggérés et le build incrémental. Le graphe est stocké sous `.asagiri/knowledge/` après `asa knowledge build`.
+
+```yaml
+knowledge:
+  default_include_flows: true
+  default_include_contracts: true
+  default_include_code: false
+  default_include_tests: false
+  incremental_by_default: false
+  warn_on_stale: true
+```
+
+- `default_include_*` — flags suggérés pour `asa knowledge build` (les flags CLI priment par exécution)
+- `incremental_by_default` — activer `--incremental` quand aucun flag explicite n'est passé
+- `warn_on_stale` — bannière staleness §21 avant le build si les sources ont changé
+
+Voir [Graphe de connaissance ingénierie](/docs/fr/concepts/engineering-knowledge-graph), [`asa knowledge`](/docs/fr/cli/knowledge) et [`asa impact`](/docs/fr/cli/impact).
+
+## `replay`
+
+Défauts de capture replay (`spec-my-F` §22). Les packages sont stockés sous `.asagiri/replays/<replay-id>/` après `asa replay create`.
+
+```yaml
+replay:
+  capture_prompts: true
+  capture_runtime_events: true
+  capture_agent_outputs: true
+  redact_secrets: true
+  offline_mode_default: false
+  compress_threshold_bytes: 4096
+```
+
+- `capture_prompts` — inclure les prompts agents si les policies l'autorisent
+- `capture_runtime_events` — copier les événements runtime / graph dans le package
+- `capture_agent_outputs` — persister les sorties agents
+- `redact_secrets` — masquer tokens, en-têtes bearer et lignes `.env` sensibles avant écriture
+- `offline_mode_default` — `asa replay run` en `--offline` par défaut (pas de cloud ni APIs externes)
+- `compress_threshold_bytes` — compression gzip des fichiers texte au-dessus de ce seuil (défaut 4096)
+
+Voir [Moteur de replay](/docs/fr/concepts/replay-engine) et [`asa replay`](/docs/fr/cli/replay). Pour le replay de vérification trust uniquement : [`asa trust replay`](/docs/fr/cli/trust-replay) et le bloc `verification:`.
+
+## `execution_graph`
+
+Défauts du planificateur de graphe d'exécution (`spec-my-C` §24). Contrôle parallélisme, arrêt sur risque, gates trust et rollback pour `asa plan graph` et `asa graph run`.
+
+```yaml
+execution_graph:
+  enabled: true
+  max_parallel: 2
+  default_strategy: risk_aware
+  require_checkpoints: true
+  stop_on_risk: high
+  allow_parallel_agents: true
+  require_isolated_worktrees: true
+  gates:
+    trust_required_for_high_risk: true
+    human_approval_for:
+      - migration
+      - security_sensitive
+      - public_contract_change
+  rollback:
+    require_strategy_for_high_risk: true
+    preserve_failed_worktrees: true
+```
+
+- `enabled` — interrupteur principal ; si false, les commandes graph échouent
+- `max_parallel` — nœuds concurrents par défaut (respecte les règles de scope fichier)
+- `stop_on_risk` — arrêt si le risque estimé atteint ce niveau
+- `gates.trust_required_for_high_risk` — vérification trust sur nœuds à haut risque
+- `gates.human_approval_for` — catégories nécessitant approbation manuelle
+- `rollback.require_strategy_for_high_risk` — stratégie rollback obligatoire pour nœuds à haut risque
+
+Voir [Graphe d'exécution](/docs/fr/concepts/execution-graph), [`asa plan graph`](/docs/fr/cli/plan-graph) et [`asa graph run`](/docs/fr/cli/graph-run).
+
+## `models`
+
+`models` regroupe les profils logiques utilisés pour le routage et le coût (`specv3`). Les clés sont des identifiants arbitraires ; chaque entrée lie un fournisseur, une classe de coût, un nom de modèle et les classes d’étapes autorisées.
+
+```yaml
+models:
+  ollama_local_qwen:
+    provider: ollama
+    class: local
+    model: qwen2.5-coder:14b
+    input_cost_per_1m_tokens: 0
+    output_cost_per_1m_tokens: 0
+    usage: [summarize, classify, pre_review, context_selection]
+```
+
+## `budgets`
+
+Les plafonds par exécution, par tâche et quotidiens se trouvent sous `budgets`. Voir [Budgets](/docs/fr/configuration/budgets).
+
+## `pricing`
+
+Les taux marginaux pour le cloud et le local viennent de votre YAML — **aucun prix cloud n’est codé en dur dans le logiciel**. Maintenez `updated_at` honnête pour savoir quand quelqu’un a aligné les chiffres sur une grille tarifaire.
+
+```yaml
+pricing:
+  currency: EUR
+  models:
+    gemini-3-flash-preview:
+      input_per_1m_tokens: 0.00
+      output_per_1m_tokens: 0.00
+      source: manual
+      updated_at: "2026-05-17"
+```
+
+## `token_estimation`
+
+Le budget en jetons repose sur des heuristiques « caractères par jeton » (`application/internal/cost/token_counter.go`). Ajuster ces ratios rapproche les estimations du profil réel de vos contenus (code dense contre prose dense).
+
+```yaml
+token_estimation:
+  default_chars_per_token: 4.0
+  code_chars_per_token: 3.2
+  markdown_chars_per_token: 4.2
+  json_chars_per_token: 3.6
+```
+
+<Callout type="cost">
+Ces ratios approximent les jetons — ce ne sont pas les tokenizers des fournisseurs.
+</Callout>
+
+## `routing`
+
+Les classes d’étapes se mappent vers des agents locaux ou cloud via `routing`. Détails : [Routage](/docs/fr/configuration/routing).
+
+## `ui`
+
+Le comportement du terminal vit sous `ui` (`application/internal/tui`) : mode de rendu, journaux temps réel, barres de progression et sortie compacte.
+
+```yaml
+ui:
+  mode: auto      # auto | rich | plain | json
+  live_logs: true
+  progress_bars: true
+  compact: false
+```
+
+## `mcp`
+
+Lorsque `mcp.enabled` vaut `true`, Asagiri peut exécuter un serveur MCP stdio local avec des délais d’outil, des limites de sortie, des plafonds d’investigation et des chemins que l’outillage ne doit pas lire.
+
+```yaml
+mcp:
+  enabled: false
+  max_output_bytes: 1048576
+  command_timeout_seconds: 120
+  secret_path_denylist: [".env", "credentials.json", "id_rsa"]
+  investigation:
+    large_file_bytes: 524288
+    max_grep_output_bytes: 262144
+    command_timeout_seconds: 120
+    sensitive_globs: ["*.pem", ".git/*"]
+```
+
+## `policies`
+
+`policies` encode les garde-fous au niveau dépôt : git propre, motifs de fichiers secrets, nombre maximal de fichiers modifiés, autorisation réseau, et étiquettes exigeant validation humaine avant certaines familles de changements.
+
+```yaml
+policies:
+  require_clean_git: true
+  forbid_untracked_secret_files: true
+  max_files_changed_per_task: 20
+  allow_network: false
+  require_human_approval_for:
+    - database_migration
+    - security_sensitive_change
+    - dependency_upgrade
+```
+
+## Valider les modifications
+
+Après avoir édité le YAML, `asa doctor` est le contrôle rapide avant un `work` sur de vrais agents.
+
+```bash
+asa doctor
+```

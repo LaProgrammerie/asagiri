@@ -1,0 +1,103 @@
+---
+title: Enrich · Asagiri CLI
+description: Enrichir une tâche (ex. via Ollama)
+---
+
+CLI path: **`asa enrich`**
+
+## When to use
+
+Workflow commands advance tracked features across spec → plan → implementation → verification → reporting guardrails before opening a merge request.
+
+> Original CLI synopsis: Enrichir une tâche (ex. via Ollama)
+
+## Usage
+
+```bash
+asa enrich [flags]
+```
+
+## Options
+
+| Flag | Scope | Default | Description |
+| --- | --- | --- | --- |
+| `--agent` | Local | `local-rag` | Agent d'enrichissement |
+| `--dry-run` | Inherited | `false` | Simuler les exécutions sans lancer d'agent ni commandes externes |
+| `--force` | Local | `false` | Relancer une étape déjà réussie |
+| `--task` | Local | `(empty)` | ID de tâche à enrichir |
+
+## Examples
+
+```bash
+asa enrich
+```
+
+> Wire richer samples through **cobra.Command.Example** when the happy path warrants copy/paste-friendly automation beyond this scaffold.
+
+## What happens internally
+
+- Validates CLI arity, honours the global **--dry-run** switch, resolves repository metadata, hydrates SQLite-backed bookkeeping, then calls façade orchestration wrappers for the requested lifecycle stage.
+- Persists deterministic run identifiers so **status** and **resume** can continue automation deterministically afterward.
+
+## Failure modes
+
+- Cobra rejects unknown flags or arity mismatches before any repository side effects occur.
+- Asagiri cannot resolve scaffolding when the command is invoked outside an initialised checkout.
+- Delegated subprocesses (**git**, MCP hosts, editor agents, etc.) can exit non-zero and bubble errors verbatim.
+
+## Related commands
+
+- [Agents](./agents.mdx)
+- [Analysis](./analysis.mdx)
+- [Architecture](./architecture.mdx)
+- [Clean](./clean.mdx)
+- [Completion](./completion.mdx)
+- [Context](./context.mdx)
+- [Continue](./continue.mdx)
+- [Contracts](./contracts.mdx)
+- [Cost](./cost.mdx)
+- [Daemon](./daemon.mdx)
+- [Dashboard](./dashboard.mdx)
+- [Dev](./dev.mdx)
+- [Docs](./docs.mdx)
+- [Doctor](./doctor.mdx)
+- [Estimate](./estimate.mdx)
+- [Explain](./explain.mdx)
+- [Flow](./flow.mdx)
+- [Flows](./flows.mdx)
+- [Gates](./gates.mdx)
+- [Graph](./graph.mdx)
+- [Help](./help.mdx)
+- [Impact](./impact.mdx)
+- [Inbox](./inbox.mdx)
+- [Index](./index.mdx)
+- [Init](./init.mdx)
+- [Inspect](./inspect.mdx)
+- [Investigate](./investigate.mdx)
+- [Knowledge](./knowledge.mdx)
+- [Mcp](./mcp.mdx)
+- [Memory](./memory.mdx)
+- [Mission](./mission.mdx)
+- [Next](./next.mdx)
+- [Onboard](./onboard.mdx)
+- [Plan](./plan.mdx)
+- [Pr](./pr.mdx)
+- [Product](./product.mdx)
+- [Prototype](./prototype.mdx)
+- [Ready](./ready.mdx)
+- [Replay](./replay.mdx)
+- [Report](./report.mdx)
+- [Resume](./resume.mdx)
+- [Review](./review.mdx)
+- [Runs](./runs.mdx)
+- [Runtime](./runtime.mdx)
+- [Session](./session.mdx)
+- [Skills](./skills.mdx)
+- [Spec](./spec.mdx)
+- [Status](./status.mdx)
+- [Sync](./sync.mdx)
+- [Tools](./tools.mdx)
+- [Trust](./trust.mdx)
+- [Verify](./verify.mdx)
+- [Version](./version.mdx)
+- [Work](./work.mdx)

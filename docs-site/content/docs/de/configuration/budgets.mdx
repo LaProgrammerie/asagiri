@@ -1,0 +1,54 @@
+---
+title: Budgets
+description: Geschätzte Kosten- und Token-Obergrenzen pro Run, Task und Tag.
+---
+
+# Budgets
+
+Budgets setzen vorhersagbare Obergrenzen für geschätzte Ausgaben und Token-Volumen, **bevor** Agenten laufen. Implementierung in `application/internal/cost/budget.go`; in der V3-Pipeline werden sie vor der Agentenausführung angewendet. Ein Lauf kann so abbrechen oder um Bestätigung bitten, statt unbemerkt über Ihre Grenzen zu steigen.
+
+Der YAML-Block unten zeigt die vollständige Form: Standardwährung, Caps pro Run und Task, tägliches Aggregat und Richtlinien zum Blockieren versus ausdrücklichem Override.
+
+## Schema
+
+```yaml
+budgets:
+  default_currency: EUR
+  per_run:
+    max_estimated_cost: 1.00
+    max_estimated_tokens: 500000
+    require_confirmation_above_cost: 0.20
+  per_task:
+    max_estimated_cost: 0.30
+    max_estimated_tokens: 150000
+  daily:
+    max_estimated_cost: 10.00
+  policies:
+    block_when_over_budget: true
+    allow_override_with_flag: true
+    override_flag: "--allow-over-budget"
+```
+
+## Interaktion mit der CLI
+
+Dieselben Zahlen und Policies erreichen Sie über Flags: einen Lauf begrenzen, nach der Schätzung stoppen oder — wenn die Policy es erlaubt — einen Block umgehen. `--yes` ist der Ausweg nach `BudgetPendingConfirmError`, wenn die Schätzung geprüft wurde und Sie dennoch fortfahren möchten.
+
+| Flag | Verhalten |
+| --- | --- |
+| `--budget <EUR>` | Run-spezifische Obergrenze für diesen Aufruf |
+| `--estimate-only` | Stoppt nach der Schätzung; keine bezahlte Ausführung |
+| `--allow-over-budget` | Umgeht den Block, wenn die Policy das erlaubt |
+| `--yes` | Bestätigt nach `BudgetPendingConfirmError` |
+
+## Grenzen
+
+Schätzungen multiplizieren heuristische Tokenzahlen mit den Raten aus `pricing`. Rechnungen der Anbieter können abweichen — etwa bei Tarifwechseln oder bei Abrechnungsfaktoren, die Asagiri nicht modelliert.
+
+<Callout type="cost">
+`pricing.models` mit aktuellen Raten pflegen. Nullpreise verzerren die Kostendarstellung, deaktivieren aber keine Token-Obergrenzen.
+</Callout>
+
+## Siehe auch
+
+- [Kostenbewusster Workflow](/docs/de/workflows/cost-aware-workflow)
+- [Token-Schätzung](/docs/de/cost-performance/token-estimation)

@@ -1,0 +1,54 @@
+---
+title: Trust Task · Asagiri CLI
+description: Agrège gates.history, validation et statut task en un score UX.
+---
+
+CLI path: **`asa trust task`**
+
+## When to use
+
+Orchestration commands coordinate higher-order Asagiri workloads such as ingestion, syncing, backlog triage, investigative passes, hydrated context payloads, coarse estimates, and workspace-specific automation.
+
+> Original CLI synopsis: Synthèse trust work gates pour une tâche (read-only)
+
+## Usage
+
+```bash
+asa trust task [flags]
+```
+
+## Options
+
+| Flag | Scope | Default | Description |
+| --- | --- | --- | --- |
+| `--dry-run` | Inherited | `false` | Simuler les exécutions sans lancer d'agent ni commandes externes |
+| `--explain` | Local | `false` | Afficher les dimensions détaillées (scores) |
+| `--json` | Local | `false` | Sortie JSON du work trust report sur stdout |
+| `--save` | Local | `false` | Enregistrer le rapport JSON sous .asagiri/reports/trust/tasks/ (confirmation sur stderr) |
+
+## Examples
+
+```bash
+asa trust task task-42
+  asa trust task task-42 --json
+  asa trust task task-42 --explain
+  asa trust task task-42 --save
+```
+
+## What happens internally
+
+- Hydrates contextual services resolved from **$PWD**, coordinating git-bound automation, ingestion pipelines, syncing, backlog triage, investigations, MCP hooks, contextual hydration, coarse estimates, and similar orchestrations for this subtree.
+
+## Failure modes
+
+- Cobra rejects unknown flags or arity mismatches before any repository side effects occur.
+- Asagiri cannot resolve scaffolding when the command is invoked outside an initialised checkout.
+- Downstream automation may fail whenever credentials, network endpoints, or cached prerequisites drift from expectations.
+
+## Related commands
+
+- [Trust Diff](./trust-diff.mdx)
+- [Trust Feature](./trust-feature.mdx)
+- [Trust Gates](./trust-gates.mdx)
+- [Trust Replay](./trust-replay.mdx)
+- [Trust Run](./trust-run.mdx)

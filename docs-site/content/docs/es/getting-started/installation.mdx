@@ -1,0 +1,111 @@
+---
+title: Instalación
+description: Instalar Asagiri y preparar un repositorio para flujos de trabajo con IA orquestados.
+---
+
+# Instalación
+
+Asagiri es una CLI en Go que une specs, investigación local, worktrees Git, agentes externos y validación — un binario, un repo, estado local en `.asagiri/`.
+
+## Qué es / no es Asagiri
+
+- **No** es otro agente de chat — un **plan de control local-first**.
+- **Orquesta** Cursor, Claude Code, Codex, Kiro, Ollama, etc.
+- **Conserva** auditoría, ledger, replay y políticas **en su máquina**.
+
+## Sin cuenta obligatoria
+
+Sin cuenta La Programmerie, sin cuota, sin nube obligatoria, sin envío automático de runs.
+
+## Requisitos
+
+| Requisito | Notas |
+| --- | --- |
+| **Go 1.25+** | Solo si compila desde fuentes |
+| **Git** | Worktrees, estados, diffs |
+| **Agentes configurados** | Binarios en `PATH` según `config.yaml` |
+
+## Homebrew (macOS / Linux) — recomendado
+
+```bash
+brew tap LaProgrammerie/tap
+brew install asagiri
+asagiri version
+asagiri doctor
+```
+
+Fórmula `asagiri` en [LaProgrammerie/homebrew-tap](https://github.com/LaProgrammerie/homebrew-tap). En macOS evite `asa` si apunta a `/usr/bin/asa` ; alias opcional: `alias asa='asagiri'`.
+
+## Script de instalación
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/LaProgrammerie/asagiri/main/scripts/install.sh | bash
+```
+
+Fijar versión: `ASAGIRI_VERSION=v1.0.0` ([GitHub Releases](https://github.com/LaProgrammerie/asagiri/releases)).
+
+## Instalación manual (archivo)
+
+GoReleaser v2: `asa_<semver>_<os>_<arch>.tar.gz` — tag `v1.0.0` → `asa_1.0.0_darwin_arm64.tar.gz`.
+
+```bash
+VERSION=v1.0.0
+VER="${VERSION#v}"
+OS="$(uname -s | tr '[:upper:]' '[:lower:]')"
+case "$(uname -m)" in
+  x86_64|amd64) ARCH=amd64 ;;
+  arm64|aarch64) ARCH=arm64 ;;
+  *) echo "unsupported arch"; exit 1 ;;
+esac
+ARCHIVE="asa_${VER}_${OS}_${ARCH}.tar.gz"
+BASE="https://github.com/LaProgrammerie/asagiri/releases/download/${VERSION}"
+
+curl -fsSLO "${BASE}/checksums.txt"
+curl -fsSLO "${BASE}/${ARCHIVE}"
+grep " ${ARCHIVE}\$" checksums.txt | sha256sum -c -
+tar -xzf "${ARCHIVE}"
+install -m 755 asa "${HOME}/.local/bin/asa"
+export PATH="${HOME}/.local/bin:$PATH"
+asa version
+```
+
+## Desde fuentes
+
+```bash
+git clone https://github.com/LaProgrammerie/asagiri.git
+cd asagiri
+make build
+./bin/asa version
+```
+
+## Inicializar un repositorio
+
+```bash
+asa init
+asa doctor
+asa agents list
+asa agents sync --write
+```
+
+Alternativa guiada: `asa onboard`. Añada `.asagiri/state.sqlite` y `.asagiri/worktrees/` a `.gitignore`.
+
+## Primera ejecución sin nube
+
+```bash
+export ASA_DRY_RUN=1
+asa work "explore my feature" --plan-only --yes
+```
+
+## Solución de problemas
+
+| Problema | Acción |
+| --- | --- |
+| `command not found` | Comprobar `PATH` |
+| Agente ausente (`doctor`) | Instalar CLI o editar `config.yaml` |
+| Specs de agentes faltantes | `asa agents sync --write` |
+| Archivo no encontrado | Verificar `asa_${VER}_${OS}_${ARCH}.tar.gz` para el tag |
+
+## Siguientes pasos
+
+- [Inicio rápido](/docs/es/getting-started/quickstart)
+- [Primer flujo](/docs/es/getting-started/first-workflow)

@@ -1,0 +1,70 @@
+---
+title: Agenten-Konfiguration
+description: Agent-IDs auf CLI-Befehle und Timeouts in config.yaml abbilden.
+---
+
+# Agenten-Konfiguration
+
+Asagiri spricht keine proprietären Agent-APIs direkt an. Jeder Agent startet als **Subprocess ohne Shell** (`application/internal/agent/exec`) mit einem klaren `argv` aus Ihrer Konfiguration. Jeder Schlüssel unter `agents:` ist eine logische ID für `--agent`, `work.default_*` und Routing.
+
+Der folgende Block zeigt eine übliche Form: mehrere IDs, verschiedene Executables, optionale `args`, Modelle, Timeouts und — wo das Protokoll es erwartet — einen HTTP-Endpunkt für Ollama.
+
+## Beispiel
+
+```yaml
+agents:
+  kiro:
+    command: kiro
+    args: ["--cli"]
+  cursor:
+    command: cursor-agent
+    default_model: auto
+    timeout: 3600
+  codex:
+    command: codex
+    timeout: 3600
+  claude:
+    command: claude
+    timeout: 3600
+  ollama:
+    endpoint: http://localhost:11434
+    model: qwen2.5-coder:14b
+    embedding_model: nomic-embed-text
+    timeout: 300
+```
+
+## Felder
+
+| Feld | Verwendung durch die Exec-Schicht |
+| --- | --- |
+| `command` | Executable-Name auf `PATH` |
+| `args` | Zusätzliches argv (Kiro, Wrapper) |
+| `default_model` | Wird übergeben, wenn der Agent Modell-Flags unterstützt |
+| `timeout` | Sekunden bis zum Abbruch |
+| `endpoint` | Basis-URL für Ollama |
+| `model` / `embedding_model` | Ollama-Modell-Tags |
+
+Fehlt `timeout`, gelten Defaults anderweitig in der Konfiguration. Ollama-spezifische Felder wirken nur für Agenten, die dieses Protokoll nutzen.
+
+## Standardwerte in `work`
+
+Der Block `work` legt fest, welche logischen IDs laufen, wenn ein Befehl nichts überschreibt. Passen Sie das an, wenn Implementierung, Reviewer oder Enricher repo-weit wechseln sollen.
+
+```yaml
+work:
+  default_agent: cursor
+  default_reviewer: codex
+  default_enricher: ollama
+```
+
+Pro Aufruf überschreibbar, etwa `asa dev feat --agent cursor` oder `asa review feat --agent codex`.
+
+## Dry-run
+
+Mit `--dry-run` werden keine echten Subprozesse gestartet — sinnvoll in CI zum Prüfen der Verdrahtung und zum Proben von Skripten ohne lange Laufzeiten.
+
+## Siehe auch
+
+- [Agenten-Übersicht](/docs/de/agents)
+- [Ollama](/docs/de/agents/ollama)
+- [CLI: dev](/docs/de/cli/generated/dev)

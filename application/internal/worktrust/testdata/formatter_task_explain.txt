@@ -1,0 +1,28 @@
+Summary
+─────
+  Verdict: Acceptable
+  Score: score 78/100
+  Feature: onboarding  Task: task-42  Status: verified
+
+Gates
+─────
+  plan               non évalué
+  enrich             OK
+  governance         non évalué
+  human_review       non évalué
+  verify_evidence    OK
+
+Risks
+─────
+  • [modéré] governance: spec drift section 3
+
+Next actions
+─────
+  → asa review onboarding --task task-42 --agent reviewer
+    task verified, ready for review
+
+Dimensions
+─────
+  Alignement spec                fort   82/100  enrich pass
+  Confiance gates              modéré   75/100  enrich pass
+  Force validation             modéré   70/100  tests OK

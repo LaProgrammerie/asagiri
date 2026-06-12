@@ -1,0 +1,69 @@
+---
+title: Multi-agent coordination
+description: Explicit agent roles, handoffs, review policies, and runtime events above the execution graph.
+---
+
+# Multi-agent coordination
+
+`spec-my-D` — governs **who** runs **which** graph node, **how** they are isolated, and **how** work passes between specialized agents.
+
+## Principles
+
+- **Explicit roles** — investigator, architect, implementer, reviewer, validator, and others map from graph node types.
+- **Structured handoffs** — artefacts under `.asagiri/handoffs/<id>/handoff.yaml` (summary, files, constraints, confidence).
+- **Independent review** — policies can forbid the same agent as implementer and reviewer (`allow_self_review: false`).
+- **Isolation by default** — `isolated_worktree` keeps agent writes off the main workspace when configured.
+- **Inspectable runtime** — `agent.*` events complement `graph.*` from the [execution graph](/docs/concepts/execution-graph).
+
+## Pipeline
+
+```text
+execution graph plan
+  → coordinator assigns role + agent ref + isolation per node
+  → agents run (worktrees / readonly / sandbox per profile)
+  → handoffs between roles → cross-validation → trust gates → merge or block
+```
+
+Configured role order lives in `coordination.pipeline` (e.g. investigator → architect → implementer → reviewer → validator).
+
+## Handoff artefact
+
+Each transfer writes:
+
+| Field | Purpose |
+|-------|---------|
+| `from` / `to` | Coordination roles |
+| `summary` | What the next agent must know |
+| `files` | Paths in scope |
+| `constraints` | Rules (no push, readonly, …) |
+| `confidence` | Subjective transfer confidence (0–1) |
+
+## Terminal UX
+
+During a coordinated run, Asagiri can render a §19 snapshot via `FormatMultiAgentRuntime`:
+
+```text
+Asagiri Multi-Agent Runtime
+═══════════════════════════
+Pipeline … Agents … Costs … Warnings
+```
+
+Icons: `✓` completed, `⠋` running, `○` pending.
+
+## Configuration
+
+Defaults live in [`coordination`](/docs/configuration/config-file#coordination) inside `.asagiri/config.yaml`. Profiles reference keys from [`agents`](/docs/configuration/agents).
+
+## Code layout
+
+```text
+internal/coordination/
+  coordinator.go
+  assignment.go
+  handoff.go
+  policies.go
+  runtime.go
+  display.go
+```
+
+Uses the execution graph model from `internal/executiongraph/` and trust gates from the [trust engine](/docs/concepts/trust-engine).

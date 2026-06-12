@@ -1,0 +1,45 @@
+---
+title: Seguridad
+description: Secretos, alcance, MCP, agentes y datos hacia proveedores.
+---
+
+# Seguridad
+
+Asagiri ensambla compiladores, MCP, agent subprocess y opcionalmente modelos en la nube : **cada capa amplifica lo que ya faltaba de higiene**. Espere **responsabilidad compartida**: la CLI impone scaffold y candados opcionales, pero decisiones de privilegio alto y prácticas de revisión siguen siendo decisión humana firme del equipo.
+
+## Matriz rápida
+
+| Área | Comportamiento |
+| --- | --- |
+| **Sistema ficheros** | Opera repo más worktrees; investigación contempla exclusiones configuradas |
+| **Secretos** | `token_env` Notions ; listas secreto ; redacción registros conocidos |
+| **Subagent** | Exec argv sólo timeouts evita shell chaining |
+| **Red** | `policies.allow_network: false` default — agentes igual podrían requerir tráficos si herramienta lo permite |
+| **MCP** | Fuera hasta activar tamaño tiempo acotados |
+| **Cloud** | Información migra cuando invoca comandos externos cloud que lo implican |
+
+## Alcance
+
+- Árboles trabajo bajo `.asagiri/worktrees/`
+- Persistencia corrida dentro `.asagiri/`
+- Investigación evita rutas marcadas tipo `.env` llaves PEM
+
+Secrets sólo locales aún expuestos al malrouting — combine perfiles menos privilegio + revisiones conscientes antes merge.
+
+## Registros
+
+`application/internal/redact` atenúa patrones conocidos pero no garantiza ausencia fugas conscientes cuando promps ingieren secret texto.
+
+## Agentes externos
+
+CLIs ejecutan permisos usuario—trátelos con misma vigilancia automatismo CI tiene credenciales.
+
+## Reportar incidentes responsable
+
+[`SECURITY.md`](https://github.com/LaProgrammerie/asagiri/blob/main/SECURITY.md) oficial disclosure path.
+
+## Relacionado
+
+- [Límites](/docs/es/security/limits)
+- [Seguridad MCP](/docs/es/mcp/security)
+- [Configuración Notion](/docs/es/configuration/notion)

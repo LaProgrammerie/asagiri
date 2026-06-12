@@ -1,0 +1,4 @@
+roles:
+  owner:
+    permissions:
+      - workspace.create

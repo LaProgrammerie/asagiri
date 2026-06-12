@@ -1,0 +1,37 @@
+---
+title: onboard
+description: Préparer config, docs et validation du dépôt pour les workflows agent.
+---
+
+# `asa onboard`
+
+Configuration guidée du projet : détection de stack, merge de config, bootstrap documentaire, validation readiness.
+
+## Usage
+
+```bash
+asa onboard
+asa onboard --yes --non-interactive
+asa onboard --dry-run
+asa onboard --resume
+asa onboard --step feature
+asa onboard --ui
+```
+
+`--ui` ouvre le **wizard TUI interactif** (Bubble Tea) : formulaire full-screen avec étapes Welcome → Projet → Stack → Agents → Docs → Feature → Récap → Apply, champs préremplis, navigation Prev/Next, panneau Advanced (budgets, verification, coordination, MCP…), puis score readiness.
+
+## Flags
+
+| Flag | Description |
+| --- | --- |
+| `--yes` | Accepter les valeurs par défaut |
+| `--non-interactive` | Sans prompts (requiert `--yes`) |
+| `--stack auto\|go\|php\|node` | Forcer la détection |
+| `--check-only` | Readiness seulement (alias : `asa ready`) |
+| `--strict` | Traiter les warns comme des échecs |
+| `--force-docs` | Écraser les placeholders docs substantiels |
+
+## Voir aussi
+
+- [`asa ready`](/docs/fr/cli/ready)
+- [Concept onboarding projet](/docs/fr/concepts/project-onboarding)

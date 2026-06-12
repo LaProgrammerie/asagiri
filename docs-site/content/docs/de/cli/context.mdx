@@ -1,0 +1,36 @@
+---
+title: context-Befehl
+description: Agent-Kontextpakete aus dem Engineering Knowledge Graph erstellen.
+---
+
+# `asa context`
+
+Kontextabruf für Agenten (`spec-my-E` §15). Kombiniert lokale Investigation-Artefakte mit dem Engineering Knowledge Graph, sofern vorhanden.
+
+## `context build`
+
+Kontextpaket aus dem Graphen erstellen (ohne `--show` / `--optimize`):
+
+```bash
+asa context build --from-graph --flow onboarding --action invite_member
+```
+
+Die Ausgabe enthält relevante Dateien, Symbole, Tests, Verträge, Flows, Events, Metriken und graphenbasierte Risiken.
+
+## Mit Investigation zusammenführen
+
+```bash
+asa context "invite regression" --show --from-graph --flow onboarding --action invite_member
+```
+
+Führt die lokale Investigation aus, merged den Graph-Scope und gibt das Markdown-Kontextpaket aus.
+
+## Voraussetzungen
+
+```bash
+asa knowledge build --include-flows --include-contracts --include-code --include-tests
+```
+
+Benötigt `.asagiri/knowledge/graph.sqlite` (oder einen vorherigen `knowledge build`).
+
+Siehe [Engineering Knowledge Graph](/docs/concepts/engineering-knowledge-graph) und [`asa knowledge`](/docs/cli/knowledge).

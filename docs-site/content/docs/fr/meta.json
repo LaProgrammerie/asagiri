@@ -1,0 +1,23 @@
+{
+  "title": "Asagiri",
+  "pages": [
+    "index",
+    "guided-path",
+    "getting-started",
+    "concepts",
+    "experience",
+    "cli",
+    "workflows",
+    "configuration",
+    "agents",
+    "cost-performance",
+    "reliability",
+    "architecture",
+    "security",
+    "mcp",
+    "reference",
+    "contributing",
+    "roadmap"
+  ],
+  "root": true
+}

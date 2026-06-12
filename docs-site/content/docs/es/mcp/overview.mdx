@@ -1,0 +1,49 @@
+---
+title: Resumen MCP
+description: Servidor MCP stdio opcional que expone herramientas de investigación y contexto.
+---
+
+# Resumen MCP
+
+Para puentes de editor que hablan MCP **stdio JSON-RPC**, Asagiri puede exponer un servidor pequeño implementado en `application/internal/mcp`. Es deliberadamente reducido: listar herramientas, invocarlas con límites y devolver resultados estructurados — no una plataforma remota completa para agentes.
+
+<Callout type="experimental">
+MCP viene desactivado por defecto. Actívelo solo tras revisar alcances en entornos confiables.
+</Callout>
+
+## Habilitación
+
+Configure `mcp.enabled` y ajustes de seguridad antes de arrancar nada que conecte un cliente externo por stdio.
+
+```yaml
+mcp:
+  enabled: true
+  max_output_bytes: 1048576
+  command_timeout_seconds: 120
+```
+
+## Servicio
+
+`asa mcp-serve` ejecuta el transporte stdio; los clientes envían JSON separado por saltos de línea y esperan `initialize`, `tools/list` y `tools/call` como JSON-RPC.
+
+```bash
+asa mcp-serve
+```
+
+Soporta `initialize`, `tools/list`, `tools/call` (JSON delimitado por nuevas líneas).
+
+## Wrapper CLI
+
+`asa mcp` es la ayuda que agrupa subcomandos MCP para inspección local — júntelo con las referencias generadas cuando necesite flags exactos.
+
+```bash
+asa mcp
+```
+
+Inspeccione comandos MCP — véase referencia generada [mcp](/docs/es/cli/generated/mcp) y [mcp-serve](/docs/es/cli/generated/mcp-serve).
+
+## Relacionado
+
+- [Herramientas MCP](/docs/es/mcp/tools)
+- [Seguridad MCP](/docs/es/mcp/security)
+- [Configuración: mcp](/docs/es/configuration/config-file#mcp)

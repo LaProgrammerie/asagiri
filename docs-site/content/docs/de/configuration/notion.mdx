@@ -1,0 +1,56 @@
+---
+title: Notion-Quellen
+description: Notion-Sync in lokale Spec-Snapshots konfigurieren.
+---
+
+# Notion-Quellen
+
+Die Integration liegt in `application/internal/source/notion`. Entscheidend ist dieses Invariant: **Nach dem Sync lesen Ausführung und Indexierung lokale Dateien**, nicht die Notion-API bei jedem Schritt. Sync ist ein Snapshot-Schritt: Er zieht Seiten in den Spec-Baum Ihres Repositories.
+
+## Konfiguration
+
+Property-Namen müssen zu Ihrem Workspace-Schema passen; Asagiri errät keine Notion-Layouts.
+
+```yaml
+sources:
+  notion:
+    enabled: true
+    token_env: NOTION_TOKEN
+    default_database_id: ""
+    specs_database_id: "<database-id>"
+    tasks_database_id: ""
+    status_property: Status
+    title_property: Name
+    updated_time_property: Last edited time
+    import_path: .asagiri/specs
+```
+
+Das API-Token wird aus der Umgebungsvariable gelesen, die `token_env` benennt (üblicherweise `NOTION_TOKEN`).
+
+## Befehle
+
+Token setzen, `sync` auf eine Seiten-URL oder einen vollständigen Sync ausweiten, importierte Specs wie jede andere Quelle über `inbox` nutzen.
+
+```bash
+export NOTION_TOKEN="..."
+asa sync notion --page "https://notion.so/..."
+asa sync all
+asa inbox --source notion
+```
+
+## Sicherheit und Probebetrieb
+
+Notion bleibt **deaktiviert**, bis `enabled: true` gesetzt ist. Mit `asa --dry-run sync notion --page …` lässt sich der Pfad ohne unbeabsichtigte Seiteneffekte üben. Existiert bereits eine lokale Spec und stdin ist ein Terminal, erscheinen Rückfragen vor dem Überschreiben — stilles Vernichten lokaler Arbeit ist nicht vorgesehen.
+
+<Callout type="experimental">
+Notion-Schemas unterscheiden sich je Workspace. Property-Namen (`status_property` und andere) validieren, bevor Sie auf Sync in Produktion setzen.
+</Callout>
+
+<Callout type="security">
+Tokens nur in Umgebung oder Secret-Manager — nie in committed YAML ablegen.
+</Callout>
+
+## Siehe auch
+
+- [Notion → Code-Workflow](/docs/de/workflows/notion-to-code)
+- [CLI: sync](/docs/de/cli/generated/sync)

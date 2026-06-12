@@ -1,0 +1,27 @@
+---
+title: graph status
+description: Afficher l'état d'un graphe d'exécution persisté.
+---
+
+# `asa graph status`
+
+Affiche l'état courant d'un graphe stocké sous `.asagiri/graphs/<graph-id>/` (`spec-my-C` §5.4).
+
+## Usage
+
+```bash
+asa graph status graph-2026-05-29-9307e4be
+asa graph status graph-2026-05-29-9307e4be --json
+```
+
+## Sortie
+
+En mode terminal : id, produit, flow, statut, compteurs nœuds/arêtes/checkpoints, coût estimé et risque maximal.
+
+Avec `--json`, retourne le graphe complet plus l'estimation.
+
+## Voir aussi
+
+- Reprendre : [`asa graph resume`](/docs/fr/cli/graph-resume)
+- Diagramme : [`asa graph visualize`](/docs/fr/cli/graph-visualize)
+- Créer un plan : [`asa plan graph`](/docs/fr/cli/plan-graph)

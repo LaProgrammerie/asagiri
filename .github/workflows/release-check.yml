@@ -1,0 +1,31 @@
+name: Release check
+
+on:
+  pull_request:
+    paths:
+      - ".goreleaser.yaml"
+      - ".github/workflows/release.yml"
+      - ".github/workflows/release-check.yml"
+      - "scripts/install.sh"
+      - "application/**"
+      - "go.mod"
+      - "go.sum"
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - uses: goreleaser/goreleaser-action@v6
+        with:
+          distribution: goreleaser
+          version: latest
+          args: check

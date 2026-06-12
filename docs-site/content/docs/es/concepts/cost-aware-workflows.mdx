@@ -1,0 +1,49 @@
+---
+title: Flujos conscientes del coste
+description: Estimar tokens y coste antes de ejecutar; aplicar presupuestos y enrutamiento.
+---
+
+# Flujos conscientes del coste
+
+## Problema
+
+Las ejecuciones de agentes pueden consumir tokens de formas difíciles de prever desde una descripción simple de tarea. Los equipos siguen necesitando **previsiones** antes de ejecutar, **techos presupuestarios** que fallen en cerrado, y **enrutamiento** que prefiera rutas de ejecución más baratas cuando la tarea no justifica un modelo pesado.
+
+## Enfoque Asagiri
+
+Asagiri lo aborda con cuatro mecanismos concretos bajo tu config:
+
+1. **Conteo heurístico de tokens** — conteo de caracteres por tipo de contenido, dividido por ratios `token_estimation` (`token_estimation` en config)
+2. **Hoja de precios** — entradas manuales `pricing.models` para modelos cloud (sin precios de proveedor hardcodeados)
+3. **Presupuestos** — topes por run, por tarea y diarios, con umbrales de confirmación opcionales
+4. **Enrutamiento** — `routing.strategies` mapea clases de paso a agentes local, cloud-rápido o cloud-pesado
+
+Puntos de entrada CLI típicos:
+
+```bash
+asa estimate billing-v2 --task task-003 --dry-run
+asa work "develop billing-v2" --estimate-only
+asa work "develop billing-v2" --budget 0.50 --allow-over-budget
+```
+
+<Callout type="cost">
+Las estimaciones son **aproximadas**. La facturación del proveedor usa tokenizers reales; Asagiri aún no incluye contadores exactos del proveedor.
+</Callout>
+
+## Compromisos
+
+| Mejora | No resuelve |
+| --- | --- |
+| Sorpresas detectadas antes de `dev` | Facturas al céntimo |
+| Política vía presupuestos YAML | Descubrimiento automático de precios cloud |
+| Razones de enrutamiento explicables | Selección óptima de modelo sin tu config |
+
+## Configuración
+
+Conecta presupuestos, reglas de enrutamiento y ajustes del estimador en las páginas dedicadas: [Presupuestos](/docs/es/configuration/budgets), [Enrutamiento](/docs/es/configuration/routing) y [Estimación de tokens](/docs/es/cost-performance/token-estimation).
+
+## Relacionado
+
+- [Guía de flujo consciente del coste](/docs/es/workflows/cost-aware-workflow)
+- [CLI: cost](/docs/es/cli/generated/cost)
+- [CLI: estimate](/docs/es/cli/generated/estimate)

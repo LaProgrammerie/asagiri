@@ -1,0 +1,6 @@
+id: archive
+title: Archive workspace
+steps:
+  - id: step1
+    action: archive_workspace
+    contract_ref: "POST /workspaces/archive"

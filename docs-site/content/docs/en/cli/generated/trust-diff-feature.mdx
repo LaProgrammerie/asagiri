@@ -1,0 +1,50 @@
+---
+title: Trust Diff Feature · Asagiri CLI
+description: Diff des snapshots trust feature
+---
+
+CLI path: **`asa trust diff feature`**
+
+## When to use
+
+Orchestration commands coordinate higher-order Asagiri workloads such as ingestion, syncing, backlog triage, investigative passes, hydrated context payloads, coarse estimates, and workspace-specific automation.
+
+> Original CLI synopsis: Diff des snapshots trust feature
+
+## Usage
+
+```bash
+asa trust diff feature [flags]
+```
+
+## Options
+
+| Flag | Scope | Default | Description |
+| --- | --- | --- | --- |
+| `--dry-run` | Inherited | `false` | Simuler les exécutions sans lancer d'agent ni commandes externes |
+| `--from` | Local | `(empty)` | Snapshot source (défaut: dernière entrée history/) |
+| `--json` | Local | `false` | Sortie JSON du diff sur stdout |
+| `--to` | Local | `(empty)` | Snapshot cible (défaut: latest) |
+
+## Examples
+
+```bash
+asa trust diff feature
+```
+
+> Wire richer samples through **cobra.Command.Example** when the happy path warrants copy/paste-friendly automation beyond this scaffold.
+
+## What happens internally
+
+- Hydrates contextual services resolved from **$PWD**, coordinating git-bound automation, ingestion pipelines, syncing, backlog triage, investigations, MCP hooks, contextual hydration, coarse estimates, and similar orchestrations for this subtree.
+
+## Failure modes
+
+- Cobra rejects unknown flags or arity mismatches before any repository side effects occur.
+- Asagiri cannot resolve scaffolding when the command is invoked outside an initialised checkout.
+- Downstream automation may fail whenever credentials, network endpoints, or cached prerequisites drift from expectations.
+
+## Related commands
+
+- [Trust Diff Run](./trust-diff-run.mdx)
+- [Trust Diff Task](./trust-diff-task.mdx)

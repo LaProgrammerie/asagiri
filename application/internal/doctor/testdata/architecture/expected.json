@@ -1,0 +1,110 @@
+{
+  "report_version": "doctor-architecture-v1",
+  "repository": {
+    "git_root": "\u003crepo\u003e"
+  },
+  "summary": {
+    "tasks": 2,
+    "execution_graphs": 1,
+    "execution_graph_nodes": 3,
+    "knowledge_nodes": 0,
+    "trust_reports": 0,
+    "agent_ledger_entries": 2,
+    "tasks_without_graph_node": 1,
+    "graph_nodes_never_executed": 3,
+    "tasks_without_knowledge_context": 2,
+    "agent_runs_without_task": 1,
+    "trust_gaps_critical_flows": 1
+  },
+  "sources": {
+    "sqlite_present": true,
+    "graphs_present": true,
+    "knowledge_store_present": false,
+    "knowledge_json_present": false,
+    "trust_reports_present": false,
+    "agent_ledger_present": true
+  },
+  "findings": [
+    {
+      "kind": "agent_run_without_task",
+      "severity": "warn",
+      "feature": "feat-arch",
+      "run_id": "run-arch",
+      "agent_id": "dev",
+      "message": "entrée agent ledger sans task_id"
+    },
+    {
+      "kind": "graph_node_never_executed",
+      "severity": "warn",
+      "graph_id": "graph-2026-05-27-a1b2c3d4",
+      "node_id": "implement-workspace-create",
+      "flow": "onboarding",
+      "product": "workspace-saas",
+      "message": "nœud d'execution graph jamais exécuté"
+    },
+    {
+      "kind": "graph_node_never_executed",
+      "severity": "warn",
+      "graph_id": "graph-2026-05-27-a1b2c3d4",
+      "node_id": "investigate-onboarding",
+      "flow": "onboarding",
+      "product": "workspace-saas",
+      "message": "nœud d'execution graph jamais exécuté"
+    },
+    {
+      "kind": "graph_node_never_executed",
+      "severity": "warn",
+      "graph_id": "graph-2026-05-27-a1b2c3d4",
+      "node_id": "verify-onboarding-flow",
+      "flow": "onboarding",
+      "product": "workspace-saas",
+      "message": "nœud d'execution graph jamais exécuté"
+    },
+    {
+      "kind": "task_without_graph_node",
+      "severity": "warn",
+      "task_id": "task-orphan",
+      "feature": "feat-arch",
+      "message": "task sans nœud dans un execution graph"
+    },
+    {
+      "kind": "task_without_knowledge_context",
+      "severity": "warn",
+      "task_id": "task-001",
+      "feature": "feat-arch",
+      "message": "task sans contexte dans le knowledge graph"
+    },
+    {
+      "kind": "task_without_knowledge_context",
+      "severity": "warn",
+      "task_id": "task-orphan",
+      "feature": "feat-arch",
+      "message": "task sans contexte dans le knowledge graph"
+    },
+    {
+      "kind": "trust_gap_critical_flow",
+      "severity": "warn",
+      "flow": "onboarding",
+      "product": "workspace-saas",
+      "message": "flow critique sans trust report produit"
+    }
+  ],
+  "recommendations": [
+    {
+      "title": "Planifier ou rafraîchir les execution graphs",
+      "cli": "asa plan graph workspace-saas --flow onboarding"
+    },
+    {
+      "title": "Construire le knowledge graph",
+      "cli": "asa knowledge build"
+    },
+    {
+      "title": "Inspecter les exécutions agents",
+      "cli": "asa agents runs --json"
+    },
+    {
+      "title": "Vérifier la confiance produit sur les flows critiques",
+      "cli": "asa verify trust onboarding --product workspace-saas"
+    }
+  ]
+}

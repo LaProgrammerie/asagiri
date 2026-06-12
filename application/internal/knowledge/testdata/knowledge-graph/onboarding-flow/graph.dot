@@ -1,0 +1,15 @@
+digraph knowledge_graph {
+  rankdir=LR;
+  "action:invite_member" [label="action\\\\ninvite_member"];
+  "api_operation:POST_invitations" [label="api_operation\\\\nPOST /invitations"];
+  "event:member.invited" [label="event\\\\nmember.invited"];
+  "flow:onboarding" [label="flow\\\\nonboarding"];
+  "symbol:InvitationService_invite" [label="symbol\\\\nInvitationService::invite"];
+  "test:InvitationServiceTest" [label="test\\\\nInvitationServiceTest"];
+  "symbol:InvitationService_invite" -> "event:member.invited" [label="emits (0.85)"];
+  "action:invite_member" -> "symbol:InvitationService_invite" [label="implements (0.87)"];
+  "api_operation:POST_invitations" -> "symbol:InvitationService_invite" [label="implements (0.87)"];
+  "action:invite_member" -> "api_operation:POST_invitations" [label="requires (0.91)"];
+  "flow:onboarding" -> "action:invite_member" [label="requires (0.95)"];
+  "symbol:InvitationService_invite" -> "test:InvitationServiceTest" [label="tests (0.90)"];
+}

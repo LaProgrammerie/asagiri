@@ -1,0 +1,32 @@
+ ╭───────────────────────────────────────────────────────────────────────────────────────────────────────────────╮ 
+ │  ASAGIRI   Mission Control                                                                                    │ 
+ │ Screen · prototype                                                                                            │ 
+ │   RUNTIME  stopped  Screen: prototype                                                                         │ 
+ │                                                                                                               │ 
+ │  NAVIGATION            │╭───────────────────────────────────────────────────────────────────────────────────╮ │ 
+ │                        ││ Prototype Mode                                                                    │ │ 
+ │   ◆  Mission           ││ Prototype Mode                                                                    │ │ 
+ │   ▣  Dashboard         ││ Product: workspace-saas                                                           │ │ 
+ │   ▶  Runs              ││ Stage: flow                                                                       │ │ 
+ │   ◎  Agents            ││ Done: wireframe -> journey -> flow                                                │ │ 
+ │   ⇄  Flow              ││                                                                                   │ │ 
+ │   ⊹  Graph             ││ Wireframe                                                                         │ │ 
+ │   ⛉  Trust             ││ Title: workspace saas                                                             │ │ 
+ │   ❏  Knowledge         ││ Path: .asagiri/products/workspace-saas/prototype/src/App.tsx                      │ │ 
+ │   ↺  Replay            ││ Email    [____________]                                                           │ │ 
+ │   ▤  Logs              ││ Password [____________]                                                           │ │ 
+ │   ?  Explain           ││ [ Sign in ]                                                                       │ │ 
+ │   ⚙  Settings          ││                                                                                   │ │ 
+ │                        ││ Flow extraction                                                                   │ │ 
+ │                        ││ - workspace-onboarding/step-1 action=click_get_started screen=landing next=signup │ │ 
+ │                        ││   contract=POST /api/workspaces trust=pending metric=onboarding_completion_rate   │ │ 
+ │                        ││                                                                                   │ │ 
+ │                        ││ Pipeline actions                                                                  │ │ 
+ │                        ││ Keys: 1 create  2 flows extract  3 contracts extract  4 spec generate             │ │ 
+ │                        ││ - asa contracts extract workspace-saas                                            │ │ 
+ │                        ││ - asa architecture derive workspace-saas                                          │ │ 
+ │                        ││ - open prototype: asa prototype                                                   │ │ 
+ │                        │╰───────────────────────────────────────────────────────────────────────────────────╯ │ 
+ │                                                                                                               │ 
+ │ Screen: prototype  |  CLI: asa prototype                                                                      │ 
+ ╰───────────────────────────────────────────────────────────────────────────────────────────────────────────────╯ 

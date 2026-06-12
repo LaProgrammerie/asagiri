@@ -1,0 +1,41 @@
+---
+title: Códigos de salida
+description: Comportamiento de salida CLI en éxito o fracaso.
+---
+
+# Códigos de salida
+
+Asagiri replica semánticas Go/Cobra para que pipelines bifurquen `$?` sin envolturas ad hoc.
+
+| Código | Sentido |
+| --- | --- |
+| **0** | Comando finalizado sin error |
+| **1** | Error genérico (error del `RunE` — configuración, git, workflow, presupuesto, agente) |
+| **2** | Error de uso Cobra (flag desconocido, aridad equivocada) |
+
+## Ejemplos
+
+Ejemplifica fallos sintácticos (salida **2**), rutas bien (doctor o estimate-only cuando sale bien) versus fallos operacionales presupuesto/verify como **1** con texto en stderr.
+
+```bash
+asa work                    # exit 2 — falta instrucción requerida
+asa doctor                  # exit 0 si todo chequea bien
+asa work "x" --estimate-only # exit 0 si la estimación alcanza
+```
+
+Bloqueos por presupuesto y validaciones suelen producir **exit 1**.
+
+## Scripts
+
+Úselo junto `||`; recuerde `--dry-run` si solo necesita revisar wiring sin fallar porque falta binario agente.
+
+```bash
+asa verify my-feature || echo "verify failed"
+```
+
+`--dry-run` puede evitar código distinto de cero en CI cuando sólo ejercitan el esqueleto orquestador.
+
+## Relacionado
+
+- [Vista CLI](/docs/es/cli)
+- [Recuperación ante fallos](/docs/es/workflows/failure-recovery)

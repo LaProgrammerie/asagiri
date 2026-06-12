@@ -1,0 +1,54 @@
+---
+title: Budgets
+description: Plafonds de coût et de jetons estimés par run, par tâche et par jour.
+---
+
+# Budgets
+
+Les budgets offrent des plafonds prévisibles sur la dépense et le volume de jetons estimés avant que les agents ne tournent. Ils sont implémentés dans `application/internal/cost/budget.go` et appliqués dans le pipeline V3 avant l'exécution des agents, afin qu'un run puisse s'arrêter ou demander confirmation au lieu de dépasser ce que vous jugez acceptable.
+
+Le bloc YAML ci-dessous est la forme complète : devise par défaut, plafonds par run et par tâche, plafond journalier agrégé, et drapeaux de politique qui contrôlent blocage versus dépassement explicite.
+
+## Schéma
+
+```yaml
+budgets:
+  default_currency: EUR
+  per_run:
+    max_estimated_cost: 1.00
+    max_estimated_tokens: 500000
+    require_confirmation_above_cost: 0.20
+  per_task:
+    max_estimated_cost: 0.30
+    max_estimated_tokens: 150000
+  daily:
+    max_estimated_cost: 10.00
+  policies:
+    block_when_over_budget: true
+    allow_override_with_flag: true
+    override_flag: "--allow-over-budget"
+```
+
+## Interaction CLI
+
+Ces flags interagissent avec les mêmes chiffres et politiques : resserrer un run, sortir après estimation seule, ou contourner un blocage quand la politique le permet. `--yes` est la sortie après `BudgetPendingConfirmError` une fois l'estimation relue.
+
+| Flag | Comportement |
+| --- | --- |
+| `--budget <EUR>` | Plafond de run pour cette invocation |
+| `--estimate-only` | S'arrête après estimation ; pas de dépense |
+| `--allow-over-budget` | Contourne le blocage si la politique l'autorise |
+| `--yes` | Accepte la confirmation après `BudgetPendingConfirmError` |
+
+## Limites
+
+Les estimations multiplient des comptages heuristiques de jetons par les taux de votre feuille `pricing`. Les factures fournisseur peuvent diverger, surtout quand les vendeurs changent de paliers ou facturent des facteurs qu'Asagiri ne modélise pas.
+
+<Callout type="cost">
+Configurez `pricing.models` avec des tarifs à jour. Des prix à zéro rendent les affichages de coût trompeurs sans désactiver les plafonds de jetons.
+</Callout>
+
+## Voir aussi
+
+- [Workflow conscient des coûts](/docs/fr/workflows/cost-aware-workflow)
+- [Estimation des jetons](/docs/fr/cost-performance/token-estimation)

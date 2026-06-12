@@ -1,0 +1,49 @@
+---
+title: Graphe de connaissance ingénierie
+description: Graphe structurel local reliant flows produit, contrats, code, tests et opérations.
+---
+
+# Graphe de connaissance ingénierie
+
+`spec-my-E` — construit un **graphe interrogeable** dans `.asagiri/knowledge/` pour que les agents raisonnent sur des relations, pas sur des fichiers isolés.
+
+## Principes
+
+- **Local-first** — SQLite (`graph.sqlite`) et export JSON (`graph.json`).
+- **IDs hybrides** — `type:cle_stable` (ex. `flow:onboarding`, `action:invite_member`).
+- **Provenance** — chaque nœud et arête porte chemin source, extracteur et confiance.
+- **Incrémental** — `asa knowledge build --incremental` ignore les extracteurs dont les mtimes sources sont inchangés.
+- **Staleness** — alerte si flows, contrats, code ou tests ont changé depuis le dernier build.
+
+## Pipeline
+
+```text
+.asagiri/products (flows, contrats) + code/tests du dépôt
+  → asa knowledge build
+  → graph.sqlite + graph.json
+  → query / impact / explain / snapshot
+  → investigation, trust, execution graph, coordination (--from-graph)
+```
+
+## CLI
+
+| Commande | Rôle |
+|----------|------|
+| `asa knowledge build` | Extraire et mettre à jour le graphe (`--include-flows`, `--include-code`, `--incremental`, `--json`) |
+| `asa knowledge query` | Requêtes par phrase ou flags |
+| `asa knowledge explain` | Chemin le plus court flow/action → symbole |
+| `asa knowledge snapshot --name` | Snapshot nommé sous `snapshots/<name>/` |
+| `asa impact analyze` | Impact d'un fichier, flow ou action |
+
+## Artefacts
+
+```text
+.asagiri/knowledge/
+  graph.sqlite
+  graph.json
+  snapshots/<name>/
+    metadata.json
+    graph.json
+```
+
+Voir [Configuration — `knowledge`](/docs/fr/configuration/config-file#knowledge), [`asa knowledge`](/docs/fr/cli/knowledge) et [`asa impact`](/docs/fr/cli/impact).

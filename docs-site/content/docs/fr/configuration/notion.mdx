@@ -1,0 +1,56 @@
+---
+title: Sources Notion
+description: Configurer la synchronisation Notion vers des snapshots de spec locaux.
+---
+
+# Sources Notion
+
+L'intégration Notion vit dans `application/internal/source/notion`. L'invariant important : après sync, l'exécution et l'indexation lisent des **fichiers locaux** sur disque, pas l'API Notion à chaque étape. Voyez la sync comme une étape de snapshot qui tire les pages dans l'arbre de specs du dépôt.
+
+## Configuration
+
+Les noms de propriétés doivent correspondre au schéma de votre workspace ; Asagiri ne devine pas les layouts Notion.
+
+```yaml
+sources:
+  notion:
+    enabled: true
+    token_env: NOTION_TOKEN
+    default_database_id: ""
+    specs_database_id: "<database-id>"
+    tasks_database_id: ""
+    status_property: Status
+    title_property: Name
+    updated_time_property: Last edited time
+    import_path: .asagiri/specs
+```
+
+Le jeton API est lu depuis la variable d'environnement nommée par `token_env` (par convention `NOTION_TOKEN`).
+
+## Commandes
+
+Exportez le jeton, pointez `sync` vers une URL de page ou lancez une sync complète, puis consommez les specs importées via `inbox` comme toute autre source.
+
+```bash
+export NOTION_TOKEN="..."
+asa sync notion --page "https://notion.so/..."
+asa sync all
+asa inbox --source notion
+```
+
+## Sécurité
+
+Notion reste **désactivé** tant que `enabled: true` n'est pas défini. Pour répéter, `asa --dry-run sync notion --page ...` exerce le chemin sans effets de bord non voulus. Quand une spec locale existe déjà et stdin est un TTY, des invites d'écrasement évitent d'écraser silencieusement du travail.
+
+<Callout type="experimental">
+Les schémas API Notion diffèrent par workspace. Validez les noms de propriétés (`status_property`, etc.) avant de compter sur la sync en production.
+</Callout>
+
+<Callout type="security">
+Stockez les jetons en environnement ou gestionnaire de secrets — jamais dans du YAML commité.
+</Callout>
+
+## Voir aussi
+
+- [Workflow Notion → code](/docs/fr/workflows/notion-to-code)
+- [CLI : sync](/docs/fr/cli/generated/sync)

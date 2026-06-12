@@ -1,0 +1,4 @@
+{
+  "title": "CLI",
+  "pages": ["index", "prototype", "flows", "contracts", "runtime", "runtime-serve", "investigate", "analysis", "knowledge", "context", "impact", "replay", "verify-trust", "trust-gates", "trust-replay", "plan-graph", "plan-explain", "graph-run", "graph-status", "graph-resume", "graph-visualize", "memory-doctor", "index-rag", "resume", "onboard", "ready", "generated"]
+}

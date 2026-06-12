@@ -1,0 +1,42 @@
+---
+title: verify trust
+description: Run the trust verification pipeline on a product flow.
+---
+
+# `asa verify trust`
+
+Trust & Verification Engine (`spec-my-B` §5). Runs registered checks, aggregates confidence across six dimensions, evaluates gates, and writes reports under `.asagiri/trust/<id>/`.
+
+## Usage
+
+```bash
+asa verify trust onboarding-flow
+asa verify trust --flow onboarding --product workspace-saas
+asa verify trust onboarding --task task-003 --branch feature/onboarding
+```
+
+## Flags
+
+| Flag | Description |
+|------|-------------|
+| `--product` | Product id under `.asagiri/products/` |
+| `--flow` | Flow id (alternative to positional argument) |
+| `--task` | Associated task id |
+| `--branch` | Git branch context |
+| `--strict` | Treat warnings as failures in CI mode |
+| `--json` | Print trust report JSON on stdout |
+| `--ci` | Non-zero exit when a blocking gate or check fails |
+
+## CI example
+
+```bash
+asa verify trust onboarding-flow --ci --json > trust-report.json
+```
+
+## Output
+
+- Terminal summary (checks, dimensions, residual risk)
+- `.asagiri/trust/<trust-id>/report.md` and `report.json`
+- `.asagiri/trust/<trust-id>/replay.yaml` for replay
+
+See [Trust engine](/docs/concepts/trust-engine) and [verification gates](/docs/configuration/config-file#verification).

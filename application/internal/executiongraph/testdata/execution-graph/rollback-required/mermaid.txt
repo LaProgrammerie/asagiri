@@ -1,0 +1,6 @@
+graph TD
+  implement_invite_member[Implement member invitation]
+  rollback_invite_member[Roll back invite member changes]
+  verify_onboarding_flow[Verify onboarding flow integrity]
+  implement_invite_member -->|validates| verify_onboarding_flow
+  verify_onboarding_flow -->|rollback_depends_on| rollback_invite_member

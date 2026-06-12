@@ -1,0 +1,38 @@
+---
+title: Contribuir
+description: Cómo contribuir a Asagiri y mantener la documentación alineada con la CLI.
+---
+
+# Contribuir
+
+La lista viva de comprobaciones, expectativas de revisión y políticas del repositorio están en **[CONTRIBUTING.md](https://github.com/LaProgrammerie/asagiri/blob/main/CONTRIBUTING.md)** en la raíz del repo — empiece ahí para todo lo que vaya más allá de este mapa breve.
+
+## Lista rápida
+
+Antes de abrir un PR, cargue el contexto del proyecto, alinee el alcance con el handoff activo y las specs de producto, demuestre que el árbol Go sigue compilando y que los tests pasan, regenere la referencia CLI cuando cambien los comandos, ejecute el build del sitio docs para edits MDX, y mantenga cada PR enfocado sin filtrar secretos.
+
+1. Leer `AGENTS.md` y `docs/ai/context-map.md`
+2. Alinear funcionalidad con `docs/ai/active/handoff.md` y specs de producto (`spec-postv123.md`, etc.)
+3. `make build && go test -race ./...`
+4. Actualizar la documentación CLI cuando cambien comandos:
+
+```bash
+go run ./application/cmd/asa docs generate-cli \
+  --output docs-site/content/docs/en/cli/generated
+```
+
+5. `cd docs-site && npm run build` ante cambios MDX
+6. Un PR por tema coherente; sin secretos en los commits
+
+## Documentación
+
+La prosa pública apunta a `docs-site/content/docs/` (el sitio en inglés usa Fumadocs). El canon interno y steering permanece bajo `docs/ai/`. Cuando código y docs discrepan, [`problems.md`](https://github.com/LaProgrammerie/asagiri/blob/main/problems.md) en la raíz rastrea el desvío conocido.
+
+## Decisiones de arquitectura
+
+Cuando cambie un trade-off duradero, regístrelo donde buscarán quien contribuya después : `docs/ai/05-decisions.md` más entradas estructuradas en `docs/decisions/` si su equipo usa esa disposición de carpetas.
+
+## Relacionado
+
+- [Flujo CI](/docs/es/workflows/ci-workflow)
+- [Roadmap](/docs/es/roadmap)

@@ -1,0 +1,37 @@
+---
+title: Feuille de route
+description: Fonctions livrées, travaux de consolidation et prochaines priorités.
+---
+
+# Feuille de route
+
+L’ordre de priorité officiel vit dans **[ROADMAP.md](https://github.com/LaProgrammerie/asagiri/blob/main/ROADMAP.md)** aux côtés du code ; cette page en est une vitrine lisible depuis le site.
+
+## Livré (V1 → V3)
+
+La livraison couvre workflows CLI centraux (`init`, `spec`, `plan`, `dev`, `verify`, `review` avec worktrees et SQLite), la surface intention en langage naturel (`work`, `continue`, `next`) ainsi que la synchro Notion, et tout l’échelon observabilité/coût (`estimate`, `investigate`, `context`, `cost`), MCP, TUI ou métriques.
+
+## En cours (consolidation)
+
+Le chantier présent passe par audits de consolidation sous `docs/consolidation/`, la mise à l’air du docs site vous étant affichée avec références CLI régénérées, et quelques chantiers OSS (Apache 2.0, `CONTRIBUTING`, exemples cueillis).
+
+## Prochain pas prioritaire
+
+Ce tableau agrège une pile grossière ; l’ordre d’exécution repose encore sur `docs/consolidation/TODO-prioritized.md`.
+
+| Priorité | Élément |
+| --- | --- |
+| P0 | Couverture `workflow` / `intent/executor` > 50 % |
+| P0 | Tokenizers exact fournisseur |
+| P1 | Cache persistant packs de contexte entre runs |
+| P1 | GitHub Actions CI complet (test, lint, release) |
+| P2 | TUI bubbletea interactive |
+| P2 | RAG embeddings vecteurs |
+| P3 | Multi-depôt / état distant |
+
+Détail : `docs/consolidation/TODO-prioritized.md`.
+
+## Voir aussi
+
+- [Contribuer](/docs/fr/contributing)
+- [Limites](/docs/fr/security/limits)

@@ -1,0 +1,47 @@
+---
+title: Outils MCP
+description: Outils exposés lorsque mcp.enabled vaut true.
+---
+
+# Outils MCP
+
+Quand `mcp.enabled` vaut `true`, `mcp-serve` enregistre des outils déléguant aux mêmes paquets investigation et optimisation de contexte que la CLI emploie. Noms et schémas JSON ne sont pas figés dans cette page — appelez `tools/list` après chaque mise à jour pour inspecter la surface réelle.
+
+## Capacités typiques
+
+Ce tableau décrit grossièrement sans prétendre à l’exhaustivité : investigation garde des lectures borner comme `investigate` en CLI ; les aides context assemblent ou résument les paquets ; le volet cost réutilise les heuristiques de jetons pour prévisualiser des charges utiles aux clients.
+
+| Domaine | Rôle |
+| --- | --- |
+| Investigation | Grep/repo borné aligné avec `investigate` en CLI |
+| Contexte | Construire ou résumer les paquets |
+| Coût | Approximer jetons/coûts pour une charge utile |
+
+Les identifiants d’outil peuvent changer par release — après upgrade, systématiquement refaire `tools/list`.
+
+## Limites
+
+La configuration réplique les garde-corps CLI : globalement `max_output_bytes` et `command_timeout_seconds`, plus les plafonds `investigation.*` partagés avec les chemins d’investigation hors MCP.
+
+- `max_output_bytes` — borne la réponse RPC
+- `command_timeout_seconds` — exécution par outil
+- `investigation.*` — plafonds grep/scan fichier (également utilisés hors MCP)
+
+## Flux client exemple
+
+Lancez le serveur, branchez votre client MCP sur stdio, puis émettez `tools/list` au format JSON-RPC attendu.
+
+```bash
+asa mcp-serve
+# Éditeur MCP connecté via stdio, envoie:
+# {"jsonrpc":"2.0","id":1,"method":"tools/list"}
+```
+
+<Callout type="experimental">
+La surface d’outil reste minimale et en mouvance. N’épousez pas d’outil non documenté en automatisation prod sans épingle de version Asagiri.
+</Callout>
+
+## Voir aussi
+
+- [Investigation locale](/docs/fr/cost-performance/local-investigation)
+- [Sécurité MCP](/docs/fr/mcp/security)

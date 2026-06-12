@@ -1,0 +1,22 @@
+Summary
+─────
+  Verdict: Acceptable
+  Confiance suffisante — quelques points à garder en tête.
+  Feature: onboarding  Task: task-42  Status: verified
+
+Gates
+─────
+  plan               non évalué
+  enrich             OK
+  governance         non évalué
+  human_review       non évalué
+  verify_evidence    OK
+
+Risks
+─────
+  • [modéré] governance: spec drift section 3
+
+Next actions
+─────
+  → asa review onboarding --task task-42 --agent reviewer
+    task verified, ready for review

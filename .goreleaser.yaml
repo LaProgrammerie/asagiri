@@ -1,0 +1,75 @@
+version: 2
+
+project_name: asa
+
+before:
+  hooks:
+    - go mod tidy
+    - go test ./...
+
+builds:
+  - id: asa
+    main: ./application/cmd/asa
+    binary: asa
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w
+      - -X github.com/LaProgrammerie/asagiri/application/internal/version.Version={{.Version}}
+      - -X github.com/LaProgrammerie/asagiri/application/internal/version.Commit={{.Commit}}
+      - -X github.com/LaProgrammerie/asagiri/application/internal/version.Date={{.Date}}
+
+archives:
+  - id: default
+    ids:
+      - asa
+    format_overrides:
+      - goos: windows
+        formats:
+          - zip
+    files:
+      - LICENSE
+      - README.md
+
+checksum:
+  name_template: checksums.txt
+
+snapshot:
+  version_template: "{{ incpatch .Version }}-next"
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^chore:"
+
+release:
+  github:
+    owner: LaProgrammerie
+    name: asagiri
+  draft: false
+  prerelease: auto
+
+brews:
+  - name: asagiri
+    repository:
+      owner: LaProgrammerie
+      name: homebrew-tap
+      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
+    directory: Formula
+    homepage: "https://github.com/LaProgrammerie/asagiri"
+    description: "Deterministic orchestration for AI coding workflows"
+    license: "Apache-2.0"
+    test: |
+      system "#{bin}/asagiri", "version"
+    install: |
+      bin.install "asa" => "asagiri"

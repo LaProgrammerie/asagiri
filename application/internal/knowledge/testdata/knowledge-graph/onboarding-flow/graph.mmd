@@ -1,0 +1,13 @@
+graph TD
+  action_invite_member[action\ninvite_member]
+  api_operation_POST_invitations[api_operation\nPOST /invitations]
+  event_member_invited[event\nmember.invited]
+  flow_onboarding[flow\nonboarding]
+  symbol_InvitationService_invite[symbol\nInvitationService::invite]
+  test_InvitationServiceTest[test\nInvitationServiceTest]
+  symbol_InvitationService_invite -->|emits (0.85)| event_member_invited
+  action_invite_member -->|implements (0.87)| symbol_InvitationService_invite
+  api_operation_POST_invitations -->|implements (0.87)| symbol_InvitationService_invite
+  action_invite_member -->|requires (0.91)| api_operation_POST_invitations
+  flow_onboarding -->|requires (0.95)| action_invite_member
+  symbol_InvitationService_invite -->|tests (0.90)| test_InvitationServiceTest

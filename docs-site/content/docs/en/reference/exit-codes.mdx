@@ -1,0 +1,41 @@
+---
+title: Exit codes
+description: CLI exit behavior on success and failure.
+---
+
+# Exit codes
+
+Asagiri follows idiomatic Go/Cobra exit semantics so shell scripts and CI gates can branch on `$?` without custom wrappers.
+
+| Code | Meaning |
+| --- | --- |
+| **0** | Command completed without error |
+| **1** | General error (`RunE` returned error — config, git, workflow, budget block, agent failure) |
+| **2** | Cobra usage error (unknown flag, wrong arity) — typical for malformed invocations |
+
+## Examples
+
+The samples illustrate the distinction between usage failures (exit **2**), happy paths (exit **0** on `doctor` or a successful estimate-only run), and operational failures (budget or validation errors surface as exit **1** with stderr context).
+
+```bash
+asa work                    # exit 2 — missing required instruction arg
+asa doctor                  # exit 0 when all checks pass
+asa work "x" --estimate-only # exit 0 when estimate succeeds
+```
+
+Budget blocks and validation failures surface as **exit 1** with stderr message.
+
+## Scripts
+
+Combine with `||` in shell scripts, and remember `--dry-run` when you only want to validate wiring in CI without failing because an agent binary is absent.
+
+```bash
+asa verify my-feature || echo "verify failed"
+```
+
+Use `--dry-run` in CI to avoid non-zero exits from missing agents when only testing orchestration scaffolding.
+
+## Related
+
+- [CLI overview](/docs/cli)
+- [Failure recovery](/docs/workflows/failure-recovery)

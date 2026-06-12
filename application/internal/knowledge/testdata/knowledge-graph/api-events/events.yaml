@@ -1,0 +1,4 @@
+version: v1
+events:
+  - name: workspace.created
+  - name: member.invited

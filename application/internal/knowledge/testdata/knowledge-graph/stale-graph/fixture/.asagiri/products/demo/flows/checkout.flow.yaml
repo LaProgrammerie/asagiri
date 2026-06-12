@@ -1,0 +1,6 @@
+id: checkout
+title: Checkout flow
+steps:
+  - id: pay
+    action: process_payment
+    contract_ref: "POST /payments"

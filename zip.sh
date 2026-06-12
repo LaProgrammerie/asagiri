@@ -1,0 +1,63 @@
+#!/bin/bash
+
+rm -f asagiri-audit.zip
+
+zip -r asagiri-audit.zip . \
+  -x ".git/*" \
+  -x "*/.git/*" \
+  -x "vendor/*" \
+  -x "*/vendor/*" \
+  -x "node_modules/*" \
+  -x "*/node_modules/*" \
+  -x ".next/*" \
+  -x "*/.next/*" \
+  -x ".asagiri/*" \
+  -x "*/.asagiri/*" \
+  -x "dist/*" \
+  -x "*/dist/*" \
+  -x "build/*" \
+  -x "*/build/*" \
+  -x "coverage/*" \
+  -x "*/coverage/*" \
+  -x "tmp/*" \
+  -x "*/tmp/*" \
+  -x "logs/*" \
+  -x "*/logs/*" \
+  -x "exports/*" \
+  -x "*/exports/*" \
+  -x "products/*" \
+  -x "*/products/*" \
+  -x "artifacts/*" \
+  -x "*/artifacts/*" \
+  -x "out/*" \
+  -x "*/out/*" \
+  -x ".idea/*" \
+  -x "*/.idea/*" \
+  -x ".vscode/*" \
+  -x "*/.vscode/*" \
+  -x ".cursor/*" \
+  -x "*/.cursor/*" \
+  -x ".kiro/cache/*" \
+  -x "*/.kiro/cache/*" \
+  -x ".claude/*" \
+  -x "*/.claude/*" \
+  -x ".cache/*" \
+  -x "*/.cache/*" \
+  -x ".terraform/*" \
+  -x "*/.terraform/*" \
+  -x ".DS_Store" \
+  -x "*/.DS_Store" \
+  -x "*.log" \
+  -x "*.sqlite" \
+  -x "*.sqlite3" \
+  -x "*.db" \
+  -x "*.db-shm" \
+  -x "*.db-wal" \
+  -x "*.tmp" \
+  -x "bin/*" \
+  -x "*/bin/*" \
+  -x "*.lock" \
+  -x "*.tsbuildinfo" \
+  -x "*/.source/*" \
+  -x "*.tfstate*"
+

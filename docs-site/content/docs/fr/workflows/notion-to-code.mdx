@@ -1,0 +1,79 @@
+---
+title: Notion → spec local → work
+description: Synchroniser Notion avec specs locales et n’exécuter que sur instantanés.
+---
+
+# Notion → spec local → work
+
+## Principe
+
+**Notion n’est jamais la source d’exécution.** Asagiri s’appuie toujours sur un **instantané local** sous `.asagiri/specs/` (ou les chemins `sources.local.paths`). La synchro ramène ce qui vit côté cloud ; `work` lit ensuite fichiers synchronisés et état SQLite.
+
+Les parties prenantes produit peuvent donc garder Notion comme atelier alors que l’ingénierie rejoue des runs à partir de clichés fichier immutables — ce découpage évite les mauvaises surprises lorsque l’équipe métier renomme des propriétés ou réordonne une base sans prévenir engineering.
+
+<Callout type="experimental">
+Sync Notion requiert config + PAT valides. Traitez l’outil comme expérimentalement sensible tant votre cartographie Workspace n’a pas été validée.
+</Callout>
+
+## Configurer Notion
+
+YAML reflète le schéma canonique : activez le connecteur, nommez la variable d’environnement du PAT, rattachez l’identifiant de base de données des specs et pointez l’import par défaut vers `.asagiri/specs` (vous pouvez le personnaliser ailleurs).
+
+```yaml
+sources:
+  notion:
+    enabled: true
+    token_env: NOTION_TOKEN
+    specs_database_id: "<your-database-id>"
+    import_path: .asagiri/specs
+```
+
+Exporter secret :
+
+```bash
+export NOTION_TOKEN="ntn_..."
+```
+
+## Synchroniser
+
+`sync notion` accepte des URL canoniques de page alors que **`sync all`** balaie ensemble toutes les sources encore actives, ce qui garde plusieurs flux auxiliaires cohérents.
+
+```bash
+asa sync notion --page "https://www.notion.so/..."
+# ou énumération + synchro combinée sources actives :
+asa sync all
+```
+
+Aperçu dry-run :
+
+```bash
+asa --dry-run sync notion --page "https://www.notion.so/..."
+```
+
+Mode interactif peut demander confirmation avant d’écraser une spec locale modifiée.
+
+## Exécuter depuis instantanés
+
+Liste + pipelines consultent encore `.asagiri/specs` après sync :
+
+```bash
+asa inbox --source notion
+asa work "develop billing-v2" --source notion
+```
+
+## Arbitrages
+
+| Gain | Risque |
+| --- | --- |
+| Source sympathique équipes métier sous Notion | Token exposée si imprudemment répétées commits |
+| Exécution offline possible après synchro succès | dérive propriétés Notion change schémas implicites |
+
+<Callout type="security">
+Ne commiter jamais `NOTION_TOKEN`. Utiliser `token_env` + secrets CI Logs masquent quelques motifs standards — confiance excessive interdite.
+</Callout>
+
+## Voir aussi
+
+- [Config Notion](/docs/fr/configuration/notion)
+- [CLI sync](/docs/fr/cli/generated/sync)
+- [CLI inbox](/docs/fr/cli/generated/inbox)

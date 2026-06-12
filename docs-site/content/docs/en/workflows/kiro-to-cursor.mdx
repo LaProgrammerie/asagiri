@@ -1,0 +1,84 @@
+---
+title: Kiro → Cursor → Verify
+description: Spec in Kiro, implement with Cursor, validate with project commands.
+---
+
+# Kiro → Cursor → Verify
+
+This handoff aligns **`spec-doc` §11.2** with Asagiri gates: authoring stays in **Kiro** (`.kiro/specs/<feature>/`), implementation happens wherever **Cursor** (or **`cursor-agent`**) excels, and the CLI enforces deterministic **`verify`**/**`review`** steps so automation cannot silently diverge.
+
+## When to use
+
+You keep requirements and tasks in **Kiro** (`.kiro/specs/<feature>/`) but want **Cursor** (or `cursor-agent`) for implementation, with mandatory verify/review steps.
+
+## Pipeline
+
+The sequence below is illustrative; downstream reporting still consumes persisted run identifiers.
+
+```mermaid
+flowchart LR
+  S[spec] --> P[plan]
+  P --> E[enrich]
+  E --> D[dev]
+  D --> V[verify]
+  V --> R[review]
+  R --> REP[report]
+```
+
+## Commands
+
+Replace `billing-v2` with your feature id:
+
+```bash
+asa spec billing-v2 --agent kiro
+asa plan billing-v2
+asa enrich billing-v2 --agent ollama
+asa dev billing-v2 --agent cursor
+asa verify billing-v2
+asa review billing-v2 --agent codex
+asa report <run-id>
+```
+
+Use `--dry-run` on any step while rehearsing:
+
+```bash
+asa dev billing-v2 --agent dev --dry-run
+```
+
+## Configuration defaults
+
+From `.asagiri/config.yaml.example` (logical agent ids; legacy tool-named agents still work):
+
+```yaml
+work:
+  default_spec_agent: laprogrammerie
+  default_agent: dev
+  default_reviewer: reviewer
+  default_enricher: local-rag
+  auto_verify: true
+  auto_review: false
+```
+
+Set `work.auto_review: true` only when you want review after every successful verify.
+
+## Intent shortcut
+
+```bash
+asa work "develop billing-v2" --stop-after verify
+```
+
+Intent resolution picks the feature; V3 pipeline applies budgets and context optimization.
+
+## Failure modes
+
+| Symptom | Fix |
+| --- | --- |
+| `kiro` not on PATH | Set `agents.kiro.command` or install Kiro CLI |
+| Verify fails | Fix tests locally; use `asa verify billing-v2 --force` only when state machine allows |
+| Dirty git blocked | Commit/stash or adjust `policies.require_clean_git` |
+
+## Related
+
+- [CLI: spec](/docs/cli/generated/spec)
+- [CLI: dev](/docs/cli/generated/dev)
+- [Architecture overview](/docs/architecture/overview)

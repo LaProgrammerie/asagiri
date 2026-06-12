@@ -1,0 +1,20 @@
+{
+  "title": "Konzepte",
+  "pages": [
+    "philosophy",
+    "mental-model",
+    "local-first",
+    "cost-aware-workflows",
+    "executable-product-layer",
+    "prototype-as-spec",
+    "runtime",
+    "investigation",
+    "analysis-layer",
+    "trust-engine",
+    "execution-graph",
+    "multi-agent-coordination",
+    "engineering-knowledge-graph",
+    "replay-engine",
+    "project-onboarding"
+  ]
+}

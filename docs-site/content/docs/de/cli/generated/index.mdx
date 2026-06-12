@@ -1,0 +1,31 @@
+---
+title: Generierte CLI-Referenz (Kurzfassungen)
+description: Deutsche Kurzseiten; vollständige Flag-Referenz auf Englisch.
+---
+
+# Generierte CLI-Referenz
+
+Die **vollständigen** Seiten (alle Befehle, mit Cobra synchronisiert) werden auf **Englisch** unter [`/docs/cli/generated`](/docs/cli/generated) gepflegt.
+
+Dieses Verzeichnis enthält **übersetzte Kurzfassungen** für die wichtigsten Befehle: Abschnitte „Wann einsetzen“ und „Fehlermodi“, plus Link zur englischen Detailseite.
+
+## Dokumentation neu generieren (Contributors)
+
+```bash
+go run ./application/cmd/asa docs generate-cli \
+  --output docs-site/content/docs/en/cli/generated
+```
+
+## Befehle mit Kurzseite
+
+- [work](./work)
+- [init](./init)
+- [doctor](./doctor)
+- [plan](./plan)
+- [dev](./dev)
+- [verify](./verify)
+- [estimate](./estimate)
+- [sync](./sync)
+- [continue](./continue)
+
+Alle anderen Befehle (`spec`, `review`, `inspect`, …) direkt in der [englischen Referenz](/docs/cli/generated).

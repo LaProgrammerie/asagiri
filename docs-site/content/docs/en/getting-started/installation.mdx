@@ -1,0 +1,121 @@
+---
+title: Installation
+description: Install Asagiri and prepare a repository for orchestrated AI workflows.
+---
+
+# Installation
+
+Asagiri is a Go CLI that ties together specs, local investigation, git worktrees, external coding agents, and validation commands. You get a single binary, point it at a repository, and the tool owns the lifecycle of runs, worktrees, and state on disk.
+
+## What Asagiri is / is not
+
+- **Not** another chat agent — a **local-first control plane** for AI-assisted development.
+- **Orchestrates** Cursor, Claude Code, Codex, Kiro, Ollama, and other CLIs you configure.
+- **Keeps** audit trails, ledger, replay, and policies **on your machine** — not in a mandatory cloud.
+
+## No account required
+
+No La Programmerie account, no quota, no mandatory cloud, no automatic upload of your runs.
+
+## Requirements
+
+| Requirement | Notes |
+| --- | --- |
+| **Go 1.25+** | Only if building from source |
+| **Git** | Required for worktrees, status checks, and diffs |
+| **Configured agents** | Commands on `PATH` referenced in `.asagiri/config.yaml` |
+
+Optional: **Ollama** for local enrichment; **Notion** token for optional sync (`NOTION_TOKEN`).
+
+## Homebrew (macOS / Linux) — recommended
+
+```bash
+brew tap LaProgrammerie/tap
+brew install asagiri
+asagiri version
+asagiri doctor
+```
+
+Formula `asagiri` is published to [LaProgrammerie/homebrew-tap](https://github.com/LaProgrammerie/homebrew-tap) on each release tag.
+
+On macOS, `/usr/bin/asa` is a system binary — Homebrew installs **`asagiri`**. Optional: `alias asa='asagiri'`. GitHub archives still contain a binary named `asa`.
+
+## Install script (macOS / Linux)
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/LaProgrammerie/asagiri/main/scripts/install.sh | bash
+```
+
+Pin a release: `ASAGIRI_VERSION=v1.0.0` (use any tag from [GitHub Releases](https://github.com/LaProgrammerie/asagiri/releases)).
+
+## Manual install (released binary)
+
+GoReleaser v2 archive pattern: `asa_<semver>_<os>_<arch>.tar.gz` — tag `v1.0.0` → `asa_1.0.0_darwin_arm64.tar.gz`.
+
+```bash
+VERSION=v1.0.0
+VER="${VERSION#v}"
+OS="$(uname -s | tr '[:upper:]' '[:lower:]')"
+case "$(uname -m)" in
+  x86_64|amd64) ARCH=amd64 ;;
+  arm64|aarch64) ARCH=arm64 ;;
+  *) echo "unsupported arch"; exit 1 ;;
+esac
+ARCHIVE="asa_${VER}_${OS}_${ARCH}.tar.gz"
+BASE="https://github.com/LaProgrammerie/asagiri/releases/download/${VERSION}"
+
+curl -fsSLO "${BASE}/checksums.txt"
+curl -fsSLO "${BASE}/${ARCHIVE}"
+grep " ${ARCHIVE}\$" checksums.txt | sha256sum -c -
+tar -xzf "${ARCHIVE}"
+install -m 755 asa "${HOME}/.local/bin/asa"
+export PATH="${HOME}/.local/bin:$PATH"
+asa version
+```
+
+Replace `VERSION` with the tag you need. On Windows, use `asa_${VER}_windows_<arch>.zip`.
+
+## Install from source
+
+```bash
+git clone https://github.com/LaProgrammerie/asagiri.git
+cd asagiri
+make build
+./bin/asa version
+```
+
+## Initialize a repository
+
+From your project root:
+
+```bash
+asa init
+asa doctor
+asa agents list
+asa agents sync --write
+```
+
+Creates `.asagiri/` (config, SQLite, runs, worktrees). Add `.asagiri/state.sqlite` and `.asagiri/worktrees/` to `.gitignore`.
+
+Guided alternative: `asa onboard`.
+
+## First run without cloud
+
+```bash
+export ASA_DRY_RUN=1
+asa work "explore my feature" --plan-only --yes
+```
+
+## Troubleshooting
+
+| Issue | Fix |
+| --- | --- |
+| `command not found` | Add install dir to `PATH` |
+| Doctor reports missing agent | Install the CLI or edit `config.yaml` |
+| Missing agent specs | `asa agents sync --write` |
+| Bad archive name | Match `asa_${VER}_${OS}_${ARCH}.tar.gz` to the release tag |
+
+## Next steps
+
+- [Quickstart](/docs/getting-started/quickstart)
+- [First workflow](/docs/getting-started/first-workflow)

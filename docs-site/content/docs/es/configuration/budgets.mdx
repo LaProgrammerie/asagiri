@@ -1,0 +1,54 @@
+---
+title: Presupuestos
+description: Topes de coste y tokens estimados por run, tarea y día.
+---
+
+# Presupuestos
+
+Los presupuestos dan techos previsibles de gasto y volumen de tokens estimados antes de que corran los agentes. Se implementan en `application/internal/cost/budget.go` y se aplican en el pipeline V3 antes de la ejecución de agentes, para que un run pueda parar o pedir confirmación en lugar de superar lo que consideras aceptable.
+
+El bloque YAML siguiente es la forma completa: moneda por defecto, topes por run y por tarea, tope diario agregado y flags de política que controlan bloqueo frente a anulación explícita.
+
+## Esquema
+
+```yaml
+budgets:
+  default_currency: EUR
+  per_run:
+    max_estimated_cost: 1.00
+    max_estimated_tokens: 500000
+    require_confirmation_above_cost: 0.20
+  per_task:
+    max_estimated_cost: 0.30
+    max_estimated_tokens: 150000
+  daily:
+    max_estimated_cost: 10.00
+  policies:
+    block_when_over_budget: true
+    allow_override_with_flag: true
+    override_flag: "--allow-over-budget"
+```
+
+## Interacción CLI
+
+Estos flags interactúan con los mismos números y políticas: apretar un run, salir tras solo estimación, o saltar un bloqueo cuando la política lo permita. `--yes` es la salida tras `BudgetPendingConfirmError` cuando ya revisaste la estimación.
+
+| Flag | Comportamiento |
+| --- | --- |
+| `--budget <EUR>` | Tope de run para esta invocación |
+| `--estimate-only` | Para tras estimar; sin gasto |
+| `--allow-over-budget` | Omite bloqueo si la política lo permite |
+| `--yes` | Acepta confirmación tras `BudgetPendingConfirmError` |
+
+## Limitaciones
+
+Las estimaciones multiplican conteos heurísticos de tokens por las tarifas de tu hoja `pricing`. Las facturas del proveedor pueden divergir, sobre todo si cambian tramos o facturan factores que Asagiri no modela.
+
+<Callout type="cost">
+Configura `pricing.models` con tarifas actuales. Precios a cero distorsionan el coste mostrado pero no desactivan topes de tokens.
+</Callout>
+
+## Relacionado
+
+- [Flujo consciente del coste](/docs/es/workflows/cost-aware-workflow)
+- [Estimación de tokens](/docs/es/cost-performance/token-estimation)

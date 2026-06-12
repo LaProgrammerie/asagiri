@@ -1,0 +1,24 @@
+{
+  "id": "graph-2026-05-29-test0002",
+  "product": "workspace-saas",
+  "flow": "workspace-onboarding",
+  "status": "planned",
+  "nodes": [
+    {
+      "id": "investigate-onboarding",
+      "type": "investigation",
+      "title": "Investigate onboarding"
+    },
+    {
+      "id": "verify-onboarding-flow",
+      "type": "validation",
+      "title": "Verify onboarding"
+    },
+    {
+      "id": "security-review",
+      "type": "validation",
+      "title": "Security review"
+    }
+  ],
+  "edges": []
+}

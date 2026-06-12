@@ -1,0 +1,67 @@
+---
+title: Mentales Modell
+description: Pipeline, Work-Gates und tägliche CLI-Befehle im Überblick.
+---
+
+# Mentales Modell
+
+Asagiri lässt sich am besten als **Pipeline** plus einige **read-only Helfer** verstehen, die den nächsten Schritt benennen. Nichts hier ändert das Workflow-Verhalten — es ist die Landkarte für den Alltag.
+
+## Pipeline
+
+Der Standard-Lieferpfad ist linear. Jeder Schritt hat eine CLI-Primitive; `asa work` führt die Kette mit menschlichen Meilensteinen dazwischen aus.
+
+```text
+spec → plan → enrich → dev → verify → review
+         ↑ Gates können zwischen Schritten pausieren
+```
+
+| Schritt | Typischer Befehl | Rolle |
+| --- | --- | --- |
+| Spec | `asa spec <feature>` | Spec und Tasks erfassen oder aktualisieren |
+| Plan | `asa plan <feature>` | Spec in ausführbare Tasks zerlegen |
+| Enrich | `asa enrich <feature> --task <id>` | Kontext (RAG, Docs) vor dem Coding anbinden |
+| Dev | `asa dev <feature> --task <id> --agent <agent>` | Implementierung in isoliertem Git-Worktree |
+| Verify | `asa verify <feature> --task <id>` | Ihre Validierungsbefehle (Tests, Linter) |
+| Review | `asa review <feature> --task <id> --agent <agent>` | Agent- oder Menschen-Review vor Merge |
+
+`asa work "<Absicht>"` mappt natürliche Sprache auf diese Pipeline. Einzelbefehle bleiben verfügbar — siehe [Geführter Pfad](/docs/de/guided-path).
+
+## Work-Gates
+
+**Gates** sind konfigurierbare Checkpoints auf der Work-Pipeline. Sie ersetzen keine Tests; sie protokollieren, ob ein Schritt erfüllt ist, bevor es weitergeht.
+
+Übliche Gates (wenn in `.asagiri/config.yaml` aktiv):
+
+| Gate | Blockiert wenn |
+| --- | --- |
+| `plan` | Plan fehlt oder abgelehnt |
+| `enrich` | Enrich vor `dev` nicht erfüllt |
+| `verify_evidence` | Verifikationsnachweise vor `review` unzureichend |
+| `human_review` | Explizite menschliche Freigabe nötig |
+
+Bei Blockade stoppt Asagiri mit einer **konkreten CLI** — meist `asa gates submit …` und dann `asa continue --yes`. `asa next` zeigt dieselbe Empfehlung read-only.
+
+Gates sind **orthogonal zu Trust**: Trust fasst Risiko aus Checks und Historie; Gates setzen Workflow-Policy durch.
+
+## Tägliche Befehle im Vergleich
+
+| Befehl | Ändert Zustand? | Wann |
+| --- | --- | --- |
+| [`asa work`](/docs/de/cli/generated/work) | Ja | Start oder Fortsetzung aus Absicht oder Feature-Slug |
+| [`asa continue`](/docs/de/cli/generated/continue) | Ja | Letztes aktives Feature nach Gate oder Unterbrechung |
+| [`asa next`](/docs/de/cli/generated/next) | Nein (`--execute` zum Ausführen) | Nächste empfohlene Primitive für aktives Feature |
+| [`asa trust …`](/docs/de/cli/generated/trust) | Nein | Vertrauens-Verdicts (Task, Feature, Run) |
+| [`asa doctor`](/docs/de/cli/generated/doctor) | Nein | Repo, Config, SQLite, Agents, optionale Onboarding-Checks |
+
+## Trust vs verify trust
+
+- **`asa trust`** — read-only **Work-Trust**-Report (Verdict, Risiken, Next Actions). In `next`, `status`, nach `work`.
+- **`asa verify trust <flow>`** — volle **Verification-Engine** (spec-my-B) für risikoreiche Lieferung.
+
+Siehe [Trust-Engine](/docs/de/concepts/trust-engine).
+
+## Weiterlesen
+
+- [Täglicher Workflow](/docs/de/workflows/daily-workflow)
+- [Geführter Pfad](/docs/de/guided-path)

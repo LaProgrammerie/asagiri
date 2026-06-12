@@ -1,0 +1,111 @@
+---
+title: Täglicher Workflow
+description: Feature starten, Gates entblocken, Trust und Doctor lesen.
+---
+
+# Täglicher Workflow
+
+Typischer Tag mit Asagiri: Arbeit starten, nächsten Schritt kennen, Gate-Blockaden verstehen, Trust und Doctor interpretieren.
+
+## 1. Feature starten
+
+```bash
+asa onboard
+asa ready
+asa work "CSV-Export für Billing" --plan-only
+asa work "CSV-Export für Billing" --yes
+```
+
+Oder mit bekanntem Slug: `asa work billing-v2 --yes`.
+
+## 2. Nächsten Schritt kennen
+
+```bash
+asa next
+asa next --feature billing-v2
+asa next --execute    # Empfehlung ausführen
+asa status
+```
+
+## 3. Gate-Blockaden
+
+### human_review ausstehend
+
+```text
+Gate human_review requires action.
+Next step:
+  asa gates submit human_review --task task-003 --verdict pass
+Then:
+  asa continue --yes
+```
+
+### verify_evidence fehlgeschlagen
+
+```bash
+asa next
+# Command: asa verify billing-v2 --task task-003 --force
+```
+
+## 4. Trust lesen
+
+| Scope | Befehl |
+| --- | --- |
+| Task | `asa trust task task-003` |
+| Feature | `asa trust feature billing-v2` |
+| Run | `asa trust run run-2026-06-06-abc` |
+
+Harmonisiert: `asa next --feature <feature>`.
+
+## 5. Doctor lesen
+
+```bash
+asa doctor
+asa doctor --full
+asa doctor --json
+asa doctor --full --strict   # CI: auch bei WARN scheitern
+```
+
+Exit: FAIL → 1 ; nur WARN → 0 ; WARN + `--strict` → 1.
+
+## 6. CI — persistente Reports (`--save`)
+
+Für Pipelines mit `jq` oder Archivierung von Trust/Doctor-Snapshots:
+
+| Stream | Inhalt |
+| --- | --- |
+| **stdout** mit `--json` | Genau ein JSON-Dokument (pipe-fähig) |
+| **stderr** mit `--save` | `Rapport enregistré : <pfad>` (Bestätigung) |
+
+```bash
+asa init
+asa doctor --full --strict --json --save 2>/dev/null
+echo $?   # 1 bei FAIL oder WARN im strict-Modus
+
+asa trust feature billing-v2 --json --save | jq -e '.score.verdict != "blocked"'
+```
+
+Gespeicherte Artefakte (atomisch bei `--save`):
+
+```text
+.asagiri/reports/doctor/latest.json
+.asagiri/reports/trust/tasks/<task-id>.json
+.asagiri/reports/trust/features/<feature>.json
+.asagiri/reports/trust/runs/<run-id>.json
+```
+
+Ohne `--save` bleibt stderr bei Erfolg leer. `--save` hängt keinen Klartext nach JSON an stdout.
+
+## Beispielszenarien
+
+### Gesundes Feature
+
+`asa next` empfiehlt `asa review …` wenn verify erledigt, Trust „Acceptable“.
+
+### doctor nur WARN
+
+`asa doctor --full` endet mit „Asagiri est prêt (avertissements).“ und Exit 0.
+
+## Weiterlesen
+
+- [Mentales Modell](/docs/de/concepts/mental-model)
+- [CI-Workflow](/docs/de/workflows/ci-workflow)

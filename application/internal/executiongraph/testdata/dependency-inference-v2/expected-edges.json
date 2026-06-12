@@ -1,0 +1,20 @@
+[
+  {
+    "from": "implement-click-get-started",
+    "to": "implement-invite-member",
+    "type": "requires",
+    "reason": "architecture projection"
+  },
+  {
+    "from": "investigate-onboarding",
+    "to": "implement-click-get-started",
+    "type": "requires",
+    "reason": "recent flow failure"
+  },
+  {
+    "from": "implement-invite-member",
+    "to": "trust-gate",
+    "type": "requires",
+    "reason": "public event change"
+  }
+]

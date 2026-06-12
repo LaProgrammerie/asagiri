@@ -1,0 +1,27 @@
+---
+title: Comando investigate
+description: Investigación local estructurada antes de la ejecución del agente.
+---
+
+# `asa investigate`
+
+Motor de investigación (`spec-my-A` §25).
+
+```bash
+asa investigate "por qué falla el onboarding tras la invitación"
+asa investigate "tests" --from-failed-tests --no-cloud
+asa investigate graph <investigation-id>
+asa investigate impact --flow onboarding --change "hacer invitaciones asíncronas"
+```
+
+## Integración
+
+```bash
+asa work "…" --investigate-first --investigation-depth deep
+asa work "…" --investigate-on-failure
+asa verify <feature> --investigate-on-failure
+```
+
+## Artefactos
+
+En `.asagiri/investigations/<id>/`: `report.md`, `context-pack.md`, `replay-pack.json`, `graph.json`.

@@ -1,0 +1,38 @@
+---
+title: Sécurité MCP
+description: Modèle de menace et durcissement du serveur MCP local.
+---
+
+# Sécurité MCP
+
+Traitez le serveur MCP comme tout autre point d’entrée d’automatisation locale : il hérite de votre identité utilisateur, de votre checkout et des outils qu’Asagiri a compilés.
+
+## Modèle de menace
+
+Le processus tourne **sous votre utilisateur** avec un accès complet au dépôt. Tout client attaché au même pipe stdio peut invoquer les outils enregistrés tant que MCP reste activé ou la connexion ouverte — le protocole n’emballe pas un second mot de passe.
+
+## Défauts (prudents)
+
+À l’origine MCP reste désactivé, les réponses et durées sont plafonnées, et les outils d’investigation refusent une courte liste de chemins évidents vers des secrets via `secret_path_denylist`. Ces réglages limitent les fuites accidentelles ; ce n’est pas un périmètre de sandbox fort.
+
+- `mcp.enabled: false`
+- Plafonds sortie et timeout
+- `secret_path_denylist` évite les lectures évidentes de secrets dans investigation
+
+## Recommandations
+
+N’employez MCP que sur des machines sous votre contrôle physique et dont vous jugez déjà les extensions d’éditeur fiables. Évitez de multiplexer stdio via tmux partagés ou shells distants tant que vous n’avez pas vu qui d’autre peut s’y brancher. Étendez `secret_path_denylist` dès que le dépôt contient des clés au-delà des exemples livrés. Enfin `policies.allow_network: false` empêche les agents de sortir réseau — MCP reste local, mais ces politiques réduisent la surface après un appel d’outil réussi.
+
+1. Activer MCP seulement sur des machines dignes de confiance
+2. Ne pas exposer stdio à des terminaux ou sessions distantes partagées sans contrôle clair des identités possibles
+3. Tenir `secret_path_denylist` alignée sur votre repo (`.env`, clés, identifiants)
+4. Associer avec `policies.allow_network: false` quand les agents doivent rester hors ligne — comprenez que MCP lui-même est local
+
+<Callout type="security">
+MCP ne bac à sable pas les implémentations d’outils. Les éditeurs connectés méritent votre confiance totale.
+</Callout>
+
+## Voir aussi
+
+- [Synthèse sécurité](/docs/fr/security)
+- [Vue MCP](/docs/fr/mcp/overview)

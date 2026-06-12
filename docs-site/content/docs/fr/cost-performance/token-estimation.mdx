@@ -1,0 +1,45 @@
+---
+title: Estimation de jetons
+description: Comptages heuristiques de jetons et tarification pour l’affichage des coûts avant exécution.
+---
+
+# Estimation de jetons
+
+L’implémentation se trouve dans `application/internal/cost/token_counter.go` et `estimator.go`. L’estimateur sert pour qu’Asagiri affiche des ordres de grandeur de **tokens et de coût** avant de lancer des agents — utile pour comparer aux budgets et journaliser grossièrement ce qu’un plan présageait, sans prétendre être l’API de facturation d’un hébergeur.
+
+## Fonctionnement
+
+Le flux est déterministe : mesurer des volumes de caractères pour fichiers ou morceaux de texte, classer chaque segment par extension en nature de contenu (`code`, `markdown`, `json`, `default`), puis diviser par les `token_estimation.*_chars_per_token` configurés et arrondir au supérieur.
+
+```yaml
+token_estimation:
+  default_chars_per_token: 4.0
+  code_chars_per_token: 3.2
+  markdown_chars_per_token: 4.2
+  json_chars_per_token: 3.6
+```
+
+## Affichage des coûts
+
+Les jetons estimés sont multipliés par les taux `pricing.models.<model-id>` pour produire un montant estimé en EUR — ou tout ce que déclare `budgets.default_currency`. C’est une multiplication transparente depuis votre YAML, pas une grille cachée dans le binaire.
+
+<Callout type="cost">
+**Pas exact au tokenizer du fournisseur.** OpenAI, Anthropic et Google facturent avec leurs jetoniseurs propres. Traitez ces chiffres comme des garde-fous d’ordre de grandeur.
+</Callout>
+
+## Commandes
+
+```bash
+asa estimate billing-v2 --task task-003
+asa work "develop billing-v2" --estimate-only
+asa cost billing-v2
+```
+
+## Tests golden
+
+La forme de l’estimateur est figée par des tests golden dans `application/internal/cost/`. Ne mettez à jour les fichiers golden avec `UPDATE_GOLDEN=1` que lorsque vous changez intentionnellement les algorithmes — sinon vous risquez de masquer des régressions sur la taille des prompts ou le coût.
+
+## Voir aussi
+
+- [Budgets](/docs/fr/configuration/budgets)
+- [Optimisation du contexte](/docs/fr/cost-performance/context-optimization)

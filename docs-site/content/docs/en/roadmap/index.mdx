@@ -1,0 +1,37 @@
+---
+title: Roadmap
+description: Delivered features, consolidation work, and prioritized next steps.
+---
+
+# Roadmap
+
+The authoritative ordering and narrative live in **[ROADMAP.md](https://github.com/LaProgrammerie/asagiri/blob/main/ROADMAP.md)** beside the code; this page is a reader-friendly mirror for the docs site.
+
+## Delivered (V1 → V3)
+
+Shipped work spans core CLI workflows — `init`, `spec`, `plan`, `dev`, `verify`, and `review` backed by worktrees and SQLite — plus the natural-language intent surface (`work`, `continue`, `next`) with Notion sync, and the cost or observability stack around `estimate`, `investigate`, `context`, `cost`, MCP, the TUI, and metrics.
+
+## In progress (consolidation)
+
+Active housekeeping focuses on consolidation audits under `docs/consolidation/`, landing the public docs site you are reading with its generated CLI reference, and OSS readiness items such as Apache 2.0 licensing, `CONTRIBUTING`, and curated examples.
+
+## Prioritized next
+
+The table is a coarse priority stack — execution order still follows discussion in `docs/consolidation/TODO-prioritized.md`.
+
+| Priority | Item |
+| --- | --- |
+| P0 | Coverage `workflow` / `intent/executor` > 50% |
+| P0 | Provider-exact tokenizers |
+| P1 | Persistent context pack cache between runs |
+| P1 | Full GitHub Actions CI (test, lint, release) |
+| P2 | Interactive bubbletea TUI |
+| P2 | Vector embeddings RAG |
+| P3 | Multi-repo / remote state |
+
+Detail: `docs/consolidation/TODO-prioritized.md`.
+
+## Related
+
+- [Contributing](/docs/contributing)
+- [Limits](/docs/security/limits)

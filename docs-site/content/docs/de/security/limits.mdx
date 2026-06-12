@@ -1,0 +1,45 @@
+---
+title: Grenzen
+description: Was Asagiri nicht garantiert und bekannte Produktgrenzen.
+---
+
+# Grenzen
+
+Asagiri hilft, disziplinierte Automatisierung aufzubauen; es erbt aber dieselben sensible Stellen wie jeder Orchestrator über großen Sprachmodellen. Die folgenden Abschnitte formulieren die **Vertrauensgrenzen**, die auch **`spec-doc` §17.1** festhält — klare Verneinungen neben dem, worauf Sie sich realistisch verlassen können.
+
+## Was Asagiri nicht leistet
+
+- **Korrektheit** generierten Codes garantieren
+- **Ihre Testsuite ersetzen** — Validierung führt nur die von Ihnen konfigurierten Befehle aus; Sie beheben weiterhin Fehler
+- **Menschliche Review** für Sicherheit, Compliance oder Architektur ablösen
+- **Jede Prompt-Injection verhindern** — bösartige Specs oder Notion-Inhalte können Agenten beeinflussen
+- **Abrechnungen so genau wie die Tokenizer der Anbieter** vorhersagen
+- **Betriebs-SLAs** über eine OSS-Orchestrierungs-CLI hinaus versprechen
+
+Ehrliche Grenzen helfen Teams, manuelle Prüfungen dort zu platzieren, wo deterministische Werkzeuge an ihre Grenzen stoßen.
+
+## Was es dennoch tut
+
+- Eine **Zustandsmaschine** für Pipeline-Schritte durchsetzen
+- Aufgaben per **Git-Worktrees** isolieren
+- **Kosten und Tokens vor Läufen schätzen**
+- **Einige Policy-Verletzungen blockieren** (unsauberes Git, gefährliche Secret-Dateinamen, Budgetüberschreitungen)
+- **Läufe dokumentieren** (`report`, SQLite)
+
+Diese Punkte unterstützen **Workflow-Hygiene**; sie bedeuten nicht, dass jeder Patch nach grünen lokalen Tests produktionssicher ist.
+
+## Experimentelle Bereiche
+
+Separat in der Dokumentation gekennzeichnet — etwa die volle MCP-Oberfläche, Notion-Sync, automatische Feinjustierung der Kontextkompression, vollautomatisches Resume ohne `--dry-run` und vektorisches RAG.
+
+Funktionen mit diesem Kennzeichen können sich schneller ändern; sie gehören erst dann fest in Produktions-Runbooks, wenn Ihr Team Regressionen und Heuristiken bewusst akzeptiert.
+
+<Callout type="warning">
+Ein erfolgreiches `verify` bedeutet: Die konfigurierten Befehle sind mit Exit 0 beendet — nicht automatisch, dass die Änderung risikofrei ausgeliefert werden kann.
+</Callout>
+
+## Verwandtes
+
+- [Philosophie](/docs/de/concepts/philosophy)
+- [Sicherheitsübersicht](/docs/de/security)
+- [Roadmap](/docs/de/roadmap)

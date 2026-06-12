@@ -1,0 +1,49 @@
+---
+title: Kostenbewusste Workflows
+description: Token und Kosten vor der Ausführung schätzen; Budgets und Routing durchsetzen.
+---
+
+# Kostenbewusste Workflows
+
+## Problem
+
+Agentenläufe können Tokens verbrauchen, ohne dass sich der Umfang aus einer kurzen Aufgabenbeschreibung vorher ablesen lässt. Teams brauchen dennoch **Vorhersagen** vor dem ersten Aufruf, **Deckel** gegen Budgetüberläufe, die zuverlässig greifen, und **Routing**, das dort günstigere Ausführungswege wählt, wo die Aufgabenart keine teure Großbaustelle erfordert.
+
+## Asagiris Ansatz
+
+Vier Mechanismen — allesamt über die Konfiguration steuerbar:
+
+1. **Heuristische Token-Zählung:** Zeichen pro Textfragment, nach Art (Code, Markdown, JSON, Standard) klassifiziert, geteilt durch die Verhältnisse unter `token_estimation` in der YAML.
+2. **Preistabelle:** Manuelle Einträge in `pricing.models` für Cloud-Modelle — **keine** fest im Binary eingebauten Anbieterpreise.
+3. **Budgets:** Obergrenzen pro Lauf, pro Task und als Tagesaggregat, optional mit Bestätigungsschwellen.
+4. **Routing:** `routing.strategies` ordnet Schrittklassen lokale, schnelle Cloud- oder schwere Cloud-Profile zu.
+
+Typische CLI-Einstiege:
+
+```bash
+asa estimate billing-v2 --task task-003 --dry-run
+asa work "develop billing-v2" --estimate-only
+asa work "develop billing-v2" --budget 0.50 --allow-over-budget
+```
+
+<Callout type="cost">
+Schätzungen sind **ungefähre Größenordnungen**. Anbieter nutzen eigene Tokenizer; Asagiri ersetzt deren Abrechnung nicht Byte für Byte.
+</Callout>
+
+## Abwägungen
+
+| Hilft gegen | Ersetzt nicht |
+| --- | --- |
+| Überraschungen vor einem teuren `dev`-Schritt | Cent-genau vorhersagbare Rechnungen |
+| Policies über YAML-Budgets | Automatisches Nachziehen öffentlicher Listenpreise |
+| Nachvollziehbare Routing-Gründe | Optimale Modellwahl ohne Ihre Kanten in der Config |
+
+## Konfiguration
+
+Budgets, Routing und Feintuning der Schätzer verbinden Sie über [Budgets](/docs/de/configuration/budgets), [Routing](/docs/de/configuration/routing) und [Token-Schätzung](/docs/de/cost-performance/token-estimation).
+
+## Siehe auch
+
+- [Leitfaden: kostenbewusster Workflow](/docs/de/workflows/cost-aware-workflow)
+- [CLI: cost](/docs/cli/generated/cost)
+- [CLI: estimate](/docs/cli/generated/estimate)

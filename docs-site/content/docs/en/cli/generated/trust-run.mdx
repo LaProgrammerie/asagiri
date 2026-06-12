@@ -1,0 +1,54 @@
+---
+title: Trust Run · Asagiri CLI
+description: 'Agrège plan gate (run scope) et rapports task : score moyen, tasks blocked/risky.'
+---
+
+CLI path: **`asa trust run`**
+
+## When to use
+
+Orchestration commands coordinate higher-order Asagiri workloads such as ingestion, syncing, backlog triage, investigative passes, hydrated context payloads, coarse estimates, and workspace-specific automation.
+
+> Original CLI synopsis: Synthèse trust work gates pour un run (read-only)
+
+## Usage
+
+```bash
+asa trust run [flags]
+```
+
+## Options
+
+| Flag | Scope | Default | Description |
+| --- | --- | --- | --- |
+| `--dry-run` | Inherited | `false` | Simuler les exécutions sans lancer d'agent ni commandes externes |
+| `--explain` | Local | `false` | Afficher les scores numériques par task |
+| `--json` | Local | `false` | Sortie JSON du run trust report sur stdout |
+| `--save` | Local | `false` | Enregistrer le rapport JSON sous .asagiri/reports/trust/runs/ (confirmation sur stderr) |
+
+## Examples
+
+```bash
+asa trust run run-42
+  asa trust run run-42 --json
+  asa trust run run-42 --explain
+  asa trust run run-42 --save
+```
+
+## What happens internally
+
+- Hydrates contextual services resolved from **$PWD**, coordinating git-bound automation, ingestion pipelines, syncing, backlog triage, investigations, MCP hooks, contextual hydration, coarse estimates, and similar orchestrations for this subtree.
+
+## Failure modes
+
+- Cobra rejects unknown flags or arity mismatches before any repository side effects occur.
+- Asagiri cannot resolve scaffolding when the command is invoked outside an initialised checkout.
+- Downstream automation may fail whenever credentials, network endpoints, or cached prerequisites drift from expectations.
+
+## Related commands
+
+- [Trust Diff](./trust-diff.mdx)
+- [Trust Feature](./trust-feature.mdx)
+- [Trust Gates](./trust-gates.mdx)
+- [Trust Replay](./trust-replay.mdx)
+- [Trust Task](./trust-task.mdx)

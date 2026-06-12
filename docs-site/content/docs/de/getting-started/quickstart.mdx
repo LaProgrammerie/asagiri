@@ -1,0 +1,81 @@
+---
+title: Schnellstart
+description: Asagiri in unter zehn Minuten durchlaufen — mit Dry-Run-Sicherheit.
+---
+
+# Schnellstart
+
+Diese Anleitung führt in weniger als zehn Minuten durch den Kern von Asagiri. Alle Beispiele verwenden **`--dry-run`**: Sie sehen, wie sich eine Absicht in Plan und Kostenschätzung übersetzt, ohne externe Agenten oder Validierungs-Shells zu starten — ein sicherer Weg, Orchestrierung auf einem echten Repository-Layout zu erkunden.
+
+Wenn Ihnen der Ablauf vertraut ist und Agents sowie Validierung stehen, können Sie `--dry-run` bewusst weglassen.
+
+## 1. Bauen und initialisieren
+
+Ausgehend von einer gebauten Binärdatei und einem Projektbaum:
+
+```bash
+make build
+export PATH="$PWD/bin:$PATH"
+cd your-repo
+asa init
+asa doctor
+```
+
+`doctor` zeigt Lücken in der Konfiguration — etwa fehlende Agents oder MCP-Einstellungen — bevor ein vollständiger Lauf Zeit oder Tokens kostet.
+
+## 2. Workflow in natürlicher Sprache im Dry-Run
+
+`work` ist der oberste Einstieg in natürlicher Sprache. Die folgenden Befehle zeigen Planung und Schätzung ohne Nebenwirkungen auf den echten Agent-Lauf:
+
+```bash
+asa work "develop my-feature" --dry-run --plan-only
+asa work "develop my-feature" --dry-run --estimate-only
+```
+
+`--plan-only` löst die Absicht auf und gibt den Ausführungsplan aus. `--estimate-only` durchläuft die V3-Pipeline bis zur Kosten- und Kontextschätzung — **ohne** externe Agent-CLIs aufzurufen.
+
+## 3. Einzelne Pipeline-Schritte isoliert testen
+
+Mit einem Kiro-Spec-Ordner (z. B. `.kiro/specs/my-feature/`) können Sie jeden Schritt einzeln anstoßen:
+
+```bash
+asa plan my-feature --dry-run
+asa enrich my-feature --dry-run
+asa dev my-feature --dry-run
+asa verify my-feature --dry-run
+asa review my-feature --dry-run
+asa status --dry-run
+```
+
+Mit `--dry-run` laufen Orchestrierung und Logging lokal; echte Subprozesse von Agents werden nicht gestartet.
+
+## 4. Lauf-Berichte einsehen
+
+Nach einem Dry-Run-`work`, das bereits Metadaten angelegt hat:
+
+```bash
+asa status --dry-run
+asa report <run-id> --dry-run
+```
+
+Reports liegen unter `.asagiri/runs/<run-id>/report.md`, ergänzt durch JSON für Werkzeugketten.
+
+## Reale Ausführung
+
+Wenn die Konfiguration steht und Sie externe Prozesse akzeptieren:
+
+```bash
+asa work "develop my-feature" --estimate-only   # zuerst das Kosten-Gate
+asa work "develop my-feature"                   # Standard: geführte Bestätigung
+```
+
+`--estimate-only` ist eine wirtschaftliche Schwelle vor bezahlter Agent-Zeit. Der übliche `work`-Pfad fragt weiter nach Bestätigung, solange Sie nicht die in der CLI-Referenz beschriebenen nicht-interaktiven Flags setzen.
+
+<Callout type="warning">
+Dry-run simuliert die Orchestrierung; er sagt nichts über die Qualität der Agentenausgabe aus. Für echte Änderungen Projektvalidierung (`go test`, Linter, menschliche Review) durchführen.
+</Callout>
+
+## Weiterlesen
+
+- [Erster Workflow](/docs/de/getting-started/first-workflow)
+- [CLI-Referenz (generiert)](/docs/de/cli/generated)

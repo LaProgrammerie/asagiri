@@ -1,0 +1,79 @@
+---
+title: Notion → local spec → work
+description: Sync Notion pages to local specs; execute only from snapshots.
+---
+
+# Notion → local spec → work
+
+## Principle
+
+**Notion is never the execution source of truth.** Asagiri always works from a **local snapshot** under `.asagiri/specs/` (or paths in `sources.local.paths`). Sync pulls remote content; `work` reads local files and SQLite state.
+
+Product and design stakeholders can therefore keep authoring in Notion while engineering replay runs from immutable filesystem snapshots—a split that avoids surprise behaviour when editors rename properties or reorganize databases mid-flight.
+
+<Callout type="experimental">
+Notion sync requires configuration and a valid API token. Treat sync as experimental until your workspace mapping is validated.
+</Callout>
+
+## Configure Notion
+
+YAML mirrors the authoritative schema: enable the connector, declare which environment variable exposes the PAT, tie it to your specs database identifier, and point imports at `.asagiri/specs` (overridable elsewhere if your layout differs).
+
+```yaml
+sources:
+  notion:
+    enabled: true
+    token_env: NOTION_TOKEN
+    specs_database_id: "<your-database-id>"
+    import_path: .asagiri/specs
+```
+
+Export the token:
+
+```bash
+export NOTION_TOKEN="ntn_..."
+```
+
+## Sync
+
+`sync notion` can target a canonical page URL, while **`sync all`** fans out across every configured source so auxiliary streams stay coherent.
+
+```bash
+asa sync notion --page "https://www.notion.so/..."
+# or list + sync all enabled sources:
+asa sync all
+```
+
+Dry-run preview:
+
+```bash
+asa --dry-run sync notion --page "https://www.notion.so/..."
+```
+
+Interactive mode may prompt before overwriting a modified local spec.
+
+## Work from local snapshot
+
+Listing plus execution both consult the synced tree under `.asagiri/specs`:
+
+```bash
+asa inbox --source notion
+asa work "develop billing-v2" --source notion
+```
+
+## Trade-offs
+
+| Gain | Risk |
+| --- | --- |
+| PM-friendly source in Notion | Token exposure if committed |
+| Offline execution after sync | Schema drift if Notion properties change |
+
+<Callout type="security">
+Never commit `NOTION_TOKEN`. Use `token_env` and CI secrets. Logs redact common secret patterns.
+</Callout>
+
+## Related
+
+- [Notion configuration](/docs/configuration/notion)
+- [CLI: sync](/docs/cli/generated/sync)
+- [CLI: inbox](/docs/cli/generated/inbox)

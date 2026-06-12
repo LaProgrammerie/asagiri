@@ -1,0 +1,21 @@
+Summary
+─────
+  Verdict: À surveiller
+  Confiance limitée — vérifier les gates avant d'avancer.
+  Run: run-99  Feature: billing  Status: running
+  Tasks: 2
+
+Gates
+─────
+  plan (run)  OK
+    plan reviewed
+  task-r2  À surveiller  (implemented)
+
+Risks
+─────
+  • 1 task(s) bloquée(s) ou à surveiller
+
+Next actions
+─────
+  → asa next --feature billing
+    task-r2 — À surveiller (implemented)

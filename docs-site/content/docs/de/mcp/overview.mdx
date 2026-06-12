@@ -1,0 +1,49 @@
+---
+title: MCP-Übersicht
+description: Optionaler stdio-MCP-Server für Investigation- und Kontextwerkzeuge.
+---
+
+# MCP-Übersicht
+
+Für Editoren und Clients, die **stdio JSON-RPC** nach dem MCP-Modell sprechen, kann Asagiri einen kompakten Server in `application/internal/mcp` bereitstellen. Er ist absichtlich schmal gehalten: Tools auflisten, mit Begrenzungen aufrufen, strukturierte Ergebnisse zurückgeben — keine vollständige Remote-Agent-Plattform.
+
+<Callout type="experimental">
+MCP ist standardmäßig deaktiviert. Aktivieren Sie es nur in vertrauenswürdigen Umgebungen und nach Prüfung der Tool-Oberfläche.
+</Callout>
+
+## Aktivierung
+
+`mcp.enabled` setzen und Sicherheitsgrenzen wie Ausgabe- und Zeitlimits konfigurieren, bevor ein externer Client stdio verbindet.
+
+```yaml
+mcp:
+  enabled: true
+  max_output_bytes: 1048576
+  command_timeout_seconds: 120
+```
+
+## Server starten
+
+`asa mcp-serve` nutzt den stdio-Transport. Clients senden newline-getrenntes JSON und erwarten JSON-RPC `initialize`, `tools/list` und `tools/call`.
+
+```bash
+asa mcp-serve
+```
+
+Unterstützt werden `initialize`, `tools/list` und `tools/call` (newline-getrenntes JSON).
+
+## CLI-Hilfsbefehl
+
+`asa mcp` bündelt MCP-bezogene Unterbefehle für lokale Inspektion — ergänzen Sie das bei Bedarf mit den generierten Referenzseiten für exakte Flags.
+
+```bash
+asa mcp
+```
+
+Detail zu MCP-Befehlen: generierte Seiten [mcp](/docs/de/cli/generated/mcp) und [mcp-serve](/docs/de/cli/generated/mcp-serve).
+
+## Verwandtes
+
+- [MCP-Tools](/docs/de/mcp/tools)
+- [MCP-Sicherheit](/docs/de/mcp/security)
+- [Konfiguration: mcp](/docs/de/configuration/config-file#mcp)

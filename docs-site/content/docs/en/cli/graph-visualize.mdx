@@ -1,0 +1,32 @@
+---
+title: graph visualize
+description: Export an execution graph as Mermaid, JSON, DOT, or markdown.
+---
+
+# `asa graph visualize`
+
+Exports a persisted graph for documentation, review, or CI artefacts (`spec-my-C` §5.6).
+
+## Usage
+
+```bash
+asa graph visualize graph-2026-05-29-9307e4be --format mermaid
+asa graph visualize graph-2026-05-29-9307e4be --format json
+asa graph visualize graph-2026-05-29-9307e4be --format dot
+asa graph visualize graph-2026-05-29-9307e4be --format markdown
+```
+
+## Formats
+
+| Format | Use case |
+|--------|----------|
+| `mermaid` | Diagrams in docs or PRs (default) |
+| `json` | Machine processing |
+| `dot` | Graphviz rendering |
+| `markdown` | Human-readable node/edge tables |
+
+## Related
+
+- Generate graph: [`asa plan graph`](/docs/cli/plan-graph)
+- Explain plan: [`asa plan explain`](/docs/cli/plan-explain)
+- Concept: [Execution graph](/docs/concepts/execution-graph)

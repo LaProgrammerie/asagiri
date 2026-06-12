@@ -1,0 +1,11 @@
+Knowledge search: invite_member
+ID  Type  Name  Score
+─────────────────────
+> action:invite_member  action  invite_member  86%
+Actions
+- impact analyze: i
+- build context: c
+- open graph: g
+- explain relationship: e
+- search: /
+CLI: asa knowledge query "invite_member"

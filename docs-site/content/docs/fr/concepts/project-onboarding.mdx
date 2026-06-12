@@ -1,0 +1,34 @@
+---
+title: Onboarding projet
+description: Parcours guidé du template forké vers un dépôt Asagiri prêt.
+---
+
+# Onboarding projet
+
+L’**onboarding projet** prépare un template forké (Go, PHP/Castor, Node) pour que `asa work` et Mission Control fonctionnent sans édition manuelle de `config.yaml`.
+
+```
+asa onboard  →  détecte la stack  →  merge config  →  bootstrap docs  →  ready
+```
+
+## Ce que ça fait
+
+- Détecte les signaux de stack (`go.mod`, `castor.php`, `package.json`)
+- Fusionne les commandes de validation de façon idempotente (préserve une config custom)
+- Bootstrap `docs/ai/`, squelette Kiro, protégé par `--force-docs`
+- Produit un **score de readiness** via `asa ready`
+
+## Ce que ça ne fait pas
+
+- Générer automatiquement les features métier
+- Installer les binaires agents (détection + instructions seulement)
+
+## Parité CLI
+
+Chaque action onboarding TUI a un équivalent CLI documenté (ADR-027).
+
+## Voir aussi
+
+- [`asa onboard`](/docs/fr/cli/onboard)
+- [`asa ready`](/docs/fr/cli/ready)
+- [`asa doctor --full`](/docs/fr/cli/generated/doctor)

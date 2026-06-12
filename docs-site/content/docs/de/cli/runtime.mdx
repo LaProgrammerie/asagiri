@@ -1,0 +1,68 @@
+---
+title: Runtime-Befehle
+description: Persistente lokale Runtime, Daemon, Sessions, Events und Memory.
+---
+
+# Runtime-Befehle
+
+Die Runtime-Schicht (`spec-my-A` §24) ergänzt eine **local-first** persistente Engineering-Umgebung über der stateless CLI.
+
+## Daemon
+
+```bash
+asa daemon start
+asa daemon start --detach
+asa daemon run
+asa daemon status
+asa daemon status --rich
+asa daemon stop
+```
+
+## Sessions und Branches
+
+```bash
+asa session create onboarding-redesign --product workspace-saas --flow onboarding
+asa session list
+asa session attach onboarding-redesign
+asa session branch onboarding-redesign --name onboarding-enterprise
+asa session graph
+```
+
+## Events
+
+```bash
+asa runtime events
+asa runtime events --follow
+```
+
+## Memory
+
+```bash
+asa memory list
+asa memory list --query "onboarding failure"
+asa memory consolidate
+```
+
+## Skills
+
+```bash
+asa skills list
+```
+
+## Lokale API
+
+```bash
+asa runtime serve --port 8765
+asa runtime serve --socket .asagiri/runtime/runtime.sock
+```
+
+Siehe [runtime serve](/docs/de/cli/runtime-serve).
+
+## SDK
+
+Go: `asagiri.Connect` / `ConnectHTTP` — TypeScript: [SDK](/docs/de/reference/typescript-sdk).
+
+## Siehe auch
+
+- [investigate](/docs/de/cli/investigate)
+- [Executable Product Layer](/docs/de/concepts/executable-product-layer)

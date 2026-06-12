@@ -1,0 +1,45 @@
+---
+title: Estimación de tokens
+description: Recuentos heurísticos de tokens y tarifación para vistas de coste previas al run.
+---
+
+# Estimación de tokens
+
+La implementación vive en `application/internal/cost/token_counter.go` y `estimator.go`. El estimador permite mostrar órdenes de magnitud de **tokens y coste** antes de invocar agentes — útil para confrontar los presupuestos y registrar con qué trabajo implicaba grosso modo un plan, sin pretender ser la API de facturación de un proveedor alojado.
+
+## Cómo funciona
+
+El flujo es determinista : medir caracteres por ficheros o trozos de texto, clasificar cada porción por extensión en tipo de contenido (`code`, `markdown`, `json`, `default`), dividir por los valores `token_estimation.*_chars_per_token` configurados y redondear hacia arriba.
+
+```yaml
+token_estimation:
+  default_chars_per_token: 4.0
+  code_chars_per_token: 3.2
+  markdown_chars_per_token: 4.2
+  json_chars_per_token: 3.6
+```
+
+## Visualización del coste
+
+Los tokens estimados se multiplican por las tarifas `pricing.models.<model-id>` para obtener un EUR aproximado — o cualquier moneda declarada por `budgets.default_currency`. Esa multiplicación es matemática YAML transparente de su lado, no una tabla oculta en el binario.
+
+<Callout type="cost">
+**No exacto al tokenizer del proveedor.** OpenAI, Anthropic y Google facturan con tokenizadores propios. Use los números como parachoques de magnitud.
+</Callout>
+
+## Comandos
+
+```bash
+asa estimate billing-v2 --task task-003
+asa work "develop billing-v2" --estimate-only
+asa cost billing-v2
+```
+
+## Tests golden
+
+La forma del estimador está fijada con tests golden en `application/internal/cost/`. Actualice goldens solo con `UPDATE_GOLDEN=1` cuando altere conscientemente los algoritmos — si no podría enmascarar regresiones en dimensionado de prompts o cómputo de costes.
+
+## Relacionado
+
+- [Budgets](/docs/es/configuration/budgets)
+- [Optimización de contexto](/docs/es/cost-performance/context-optimization)

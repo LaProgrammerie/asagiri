@@ -1,0 +1,43 @@
+---
+title: Modèles locaux
+description: Quand préférer les agents locaux et comment le routage les sélectionne.
+---
+
+# Modèles locaux
+
+« Local » désigne ici **des modèles que vous servez sur la même machine ou sur le LAN**, en général via Ollama. Dans `models`, les profils locaux portent typiquement un coût marginal nul (`input_cost_per_1m_tokens: 0` / `output_cost_per_1m_tokens: 0`) afin que le routage conscient des coûts puisse les préférer lorsque la classe d’étape le permet.
+
+## Quand les utiliser
+
+Les modèles locaux excellent lorsque la latence vers une API cloud est gênante ou que vous voulez une dépense bornée : classification d’intention et de tâche, enrichissement de spec avant une passe `dev` cloud, triage de journaux, et pré-revue légère sont des cas typiques. Ils répondent aussi par défaut aux arbres isolés du réseau ou aux dépôts où chaque centime et chaque octet sortant comptent.
+
+- Classifier intentions et tâches
+- Enrichir les specs avant un `dev` cloud
+- Analyser des journaux et faire une pré-revue
+- Dépôts air-gap ou sensibles au coût
+
+## Activer en local
+
+Branchez `agents.ollama` (ou un autre protocole local que vous configurez), ajoutez un profil `models` avec `class: local`, étendez `routing.prefer_local_for` avec les classes d’étapes que vous voulez garder sur la machine, et utilisez `--prefer-local` ou `--no-cloud` sur `work` lorsqu’il vous faut une contrainte ponctuelle sans modifier le YAML.
+
+1. Configurer `agents.ollama` et un profil `models` avec `class: local`
+2. Définir les classes d’étape dans `prefer_local_for`
+3. Lancer avec `--prefer-local` ou `--no-cloud` sur `work`
+
+```bash
+asa work "add logging" --prefer-local --estimate-only
+```
+
+## Limites
+
+Les poids locaux sont plus petits et les fenêtres de contexte plus courtes ; les gros refactorings ou les revues sensibles sur le plan sécurité peuvent encore exiger un profil cloud. Lorsque `use_cloud_heavy_for` correspond et que vous passez `--allow-cloud`, le routage peut escalader après les seuils d’échec configurés — vérifiez les nombres de votre stratégie avant de supposer qu’une commande est restée entièrement locale.
+
+<Callout type="local-first">
+Le paradigme local-first réduit coût et fuite d’information ; il ne remplace pas la validation ni la revue humaine sur les chemins critiques.
+</Callout>
+
+## Pour aller plus loin
+
+- [Ollama](/docs/fr/agents/ollama)
+- [Concepts local-first](/docs/fr/concepts/local-first)
+- [Routage](/docs/fr/configuration/routing)

@@ -1,0 +1,33 @@
+---
+title: Comandos prototype
+description: Crear, ejecutar y parchear prototipos clicables locales.
+---
+
+# Comandos prototype
+
+`asa prototype` gestiona prototipos locales en `.asagiri/products/<product>/prototype`.
+
+## Crear
+
+```bash
+asa prototype create "SaaS de workspaces con invitaciones" --product workspace-saas
+```
+
+## Ejecutar
+
+```bash
+asa prototype run workspace-saas
+```
+
+## Parchear
+
+```bash
+asa prototype patch workspace-saas "Agregar onboarding de 3 pasos"
+```
+
+## Guardrails
+
+- sin lectura de secretos;
+- sin lectura de `.env`;
+- sin escritura fuera del directorio de producto;
+- sin instalar dependencias sin confirmación.

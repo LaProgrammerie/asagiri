@@ -1,0 +1,39 @@
+# Example Homebrew formula shape (generated automatically by GoReleaser).
+# Published to: https://github.com/LaProgrammerie/homebrew-tap/tree/main/Formula
+#
+# brew tap LaProgrammerie/tap
+# brew install asa
+
+class Asa < Formula
+  desc "Deterministic orchestration for AI coding workflows"
+  homepage "https://github.com/LaProgrammerie/asagiri"
+  version "0.1.0"
+
+  on_macos do
+    if Hardware::CPU.arm?
+      url "https://github.com/LaProgrammerie/asagiri/releases/download/v0.1.0/asa_Darwin_arm64.tar.gz"
+      sha256 "REPLACE_ME"
+    else
+      url "https://github.com/LaProgrammerie/asagiri/releases/download/v0.1.0/asa_Darwin_x86_64.tar.gz"
+      sha256 "REPLACE_ME"
+    end
+  end
+
+  on_linux do
+    if Hardware::CPU.arm?
+      url "https://github.com/LaProgrammerie/asagiri/releases/download/v0.1.0/asa_Linux_arm64.tar.gz"
+      sha256 "REPLACE_ME"
+    else
+      url "https://github.com/LaProgrammerie/asagiri/releases/download/v0.1.0/asa_Linux_x86_64.tar.gz"
+      sha256 "REPLACE_ME"
+    end
+  end
+
+  def install
+    bin.install "asa"
+  end
+
+  test do
+    assert_match version.to_s, shell_output("#{bin}/asa version")
+  end
+end

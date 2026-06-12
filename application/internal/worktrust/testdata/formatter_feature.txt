@@ -1,0 +1,18 @@
+Summary
+─────
+  Verdict: À surveiller
+  Confiance limitée — vérifier les gates avant d'avancer.
+  Feature: onboarding  Tasks: 2
+
+Gates
+─────
+  task-bad  Bloqué  (planned)
+
+Risks
+─────
+  1 task(s) bloquée(s) ou à surveiller
+
+Next actions
+─────
+  → asa next --feature onboarding
+    task-bad — Bloqué (planned)

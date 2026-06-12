@@ -1,0 +1,106 @@
+---
+title: Doctor · Asagiri CLI
+description: Vérifier l'environnement et la configuration
+---
+
+CLI path: **`asa doctor`**
+
+## When to use
+
+Bootstrap commands scaffold or reconcile the Asagiri working tree so subsequent workflow nodes can reliably resolve configuration and repository metadata.
+
+> Original CLI synopsis: Vérifier l'environnement et la configuration
+
+## Usage
+
+```bash
+asa doctor [flags]
+```
+
+## Options
+
+| Flag | Scope | Default | Description |
+| --- | --- | --- | --- |
+| `--dry-run` | Inherited | `false` | Simuler les exécutions sans lancer d'agent ni commandes externes |
+| `--full` | Local | `false` | Inclure checks onboarding (gitignore, agents, docs, kiro) |
+| `--json` | Local | `false` | Sortie JSON du rapport doctor sur stdout |
+| `--save` | Local | `false` | Enregistrer le rapport JSON sous .asagiri/reports/doctor/latest.json (confirmation sur stderr) |
+| `--strict` | Local | `false` | Code de sortie non nul si des avertissements sont présents |
+
+## Examples
+
+```bash
+asa init
+  asa doctor
+  asa doctor --full
+  asa doctor --json
+  asa doctor --full --strict
+  asa doctor --save
+```
+
+## What happens internally
+
+- Probes requisite binaries and configuration coherence—including MCP switches and caches—to surface actionable diagnostics before workflows run hot.
+
+## Failure modes
+
+- Cobra rejects unknown flags or arity mismatches before any repository side effects occur.
+- Asagiri cannot resolve scaffolding when the command is invoked outside an initialised checkout.
+- Downstream automation may fail whenever credentials, network endpoints, or cached prerequisites drift from expectations.
+
+## Related commands
+
+- [Agents](./agents.mdx)
+- [Analysis](./analysis.mdx)
+- [Architecture](./architecture.mdx)
+- [Clean](./clean.mdx)
+- [Completion](./completion.mdx)
+- [Context](./context.mdx)
+- [Continue](./continue.mdx)
+- [Contracts](./contracts.mdx)
+- [Cost](./cost.mdx)
+- [Daemon](./daemon.mdx)
+- [Dashboard](./dashboard.mdx)
+- [Dev](./dev.mdx)
+- [Docs](./docs.mdx)
+- [Enrich](./enrich.mdx)
+- [Estimate](./estimate.mdx)
+- [Explain](./explain.mdx)
+- [Flow](./flow.mdx)
+- [Flows](./flows.mdx)
+- [Gates](./gates.mdx)
+- [Graph](./graph.mdx)
+- [Help](./help.mdx)
+- [Impact](./impact.mdx)
+- [Inbox](./inbox.mdx)
+- [Index](./index.mdx)
+- [Init](./init.mdx)
+- [Inspect](./inspect.mdx)
+- [Investigate](./investigate.mdx)
+- [Knowledge](./knowledge.mdx)
+- [Mcp](./mcp.mdx)
+- [Memory](./memory.mdx)
+- [Mission](./mission.mdx)
+- [Next](./next.mdx)
+- [Onboard](./onboard.mdx)
+- [Plan](./plan.mdx)
+- [Pr](./pr.mdx)
+- [Product](./product.mdx)
+- [Prototype](./prototype.mdx)
+- [Ready](./ready.mdx)
+- [Replay](./replay.mdx)
+- [Report](./report.mdx)
+- [Resume](./resume.mdx)
+- [Review](./review.mdx)
+- [Runs](./runs.mdx)
+- [Runtime](./runtime.mdx)
+- [Session](./session.mdx)
+- [Skills](./skills.mdx)
+- [Spec](./spec.mdx)
+- [Status](./status.mdx)
+- [Sync](./sync.mdx)
+- [Tools](./tools.mdx)
+- [Trust](./trust.mdx)
+- [Verify](./verify.mdx)
+- [Version](./version.mdx)
+- [Work](./work.mdx)

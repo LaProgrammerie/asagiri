@@ -1,0 +1,49 @@
+---
+title: Investigation locale
+description: Grep et parcours filesystem bornés avant les appels agents cloud.
+---
+
+# Investigation locale
+
+Avant qu’Asagiri ne transmette du contexte de dépôt à un agent cloud, il **investigue le projet localement**. L’implémentation se trouve dans `application/internal/investigation` et alimente à la fois `asa investigate` et le prélude du pipeline V3. L’objectif d’ingénierie est étroit mais important : **réduire la taille des prompts et mettre en avant les fichiers qui comptent** au moyen d’outils bornés et reproductifs — grep, parcours du système de fichiers, heuristiques — plutôt que de demander à un modèle d’ingérer tout l’arbre.
+
+## Ce qui se passe sur votre machine
+
+L’investigation commence en général par un **grep** sur des motifs de fonctionnalité ou de tâche, avec des plafonds durs sur les octets de sortie afin qu’une correspondance pathologique ne puisse épuiser tout votre budget de contexte. Un **scan du système de fichiers** parcourt les chemins candidats et signale tout fichier au-dessus de `large_file_bytes`, ce qui évite d’empaqueter par erreur d’énormes binaires ou journaux. La **détection de chemins sensibles** applique `secret_path_denylist` et des globales configurées pour limiter l’entrée de clés et d’identifiants dans prompts et rapports. Enfin, des **heuristiques de tests associés** proposent des tests liés aux chemins sources candidats, ce qui soutient l’étape verify sans énumérer tout le dépôt.
+
+Ces artefacts alimentent l’empaquetage du contexte et l’estimation des coûts en aval. Ce sont des entrées, pas des verdicts : ils ne remplacent pas le jugement humain sur le périmètre ni sur la sécurité.
+
+## Commandes CLI
+
+Utilisez ces commandes pour exécuter ou déboguer l’investigation en dehors d’un pipeline `work` complet :
+
+```bash
+asa investigate billing-v2
+asa investigate billing-v2 --task task-003
+asa inspect diff
+asa inspect symbol Handler
+asa inspect tests billing-v2
+```
+
+Les sous-commandes `inspect` encapsulent des aides ciblées lorsque vous savez déjà si un diff, un symbole ou des associations de tests vous intéressent.
+
+## Limites et configuration
+
+L’investigation respecte les délais d’attente et les plafonds d’octets de la config. Exemple de valeurs par défaut :
+
+```yaml
+mcp:
+  investigation:
+    large_file_bytes: 524288
+    max_grep_output_bytes: 262144
+    command_timeout_seconds: 120
+    sensitive_globs: ["*.pem", ".git/*"]
+```
+
+Resserrer ces valeurs échange du rappel contre davantage de sécurité et des coûts plus stables. Les assouplir peut exposer davantage de contexte environnant, mais augmente le risque de prompts surdimensionnés et d’exposition accidentelle de secrets.
+
+## Pour aller plus loin
+
+- [Concepts local-first](/docs/fr/concepts/local-first)
+- [CLI : investigate](/docs/cli/generated/investigate)
+- [Outils MCP](/docs/fr/mcp/tools) (exposition optionnelle via MCP lorsque activé)

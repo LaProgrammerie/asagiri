@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "hooks": {
+    "sessionStart": [
+      {
+        "command": ".cursor/hooks/template-sync-session-start.sh"
+      }
+    ],
+    "postToolUse": [
+      {
+        "command": ".cursor/hooks/template-sync-post-write.sh",
+        "matcher": "Write"
+      }
+    ]
+  }
+}

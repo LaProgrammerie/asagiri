@@ -1,0 +1,51 @@
+---
+title: Explain Routing · Asagiri CLI
+description: Expliquer le routage d'agent pour une classe d'étape (mode non interactif)
+---
+
+CLI path: **`asa explain routing`**
+
+## When to use
+
+Orchestration commands coordinate higher-order Asagiri workloads such as ingestion, syncing, backlog triage, investigative passes, hydrated context payloads, coarse estimates, and workspace-specific automation.
+
+> Original CLI synopsis: Expliquer le routage d'agent pour une classe d'étape (mode non interactif)
+
+## Usage
+
+```bash
+asa explain routing [flags]
+```
+
+## Options
+
+| Flag | Scope | Default | Description |
+| --- | --- | --- | --- |
+| `--allow-cloud` | Local | `false` | Autoriser le cloud |
+| `--dry-run` | Inherited | `false` | Simuler les exécutions sans lancer d'agent ni commandes externes |
+| `--json` | Local | `false` | Sortie JSON |
+| `--no-cloud` | Local | `false` | Interdire le cloud (prévaut sur les autres flags) |
+| `--prefer-local` | Local | `false` | Préférer un backend local |
+| `--step-class` | Local | `(empty)` | Classe d'étape à expliquer (ex. implement, review) |
+
+## Examples
+
+```bash
+asa explain routing --step-class implement
+  asa explain routing --step-class review --prefer-local
+  asa explain routing --step-class implement --no-cloud --json
+```
+
+## What happens internally
+
+- Hydrates contextual services resolved from **$PWD**, coordinating git-bound automation, ingestion pipelines, syncing, backlog triage, investigations, MCP hooks, contextual hydration, coarse estimates, and similar orchestrations for this subtree.
+
+## Failure modes
+
+- Cobra rejects unknown flags or arity mismatches before any repository side effects occur.
+- Asagiri cannot resolve scaffolding when the command is invoked outside an initialised checkout.
+- Downstream automation may fail whenever credentials, network endpoints, or cached prerequisites drift from expectations.
+
+## Related commands
+
+_No sibling commands at this depth (Explain Routing)._

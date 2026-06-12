@@ -1,0 +1,49 @@
+---
+title: Cost-aware workflows
+description: Estimate tokens and cost before execution; enforce budgets and routing.
+---
+
+# Cost-aware workflows
+
+## Problem
+
+Agent runs can consume tokens in ways that are hard to predict from a plain task description. Teams still need **forecasts** before execution, **budget ceilings** that fail closed, and **routing** that prefers cheaper execution paths when the task does not justify a heavy model.
+
+## Asagiri approach
+
+Asagiri addresses that with four concrete mechanisms that stay under your config:
+
+1. **Heuristic token counting** — character counts classified by content kind, divided by `token_estimation` ratios (`token_estimation` in config)
+2. **Pricing sheet** — manual `pricing.models` entries for cloud models (no hardcoded vendor prices in code)
+3. **Budgets** — per-run, per-task, and daily caps with optional confirmation thresholds
+4. **Routing** — `routing.strategies` map step classes to local versus cloud-fast versus cloud-heavy agents
+
+Typical CLI entry points:
+
+```bash
+asa estimate billing-v2 --task task-003 --dry-run
+asa work "develop billing-v2" --estimate-only
+asa work "develop billing-v2" --budget 0.50 --allow-over-budget
+```
+
+<Callout type="cost">
+Estimates are **approximate**. Provider billing uses real tokenizers; Asagiri does not yet ship provider-exact counters.
+</Callout>
+
+## Trade-offs
+
+| Improves | Does not solve |
+| --- | --- |
+| Surprises caught before `dev` | Penny-perfect invoices |
+| Policy via YAML budgets | Automatic cloud price discovery |
+| Explainable routing reasons | Optimal model selection without your config |
+
+## Configuration
+
+Wire budgets, routing rules, and estimator knobs through the dedicated pages: [Budgets](/docs/configuration/budgets), [Routing](/docs/configuration/routing), and [Token estimation](/docs/cost-performance/token-estimation).
+
+## Related
+
+- [Cost-aware workflow guide](/docs/workflows/cost-aware-workflow)
+- [CLI: cost](/docs/cli/generated/cost)
+- [CLI: estimate](/docs/cli/generated/estimate)

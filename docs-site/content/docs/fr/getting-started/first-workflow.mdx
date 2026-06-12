@@ -1,0 +1,84 @@
+---
+title: Premier workflow
+description: Flux Asagiri bout en bout depuis init jusqu’au rapport avec de vraies commandes CLI.
+---
+
+# Premier workflow
+
+Cette page suit le même contrat end-to-end que `spec-doc` §11.1 : initialiser le dépôt, vérifier l’environnement, estimer les coûts avant dépenser, faire tourner le pipeline avec une intention explicite, consulter l’état et ouvrir le rapport. L’objectif est une séquence reproductible à coller dans un terminal, sans étapes masquées entre `init` et `report`.
+
+## Prérequis
+
+Asagiri compilé et sur `PATH`, un dépôt git dont les specs vivent sous `.kiro/specs/<fonctionnalité>/` ou `.asagiri/specs/`, et un `.asagiri/config.yaml` dont les commandes agents existent réellement sur votre machine. Sans ces trois éléments, les étapes suivantes échouent pour des raisons limpides : binaire absent, spec manquante, ou sous-processus impossible à démarrer.
+
+## Étapes
+
+### 1. Initialiser et vérifier
+
+Partez d’une vision claire du système de fichiers et de la chaîne d’outils qu’Asagiri utilisera :
+
+```bash
+asa init
+asa doctor
+```
+
+`doctor` fait office de portillon : réglez tout ce qu’il signale avant d’estimer ou d’exécuter.
+
+### 2. Estimer avant dépenser
+
+Lancez `work` en mode estimation seule pour que projections de jetons et de coût apparaissent avant toute invocation d’agent :
+
+```bash
+asa work "develop billing-v2" --estimate-only
+```
+
+Relisez les estimations et toute invitation budgétaire. Bridez avec `--budget 0.50` ou via le bloc `budgets`. N’utilisez `--allow-over-budget` que si vos règles le permettent explicitement — sinon vous court-circuitez les garde-fous que vous avez configurés.
+
+### 3. Répétition plan uniquement
+
+Validez la résolution d’intention et la sélection des tâches sans exécuter les agents :
+
+```bash
+asa work "develop billing-v2" --plan-only
+```
+
+Utile quand vous voulez sécuriser routage et planification avant tout travail `dev` dans un worktree.
+
+### 4. Exécuter le run
+
+Lorsque l’exécution réelle est prête :
+
+```bash
+asa work "develop billing-v2"
+```
+
+Avec `intent.default_mode: guided` et `work.require_plan_confirmation: true`, Asagiri demande avant d’aller plus loin sauf `--yes`. Les phases que vous voyez généralement : résolution d’intention, plan et enrichissement, développement dans un worktree, vérification, revue optionnelle puis rapport.
+
+### 5. Statut et rapport
+
+Après l’exécution — ou pour retrouver un identifiant — listez les runs et ouvrez le rapport désiré :
+
+```bash
+asa status
+asa report <run-id>
+```
+
+Remplacez `<run-id>` par la valeur donnée par `status` (format du type `run-2026-05-17-…`).
+
+## Ce que vous devez observer
+
+Les runs qui réussissent laissent **l’état SQLite** à `.asagiri/state.sqlite`, des **artefacts par run** sous `.asagiri/runs/<run-id>/`, et — pour une tâche de développement active — un **git worktree** sous `.asagiri/worktrees/`. Les sorties de validation proviennent des commandes que vous avez définies sous `validation.commands` (par exemple `go test ./...`). Ces artefacts rendent une exécution inspectable a posteriori sans relancer les agents.
+
+## Reprendre et récupérer
+
+```bash
+asa resume <run-id>
+```
+
+Sans `--execute`, **`resume` affiche uniquement le prochain step** — exécutez-le manuellement ou utilisez `continue`. Avec **`asa resume <run-id> --execute`**, les steps restants s'enchaînent jusqu'à complétion, gate ou `--max-steps` (agents réels si `--dry-run` global est absent).
+
+Voir [resume CLI](/docs/fr/cli/resume) et [Reprise après échec](/docs/fr/workflows/failure-recovery).
+
+## Workflows liés
+
+Pour parcours multi-outils et gestion des pannes voir [Kiro → Cursor → Verify](/docs/fr/workflows/kiro-to-cursor), [Flux soucieux des coûts](/docs/fr/workflows/cost-aware-workflow) et [Récupération après échec](/docs/fr/workflows/failure-recovery).

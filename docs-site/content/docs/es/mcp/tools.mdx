@@ -1,0 +1,47 @@
+---
+title: Herramientas MCP
+description: Herramientas expuestas cuando mcp.enabled es true.
+---
+
+# Herramientas MCP
+
+Con `mcp.enabled: true`, `mcp-serve` registra utilidades delegadas en los mismos paquetes de investigación y optimización contextual que usa la CLI. Nombres y esquema JSON evolucionan — llame `tools/list` después de cada actualización para ver la superficie viva.
+
+## Capacidades típicas
+
+La tabla ayuda pero no agota casos : la investigación mantiene lecturas acotadas como la CLI `investigate`, helpers de contexto arma o sintetiza packs, cost reutiliza heurísticas para previsualizar carga útil cliente.
+
+| Área | Propósito |
+| --- | --- |
+| Investigation | grep / barrido repo acotados coherentes con `investigate` CLI |
+| Context | Construir o resumir paquetes contextual |
+| Cost | Tokens/coste aproximado de un payload |
+
+IDs exactos pueden cambiar release a release — invoque siempre `tools/list` después de cambiar versión.
+
+## Límites
+
+La configuración refleja rieles de la CLI global `max_output_bytes` y `command_timeout_seconds`, más topes `investigation.*` compartidos fuera MCP.
+
+- `max_output_bytes` — tope tamaño respuesta RPC
+- `command_timeout_seconds` — ejecución por herramienta
+- `investigation.*` — caps grep/scan (compartidas)
+
+## Ejemplo cliente
+
+Arranque el servidor, conecte su cliente MCP vía stdio y emita solicitud JSON-RPC esperada para `tools/list`.
+
+```bash
+asa mcp-serve
+# Editor MCP client connects via stdio, sends:
+# {"jsonrpc":"2.0","id":1,"method":"tools/list"}
+```
+
+<Callout type="experimental">
+La superficie minimalista cambia rápido. No dependa de herramientas indocumentadas sin fijar versión Asagiri.
+</Callout>
+
+## Relacionado
+
+- [Investigación local](/docs/es/cost-performance/local-investigation)
+- [Seguridad MCP](/docs/es/mcp/security)

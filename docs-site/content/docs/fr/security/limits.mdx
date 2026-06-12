@@ -1,0 +1,45 @@
+---
+title: Limites
+description: Ce qu’Asagiri ne garantit pas et frontières produit connues.
+---
+
+# Limites
+
+Asagiri excelle comme échafaudage d’automations disciplinées, mais elle hérite des fragilités inhérentes à tout orchestrateur calé sur de grands modèles linguistiques. Les sections suivantes détaillent les **frontières de confiance** portées dans **`spec-doc` §17.1** : refus nets et capacités sur lesquelles vous pouvez compter lucidement.
+
+## Asagiri ne fait pas :
+
+- **Garantir l’exactitude** du code généré
+- **Remplacer votre batterie de tests** — elle exécute ce que vous déclarez ; les échecs restent vos à corriger
+- **Supplanter la revue humaine** sur sécurité, conformité ou architecture
+- **Immuniser contre toute injection de prompt** — specs ou pages Notion hostiles peuvent orienter agents
+- **Répliquer la facturation exacte tokenizer** des fournisseurs
+- **Offrir SLA production** — CLI OSS d’orientation
+
+Nommer ces non-garanties aide répartir la validation là où déterminisme s’efface davantage prompts adversarial prudence uptime.
+
+## Ce qu’il fait bien
+
+- Appliquer une **machine à états** pour les étapes pipeline
+- **Isoler** tâches via git worktrees
+- **Estimer** jetons/coûts avant exec
+- **Bloquer** certaines violations (git sale, motifs secrets fichier, budgets)
+- **Enregistrer** runs auditables (`report`, SQLite)
+
+Ces garanties visent **l’hygiène de flux** sans prétendre qu’un patch passe tests locaux garantit mise en prod sûre.
+
+## Capabilités marquées expérimentales
+
+La doc sépare explicitement MCP complet, synchro Notion, compression contextuelle auto-agressive tuning, reprise automatique hors dry-run, RAG vecteur comme terrains mobiles.
+
+Ce qui porte cette étiquette peut bouger vite ; intégrez dans runbooks production seulement une fois regressions conscientes admises.
+
+<Callout type="warning">
+`verify` signifiant command-configurées exited 0 n’equivaut pas absolument shipment safe.
+</Callout>
+
+## Voir aussi
+
+- [Philosophie](/docs/fr/concepts/philosophy)
+- [Synthèse sécurité](/docs/fr/security)
+- [Roadmap](/docs/fr/roadmap)

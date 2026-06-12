@@ -1,0 +1,49 @@
+---
+title: Workflow produit vers code
+description: Enchaînement complet d’une intention produit jusqu’au plan de dev.
+---
+
+# Workflow produit vers code
+
+## Chemin guidé V1 (`asa work`)
+
+Pour une intention produit large, le happy path passe par **deux invocations** de `asa work` (sans auto-enchaînement) :
+
+```bash
+# Étape 1 — préparation Product Layer
+asa work "Créer un CRM pour artisans" --dry-run
+asa work "Créer un CRM pour artisans" --yes
+
+# Étape 2 — implémentation technique
+asa work crm-artisans --yes
+asa next --feature crm-artisans
+```
+
+Classification : `technical_task` et `feature_work` → workflow technique normal ; `product_level_intent` → Product Layer puis arrêt contrôlé.
+
+## Séquence experte (commandes unitaires)
+
+Séquence manuelle équivalente :
+
+```bash
+asa prototype create "SaaS workspace avec invitations" --product workspace-saas
+asa prototype run workspace-saas
+asa flows extract workspace-saas
+asa flows inspect workspace-saas
+asa flows review workspace-saas
+asa contracts extract workspace-saas
+asa architecture derive workspace-saas
+asa spec generate-from-product workspace-saas
+asa product review workspace-saas
+asa work "develop workspace-saas" --plan-only
+```
+
+## Sorties
+
+- prototype local cliquable ;
+- flows/screens YAML ;
+- review flow business-aware (métriques/obs/sécurité) ;
+- contrats techniques ;
+- projection architecture (API/async/sécurité/infra) ;
+- specs/tasks générées ;
+- plan d’exécution `work`.

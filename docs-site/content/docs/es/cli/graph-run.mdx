@@ -1,0 +1,41 @@
+---
+title: graph run
+description: Planificar y ejecutar (o simular) un grafo de ejecución.
+---
+
+# `asa graph run`
+
+Planifica un grafo para un flow de producto, persiste artefactos y ejecuta nodos (o simula con `--dry-run`) (`spec-my-C` §5.3).
+
+## Uso
+
+```bash
+asa graph run workspace-saas --flow onboarding
+asa graph run workspace-saas --flow onboarding --dry-run
+asa graph run workspace-saas --flow onboarding --max-parallel 2 --strict-trust
+asa graph run workspace-saas --flow onboarding --ci --json
+```
+
+## Flags
+
+| Flag | Descripción |
+|------|-------------|
+| `--flow` | **Obligatorio.** Id del flow |
+| `--max-parallel` | Sobrescribe `max_parallel` de config |
+| `--stop-on-risk` | Parar si el riesgo alcanza este nivel (`low`, `medium`, `high`) |
+| `--strict-trust` | Tratar avisos trust como fallos |
+| `--budget` | Tope de presupuesto en EUR (0 = config/defecto) |
+| `--checkpoint-every` | Cadencia checkpoint: `node` o `group` |
+| `--dry-run` | Planificar y persistir sin ejecutar agentes |
+| `--ci` | Paralelismo conservador; exit ≠ 0 si falla la política |
+| `--json` | Salida JSON estructurada |
+
+## Dry-run
+
+`--dry-run` escribe los mismos artefactos que una ejecución real y avanza la máquina de estados sin agentes subprocess. Útil en CI para validar política de planificación.
+
+## Ver también
+
+- Estado: [`asa graph status`](/docs/es/cli/graph-status)
+- Reanudar: [`asa graph resume`](/docs/es/cli/graph-resume)
+- Gates trust: [`asa verify trust`](/docs/es/cli/verify-trust)

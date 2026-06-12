@@ -1,0 +1,60 @@
+---
+title: Agents Sync · Asagiri CLI
+description: Synchroniser le registry AgentSpec depuis les templates embarqués
+---
+
+CLI path: **`asa agents sync`**
+
+## When to use
+
+Orchestration commands coordinate higher-order Asagiri workloads such as ingestion, syncing, backlog triage, investigative passes, hydrated context payloads, coarse estimates, and workspace-specific automation.
+
+> Original CLI synopsis: Synchroniser le registry AgentSpec depuis les templates embarqués
+
+## Usage
+
+```bash
+asa agents sync [flags]
+```
+
+## Options
+
+| Flag | Scope | Default | Description |
+| --- | --- | --- | --- |
+| `--agent` | Local | `(empty)` | Synchroniser un seul agent (id template) |
+| `--check` | Local | `false` | Vérifier sans écrire (comportement par défaut) |
+| `--dry-run` | Inherited | `false` | Simuler les exécutions sans lancer d'agent ni commandes externes |
+| `--force` | Local | `false` | Écraser les fichiers modifiés |
+| `--json` | Local | `false` | Sortie JSON sur stdout |
+| `--write` | Local | `false` | Écrire sous .asagiri/agents/ (dry-run par défaut) |
+
+## Examples
+
+```bash
+asa agents sync
+  asa agents sync --write
+  asa agents sync --write --force
+  asa agents sync --agent dev --json
+```
+
+## What happens internally
+
+- Hydrates contextual services resolved from **$PWD**, coordinating git-bound automation, ingestion pipelines, syncing, backlog triage, investigations, MCP hooks, contextual hydration, coarse estimates, and similar orchestrations for this subtree.
+
+## Failure modes
+
+- Cobra rejects unknown flags or arity mismatches before any repository side effects occur.
+- Asagiri cannot resolve scaffolding when the command is invoked outside an initialised checkout.
+- Downstream automation may fail whenever credentials, network endpoints, or cached prerequisites drift from expectations.
+
+## Related commands
+
+- [Agents Diff](./agents-diff.mdx)
+- [Agents Export](./agents-export.mdx)
+- [Agents External](./agents-external.mdx)
+- [Agents List](./agents-list.mdx)
+- [Agents Run](./agents-run.mdx)
+- [Agents Runs](./agents-runs.mdx)
+- [Agents Show](./agents-show.mdx)
+- [Agents Stats](./agents-stats.mdx)
+- [Agents Watch](./agents-watch.mdx)

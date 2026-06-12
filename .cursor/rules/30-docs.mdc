@@ -1,0 +1,11 @@
+---
+description: Documentation and docs/ai files
+globs: "docs/**/*.{md,mdx}"
+alwaysApply: false
+---
+
+# Documentation
+
+- `docs/ai/` is detailed project truth; `AGENTS.md` is the short router; `context-map.md` describes sources of truth and anti-drift.
+- Structural changes deserve an entry in `docs/ai/05-decisions.md` when relevant.
+- Tone: professional, precise; avoid duplicating `.kiro/specs/` — link instead.

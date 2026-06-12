@@ -1,0 +1,8 @@
+graph TD
+  implement_invite_member[Implement member invitation]
+  manual_approval[Human approval for permission model change]
+  security_review[Security review for invite_member]
+  trust_gate[Trust verification for sensitive action]
+  implement_invite_member -->|validates| security_review
+  security_review -->|requires| trust_gate
+  trust_gate -->|requires_human_approval| manual_approval

@@ -1,0 +1,38 @@
+---
+title: Moteur d'investigation
+description: Investigation locale structurée avant modification par les agents.
+---
+
+# Moteur d'investigation
+
+La couche investigation (`spec-my-A` §25) répond à : **quoi, où, pourquoi** — avant qu'un agent modifie le code.
+
+## Pipeline
+
+```text
+symptôme / intention
+  → résolution de scope (flow, task, tests en échec)
+  → découverte locale (grep, symboles, tests)
+  → analyse statique
+  → corrélation flows / contracts
+  → hypothèses scorées
+  → context-pack.md + graph.json
+  → travail agent ciblé
+```
+
+## Artefacts
+
+Sous `.asagiri/investigations/<id>/` : `report.md`, `context-pack.md`, `replay-pack.json`, `graph.json`.
+
+## Intégration
+
+- `asa work --investigate-first` / `--investigation-depth`
+- `asa work --investigate-on-failure`
+- `asa verify --investigate-on-failure`
+- `asa investigate impact --flow … --change …`
+- Alimentation de la mémoire runtime
+
+## Voir aussi
+
+- [Commande investigate](/docs/fr/cli/investigate)
+- [Couche produit exécutable](/docs/fr/concepts/executable-product-layer)

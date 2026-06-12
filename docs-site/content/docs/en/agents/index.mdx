@@ -1,0 +1,63 @@
+---
+title: Agents overview
+description: Logical agent profiles and external providers in Asagiri orchestration.
+---
+
+# Agents overview
+
+Asagiri does not ship embedded models. You declare **providers** (external runtimes) and **agents** (logical profiles). Routing, `work` defaults, and flags such as `--agent` always refer to **agent ids**, never directly to provider ids.
+
+## Providers vs agents
+
+| Layer | Example ids | Config |
+| --- | --- | --- |
+| Provider | `kiro-cli`, `claude-code`, `ollama` | `providers:` + `type` |
+| Agent | `dev`, `reviewer`, `local-rag` | `agents:` + optional `provider` |
+| Work role | spec / dev / review / enrich | `work.default_*` |
+
+Multiple agents can share one provider — a common reason to split the two layers:
+
+```yaml
+agents:
+  dev:
+    provider: kiro-cli
+  architect:
+    provider: kiro-cli
+  reviewer:
+    provider: claude-code
+```
+
+## Typical roles
+
+| Agent id (example) | Typical step | Provider (example) |
+| --- | --- | --- |
+| `laprogrammerie` / `kiro` | Spec (`asa spec`) | Kiro CLI |
+| `dev` / `cursor` | Implementation (`asa dev`) | Kiro CLI or Cursor Agent |
+| `reviewer` / `codex` | Review (`asa review`) | Claude Code or Codex CLI |
+| `local-rag` / `ollama` | Enrich, classify | Ollama |
+
+Names are yours — the table shows conventions, not hard-coded tools.
+
+## Contracts
+
+- Adapter = `providers.<id>.type` (not the provider or agent name)
+- No shell interpolation — argv only
+- Timeouts from merged provider + agent config
+- Dry-run skips real execution
+- Logs pass through redaction (`application/internal/redact`)
+
+## Choose agents per step
+
+```bash
+asa spec feat --agent laprogrammerie
+asa enrich feat --agent local-rag
+asa dev feat --agent dev
+asa review feat --agent reviewer
+```
+
+## Related
+
+- [Agents configuration](/docs/configuration/agents)
+- [Ollama](/docs/agents/ollama)
+- [Local models](/docs/agents/local-models)
+- [Routing](/docs/configuration/routing)

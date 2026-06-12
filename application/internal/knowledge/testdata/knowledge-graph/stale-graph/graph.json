@@ -1,0 +1,12 @@
+{
+  "nodes": [
+    {
+      "id": "flow:checkout",
+      "type": "flow",
+      "name": "checkout",
+      "confidence": 0.95,
+      "source": { "kind": "flow", "extractor": "flows" }
+    }
+  ],
+  "edges": []
+}

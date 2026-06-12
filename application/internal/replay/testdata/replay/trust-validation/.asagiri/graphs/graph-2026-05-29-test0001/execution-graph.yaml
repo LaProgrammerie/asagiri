@@ -1,0 +1,12 @@
+id: graph-2026-05-29-test0001
+product: workspace-saas
+flow: workspace-onboarding
+status: planned
+nodes:
+  - id: investigate-onboarding
+    type: investigation
+    title: Investigate onboarding
+  - id: verify-onboarding-flow
+    type: validation
+    title: Verify onboarding
+edges: []

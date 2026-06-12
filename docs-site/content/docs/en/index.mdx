@@ -1,0 +1,40 @@
+---
+title: Asagiri
+description: Deterministic orchestration for AI coding workflows.
+---
+
+# Asagiri
+
+Deterministic orchestration for AI coding workflows.
+
+Asagiri turns specs into auditable, cost-aware development runs. The pipeline combines local investigation, git worktrees, external AI coding agents, validation commands you define, and reproducible reports so each run leaves a traceable record instead of an opaque chat log.
+
+```bash
+asa work "develop billing-v2"
+```
+
+## Core ideas
+
+**Local-first investigation** runs before cloud model calls. Asagiri scans the repository with bounded grep and filesystem traversal, then narrows context so you do not ship entire trees to remote APIs by default.
+
+**Cost and token estimation** surfaces expected spend before execution. Heuristic counters and configurable pricing sheets give order-of-magnitude guardrails; budgets can block or confirm overruns before agents run.
+
+**Git worktree isolation** keeps each task on its own branch and working tree under `.asagiri/worktrees/`, reducing collisions when several features move in parallel.
+
+**Agent routing** maps pipeline step classes to the agent profile you configured—local Ollama for triage, cloud CLIs for heavy implementation—based on strategy and policy in YAML.
+
+**Validation before trust** means Asagiri runs your commands (`go test`, linters, custom scripts), not agent self-assessment, before a step is treated as done.
+
+**Reproducible reports** write markdown and JSON under `.asagiri/runs/<run-id>/` so you can audit what ran, what it cost, and what validation reported.
+
+## Get started
+
+Follow these pages in order when onboarding a repository:
+
+1. [Installation](/docs/getting-started/installation)
+2. [Quickstart](/docs/getting-started/quickstart)
+3. [First workflow](/docs/getting-started/first-workflow)
+
+<Callout type="warning">
+Asagiri does not prove correctness. Validation and human review remain mandatory for critical changes.
+</Callout>

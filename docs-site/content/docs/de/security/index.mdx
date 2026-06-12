@@ -1,0 +1,45 @@
+---
+title: Sicherheit
+description: Geheimnisse, Reichweite, MCP, Agents und Datenübertragung an Anbieter.
+---
+
+# Sicherheit
+
+Asagiri verknüpft Compiler, MCP-Server, Subprozess-Agenten und optional cloud-gehostete Modelle. **Jede Schicht verstärkt das, was ohnehin in Ihrer Repository-Hygiene steckt.** Es gilt **gemeinsame Verantwortung**: Das CLI kann Grundrichtlinien erzwingen, aber sensible Konfiguration und nachgelagerte Review-Prozesse bleiben bei Ihrem Team.
+
+## Überblick
+
+| Bereich | Verhalten |
+| --- | --- |
+| **Dateisystem** | Arbeit auf Repository plus Worktrees; Investigation achtet Denylisten |
+| **Geheimnisse** | z. B. `token_env` für Notion, `secret_path_denylist`, Reduktion bekannter Muster in Logs |
+| **Subprozess-Agenten** | Keine Shell; nur explizites `argv` mit Timeouts |
+| **Netzwerk** | `policies.allow_network` ist standardmäßig `false`; Agents können dennoch netzwerkaktives Tooling ausführen, wenn Ihre Konfiguration das erlaubt |
+| **MCP** | Standard aus; Begrenzung von Ausgabegröße und Laufzeit |
+| **Cloud-Modelle** | Daten verlassen den Rechner, sobald Cloud-Agenten laufen — Sie entscheiden, welche Befehle und Konfigurationen das ermöglichen |
+
+## Reichweite auf der Platte
+
+- Worktrees unter `.asagiri/worktrees/`
+- Status und Artefakte unter `.asagiri/`
+- Investigation lässt konfigurierte sensible Glob-Muster und Denylist-Pfade wie `.env` oder Schlüssel aus
+
+Selbst nicht eingecheckte, aber lokal vorhandene Geheimnisse können durch falsche Anweisungen oder zu großzügige Agentenprofile gefährdet werden — minimale Agent-Rechte und klare Policies bleiben wichtig.
+
+## Sensitive Logs
+
+`application/internal/redact` maskiert gängige Token-Muster in Ausgaben. Darauf allein soll man sich nicht verlassen — keine Secrets absichtlich über Prompts einspeisen.
+
+## Externe Agent-Befehle
+
+Konfigurierte CLIs (`cursor-agent`, `codex`, …) laufen mit Ihren Nutzerrechten. Behandeln Sie sie wie jedes andere Tool mit vollständigem Repository-Zugriff.
+
+## Melden von Problemen
+
+Bei Hinweisen auf Rechteausweitung oder andere sicherheitsrelevante Schwächen siehe [`SECURITY.md`](https://github.com/LaProgrammerie/asagiri/blob/main/SECURITY.md).
+
+## Verwandtes
+
+- [Grenzen](/docs/de/security/limits)
+- [MCP-Sicherheit](/docs/de/mcp/security)
+- [Notion-Konfiguration](/docs/de/configuration/notion)

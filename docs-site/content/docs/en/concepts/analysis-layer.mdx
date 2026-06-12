@@ -1,0 +1,44 @@
+---
+title: Engineering analysis layer
+description: Local structural graphs for agents (symbols, dependencies, flows, APIs).
+---
+
+# Engineering analysis layer
+
+`spec-my-A` §24.16 — local structural intelligence under `application/internal/analysis/`.
+
+## Graph kinds
+
+| Graph | Source |
+|-------|--------|
+| symbol | Go AST (`go/parser`) |
+| dependency | Go imports |
+| flow | `.asagiri/products/<id>/flows/*.yaml` |
+| event | `contracts/events.yaml` |
+| api | `contracts/api.openapi.yaml` |
+| migration | `**/migrations/*.sql` |
+| ownership | Path heuristics (`application/internal/...`) |
+
+## CLI
+
+```bash
+asa analysis build --product workspace-saas
+```
+
+Writes `.asagiri/analysis/<product>/graphs.json` (all graphs in one bundle).
+
+## Layout
+
+```text
+internal/analysis/
+  ast/
+  symbols/
+  dependencies/
+  events/
+  flows/
+  ownership/
+  architecture/
+  engine.go
+```
+
+Used by investigation and future agent context packs.

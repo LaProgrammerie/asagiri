@@ -1,0 +1,78 @@
+---
+title: Notion → lokale Spezifikation → work
+description: Notion-Seiten in lokale Spec-Snapshots synchronisieren; Ausführung nur aus lokalen Dateien.
+---
+
+# Notion → lokale Spezifikation → work
+
+## Grundsatz
+
+**Notion ist nie die alleinige Laufzeitwahrheit.** Asagiri arbeitet immer von einem **lokalen Snapshot** unter `.asagiri/specs/` (oder den Pfaden in `sources.local.paths`). Sync holt Inhalt aus der Cloud; `work` liest lokale Dateien und SQLite-Zustand.
+
+Produkt- und Designrollen können in Notion schreiben; Engineering wiederholt Läufe aus **Dateisystem-Snapshots**. So bleibt das Verhalten nachvollziehbar, wenn sich Workspace-Schemas oder Datenbankstrukturen ändern.
+
+<Callout type="experimental">
+Notion-Sync verlangt Konfiguration und ein gültiges API-Token. Behandeln Sie Sync als experimentell, bis Ihre Workspace-Zuordnung validiert ist.
+</Callout>
+
+## Notion konfigurieren
+
+YAML spiegelt das Schema: Connector aktivieren, Umgebungsvariable für das PAT festlegen, Datenbank-ID der Specs setzen, Importpfad typischerweise `.asagiri/specs` (anders wo dokumentiert).
+
+```yaml
+sources:
+  notion:
+    enabled: true
+    token_env: NOTION_TOKEN
+    specs_database_id: "<your-database-id>"
+    import_path: .asagiri/specs
+```
+
+Token setzen:
+
+```bash
+export NOTION_TOKEN="ntn_..."
+```
+
+## Synchronisation
+
+Einzelne Seite per URL oder alle aktivierten Quellen:
+
+```bash
+asa sync notion --page "https://www.notion.so/..."
+asa sync all
+```
+
+Vorschau ohne Seiteneffekte:
+
+```bash
+asa --dry-run sync notion --page "https://www.notion.so/..."
+```
+
+Im interaktiven Modus kann vor dem Überschreiben einer lokal geänderten Spec nachgefragt werden.
+
+## Arbeiten vom lokalen Snapshot
+
+Listing und Ausführung lesen denselben synchronisierten Baum:
+
+```bash
+asa inbox --source notion
+asa work "develop billing-v2" --source notion
+```
+
+## Abwägungen
+
+| Vorteil | Risiko |
+| --- | --- |
+| Authoring für Rollen in Notion | Token-Unfall beim Commit |
+| Offline nach Sync weiterarbeiten | Schema-Drift bei Property-Umbenennungen in Notion |
+
+<Callout type="security">
+`NOTION_TOKEN` niemals committen — nur über `token_env` und CI-Geheimnisse. Logs reduzieren bekannte Secret-Muster, ersetzen aber keine saubere Handhabung von Credentials.
+</Callout>
+
+## Verwandtes
+
+- [Notion-Konfiguration](/docs/de/configuration/notion)
+- [CLI: sync](/docs/de/cli/generated/sync)
+- [CLI: inbox](/docs/de/cli/generated/inbox)

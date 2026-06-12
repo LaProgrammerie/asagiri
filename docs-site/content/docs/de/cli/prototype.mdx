@@ -1,0 +1,33 @@
+---
+title: prototype Befehle
+description: Lokale klickbare Prototypen erstellen, starten und patchen.
+---
+
+# prototype Befehle
+
+`asa prototype` verwaltet lokale Prototypen unter `.asagiri/products/<product>/prototype`.
+
+## Erstellen
+
+```bash
+asa prototype create "Workspace SaaS mit Team-Einladungen" --product workspace-saas
+```
+
+## Starten
+
+```bash
+asa prototype run workspace-saas
+```
+
+## Patchen
+
+```bash
+asa prototype patch workspace-saas "Fuege ein 3-Schritt-Onboarding hinzu"
+```
+
+## Schutzregeln
+
+- keine Secret-Ingestion;
+- kein `.env`-Lesen;
+- kein Schreiben ausserhalb des Produktordners;
+- keine Dependency-Installation ohne Bestaetigung.

@@ -1,0 +1,42 @@
+---
+title: Product schema
+description: Canonical structure of product.yaml for the product layer.
+---
+
+# Product schema
+
+`product.yaml` is the canonical product-level descriptor under `.asagiri/products/<product>/`.
+
+## Minimal shape
+
+```yaml
+id: workspace-saas
+name: Workspace SaaS
+status: draft
+intent: >
+  Let a user create a workspace, invite a team, and complete setup.
+
+prototype:
+  stack: react
+  path: prototype
+  status: generated
+  mock_data: true
+```
+
+## Recommended fields
+
+- `id`, `name`, `status`, `intent`
+- `prototype` metadata
+- business and quality constraints
+- source provenance (`created_from`, `created_at`)
+
+## Validation rules
+
+- `id` is required and used as product key.
+- `intent` must be present.
+- `prototype.path` is repository-relative.
+- unknown keys are tolerated but preserved for forward compatibility.
+
+## Related
+
+- [Reference: flow schema](/docs/reference/flow-schema)

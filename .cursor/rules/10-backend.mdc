@@ -1,0 +1,13 @@
+---
+description: Backend Go — application/
+globs: "**/*.go"
+alwaysApply: false
+---
+
+# Backend Go
+
+- Suivre `docs/ai/02-architecture.md` et `03-standards.md`.
+- Code métier dans `application/internal/` ; `application/cmd/` = `main` minimal uniquement.
+- Erreurs explicites ; pas de `panic` aux frontières HTTP/CLI.
+- Ne pas importer `application/internal/` depuis l’extérieur du module.
+- Workflows locaux : `Makefile` et `go` — pas Castor.

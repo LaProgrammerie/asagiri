@@ -1,0 +1,44 @@
+---
+title: contracts commands
+description: Derive technical contracts from extracted flows.
+---
+
+# contracts commands
+
+`asa contracts extract` turns product flows into implementation contracts.
+
+## Extract contracts
+
+```bash
+asa contracts extract workspace-saas
+```
+
+Generates:
+
+- `contracts/api.openapi.yaml`
+- `contracts/permissions.yaml`
+- `contracts/events.yaml`
+- `contracts/analytics.yaml`
+- `contracts/observability.yaml`
+
+## Why this step matters
+
+It exposes backend and platform expectations before coding starts:
+
+- API operations;
+- role/permission model;
+- business and analytics events;
+- metrics/logs/traces expectations.
+
+## Uncertainties
+
+The extraction report flags uncertain mappings that should be reviewed before implementation.
+
+## Strict coupling validation
+
+`asa contracts extract` now hard-fails when metrics/analytics/contracts coupling is incomplete (for example missing flow metrics, missing analytics metric/dashboard, or missing observability metric linkage).
+
+## Related
+
+- [Workflow: product to code](/docs/workflows/product-to-code)
+- [CLI: generated spec](/docs/cli/generated/spec)

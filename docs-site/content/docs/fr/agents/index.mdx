@@ -1,0 +1,39 @@
+---
+title: Vue d'ensemble des agents
+description: Profils logiques et providers externes dans l'orchestration Asagiri.
+---
+
+# Vue d'ensemble des agents
+
+Asagiri ne embarque pas de modèles. Vous déclarez des **providers** (runtimes externes) et des **agents** (profils logiques). Le routage, les défauts `work` et les flags `--agent` référencent toujours des **ids d'agents**, jamais directement des providers.
+
+## Providers vs agents
+
+| Couche | Exemples | Config |
+| --- | --- | --- |
+| Provider | `kiro-cli`, `claude-code`, `ollama` | `providers:` + `type` |
+| Agent | `dev`, `reviewer`, `local-rag` | `agents:` + `provider` optionnel |
+| Rôle work | spec / dev / review / enrich | `work.default_*` |
+
+Plusieurs agents peuvent partager un provider :
+
+```yaml
+agents:
+  dev:
+    provider: kiro-cli
+  architect:
+    provider: kiro-cli
+  reviewer:
+    provider: claude-code
+```
+
+## Contrats
+
+- Adapter = `providers.<id>.type` (pas le nom du provider ou de l'agent)
+- Pas d'interpolation shell — argv uniquement
+- Dry-run sans exécution réelle
+
+## Voir aussi
+
+- [Configuration des agents](/docs/fr/configuration/agents)
+- [Ollama](/docs/fr/agents/ollama)

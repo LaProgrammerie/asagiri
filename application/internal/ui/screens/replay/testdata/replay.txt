@@ -1,0 +1,23 @@
+Replay
+ID: replay-001
+Created: 2026-05-29T08:02:00Z
+Repo: feature/spec-ui @ abcdef123456
+Mode: simulation
+
+Artifacts
+- graph/execution-graph.json
+- runtime/events.jsonl
+
+Timeline
+> 08:12:00 investigation.started
+  08:14:00 graph.generated artifact=graph/execution-graph.json
+  08:16:00 implementation.started
+Actions
+- jump to event: j
+- inspect artifact: a
+- compare run: m
+- replay offline: O
+- explain divergence: D
+- open replay: asa replay open replay-001
+- compare: asa replay compare <replay-a> <replay-b>
+- explain: asa replay explain <replay-a> <replay-b>

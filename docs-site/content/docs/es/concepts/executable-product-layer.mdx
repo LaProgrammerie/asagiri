@@ -1,0 +1,38 @@
+---
+title: Capa de producto ejecutable
+description: Convertir intención de producto en prototipo versionable, flujos, contratos y tareas.
+---
+
+# Capa de producto ejecutable
+
+La capa de producto ejecutable agrega una entrada orientada a producto en Asagiri sin convertirlo en un constructor visual genérico. Los artefactos quedan locales, auditables y versionables.
+
+## Pipeline
+
+```text
+Intent
+  -> prototipo
+  -> flujos
+  -> contratos
+  -> specs generadas
+  -> tareas ejecutables
+  -> plan de trabajo
+```
+
+## Estructura del repositorio
+
+```text
+.asagiri/products/<product>/
+  intent.md
+  product.yaml
+  prototype/
+  flows/
+  screens/
+  contracts/
+  extraction/
+  generated-specs/
+```
+
+## Limites
+
+El prototipo no es codigo de produccion. Esta capa sirve para alinear, derivar y revisar antes de implementar.

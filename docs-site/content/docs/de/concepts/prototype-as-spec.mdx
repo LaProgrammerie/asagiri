@@ -1,0 +1,32 @@
+---
+title: Prototyp als Spezifikation
+description: Klickbaren Prototyp als Quelle fuer stabile Flows und Vertraege nutzen.
+---
+
+# Prototyp als Spezifikation
+
+In Asagiri ist der Prototyp ein ausfuehrbarer Input fuer Engineering, nicht das Endprodukt.
+
+## Rolle
+
+- User-Journeys konkret machen;
+- Aktionen, Zustaende und Routen extrahieren;
+- Flows, Vertraege, Specs und Tasks ableiten.
+
+## Stabile Schicht
+
+- `product.yaml`
+- `flows/*.flow.yaml`
+- `screens/*.screen.yaml`
+- `contracts/*.yaml`
+
+Diese Dateien bleiben diffbar und gut reviewbar.
+
+## Kontrolle
+
+Vor der Implementierung pruefen:
+
+- fehlende Error-States;
+- destruktive Aktionen ohne Bestaetigung;
+- Auth/Permission-Annahmen;
+- ungeklaerte API-Vertraege.

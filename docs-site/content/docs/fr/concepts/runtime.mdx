@@ -1,0 +1,57 @@
+---
+title: Runtime persistant
+description: Runtime d'ingénierie local avec sessions, mémoire et événements.
+---
+
+# Runtime persistant
+
+Asagiri évolue d'une CLI stateless vers un **runtime d'ingénierie local-first** (`spec-my-A` §24).
+
+## Architecture
+
+```text
+asa daemon run
+  ↓
+SQLite (.asagiri/runtime/runtime.db)
+  ↓
+sessions · branches · events · memory · hook queue
+  ↓
+workers (commandes asa autorisées uniquement)
+```
+
+## Principes
+
+- **Optionnel** : les commandes stateless fonctionnent sans daemon
+- **Inspectable** : état sur disque (hooks, skills, investigations)
+- **Sûr** : pas de shell arbitraire dans les hooks
+- **Mémoire scoped** : project, product, flow, feature, …
+
+## Cas d'usage
+
+| Besoin | Commande |
+|--------|----------|
+| Feature longue | `asa session create` |
+| Variante produit | `asa session branch` |
+| Apprentissage inter-runs | `asa memory list` |
+| Automatisation | hooks sur `session.created`, `flow.completed` |
+
+## Modes runtime
+
+Dans `.asagiri/config.yaml` :
+
+```yaml
+runtime:
+  mode: guided  # guided | interactive | headless | ci | review | exploration
+```
+
+## Embeddings mémoire
+
+Mémoire scopée avec backend vectoriel configurable (`runtime.memory.embedder`) : `hash` (défaut), `ollama`, `cloud` (opt-in). Après changement : `asa memory reindex`. Requête : `asa memory list --query "..."`.
+
+Voir [Configuration](/docs/fr/configuration/config-file#runtime).
+
+## Voir aussi
+
+- [Commandes runtime](/docs/fr/cli/runtime)
+- [Investigation](/docs/fr/concepts/investigation)
+- [SDK TypeScript](/docs/fr/reference/typescript-sdk)

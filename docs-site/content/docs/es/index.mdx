@@ -1,0 +1,40 @@
+---
+title: Asagiri
+description: Orquestación determinista de flujos de desarrollo asistidos por IA.
+---
+
+# Asagiri
+
+Orquestación determinista de flujos de desarrollo asistidos por IA.
+
+Asagiri convierte especificaciones en ejecuciones de desarrollo auditables y conscientes del coste. El pipeline combina investigación local, *git worktrees*, agentes de codificación externos, los comandos de validación que usted define e informes reproducibles. Así, cada corrida deja un rastro que puede revisarse después, en lugar de quedar atrapada en un hilo de chat opaco.
+
+```bash
+asa work "develop billing-v2"
+```
+
+## Ideas centrales
+
+**Investigación local primero** se ejecuta antes de las llamadas a modelos en la nube. Asagiri recorre el repositorio con *grep* acotado y recorridos del sistema de archivos, y reduce el contexto para no enviar árboles enteros a APIs remotas por defecto.
+
+**Coste y estimación de tokens** muestran el gasto esperado antes de ejecutar. Contadores heurísticos y una hoja de precios configurable ofrecen límites de orden de magnitud; los presupuestos pueden bloquear la ejecución o pedir confirmación antes de lanzar agentes.
+
+**Aislamiento con *git worktree*** mantiene cada tarea en su propia rama y árbol de trabajo bajo `.asagiri/worktrees/`, lo que reduce choques cuando varias funcionalidades avanzan en paralelo.
+
+**Enrutamiento de agentes** asigna cada clase de paso del pipeline al perfil que usted configuró (por ejemplo Ollama local para triaje, CLIs en la nube para implementación pesada), según la estrategia y las políticas del YAML.
+
+**Validación antes de confiar** significa que Asagiri ejecuta sus comandos (`go test`, linters, scripts propios), no la autoevaluación del agente, antes de dar un paso por cerrado.
+
+**Informes reproducibles** escriben Markdown y JSON bajo `.asagiri/runs/<run-id>/` para auditar qué se ejecutó, cuánto costó y qué informó la validación.
+
+## Primeros pasos
+
+Siga estas páginas en orden al incorporar un repositorio:
+
+1. [Instalación](/docs/es/getting-started/installation)
+2. [Inicio rápido](/docs/es/getting-started/quickstart)
+3. [Primer flujo de trabajo](/docs/es/getting-started/first-workflow)
+
+<Callout type="warning">
+Asagiri no demuestra la corrección del código. La validación y la revisión humana siguen siendo obligatorias para los cambios críticos.
+</Callout>

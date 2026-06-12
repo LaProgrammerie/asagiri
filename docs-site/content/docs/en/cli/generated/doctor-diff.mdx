@@ -1,0 +1,49 @@
+---
+title: Doctor Diff · Asagiri CLI
+description: Compare latest.json avec l'entrée d'historique la plus récente.
+---
+
+CLI path: **`asa doctor diff`**
+
+## When to use
+
+Bootstrap commands scaffold or reconcile the Asagiri working tree so subsequent workflow nodes can reliably resolve configuration and repository metadata.
+
+> Original CLI synopsis: Comparer deux snapshots doctor enregistrés
+
+## Usage
+
+```bash
+asa doctor diff [flags]
+```
+
+## Options
+
+| Flag | Scope | Default | Description |
+| --- | --- | --- | --- |
+| `--dry-run` | Inherited | `false` | Simuler les exécutions sans lancer d'agent ni commandes externes |
+| `--from` | Local | `(empty)` | Snapshot source (défaut: dernière entrée history/) |
+| `--json` | Local | `false` | Sortie JSON du diff sur stdout |
+| `--to` | Local | `(empty)` | Snapshot cible (défaut: latest.json) |
+
+## Examples
+
+```bash
+asa doctor diff
+  asa doctor diff --json
+  asa doctor diff --from .asagiri/reports/doctor/history/20260608T120000Z.json
+```
+
+## What happens internally
+
+- Probes requisite binaries and configuration coherence—including MCP switches and caches—to surface actionable diagnostics before workflows run hot.
+
+## Failure modes
+
+- Cobra rejects unknown flags or arity mismatches before any repository side effects occur.
+- Asagiri cannot resolve scaffolding when the command is invoked outside an initialised checkout.
+- Downstream automation may fail whenever credentials, network endpoints, or cached prerequisites drift from expectations.
+
+## Related commands
+
+- [Doctor Architecture](./doctor-architecture.mdx)

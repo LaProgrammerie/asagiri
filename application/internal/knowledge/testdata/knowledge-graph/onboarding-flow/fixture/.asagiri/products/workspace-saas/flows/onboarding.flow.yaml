@@ -1,0 +1,7 @@
+id: onboarding
+title: Workspace onboarding
+steps:
+  - id: invite
+    action: invite_member
+    contract_ref: POST /invitations
+    screen: team

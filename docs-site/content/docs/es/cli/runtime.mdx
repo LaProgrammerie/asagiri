@@ -1,0 +1,68 @@
+---
+title: Comandos runtime
+description: Runtime local persistente, daemon, sesiones, eventos y memoria.
+---
+
+# Comandos runtime
+
+La capa runtime (`spec-my-A` §24) añade un entorno de ingeniería **local-first** persistente sobre la CLI sin estado.
+
+## Daemon
+
+```bash
+asa daemon start
+asa daemon start --detach
+asa daemon run
+asa daemon status
+asa daemon status --rich
+asa daemon stop
+```
+
+## Sesiones y ramas
+
+```bash
+asa session create onboarding-redesign --product workspace-saas --flow onboarding
+asa session list
+asa session attach onboarding-redesign
+asa session branch onboarding-redesign --name onboarding-enterprise
+asa session graph
+```
+
+## Eventos
+
+```bash
+asa runtime events
+asa runtime events --follow
+```
+
+## Memoria
+
+```bash
+asa memory list
+asa memory list --query "onboarding failure"
+asa memory consolidate
+```
+
+## Skills
+
+```bash
+asa skills list
+```
+
+## API local
+
+```bash
+asa runtime serve --port 8765
+asa runtime serve --socket .asagiri/runtime/runtime.sock
+```
+
+Ver [runtime serve](/docs/es/cli/runtime-serve).
+
+## SDK
+
+Go: `asagiri.Connect` / `ConnectHTTP` — TypeScript: [SDK](/docs/es/reference/typescript-sdk).
+
+## Ver también
+
+- [investigate](/docs/es/cli/investigate)
+- [Executable Product Layer](/docs/es/concepts/executable-product-layer)

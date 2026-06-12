@@ -1,0 +1,5 @@
+Trust
+─────
+  Verdict: Acceptable
+  Risque: governance — spec drift section 3
+  → asa review onboarding --task task-42 --agent reviewer

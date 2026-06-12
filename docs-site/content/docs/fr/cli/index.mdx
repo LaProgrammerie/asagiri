@@ -1,0 +1,58 @@
+---
+title: Vue d'ensemble CLI
+description: Groupes de commandes Asagiri et référence générée par commande.
+---
+
+# Vue d'ensemble CLI
+
+Le binaire **`asa`** (`application/cmd/asa`) est la seule entrée pour initialiser un projet, découper le pipeline spec-driven en verbes discrets, inspecter les artefacts de coût et l'exploitation courante. Le trafic quotidien passe soit par **`work`**, où des intentions en langage naturel mappent des pipelines entiers, soit par des étapes nommées (**`plan`**, **`dev`**, **`verify`**, etc.) quand `.kiro/specs/<feature>/` ancre déjà votre plan. Les regroupements ci-dessous résument l'intention ; les flags faisant foi viennent de Cobra via la **[référence CLI générée](/docs/fr/cli/generated)** — régénérez cet arbre à chaque changement de câblage CLI.
+
+## Comportement global
+
+Les flags de simulation s'appliquent de façon cohérente aux sous-commandes :
+
+| Flag | Description |
+| --- | --- |
+| `--dry-run` | Simule sans agents externes ni shells de validation |
+| (persistant) | Hérité par toutes les sous-commandes |
+
+Des variables d'environnement comme `ASA_DRY_RUN=1` et `ASA_YES=1` reflètent des flags courants ; voir [Variables d'environnement](/docs/fr/reference/environment-variables) pour la liste complète.
+
+## Groupes de commandes en un coup d'œil
+
+| Groupe | Commandes | Usage typique |
+| --- | --- | --- |
+| **Bootstrap** | `init`, `doctor`, `version` | Première installation et contrôles santé |
+| **Pipeline** | `spec`, `plan`, `enrich`, `dev`, `verify`, `review`, `pr` | Étapes spec-driven sur `.kiro/specs/<feature>/` |
+| **Intent** | `work`, `continue`, `next`, `inbox` | Workflows en langage naturel et reprise |
+| **Sources** | `sync`, `index` | Sources externes (ex. Notion) et indexation |
+| **Coût / contexte** | `estimate`, `investigate`, `context`, `cost`, `cost-report`, `cost-models` | Estimation, investigation, packs de contexte |
+| **Inspect** | `inspect` (diff, symbol, tests) | Investigation locale ciblée |
+| **Ops** | `status`, `resume`, `report`, `clean` | Cycle de vie des runs et artefacts |
+| **MCP** | `mcp`, `mcp-serve` | Intégration MCP si activée |
+| **Meta** | `docs`, `help` | Génération de doc et aide intégrée |
+
+Considérez le regroupement comme aide à la navigation — pas comme règle sur combien de commandes mettre dans des scripts versus le shell interactif.
+
+## Référence générée par commande
+
+Les pages par commande avec flags sont sous **[CLI generated](/docs/fr/cli/generated)**. Après modification des commandes Cobra, régénérez :
+
+```bash
+go run ./application/cmd/asa docs generate-cli \
+  --output docs-site/content/docs/en/cli/generated
+```
+
+Commitez le MDX généré avec le changement CLI pour garder la doc publique alignée.
+
+## Premières commandes à essayer
+
+Testez sans risque avant de brancher les agents :
+
+```bash
+asa init
+asa doctor
+asa work "my feature" --dry-run --plan-only
+```
+
+Ensuite, suivez le [Démarrage rapide](/docs/fr/getting-started/quickstart) pour un dry-run sûr, puis le [Premier workflow](/docs/fr/getting-started/first-workflow) quand agents et commandes de validation sont configurés.

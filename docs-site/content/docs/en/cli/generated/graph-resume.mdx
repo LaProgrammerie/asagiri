@@ -1,0 +1,48 @@
+---
+title: Graph Resume · Asagiri CLI
+description: Reprendre un graphe interrompu
+---
+
+CLI path: **`asa graph resume`**
+
+## When to use
+
+Orchestration commands coordinate higher-order Asagiri workloads such as ingestion, syncing, backlog triage, investigative passes, hydrated context payloads, coarse estimates, and workspace-specific automation.
+
+> Original CLI synopsis: Reprendre un graphe interrompu
+
+## Usage
+
+```bash
+asa graph resume [flags]
+```
+
+## Options
+
+| Flag | Scope | Default | Description |
+| --- | --- | --- | --- |
+| `--dry-run` | Inherited | `false` | Simuler les exécutions sans lancer d'agent ni commandes externes |
+| `--json` | Local | `false` | Structured JSON output on stdout |
+
+## Examples
+
+```bash
+asa graph resume graph-20260529-001
+```
+
+## What happens internally
+
+- Hydrates contextual services resolved from **$PWD**, coordinating git-bound automation, ingestion pipelines, syncing, backlog triage, investigations, MCP hooks, contextual hydration, coarse estimates, and similar orchestrations for this subtree.
+
+## Failure modes
+
+- Cobra rejects unknown flags or arity mismatches before any repository side effects occur.
+- Asagiri cannot resolve scaffolding when the command is invoked outside an initialised checkout.
+- Downstream automation may fail whenever credentials, network endpoints, or cached prerequisites drift from expectations.
+
+## Related commands
+
+- [Graph Rollback](./graph-rollback.mdx)
+- [Graph Run](./graph-run.mdx)
+- [Graph Status](./graph-status.mdx)
+- [Graph Visualize](./graph-visualize.mdx)

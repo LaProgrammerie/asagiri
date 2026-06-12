@@ -1,0 +1,26 @@
+---
+title: contracts Befehle
+description: Technische Vertraege aus extrahierten Flows ableiten.
+---
+
+# contracts Befehle
+
+`asa contracts extract` transformiert Flows in umsetzbare technische Vertraege.
+
+## Extrahieren
+
+```bash
+asa contracts extract workspace-saas
+```
+
+Erzeugt:
+
+- `contracts/api.openapi.yaml`
+- `contracts/permissions.yaml`
+- `contracts/events.yaml`
+- `contracts/analytics.yaml`
+- `contracts/observability.yaml`
+
+Der Extraktionsreport markiert Unsicherheiten vor der Implementierung.
+
+Strikte Validierung: Der Befehl bricht jetzt ab, wenn die Kopplung metrics/analytics/contracts unvollstaendig ist (fehlende Flow-Metriken, fehlende Analytics-Metrik/Dashboard oder fehlender Observability-Link).

@@ -1,0 +1,107 @@
+---
+title: Workflow diario
+description: Iniciar feature, desbloquear gates, leer trust y doctor.
+---
+
+# Workflow diario
+
+## 1. Iniciar una feature
+
+```bash
+asa onboard
+asa ready
+asa work "añadir export CSV a billing" --yes
+asa work billing-v2 --yes
+```
+
+## 2. Qué hacer después
+
+```bash
+asa next
+asa next --feature billing-v2
+asa next --execute
+asa status
+```
+
+## 3. Bloqueos gates
+
+### human_review pending
+
+```text
+Gate human_review requires action.
+Next step:
+  asa gates submit human_review --task task-003 --verdict pass
+Then:
+  asa continue --yes
+```
+
+### verify_evidence failed
+
+```bash
+asa next
+# Command: asa verify billing-v2 --task task-003 --force
+```
+
+## 4. Leer trust
+
+```bash
+asa trust task task-003
+asa trust feature billing-v2
+asa trust run run-2026-06-06-abc
+```
+
+Siguiente paso harmonizado: `asa next --feature <feature>`.
+
+## 5. Leer doctor
+
+```bash
+asa doctor
+asa doctor --full
+asa doctor --json
+asa doctor --full --strict
+```
+
+Exit: FAIL → 1 ; solo WARN → 0 ; WARN + `--strict` → 1.
+
+## 6. CI — informes persistentes (`--save`)
+
+Para pipelines con `jq` o archivo de snapshots trust/doctor:
+
+| Stream | Contenido |
+| --- | --- |
+| **stdout** con `--json` | Un solo documento JSON (apta para pipe) |
+| **stderr** con `--save` | `Rapport enregistré : <ruta>` (confirmación) |
+
+```bash
+asa init
+asa doctor --full --strict --json --save 2>/dev/null
+echo $?   # 1 si FAIL o WARN en modo strict
+
+asa trust feature billing-v2 --json --save | jq -e '.score.verdict != "blocked"'
+```
+
+Artefactos guardados (escritura atómica con `--save`):
+
+```text
+.asagiri/reports/doctor/latest.json
+.asagiri/reports/trust/tasks/<task-id>.json
+.asagiri/reports/trust/features/<feature>.json
+.asagiri/reports/trust/runs/<run-id>.json
+```
+
+Sin `--save`, `--json` deja stderr vacío en éxito. `--save` no añade texto humano tras el JSON en stdout.
+
+## Escenarios concretos
+
+### Feature sana
+
+`asa next` recomienda `asa review …` ; trust « Acceptable ».
+
+### doctor warn-only
+
+`asa doctor --full` → « prêt (avertissements) », exit 0.
+
+## Más lectura
+
+- [Modelo mental](/docs/es/concepts/mental-model)
+- [Workflow CI](/docs/es/workflows/ci-workflow)

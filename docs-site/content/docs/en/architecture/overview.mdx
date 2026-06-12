@@ -1,0 +1,64 @@
+---
+title: Architecture overview
+description: Go modules under application/internal and the execution pipeline.
+---
+
+# Architecture overview
+
+Asagiri ships as a Go CLI (`application/cmd/asa`) with most behavior in `application/internal/` and shared contracts in `application/pkg/asa`. This split keeps the binary thin while isolating parsing, planning, investigation, costing, and storage behind explicit packages you can reason about from the filesystem layout alone.
+
+## Execution pipeline
+
+The end-to-end path starts at the CLI, resolves intent, runs the V3 pipeline (investigation, context optimization, cost and budgets, routing), then executes the workflow stages—plan, enrich, and dev—inside a worktree before validation, optional review, and reporting.
+
+```mermaid
+flowchart TD
+  A[User intent / CLI] --> B[intent resolver + planner]
+  B --> C[pipeline V3]
+  C --> D[investigation]
+  D --> E[contextopt]
+  E --> F[cost estimate + budgets]
+  F --> G[routing]
+  G --> H[workflow: plan enrich dev]
+  H --> I[worktree + agent exec]
+  I --> J[validation]
+  J --> K[review + report]
+```
+
+## Internal modules
+
+| Package | Role |
+| --- | --- |
+| `cli` | Cobra commands, docgen, app context |
+| `config` | YAML load, defaults, path resolve |
+| `intent` | NL `work`/`continue`, hybrid resolver, executor |
+| `workflow` | State machine, plan/dev/verify/review, worktrees |
+| `worktree` | Git worktree lifecycle |
+| `agent` / `agent/exec` | Subprocess contracts |
+| `source` / `source/notion` | Spec ingestion |
+| `contextopt` | Context collect/reduce/pack |
+| `investigation` | Local grep/scan |
+| `cost` | Tokens, pricing, budgets |
+| `routing` | Step-class → agent/model |
+| `mcp` | Stdio MCP tools (optional) |
+| `store/sqlite` | Runs, tasks, metrics |
+| `report` | Run reports |
+| `tui` | Rich/plain/json UI |
+| `rag` | Chunk index (SQLite, non-vector) |
+| `bootstrap` | `init`, `doctor` |
+| `redact` | Log secret masking |
+| `validation` | External command runner |
+
+## State storage
+
+Runs and tasks persist in **SQLite** at `state.path` (default `.asagiri/state.sqlite`). Artefacts for each run land under `.asagiri/runs/<run-id>/`, which keeps prompts, logs, and intermediate outputs addressable without rereading the database.
+
+## Extension points
+
+You can introduce new agents through config alone; wire new quality gates via `validation.commands`; add routing strategies under `routing.strategies`; and expose optional MCP tools when `mcp.enabled: true`. Those hooks are intentional seams: most teams extend Asagiri without forking the Go entrypoint.
+
+## Related
+
+- [Configuration](/docs/configuration/config-file)
+- [Reliability: worktrees](/docs/reliability/worktree-isolation)
+- [MCP overview](/docs/mcp/overview)

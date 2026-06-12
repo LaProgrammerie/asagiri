@@ -1,0 +1,47 @@
+---
+title: Sécurité
+description: Secrets, périmètre, MCP, agents et données envoyées aux fournisseurs.
+---
+
+# Sécurité
+
+Asagiri enchaîne compilateurs, serveurs MCP, agents en sous-processus et modèles cloud optionnels ; chaque couche amplifie les erreurs d’hygiène déjà présentes dans le dépôt. Attendez-vous à une **responsabilité partagée** : la CLI impose des garde-corps mécaniques, mais choix configurés trop privilégiés et routines de revue après coup restent de votre équipe.
+
+## Synthèse par axe
+
+| Axe | Comportement |
+| --- | --- |
+| **Système de fichiers** | Opère repo + worktrees ; investigation respecte listes bloquées |
+| **Secrets** | `token_env` Notion ; `secret_path_denylist` ; anonymisation journaux |
+| **Agents externes** | Pas de shell ; `execve` avec argv uniquement et timeouts réseau |
+| **Réseau** | `policies.allow_network: false` par défaut mais agents peuvent téléphoner hors |
+| **MCP** | Désactivé par défaut ; taille/timeouts bornés |
+| **Modèles cloud** | Données quittent la machine lorsqu’un agent cloud s’active — vos commandes choisissent |
+
+## Étendue disque
+
+La surface explorée :
+
+- Worktrees sous `.asagiri/worktrees/`
+- État/exécutions sous `.asagiri/`
+- Investigation évite globs sensibles et chemoins listés (`.env`, clés)
+
+Pour autant fichiers ignorés — secrets présents uniquement localement — restent atteignables si un opérateur force des chemins, d’où profiles agents moind-privilège toujours recommandés.
+
+## Journaux sensibles
+
+`application/internal/redact` masque certains motifs de jeton communs dans la sortie. Ne reposez pas uniquement là-dessus : évitez d’injecter secrets dans vos prompts agents.
+
+## Agents externes
+
+CLIs configurés (`cursor-agent`, `codex`, …) gardent vos droits utilisateur. Traitez-les comme n’importe quel automate avec accès checkout.
+
+## Signaler problèmes
+
+Consultez **[SECURITY.md](https://github.com/LaProgrammerie/asagiri/blob/main/SECURITY.md)** lorsque vous observez escalade de privilèges orchestrations.
+
+## Voir aussi
+
+- [Limites](/docs/fr/security/limits)
+- [Sécurité MCP](/docs/fr/mcp/security)
+- [Configuration Notion](/docs/fr/configuration/notion)

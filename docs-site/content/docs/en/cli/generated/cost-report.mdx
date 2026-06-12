@@ -1,0 +1,49 @@
+---
+title: Cost Report · Asagiri CLI
+description: Historique des coûts
+---
+
+CLI path: **`asa cost report`**
+
+## When to use
+
+Use **cost** when reconciling SQLite-backed telemetry with pricing tables declared in **.asagiri/config.yaml** or when slicing spend over a bounded recency window.
+
+> Original CLI synopsis: Historique des coûts
+
+## Usage
+
+```bash
+asa cost report [flags]
+```
+
+## Options
+
+| Flag | Scope | Default | Description |
+| --- | --- | --- | --- |
+| `--dry-run` | Inherited | `false` | Simuler les exécutions sans lancer d'agent ni commandes externes |
+| `--since` | Local | `7d` | Fenêtre (ex. 7d) |
+
+## Examples
+
+```bash
+asa cost report
+```
+
+> Wire richer samples through **cobra.Command.Example** when the happy path warrants copy/paste-friendly automation beyond this scaffold.
+
+## What happens internally
+
+- Parses the **--since** shorthand window, opens the SQLite telemetry store associated with **$PWD**, and aggregates totals through **telemetry.SummarizeSince**.
+
+## Failure modes
+
+- Cobra rejects unknown flags or arity mismatches before any repository side effects occur.
+- Asagiri cannot resolve scaffolding when the command is invoked outside an initialised checkout.
+- SQLite contention or corrupted telemetry prevent summarisation queries from completing.
+- Malformed **--since** payloads fail fast before aggregates are queried.
+
+## Related commands
+
+- [Cost Models](./cost-models.mdx)
+- [Cost Trends](./cost-trends.mdx)

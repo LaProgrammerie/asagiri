@@ -1,0 +1,31 @@
+---
+title: Index CLI généré
+description: Référence de commandes auto-générée à partir des définitions Cobra.
+---
+
+# Référence CLI générée
+
+Les pages de cette section ne prennent forme que via **`docs generate-cli`**. Traitez les retouches Markdown comme éphémères : l’avertissement ci-dessous reste vrai, car une régénération Cobra écrase les ajouts manuels.
+
+Ces pages sont **générées** à partir des définitions Cobra actives. Ne les modifiez pas à la main — les changements seront écrasés.
+
+## Régénérer
+
+```bash
+go run ./application/cmd/asa docs generate-cli \
+  --output docs-site/content/docs/en/cli/generated
+```
+
+Ou avec un binaire compilé :
+
+```bash
+./bin/asa docs generate-cli --output docs-site/content/docs/en/cli/generated
+```
+
+## Parcourir les commandes
+
+Ouvrez la section **CLI → généré** dans la barre latérale, ou commencez par [l’index généré](/docs/cli/generated/index). La section française propose des pages résumé pour un sous-ensemble de commandes ; le détail complet des drapeaux reste sur l’arborescence anglaise générée (`/docs/cli/generated`).
+
+## Guides rédigés
+
+Pour les workflows et les concepts : [Vue d’ensemble CLI](/docs/fr/cli), [Premier workflow](/docs/fr/getting-started/first-workflow) et [Workflows](/docs/fr/workflows/kiro-to-cursor).

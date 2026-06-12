@@ -1,0 +1,45 @@
+---
+title: Límites
+description: Lo que Asagiri no promete y fronteras conocidas del producto.
+---
+
+# Límites
+
+Asagiri destaca ordenando automatización disciplinada, pero cada orquestador apoyado en LLMs hereda aristas delicadas. Debajo están las **fronteras de confianza** explícitas de **`spec-doc` §17.1** junto capacidades donde sí puede ayudarte.
+
+## Asagiri no hace estas promesas
+
+- **Correctitud absoluta** de código producido por modelos
+- **Sustituir tu suite** — ejecuta comandos que defines; fracasos son tuyos
+- **Eliminar revisión humana** en seguridad, cumplimiento o arquitectura
+- **Bloquear al 100% inyección de prompt** — specs o contenido Notion maligno pueden guiar agentes
+- **Facturación idéntica a tokenizers hospedados**
+- **Acuerdos SLA** para producción mediante CLI OSS
+
+Ser explícitos con lo que no garantizamos permite concentrar chequeos manuales donde la herramienta determinística se detiene ante prompts hostiles costes uptime.
+
+## Capacidades sólidas
+
+- **Máquina de estados** para cada paso de pipeline
+- **Aislar** trabajo en worktrees Git
+- **Estimar** coste/tokens previo a lanzar gasto
+- **Bloquear** ciertas políticas git sucio ficheros secreto límites presupuesto
+- **Registrar** rutas ejecutadas para auditorías (`report`, SQLite)
+
+Garantías orientadas a **disciplina de flujo**, no seguridad inherente porque `go test` pasó una vez local.
+
+## Zona experimental
+
+Capacidades en docs etiquetadas — MCP completa Notionsync compresión contexto automatizada resumes sin `--dry-run` RAG vectores pueden iterar rápido.
+
+Formalícelos en runbooks sólo después aceptación consciente de regresiones asociadas heurísticas.
+
+<Callout type="warning">
+Aprobar `verify` sólo garantiza comandos configurados cerraron código 0, no garantía seguridad rollout.
+</Callout>
+
+## Relacionado
+
+- [Filosofía](/docs/es/concepts/philosophy)
+- [Seguridad índice](/docs/es/security)
+- [Roadmap](/docs/es/roadmap)

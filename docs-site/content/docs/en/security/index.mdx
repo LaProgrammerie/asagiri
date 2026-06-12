@@ -1,0 +1,47 @@
+---
+title: Security
+description: Secrets, scope, MCP, agents, and data sent to providers.
+---
+
+# Security
+
+Asagiri stitches together compilers, MCP servers, subprocess agents, and optional cloud-hosted models—each layer amplifying whichever mistakes already exist in your repository hygiene. Expect **shared responsibility**: the CLI can enforce scaffolding, but privileged configuration choices and downstream review rituals remain firmly with your team.
+
+## Model summary
+
+| Area | Behavior |
+| --- | --- |
+| **Filesystem** | Operates on repo + worktrees; investigation respects denylists |
+| **Secrets** | `token_env` for Notion; `secret_path_denylist`; log redaction |
+| **Subprocess agents** | No shell; argv-only exec with timeouts |
+| **Network** | `policies.allow_network: false` by default; agents may still call networks |
+| **MCP** | Off by default; caps output bytes and command time |
+| **Cloud models** | Data leaves machine when cloud agents run — you control which commands run |
+
+## Filesystem scope
+
+Surface area stays bounded:
+
+- Worktrees under `.asagiri/worktrees/`
+- State and runs under `.asagiri/`
+- Investigation skips sensitive globs and denylisted paths (`.env`, keys)
+
+Everything else—including ignored secrets your editors never committed—is still reachable if an operator misroutes commands, so pairing these defaults with least-privilege agent profiles remains essential.
+
+## Sensitive logs
+
+`application/internal/redact` masks common token patterns in output. Do not rely on redaction alone — avoid piping secrets into agent prompts.
+
+## External agents
+
+Configured CLIs (`cursor-agent`, `codex`, etc.) run with your user permissions. Treat them like any CI tool with repo access.
+
+## Reporting issues
+
+See repository [`SECURITY.md`](https://github.com/LaProgrammerie/asagiri/blob/main/SECURITY.md) for disclosure guidance whenever you uncover privilege escalations tied to orchestration workflows.
+
+## Related
+
+- [Limits](/docs/security/limits)
+- [MCP security](/docs/mcp/security)
+- [Notion configuration](/docs/configuration/notion)

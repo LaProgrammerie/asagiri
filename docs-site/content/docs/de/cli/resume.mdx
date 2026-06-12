@@ -1,0 +1,33 @@
+---
+title: resume
+description: Unterbrochenen Workflow-Run fortsetzen; Steps mit --execute verketten.
+---
+
+# `asa resume`
+
+Setzt einen in `.asagiri/state.sqlite` gespeicherten Workflow-Run fort (PF-X-01).
+
+## Verwendung
+
+```bash
+asa resume <run-id>                    # nächsten Step anzeigen
+asa resume <run-id> --execute          # verbleibende Steps (echte Agenten)
+asa resume <run-id> --execute --max-steps 10
+asa resume <run-id> --force --execute  # bereits erfolgreichen Step erneut
+```
+
+## Verhalten
+
+| Modus | Wirkung |
+| --- | --- |
+| Standard | Gibt `prochain step: plan\|enrich\|dev\|…` aus |
+| `--execute` | Läuft bis Ende, Gate oder `--max-steps` |
+| Globales `--dry-run` | Mit `--execute`: Simulation ohne externe Agenten |
+
+Ohne `--execute` den angezeigten Step manuell ausführen oder **`asa continue`** nutzen.
+
+## Siehe auch
+
+- [Generierte Referenz](/docs/cli/generated/resume)
+- [Fehlerbehebung](/docs/de/workflows/failure-recovery)
+- [Erster Workflow](/docs/de/getting-started/first-workflow)

@@ -1,0 +1,19 @@
+---
+title: Comando impact
+description: Analizar el impacto de cambios usando el grafo de conocimiento.
+---
+
+# `asa impact analyze`
+
+Análisis de impacto (`spec-my-E` §14).
+
+```bash
+asa impact analyze --file internal/invitation/invitation_service.go
+asa impact analyze --flow onboarding --action invite_member --json
+```
+
+Requiere un grafo construido (`asa knowledge build` antes).
+
+Lista flows, operaciones API, eventos, pruebas impactadas, nivel de riesgo y comprobaciones recomendadas.
+
+Ver [Grafo de conocimiento de ingeniería](/docs/es/concepts/engineering-knowledge-graph).

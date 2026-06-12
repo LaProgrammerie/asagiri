@@ -1,0 +1,35 @@
+---
+title: Flow-Schema
+description: Struktur von .flow.yaml Dateien aus der Prototyp-Extraktion.
+---
+
+# Flow-Schema
+
+Jede `.flow.yaml` beschreibt eine User-Journey.
+
+## Minimale Form
+
+```yaml
+id: onboarding
+name: Onboarding
+status: draft
+entrypoint:
+  route: /onboarding
+  screen: onboarding_welcome
+steps:
+  - id: create_workspace
+    screen: create_workspace
+    actions:
+      - id: submit_workspace
+        type: command
+        command: workspace.create
+        requires_api: true
+exitpoints:
+  - route: /dashboard
+```
+
+## Qualitaetssignale
+
+- fehlende loading/error states;
+- ungeklaerte Vertraege;
+- sensible Aktionen ohne explizite Bestaetigung.

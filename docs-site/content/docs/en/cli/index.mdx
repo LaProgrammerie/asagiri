@@ -1,0 +1,58 @@
+---
+title: CLI overview
+description: Asagiri command groups and generated per-command reference.
+---
+
+# CLI overview
+
+The **`asa` binary (`application/cmd/asa`) is the sole entry surface for initializing projects, slicing the spec-driven pipeline into discrete verbs, inspecting cost artefacts, and running operational housekeeping. Day-to-day traffic usually flows either through **`work`**, where natural-language intents map onto entire pipelines, or through named steps such as **`plan`**, **`dev`**, **`verify`**, etc., when `.kiro/specs/<feature>/` already anchors your plan. Groupings below summarize intent, but authoritative flags arrive from Cobra via the **[generated CLI reference](/docs/cli/generated)**—regenerate that tree whenever CLI wiring changes.
+
+## Global behavior
+
+Simulation flags apply consistently across nested commands:
+
+| Flag | Description |
+| --- | --- |
+| `--dry-run` | Simulate without external agents or validation shells |
+| (persistent) | Inherited by all subcommands |
+
+Environment variables such as `ASA_DRY_RUN=1` and `ASA_YES=1` mirror common flags; see [Environment variables](/docs/reference/environment-variables) for the full list.
+
+## Command groups at a glance
+
+| Group | Commands | Typical use |
+| --- | --- | --- |
+| **Bootstrap** | `init`, `doctor`, `version` | First-time setup and health checks |
+| **Pipeline** | `spec`, `plan`, `enrich`, `dev`, `verify`, `review`, `pr` | Spec-driven steps on `.kiro/specs/<feature>/` |
+| **Intent** | `work`, `continue`, `next`, `inbox` | Natural-language workflows and resume |
+| **Sources** | `sync`, `index` | External sources (e.g. Notion) and indexing |
+| **Cost / context** | `estimate`, `investigate`, `context`, `cost`, `cost-report`, `cost-models` | Estimation, investigation, context packs |
+| **Inspect** | `inspect` (diff, symbol, tests) | Targeted local investigation |
+| **Ops** | `status`, `resume`, `report`, `clean` | Run lifecycle and artifacts |
+| **MCP** | `mcp`, `mcp-serve` | MCP integration when enabled |
+| **Meta** | `docs`, `help` | Doc generation and built-in help |
+
+Treat the grouping as navigation aid—not a mandate about how many commands belong in scripts versus interactive shells.
+
+## Generated per-command reference
+
+Per-command pages with flags live under **[CLI generated](/docs/cli/generated)**. After changing Cobra commands, regenerate:
+
+```bash
+go run ./application/cmd/asa docs generate-cli \
+  --output docs-site/content/docs/en/cli/generated
+```
+
+Commit the generated MDX with the CLI change so the public docs stay in sync.
+
+## First commands to try
+
+Kick the tyres safely before layering agents:
+
+```bash
+asa init
+asa doctor
+asa work "my feature" --dry-run --plan-only
+```
+
+From there, follow [Quickstart](/docs/getting-started/quickstart) for a safe dry-run path, then [First workflow](/docs/getting-started/first-workflow) when agents and validation commands are configured.

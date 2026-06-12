@@ -1,0 +1,101 @@
+---
+title: Estimate · Asagiri CLI
+description: Estimer tokens/coût/temps sans exécuter
+---
+
+CLI path: **`asa estimate`**
+
+## When to use
+
+Orchestration commands coordinate higher-order Asagiri workloads such as ingestion, syncing, backlog triage, investigative passes, hydrated context payloads, coarse estimates, and workspace-specific automation.
+
+> Original CLI synopsis: Estimer tokens/coût/temps sans exécuter
+
+## Usage
+
+```bash
+asa estimate [flags]
+```
+
+## Options
+
+| Flag | Scope | Default | Description |
+| --- | --- | --- | --- |
+| `--budget` | Local | `0` | Plafond coût estimé (unité majeure, ex. EUR) |
+| `--dry-run` | Inherited | `false` | Simuler les exécutions sans lancer d'agent ni commandes externes |
+| `--task` | Local | `(empty)` | ID de tâche |
+
+## Examples
+
+```bash
+asa estimate
+```
+
+> Wire richer samples through **cobra.Command.Example** when the happy path warrants copy/paste-friendly automation beyond this scaffold.
+
+## What happens internally
+
+- Hydrates contextual services resolved from **$PWD**, coordinating git-bound automation, ingestion pipelines, syncing, backlog triage, investigations, MCP hooks, contextual hydration, coarse estimates, and similar orchestrations for this subtree.
+
+## Failure modes
+
+- Cobra rejects unknown flags or arity mismatches before any repository side effects occur.
+- Asagiri cannot resolve scaffolding when the command is invoked outside an initialised checkout.
+- Downstream automation may fail whenever credentials, network endpoints, or cached prerequisites drift from expectations.
+
+## Related commands
+
+- [Agents](./agents.mdx)
+- [Analysis](./analysis.mdx)
+- [Architecture](./architecture.mdx)
+- [Clean](./clean.mdx)
+- [Completion](./completion.mdx)
+- [Context](./context.mdx)
+- [Continue](./continue.mdx)
+- [Contracts](./contracts.mdx)
+- [Cost](./cost.mdx)
+- [Daemon](./daemon.mdx)
+- [Dashboard](./dashboard.mdx)
+- [Dev](./dev.mdx)
+- [Docs](./docs.mdx)
+- [Doctor](./doctor.mdx)
+- [Enrich](./enrich.mdx)
+- [Explain](./explain.mdx)
+- [Flow](./flow.mdx)
+- [Flows](./flows.mdx)
+- [Gates](./gates.mdx)
+- [Graph](./graph.mdx)
+- [Help](./help.mdx)
+- [Impact](./impact.mdx)
+- [Inbox](./inbox.mdx)
+- [Index](./index.mdx)
+- [Init](./init.mdx)
+- [Inspect](./inspect.mdx)
+- [Investigate](./investigate.mdx)
+- [Knowledge](./knowledge.mdx)
+- [Mcp](./mcp.mdx)
+- [Memory](./memory.mdx)
+- [Mission](./mission.mdx)
+- [Next](./next.mdx)
+- [Onboard](./onboard.mdx)
+- [Plan](./plan.mdx)
+- [Pr](./pr.mdx)
+- [Product](./product.mdx)
+- [Prototype](./prototype.mdx)
+- [Ready](./ready.mdx)
+- [Replay](./replay.mdx)
+- [Report](./report.mdx)
+- [Resume](./resume.mdx)
+- [Review](./review.mdx)
+- [Runs](./runs.mdx)
+- [Runtime](./runtime.mdx)
+- [Session](./session.mdx)
+- [Skills](./skills.mdx)
+- [Spec](./spec.mdx)
+- [Status](./status.mdx)
+- [Sync](./sync.mdx)
+- [Tools](./tools.mdx)
+- [Trust](./trust.mdx)
+- [Verify](./verify.mdx)
+- [Version](./version.mdx)
+- [Work](./work.mdx)

@@ -1,0 +1,27 @@
+---
+title: Mission Control
+description: Écran cockpit par défaut pour comprendre l’état du workspace en moins de dix secondes.
+---
+
+# Mission Control
+
+Ouvrir Mission Control :
+
+```bash
+asa
+# ou
+asa mission
+```
+
+## Contenu principal
+
+- workspace et branche
+- statut runtime et session
+- étapes du flow actif avec glyphes de progression
+- synthèse Agent Theatre
+- dimensions trust et score global
+- **coût jour / mois** (dérivé des événements runtime récents)
+- événements récents (flux live)
+- **actions recommandées** — prochaines étapes classées avec équivalents CLI (`GetRecommendedActionsQuery`)
+
+Lancer une action recommandée ou **Ctrl+P** pour démarrer un work, vérifier la trust, reprendre un graph bloqué ou avancer le pipeline prototype.

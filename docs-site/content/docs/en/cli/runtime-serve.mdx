@@ -1,0 +1,64 @@
+---
+title: runtime serve
+description: Local JSON REST API and Unix socket for runtime embedding.
+---
+
+# `asa runtime serve`
+
+Exposes the persistent runtime for **embedding** and SDK clients.
+
+## HTTP (localhost)
+
+```bash
+asa runtime serve --port 8765
+```
+
+Binds **`127.0.0.1` only**.
+
+## Unix socket
+
+```bash
+asa runtime serve --socket .asagiri/runtime/runtime.sock
+```
+
+You can run HTTP and Unix together: keep `--port` while passing `--socket`.
+
+## With worker
+
+```bash
+asa daemon run --api-port 8765
+```
+
+## Observability
+
+`GET /v1/status` returns daemon counters **and** metrics:
+
+- `active_sessions`
+- `memory_hits`
+- `context_reduction_ratio`
+- `runtime_event_rate`
+- `agent_failure_rate`
+- `flow_completion_rate`
+- `review_rejection_rate`
+
+## Authentication
+
+Token file: `.asagiri/runtime/api.token`
+
+```http
+Authorization: Bearer <token>
+```
+
+## SDKs
+
+- Go: `Connect`, `ConnectHTTP`
+- TypeScript: [`@laprogrammerie/asagiri`](../../reference/typescript-sdk)
+
+## Runtime modes
+
+Configure in `.asagiri/config.yaml`:
+
+```yaml
+runtime:
+  mode: guided  # guided | interactive | headless | ci | review | exploration
+```

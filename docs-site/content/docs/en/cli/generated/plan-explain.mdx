@@ -1,0 +1,46 @@
+---
+title: Plan Explain · Asagiri CLI
+description: Expliquer les dépendances, le parallélisme et les risques du plan
+---
+
+CLI path: **`asa plan explain`**
+
+## When to use
+
+Workflow commands advance tracked features across spec → plan → implementation → verification → reporting guardrails before opening a merge request.
+
+> Original CLI synopsis: Expliquer les dépendances, le parallélisme et les risques du plan
+
+## Usage
+
+```bash
+asa plan explain [flags]
+```
+
+## Options
+
+| Flag | Scope | Default | Description |
+| --- | --- | --- | --- |
+| `--dry-run` | Inherited | `false` | Simuler les exécutions sans lancer d'agent ni commandes externes |
+| `--flow` | Local | `(empty)` | Flow id under .asagiri/products/<product>/flows/ |
+
+## Examples
+
+```bash
+asa plan explain workspace-saas --flow workspace-onboarding
+```
+
+## What happens internally
+
+- Validates CLI arity, honours the global **--dry-run** switch, resolves repository metadata, hydrates SQLite-backed bookkeeping, then calls façade orchestration wrappers for the requested lifecycle stage.
+- Persists deterministic run identifiers so **status** and **resume** can continue automation deterministically afterward.
+
+## Failure modes
+
+- Cobra rejects unknown flags or arity mismatches before any repository side effects occur.
+- Asagiri cannot resolve scaffolding when the command is invoked outside an initialised checkout.
+- Delegated subprocesses (**git**, MCP hosts, editor agents, etc.) can exit non-zero and bubble errors verbatim.
+
+## Related commands
+
+- [Plan Graph](./plan-graph.mdx)

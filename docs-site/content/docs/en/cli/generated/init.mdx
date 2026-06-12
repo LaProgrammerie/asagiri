@@ -1,0 +1,99 @@
+---
+title: Init · Asagiri CLI
+description: Crée .asagiri/, copie config.yaml si absent, et initialise state.sqlite.
+---
+
+CLI path: **`asa init`**
+
+## When to use
+
+Bootstrap commands scaffold or reconcile the Asagiri working tree so subsequent workflow nodes can reliably resolve configuration and repository metadata.
+
+> Original CLI synopsis: Initialiser Asagiri dans le dépôt courant
+
+## Usage
+
+```bash
+asa init [flags]
+```
+
+## Options
+
+| Flag | Scope | Default | Description |
+| --- | --- | --- | --- |
+| `--dry-run` | Inherited | `false` | Simuler les exécutions sans lancer d'agent ni commandes externes |
+
+## Examples
+
+```bash
+asa init
+```
+
+> Wire richer samples through **cobra.Command.Example** when the happy path warrants copy/paste-friendly automation beyond this scaffold.
+
+## What happens internally
+
+- Writes Asagiri scaffolding (directories plus manifests) that align repositories with onboarding expectations documented for contributors.
+
+## Failure modes
+
+- Cobra rejects unknown flags or arity mismatches before any repository side effects occur.
+- Asagiri cannot resolve scaffolding when the command is invoked outside an initialised checkout.
+- Downstream automation may fail whenever credentials, network endpoints, or cached prerequisites drift from expectations.
+
+## Related commands
+
+- [Agents](./agents.mdx)
+- [Analysis](./analysis.mdx)
+- [Architecture](./architecture.mdx)
+- [Clean](./clean.mdx)
+- [Completion](./completion.mdx)
+- [Context](./context.mdx)
+- [Continue](./continue.mdx)
+- [Contracts](./contracts.mdx)
+- [Cost](./cost.mdx)
+- [Daemon](./daemon.mdx)
+- [Dashboard](./dashboard.mdx)
+- [Dev](./dev.mdx)
+- [Docs](./docs.mdx)
+- [Doctor](./doctor.mdx)
+- [Enrich](./enrich.mdx)
+- [Estimate](./estimate.mdx)
+- [Explain](./explain.mdx)
+- [Flow](./flow.mdx)
+- [Flows](./flows.mdx)
+- [Gates](./gates.mdx)
+- [Graph](./graph.mdx)
+- [Help](./help.mdx)
+- [Impact](./impact.mdx)
+- [Inbox](./inbox.mdx)
+- [Index](./index.mdx)
+- [Inspect](./inspect.mdx)
+- [Investigate](./investigate.mdx)
+- [Knowledge](./knowledge.mdx)
+- [Mcp](./mcp.mdx)
+- [Memory](./memory.mdx)
+- [Mission](./mission.mdx)
+- [Next](./next.mdx)
+- [Onboard](./onboard.mdx)
+- [Plan](./plan.mdx)
+- [Pr](./pr.mdx)
+- [Product](./product.mdx)
+- [Prototype](./prototype.mdx)
+- [Ready](./ready.mdx)
+- [Replay](./replay.mdx)
+- [Report](./report.mdx)
+- [Resume](./resume.mdx)
+- [Review](./review.mdx)
+- [Runs](./runs.mdx)
+- [Runtime](./runtime.mdx)
+- [Session](./session.mdx)
+- [Skills](./skills.mdx)
+- [Spec](./spec.mdx)
+- [Status](./status.mdx)
+- [Sync](./sync.mdx)
+- [Tools](./tools.mdx)
+- [Trust](./trust.mdx)
+- [Verify](./verify.mdx)
+- [Version](./version.mdx)
+- [Work](./work.mdx)

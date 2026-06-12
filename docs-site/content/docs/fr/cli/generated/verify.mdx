@@ -1,0 +1,22 @@
+---
+title: verify · aperçu CLI
+description: Exécuter les validations locales — résumé et lien vers la référence complète.
+---
+
+# verify
+
+CLI : **`asa verify`**
+
+## Quand l'utiliser
+
+Les commandes de workflow font avancer les fonctionnalités suivies à travers spec → plan → implémentation → vérification → garde-fous de reporting avant l'ouverture d'une demande de fusion.
+
+## Modes de défaillance
+
+- Cobra rejette les drapeaux inconnus ou les erreurs d'arité avant tout effet de bord sur le dépôt.
+- Asagiri ne peut pas résoudre l'amorçage si la commande est invoquée en dehors d'un checkout initialisé.
+- Les subprocess délégués (**git**, hôtes MCP, agents éditeur, etc.) peuvent quitter avec un code non nul et remonter l'erreur telle quelle.
+
+## Référence complète (anglais)
+
+[Drapeaux, exemples et détails](/docs/cli/generated/verify)

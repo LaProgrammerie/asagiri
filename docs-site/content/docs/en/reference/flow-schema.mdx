@@ -1,0 +1,49 @@
+---
+title: Flow schema
+description: Structure of .flow.yaml files generated from prototypes.
+---
+
+# Flow schema
+
+Each `.flow.yaml` describes one user journey extracted from the prototype.
+
+## Minimal shape
+
+```yaml
+id: onboarding
+name: Onboarding
+status: draft
+entrypoint:
+  route: /onboarding
+  screen: onboarding_welcome
+steps:
+  - id: create_workspace
+    screen: create_workspace
+    actions:
+      - id: submit_workspace
+        type: command
+        command: workspace.create
+        requires_api: true
+exitpoints:
+  - route: /dashboard
+```
+
+## Required sections
+
+- flow identity (`id`, `name`)
+- `entrypoint`
+- `steps` with explicit actions
+- `exitpoints`
+
+## Quality signals
+
+The extractor and review step should flag:
+
+- missing error/loading states;
+- unresolved contracts;
+- sensitive actions without explicit confirmation policy.
+
+## Related
+
+- [Reference: screen schema](/docs/reference/screen-schema)
+- [CLI: flows](/docs/cli/flows)

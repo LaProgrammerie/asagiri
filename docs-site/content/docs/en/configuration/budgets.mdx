@@ -1,0 +1,54 @@
+---
+title: Budgets
+description: Per-run, per-task, and daily estimated cost and token caps.
+---
+
+# Budgets
+
+Budgets give you predictable ceilings on estimated spend and token volume before agents run. They are implemented in `application/internal/cost/budget.go` and applied in the V3 pipeline ahead of agent execution, so a run can stop or ask for confirmation instead of drifting past what you consider acceptable.
+
+The YAML block below is the full shape: currency default, per-run and per-task caps, a daily aggregate cap, and policy flags that control blocking versus explicit override.
+
+## Schema
+
+```yaml
+budgets:
+  default_currency: EUR
+  per_run:
+    max_estimated_cost: 1.00
+    max_estimated_tokens: 500000
+    require_confirmation_above_cost: 0.20
+  per_task:
+    max_estimated_cost: 0.30
+    max_estimated_tokens: 150000
+  daily:
+    max_estimated_cost: 10.00
+  policies:
+    block_when_over_budget: true
+    allow_override_with_flag: true
+    override_flag: "--allow-over-budget"
+```
+
+## CLI interaction
+
+These flags interact with the same numbers and policies: tighten a single run, exit after estimation only, or bypass a block when policy permits. `--yes` is the escape hatch after `BudgetPendingConfirmError` when you have already reviewed the estimate and want to proceed.
+
+| Flag | Behavior |
+| --- | --- |
+| `--budget <EUR>` | Run-level cap for this invocation |
+| `--estimate-only` | Stop after estimate; no spend |
+| `--allow-over-budget` | Bypass block when policy allows |
+| `--yes` | Accept confirmation after `BudgetPendingConfirmError` |
+
+## Limitations
+
+Estimates multiply heuristic token counts by the rates in your `pricing` sheet. Provider invoices can diverge from that model, especially when vendors change tiers or bill by factors Asagiri does not model.
+
+<Callout type="cost">
+Configure `pricing.models` with current rates. Zero prices make cost displays misleading but do not disable token caps.
+</Callout>
+
+## Related
+
+- [Cost-aware workflow](/docs/workflows/cost-aware-workflow)
+- [Token estimation](/docs/cost-performance/token-estimation)

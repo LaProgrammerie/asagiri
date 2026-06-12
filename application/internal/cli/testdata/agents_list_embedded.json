@@ -1,0 +1,114 @@
+{
+  "report_version": "agents-list-v1",
+  "registry": {
+    "path": ".asagiri/agents",
+    "present": false,
+    "file_count": 0,
+    "using_embedded_defaults": true
+  },
+  "agents": [
+    {
+      "id": "dev",
+      "role": "dev",
+      "version": "1.0.0",
+      "content_hash": "4801853fae585ea985be57a9f951abacd648bdd5d10ce38730e4129166335a4e",
+      "source": "embedded",
+      "output_format": "asagiri-v1",
+      "provider_targets": [
+        "kiro-cli",
+        "cursor-cli",
+        "codex-cli"
+      ],
+      "provider_support": {
+        "config_key": "dev",
+        "provider_type": "kiro-cli",
+        "level": "inline_prompt",
+        "targets": {
+          "codex-cli": "inline_prompt",
+          "cursor-cli": "inline_prompt",
+          "kiro-cli": "inline_prompt"
+        },
+        "summary": "config dev → kiro-cli (inline_prompt); targets: codex-cli:inline_prompt, cursor-cli:inline_prompt, kiro-cli:inline_prompt"
+      }
+    },
+    {
+      "id": "enricher",
+      "role": "enricher",
+      "version": "1.0.0",
+      "content_hash": "4354a75e2ee086b74bcceab17d121e2985add49b9d633efdaa241f2dbe6f013e",
+      "source": "embedded",
+      "output_format": "gate-yaml",
+      "provider_targets": [
+        "ollama",
+        "kiro-cli"
+      ],
+      "provider_support": {
+        "targets": {
+          "kiro-cli": "inline_prompt",
+          "ollama": "inline_prompt"
+        },
+        "summary": "kiro-cli:inline_prompt, ollama:inline_prompt"
+      }
+    },
+    {
+      "id": "gate",
+      "role": "gate",
+      "version": "1.0.0",
+      "content_hash": "7dc024b3652cf8d8df096ab167048cf7f36c512c2332161d382d3ecc3cd72cdd",
+      "source": "embedded",
+      "output_format": "gate-yaml",
+      "provider_targets": [
+        "claude-code",
+        "reviewer"
+      ],
+      "provider_support": {
+        "targets": {
+          "claude-code": "native_profile",
+          "reviewer": "unsupported"
+        },
+        "summary": "claude-code:native_profile, reviewer:unsupported"
+      }
+    },
+    {
+      "id": "governance",
+      "role": "governance",
+      "version": "1.0.0",
+      "content_hash": "e7e32f747596022e7b8717792f7446839c3eafb01f016050ce4ff170677ce142",
+      "source": "embedded",
+      "output_format": "gate-yaml",
+      "provider_targets": [
+        "claude-code",
+        "reviewer"
+      ],
+      "provider_support": {
+        "targets": {
+          "claude-code": "native_profile",
+          "reviewer": "unsupported"
+        },
+        "summary": "claude-code:native_profile, reviewer:unsupported"
+      }
+    },
+    {
+      "id": "reviewer",
+      "role": "reviewer",
+      "version": "1.0.0",
+      "content_hash": "aac3d2eaf3c844d71ca5a47fdbdd3ed613609b8c628ee6d3ddd4e27a3b5b2a70",
+      "source": "embedded",
+      "output_format": "gate-yaml",
+      "provider_targets": [
+        "claude-code",
+        "cursor-cli"
+      ],
+      "provider_support": {
+        "config_key": "reviewer",
+        "provider_type": "claude-code",
+        "level": "native_profile",
+        "targets": {
+          "claude-code": "native_profile",
+          "cursor-cli": "inline_prompt"
+        },
+        "summary": "config reviewer → claude-code (native_profile); targets: claude-code:native_profile, cursor-cli:inline_prompt"
+      }
+    }
+  ]
+}

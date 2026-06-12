@@ -1,0 +1,11 @@
+---
+description: Core rule — point to AGENTS.md, context-map, docs/ai; avoid context walls
+alwaysApply: true
+---
+
+# Project core
+
+- Read `AGENTS.md` then `docs/ai/context-map.md` for reading order and sources of truth.
+- Canonical detail: `docs/ai/` (`02-architecture.md`, `03-standards.md`, etc.).
+- Implementation: `docs/ai/active/handoff.md` (prescriptive contract: scope, allowed/denied files, DoD); do not extend without updating spec + handoff.
+- **Long, universal** workflows: `~/.kiro/skills/`; **repo-tied** workflows (e.g. handoff): `.kiro/skills/`.

@@ -1,0 +1,43 @@
+---
+title: Modelos locales
+description: Cuándo preferir agentes locales y cómo el enrutamiento los selecciona.
+---
+
+# Modelos locales
+
+«Local» significa aquí **modelos que ejecuta en la misma máquina o en la LAN**, habitualmente vía Ollama. En `models`, los perfiles locales suelen llevar tipo marginal cero (`input_cost_per_1m_tokens: 0` / `output_cost_per_1m_tokens: 0`) para que el enrutamiento consciente del coste pueda preferirlos cuando la clase de paso lo permita.
+
+## Cuándo encajan
+
+Los modelos locales destacan cuando la latencia hacia una API en la nube molesta o cuando busca un gasto acotado: clasificación de intenciones, enriquecimiento de especificaciones antes de un pase `dev` en la nube, triage de registros y pre-revisión ligera son casos típicos. También son la respuesta por defecto en árboles aislados o en repositorios donde importa cada céntimo y cada byte que sale de la red.
+
+- Clasificar intenciones y tareas
+- Enriquecer especificaciones antes del `dev` en la nube
+- Análisis de registros y pre-revisión
+- Repositorios sensibles al coste o en entornos *air-gapped*
+
+## Activación en local
+
+Configure `agents.ollama` (o otro protocolo local que defina), añada un perfil `models` con `class: local`, amplíe `routing.prefer_local_for` con las clases de paso que quiera mantener en local, y use `--prefer-local` o `--no-cloud` en `work` cuando necesite una restricción puntual sin editar el YAML.
+
+1. Configure `agents.ollama` y un perfil `models` con `class: local`
+2. Defina en el enrutamiento las clases de paso en `prefer_local_for`
+3. Ejecute con `--prefer-local` o `--no-cloud` en `work`
+
+```bash
+asa work "add logging" --prefer-local --estimate-only
+```
+
+## Límites
+
+Los pesos locales son más pequeños y las ventanas de contexto más cortas; los refactors grandes o las revisiones sensibles a la seguridad pueden seguir necesitando un perfil en la nube. Cuando `use_cloud_heavy_for` coincide y pasa `--allow-cloud`, el enrutamiento puede escalar tras los umbrales de fallo configurados: revise los números de la estrategia antes de asumir que un comando se mantuvo enteramente en local.
+
+<Callout type="local-first">
+Local-first reduce coste y fugas de datos; no sustituye la validación ni la revisión humana en rutas críticas.
+</Callout>
+
+## Ver también
+
+- [Ollama](/docs/es/agents/ollama)
+- [Conceptos local-first](/docs/es/concepts/local-first)
+- [Enrutamiento](/docs/es/configuration/routing)

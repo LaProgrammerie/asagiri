@@ -1,0 +1,52 @@
+---
+title: Modelo mental
+description: Pipeline, gates de work y comandos CLI diarios.
+---
+
+# Modelo mental
+
+Asagiri se entiende mejor como un **pipeline** más ayudas **read-only** que indican el siguiente paso. Nada aquí cambia el comportamiento del workflow.
+
+## Pipeline
+
+```text
+spec → plan → enrich → dev → verify → review
+         ↑ las gates pueden pausar entre pasos
+```
+
+| Paso | Comando | Rol |
+| --- | --- | --- |
+| Spec | `asa spec <feature>` | Capturar o refrescar spec y tasks |
+| Plan | `asa plan <feature>` | Dividir en tasks ejecutables |
+| Enrich | `asa enrich <feature> --task <id>` | Contexto antes de codificar |
+| Dev | `asa dev <feature> --task <id> --agent <agent>` | Implementar en worktree aislado |
+| Verify | `asa verify <feature> --task <id>` | Validación (tests, linters) |
+| Review | `asa review <feature> --task <id> --agent <agent>` | Revisión antes del merge |
+
+`asa work "<intención>"` resuelve lenguaje natural a este pipeline. Ver [Ruta guiada](/docs/es/guided-path).
+
+## Gates work
+
+Checkpoints configurables. Bloqueo típico: `asa gates submit …` luego `asa continue --yes`. `asa next` muestra la misma recomendación sin mutar estado.
+
+Gates y **trust** son ortogonales: trust resume riesgo; gates aplican política.
+
+## Comandos diarios
+
+| Comando | ¿Mutación? | Cuándo |
+| --- | --- | --- |
+| `asa work` | Sí | Iniciar o continuar trabajo |
+| `asa continue` | Sí | Reanudar feature activa tras gate |
+| `asa next` | No | Ver siguiente primitive recomendada |
+| `asa trust …` | No | Verdictos de confianza |
+| `asa doctor` | No | Salud del entorno y proyecto |
+
+## Trust vs verify trust
+
+- **`asa trust`** — reporte work trust read-only (daily UX).
+- **`asa verify trust <flow>`** — motor de verificación completo (spec-my-B).
+
+## Más lectura
+
+- [Workflow diario](/docs/es/workflows/daily-workflow)
+- [Motor trust](/docs/es/concepts/trust-engine)

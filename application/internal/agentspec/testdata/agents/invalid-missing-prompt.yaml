@@ -1,0 +1,6 @@
+id: invalid-missing-prompt
+version: "1.0.0"
+role: dev
+system_prompt: ""
+output_contract:
+  format: asagiri-v1

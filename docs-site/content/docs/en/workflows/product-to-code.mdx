@@ -1,0 +1,64 @@
+---
+title: Product to code workflow
+description: End-to-end workflow from product intent to executable work plan.
+---
+
+# Product to code workflow
+
+## Guided path V1 (`asa work`)
+
+For a broad product intent, the happy path uses **two separate** `asa work` invocations (no auto-chain):
+
+```bash
+# Step 1 — Product Layer preparation
+asa work "Build a CRM for artisans" --dry-run
+asa work "Build a CRM for artisans" --yes
+
+# Step 2 — technical implementation
+asa work crm-artisans --yes
+asa next --feature crm-artisans
+```
+
+Classification: `technical_task` and `feature_work` → normal technical workflow; `product_level_intent` → Product Layer then controlled stop.
+
+## Expert sequence (unitary commands)
+
+Manual equivalent:
+
+```bash
+asa prototype create "Workspace SaaS with team invites" --product workspace-saas
+asa prototype run workspace-saas
+asa flows extract workspace-saas
+asa flows inspect workspace-saas
+asa flows review workspace-saas
+asa contracts extract workspace-saas
+asa architecture derive workspace-saas
+asa spec generate-from-product workspace-saas
+asa product review workspace-saas
+asa work "develop workspace-saas" --plan-only
+```
+
+## Outputs by stage
+
+| Stage | Output |
+| --- | --- |
+| prototype create | local clickable prototype + `product.yaml` |
+| flows extract | `flows/*.flow.yaml` + `screens/*.screen.yaml` |
+| flows review | business-aware gap analysis (metrics/observability/security) |
+| contracts extract | API, permissions, events, analytics, observability contracts |
+| architecture derive | system projection report (API/async/security/infra) |
+| spec generate-from-product | requirements/design/tasks + canonical spec/task files |
+| work --plan-only | executable plan from generated tasks |
+
+## Review gates
+
+Before full execution (`asa work` without `--plan-only`), validate:
+
+- unresolved contracts;
+- sensitive actions (payment, auth, role change, deletion);
+- quality and acceptance criteria per generated task.
+
+## Related
+
+- [Executable Product Layer](/docs/concepts/executable-product-layer)
+- [CLI overview](/docs/cli)

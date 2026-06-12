@@ -1,0 +1,73 @@
+{
+  "id": "graph-2026-05-27-a1b2c3d4",
+  "product": "workspace-saas",
+  "flow": "onboarding",
+  "status": "failed",
+  "created_at": "2026-05-27T10:00:00Z",
+  "strategy": {
+    "max_parallel": 1,
+    "stop_on_risk": "high",
+    "strict_trust": true,
+    "budget": 0.5
+  },
+  "nodes": [
+    {
+      "id": "investigate-onboarding",
+      "type": "investigation",
+      "title": "Investigate onboarding flow",
+      "agent": "local",
+      "risk": "low",
+      "estimated_duration": "30s",
+      "outputs": [
+        "context_pack"
+      ]
+    },
+    {
+      "id": "implement-workspace-create",
+      "type": "implementation",
+      "title": "Implement workspace creation endpoint",
+      "task": "task-001",
+      "agent": "cursor",
+      "risk": "medium",
+      "estimated_cost": 0.08,
+      "estimated_duration": "4m",
+      "required_checks": [
+        "tests"
+      ]
+    },
+    {
+      "id": "verify-onboarding-flow",
+      "type": "trust_verification",
+      "title": "Verify onboarding flow integrity",
+      "agent": "local",
+      "risk": "high",
+      "required_checks": [
+        "flows"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "from": "investigate-onboarding",
+      "to": "implement-workspace-create",
+      "type": "produces_context_for"
+    },
+    {
+      "from": "implement-workspace-create",
+      "to": "verify-onboarding-flow",
+      "type": "validates"
+    }
+  ],
+  "checkpoints": [
+    {
+      "after": "investigate-onboarding"
+    },
+    {
+      "after": "implement-workspace-create"
+    }
+  ],
+  "rollback": {
+    "strategy": "worktree_reset",
+    "preserve_reports": true
+  }
+}

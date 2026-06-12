@@ -1,0 +1,60 @@
+---
+title: Ollama
+description: Exécuter des modèles locaux pour enrichissement, routage et repli du résolveur d'intention.
+---
+
+# Ollama
+
+Ollama soutient les étapes **locales** d’Asagiri : passes d’enrichissement, résolveur d’intention lorsque `intent.resolver.use_ollama_fallback` est activé, et routage conscient des coûts qui cible `work.default_enricher`. Il ne s’agit pas d’une intégration produit séparée : vous câblez le point de terminaison HTTP et les tags de modèles sous `agents.ollama`, avec des entrées `models` assorties.
+
+## Configurer
+
+Pointez `endpoint` vers votre démon, nommez les tags chat et embedding que vous avez tirés (`ollama pull`), et faites correspondre l’identifiant de modèle dans un profil `models` avec `provider: ollama` et les classes `usage` attendues en local.
+
+```yaml
+agents:
+  ollama:
+    endpoint: http://localhost:11434
+    model: qwen2.5-coder:14b
+    embedding_model: nomic-embed-text
+    timeout: 300
+
+models:
+  ollama_local_qwen:
+    provider: ollama
+    class: local
+    model: qwen2.5-coder:14b
+    usage: [summarize, classify, pre_review, context_selection]
+```
+
+## Prérequis
+
+Démarrez le démon, tirez les poids que vous référencez, puis laissez `doctor` confirmer que l’arbre et la configuration sont alignés.
+
+```bash
+ollama serve
+ollama pull qwen2.5-coder:14b
+asa doctor
+```
+
+## Utilisation
+
+`enrich` appelle Ollama directement lorsque vous passez `--agent ollama` ; `work --prefer-local` maintient sur le profil local les étapes éligibles selon votre routage.
+
+```bash
+asa enrich billing-v2 --agent ollama
+asa work "refactor utils" --prefer-local
+```
+
+## Embeddings / RAG
+
+`embedding_model` est réservé au travail de récupération que le projet n’a pas encore entièrement livré. Aujourd’hui, `asa index` persiste des **morceaux de texte** dans SQLite — il ne faut pas attendre d’une build standard une recherche par similarité vectorielle.
+
+<Callout type="experimental">
+Les embeddings vectoriels et la recherche sémantique RAG figurent à la feuille de route (voir `ROADMAP.md` à la racine). Ne présumez pas d’une recherche fondée sur les embeddings en v1.
+</Callout>
+
+## Pour aller plus loin
+
+- [Modèles locaux](/docs/fr/agents/local-models)
+- [CLI : enrich](/docs/cli/generated/enrich)

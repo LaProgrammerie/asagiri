@@ -1,0 +1,46 @@
+{
+  "nodes": [
+    {
+      "id": "action:archive_workspace",
+      "type": "action",
+      "name": "archive_workspace",
+      "source": {
+        "kind": "flow",
+        "path": ".asagiri/products/demo/flows/archive.flow.yaml",
+        "extractor": "flows"
+      },
+      "confidence": 0.95,
+      "created_at": "2026-05-29T10:00:00Z",
+      "updated_at": "2026-05-29T10:00:00Z"
+    },
+    {
+      "id": "flow:archive",
+      "type": "flow",
+      "name": "archive",
+      "source": {
+        "kind": "flow",
+        "path": ".asagiri/products/demo/flows/archive.flow.yaml",
+        "extractor": "flows"
+      },
+      "confidence": 0.95,
+      "created_at": "2026-05-29T10:00:00Z",
+      "updated_at": "2026-05-29T10:00:00Z"
+    }
+  ],
+  "edges": [
+    {
+      "id": "requires:flow_archive>action_archive_workspace",
+      "from": "flow:archive",
+      "to": "action:archive_workspace",
+      "type": "requires",
+      "source": {
+        "kind": "flow",
+        "path": ".asagiri/products/demo/flows/archive.flow.yaml",
+        "extractor": "flows"
+      },
+      "confidence": 0.95,
+      "created_at": "2026-05-29T10:00:00Z",
+      "updated_at": "2026-05-29T10:00:00Z"
+    }
+  ]
+}

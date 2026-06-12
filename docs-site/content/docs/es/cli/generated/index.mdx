@@ -1,0 +1,31 @@
+---
+title: Referencia CLI generada (resúmenes)
+description: Páginas resumidas en español; banderas detalladas en inglés.
+---
+
+# Referencia CLI generada
+
+Las páginas **completas** (todos los comandos, sincronizadas con Cobra) se mantienen en **inglés** en [`/docs/cli/generated`](/docs/cli/generated).
+
+Este directorio ofrece **resúmenes traducidos** para los comandos más usados: secciones «Cuándo usar» y «Modos de fallo», más enlace a la página inglesa detallada.
+
+## Regenerar documentación (colaboradores)
+
+```bash
+go run ./application/cmd/asa docs generate-cli \
+  --output docs-site/content/docs/en/cli/generated
+```
+
+## Comandos con resumen
+
+- [work](./work)
+- [init](./init)
+- [doctor](./doctor)
+- [plan](./plan)
+- [dev](./dev)
+- [verify](./verify)
+- [estimate](./estimate)
+- [sync](./sync)
+- [continue](./continue)
+
+Para cualquier otro comando (`spec`, `review`, `inspect`, …) use directamente la [referencia en inglés](/docs/cli/generated).

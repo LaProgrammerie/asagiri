@@ -1,0 +1,69 @@
+---
+title: Coordinación multiagente
+description: Roles explícitos, handoffs, políticas de revisión y eventos runtime sobre el grafo de ejecución.
+---
+
+# Coordinación multiagente
+
+`spec-my-D` — gobierna **quién** ejecuta **qué** nodo del grafo, **cómo** se aísla y **cómo** el trabajo pasa entre agentes especializados.
+
+## Principios
+
+- **Roles explícitos** — investigator, architect, implementer, reviewer, validator, etc. derivados de los tipos de nodo del grafo.
+- **Handoffs estructurados** — artefactos en `.asagiri/handoffs/<id>/handoff.yaml` (resumen, archivos, restricciones, confianza).
+- **Revisión independiente** — las políticas pueden prohibir el mismo agente como implementer y reviewer (`allow_self_review: false`).
+- **Aislamiento por defecto** — `isolated_worktree` ejecuta fuera del workspace principal cuando está configurado.
+- **Runtime inspeccionable** — los eventos `agent.*` complementan los `graph.*` del [grafo de ejecución](/docs/es/concepts/execution-graph).
+
+## Pipeline
+
+```text
+plan del grafo de ejecución
+  → el coordinador asigna rol + ref de agente + aislamiento por nodo
+  → ejecución (worktrees / readonly / sandbox según perfil)
+  → handoffs entre roles → validación cruzada → gates de confianza → merge o bloqueo
+```
+
+El orden de roles está en `coordination.pipeline` (p. ej. investigator → architect → implementer → reviewer → validator).
+
+## Artefacto handoff
+
+Cada transferencia escribe:
+
+| Campo | Propósito |
+|-------|-----------|
+| `from` / `to` | Roles de coordinación |
+| `summary` | Contexto para el siguiente agente |
+| `files` | Rutas en alcance |
+| `constraints` | Reglas (sin push, readonly, …) |
+| `confidence` | Confianza de la transferencia (0–1) |
+
+## UX en terminal
+
+Durante una ejecución coordinada, Asagiri puede mostrar la instantánea §19 con `FormatMultiAgentRuntime`:
+
+```text
+Asagiri Multi-Agent Runtime
+═══════════════════════════
+Pipeline … Agents … Costs … Warnings
+```
+
+Iconos: `✓` completado, `⠋` en curso, `○` pendiente.
+
+## Configuración
+
+Los valores por defecto están en [`coordination`](/docs/es/configuration/config-file#coordination) en `.asagiri/config.yaml`. Los perfiles referencian claves de [`agents`](/docs/es/configuration/agents).
+
+## Código
+
+```text
+internal/coordination/
+  coordinator.go
+  assignment.go
+  handoff.go
+  policies.go
+  runtime.go
+  display.go
+```
+
+Usa `internal/executiongraph/` y los gates del [motor de confianza](/docs/es/concepts/trust-engine).

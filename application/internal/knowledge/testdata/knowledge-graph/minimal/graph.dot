@@ -1,0 +1,6 @@
+digraph knowledge_graph {
+  rankdir=LR;
+  "action:invite_member" [label="action\\\\ninvite_member"];
+  "flow:onboarding" [label="flow\\\\nonboarding"];
+  "flow:onboarding" -> "action:invite_member" [label="requires (0.95)"];
+}

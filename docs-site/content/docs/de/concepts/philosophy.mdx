@@ -1,0 +1,57 @@
+---
+title: Philosophie
+description: Deterministische Orchestrierung, Validierung vor Vertrauen, ehrliche Grenzen.
+---
+
+# Philosophie
+
+## Das Engineering-Problem
+
+KI-Coding-Agenten sind leistungsfähig; ihre Ausgaben sind probabilistisch und nicht garantiert wiederholbar. Teams brauchen dennoch **nachvollziehbare** Abläufe: klare Schritte, isolierte Branches, externe Validierung, sichtbare Kosten und prüfbare Spuren — statt Läufen, bei denen nachträglich kaum erklärbar ist, was geschah und warum.
+
+Asagiri macht Orchestrierung **explizit**: Sie beschreiben Pipeline, Validierungsbefehle und wirtschaftliche Leitplanken; das Werkzeug koordiniert die Ausführung und dokumentiert sie.
+
+## Wie Asagiri das angeht
+
+Die Leitmentalität ist **Spec → Plan → Implement → Verify → Review → Report**. Jede Phase hat einen festen Platz in der State Machine und in den Reports unter `.asagiri/runs/`.
+
+**Expliziter Zustand:** Läufe und Tasks werden in SQLite mit dokumentierten Übergängen geführt. Status abfragen, fortsetzen und Reports über Run-IDs zuordnen — ohne Chat-Verlauf zu rekonstruieren.
+
+**Local-first-Untersuchung:** Grep, Verzeichnisdurchläufe und das Packen von Kontext passieren **lokal**, bevor teure Cloud-Aufrufe starten. Ziel sind kleinere, relevantere Prompts — nicht der Komfort, halbe Repositories an ein externes Modell zu schicken.
+
+**Kostenbewusstsein:** Heuristiken zu Tokenzahl und Budgets greifen **vor** der Ausführung. Die Zahlen sind Näherungen, aber Sie sehen Risiken früh — statt die Rechnung erst nach langem Agent-Einsatz zu entdecken.
+
+**Git-Worktree-Isolation:** Jede Aufgabe auf eigenem Branch und eigenem Arbeitsbaum. Parallel laufende Themen kollidieren seltener im gemeinsamen Checkout.
+
+**Validierung durch Ihre Befehle:** `go test`, Linter und Skripte, denen Sie vertrauen — nicht die Selbsteinschätzung des Modells. Asagiri plant diese Prüfungen; sie ersetzen Ihre Testsuite nicht.
+
+**Reproduzierbare Reports:** Markdown und JSON-Artefakte, damit Betrieb und Review einen Lauf auch Tage später nachvollziehen können.
+
+## Was wir nicht behaupten
+
+<Callout type="warning">
+Asagiri garantiert weder Korrektheit noch Sicherheit noch Produktionsreife eines Patches. Es verbindet Werkzeuge; Menschen und Ihre Testsuite bleiben die Instanz für die Bewertung der Änderung.
+</Callout>
+
+## Bewusste Kompromisse
+
+| Gewinn | Preis |
+| --- | --- |
+| Vorhersagbare Pipeline-Schritte | Weniger „Ein-Klick-Zauber“ als unstrukturierte Agent-Chats |
+| Kostenschätzung vor der Arbeit | Zahlen sind Näherungen (Zeichen-/Token-Heuristiken) |
+| Schutz durch Worktrees | Mehr Speicher und etwas mehr Git-Verwaltung |
+| Auswechselbare Agents | Jedes CLI muss installiert, gewartet und policykonform sein |
+
+Asagiri setzt auf **Steuerbarkeit und Prüfbarkeit** statt auf die Illusion vollständig autonomer Codierung.
+
+## Wichtige Konfigurationshebel
+
+- `work.auto_verify`, `work.auto_review` — Automatisierung versus manuelle Gates
+- `policies.require_clean_git` — Harter Stopp bei „schmutzigem“ Arbeitsbaum, wenn die Policy es verlangt
+- `budgets` — wirtschaftliche Obergrenzen vor kostspieligen Schritten
+
+## Weiterlesen
+
+- [Local-first-Konzepte](/docs/de/concepts/local-first)
+- [Kostenbewusste Workflows](/docs/de/concepts/cost-aware-workflows)
+- [Grenzen](/docs/de/security/limits)

@@ -1,0 +1,46 @@
+---
+title: Doctor Architecture · Asagiri CLI
+description: Croiser tasks, graphs, knowledge, trust et agent ledger (lecture seule)
+---
+
+CLI path: **`asa doctor architecture`**
+
+## When to use
+
+Bootstrap commands scaffold or reconcile the Asagiri working tree so subsequent workflow nodes can reliably resolve configuration and repository metadata.
+
+> Original CLI synopsis: Croiser tasks, graphs, knowledge, trust et agent ledger (lecture seule)
+
+## Usage
+
+```bash
+asa doctor architecture [flags]
+```
+
+## Options
+
+| Flag | Scope | Default | Description |
+| --- | --- | --- | --- |
+| `--dry-run` | Inherited | `false` | Simuler les exécutions sans lancer d'agent ni commandes externes |
+| `--json` | Local | `false` | Sortie JSON du rapport architecture sur stdout |
+
+## Examples
+
+```bash
+asa doctor architecture
+  asa doctor architecture --json
+```
+
+## What happens internally
+
+- Probes requisite binaries and configuration coherence—including MCP switches and caches—to surface actionable diagnostics before workflows run hot.
+
+## Failure modes
+
+- Cobra rejects unknown flags or arity mismatches before any repository side effects occur.
+- Asagiri cannot resolve scaffolding when the command is invoked outside an initialised checkout.
+- Downstream automation may fail whenever credentials, network endpoints, or cached prerequisites drift from expectations.
+
+## Related commands
+
+- [Doctor Diff](./doctor-diff.mdx)

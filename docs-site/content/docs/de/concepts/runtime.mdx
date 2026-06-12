@@ -1,0 +1,37 @@
+---
+title: Persistente Runtime
+description: Lokale Engineering-Runtime mit Sessions, Memory und Events.
+---
+
+# Persistente Runtime
+
+Asagiri wird von einer stateless CLI zu einer **local-first Engineering-Runtime** (`spec-my-A` §24).
+
+## Architektur
+
+```text
+asa daemon run → SQLite → sessions · events · memory · hooks
+```
+
+## Prinzipien
+
+Optional, inspizierbar, sicher (nur `asa …` in Hooks), scoped Memory.
+
+## Modi
+
+```yaml
+runtime:
+  mode: guided  # guided | interactive | headless | ci | review | exploration
+```
+
+## Memory-Embeddings
+
+Scoped Memory mit `runtime.memory.embedder`: `hash` (Standard), `ollama`, `cloud` (nur bei `cloud.enabled: true`). Nach Wechsel: `asa memory reindex`.
+
+Siehe [Konfiguration](/docs/de/configuration/config-file#runtime).
+
+## Siehe auch
+
+- [Runtime-Befehle](/docs/de/cli/runtime)
+- [Investigation](/docs/de/concepts/investigation)
+- [TypeScript-SDK](/docs/de/reference/typescript-sdk)

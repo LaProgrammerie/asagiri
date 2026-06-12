@@ -1,0 +1,78 @@
+---
+title: Mental model
+description: Pipeline, work gates, and how daily CLI commands fit together.
+---
+
+# Mental model
+
+Asagiri is easiest to learn as a **pipeline** plus a handful of **read-only helpers** that tell you what to run next. Nothing here changes workflow behaviour—it is the map operators use every day.
+
+## Pipeline
+
+The default delivery path is linear. Each step has a dedicated CLI primitive; `asa work` runs the chain for you with human milestones in between.
+
+```text
+spec → plan → enrich → dev → verify → review
+         ↑ gates may pause between steps
+```
+
+| Step | Typical command | What it does |
+| --- | --- | --- |
+| Spec | `asa spec <feature>` | Capture or refresh the feature spec and tasks |
+| Plan | `asa plan <feature>` | Break the spec into executable tasks |
+| Enrich | `asa enrich <feature> --task <id>` | Attach context (RAG, docs) before coding |
+| Dev | `asa dev <feature> --task <id> --agent <agent>` | Implement in an isolated git worktree |
+| Verify | `asa verify <feature> --task <id>` | Run your validation commands (tests, linters) |
+| Review | `asa review <feature> --task <id> --agent <agent>` | Agent or human review before merge |
+
+`asa work "<intent>"` resolves natural language to this pipeline. Unitary commands remain available when you want one step only—see [Guided path](/docs/guided-path).
+
+## Work gates
+
+**Gates** are configurable checkpoints on the work pipeline. They do not replace your tests; they record whether a step was satisfied before the workflow continues.
+
+Common gates (when enabled in `.asagiri/config.yaml`):
+
+| Gate | Blocks when |
+| --- | --- |
+| `plan` | Plan output missing or rejected |
+| `enrich` | Enrich step not satisfied before `dev` |
+| `verify_evidence` | Verification evidence insufficient before `review` |
+| `human_review` | Explicit human approval required |
+
+When a gate blocks a task, Asagiri stops with a **concrete CLI**—usually `asa gates submit …` and then `asa continue --yes`. `asa next` surfaces the same recommendation read-only.
+
+Gates are **orthogonal to trust**: trust summarizes risk from checks and history; gates enforce workflow policy. Neither replaces the other.
+
+## Daily commands compared
+
+| Command | Mutates state? | Use when |
+| --- | --- | --- |
+| [`asa work`](/docs/cli/generated/work) | Yes (runs pipeline) | Start or resume work from an instruction or feature slug |
+| [`asa continue`](/docs/cli/generated/continue) | Yes | Resume the last active feature after a gate or interruption |
+| [`asa next`](/docs/cli/generated/next) | No (use `--execute` to run) | See the next recommended primitive for the active feature |
+| [`asa trust …`](/docs/cli/generated/trust) | No | Read confidence verdicts (task, feature, or run) |
+| [`asa doctor`](/docs/cli/generated/doctor) | No | Check repo, config, SQLite, agents, and optional onboarding checks |
+
+Quick decision tree:
+
+```text
+New need in natural language     → asa work "<intent>"
+Already mid-feature, gate cleared → asa continue --yes
+What should I run next?           → asa next [--feature <name>]
+Is this task/feature trustworthy? → asa trust task|feature|run …
+Is the machine ready?             → asa doctor [--full]
+```
+
+## Trust vs verify trust
+
+- **`asa trust`** — read-only **work trust** report (verdict, risks, next actions). Part of daily UX on `next`, `status`, and after `work`.
+- **`asa verify trust <flow>`** — full **verification engine** pipeline (spec-my-B): checks, scoring, blocking verification gates. Used before high-risk delivery, not for every daily loop.
+
+See [Trust engine](/docs/concepts/trust-engine) for the verification layer.
+
+## Related reading
+
+- [Daily workflow](/docs/workflows/daily-workflow) — scenarios, gate blockages, reading trust and doctor output
+- [Guided path](/docs/guided-path)
+- [Philosophy](/docs/concepts/philosophy)

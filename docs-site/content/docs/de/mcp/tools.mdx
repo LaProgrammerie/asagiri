@@ -1,0 +1,47 @@
+---
+title: MCP-Tools
+description: "Werkzeuge des MCP-Servers, sobald mcp.enabled in der Konfiguration aktiv ist."
+---
+
+# MCP-Tools
+
+Wenn in der Konfiguration **`mcp.enabled`** gesetzt ist, registriert `mcp-serve` Werkzeuge, die auf dieselben Investigation- und Kontextpfade wie die CLI zurückgreifen. Konkrete Tool-Namen und JSON-Schemas werden hier nicht fest eingefroren — nach jedem Upgrade von Asagiri sollten Clients **`tools/list`** aufrufen, um die aktuelle Oberfläche zu sehen.
+
+## Typische Fähigkeiten
+
+Die folgende Tabelle beschreibt Rollen, keine garantierte Tool-Liste: Investigation hält Repository-Zugriffe begrenzt wie bei CLI `investigate`; Kontext-Helfer bauen oder fassen Kontextpakete zusammen; Kostenhilfen nutzen dieselben Token-Heuristiken wie die CLI, damit Clients die Größenordnung einer Nutzlast vorab sehen können.
+
+| Bereich | Zweck |
+| --- | --- |
+| Investigation | Begrenztes Grep und Repo-Scanning analog zu CLI `investigate` |
+| Context | Kontextpakete erzeugen oder zusammenfassen |
+| Cost | Ungefähre Tokenzahl und Kosten einer Nutzlast |
+
+Exakte Tool-IDs können zwischen Releases wechseln — **`tools/list` nach jedem Upgrade ausführen.**
+
+## Begrenzungen
+
+Die Konfiguration entspricht den gleichen Leitplanken wie die CLI: globale `max_output_bytes` und `command_timeout_seconds` sowie gemeinsame Caps unter `investigation.*`, die auch für Investigation außerhalb von MCP gelten.
+
+- `max_output_bytes` — Obergrenze für die Größe von RPC-Nutzlasten
+- `command_timeout_seconds` — Zeitlimit pro Tool-Ausführung
+- `investigation.*` — gemeinsame Grenzen für Grep und Dateiscan mit allen nicht-MCP-Pfaden
+
+## Beispiel: Client-Ablauf
+
+Server starten, MCP-Client per stdio anbinden, dann wie vom JSON-RPC-Protokoll erwartet `tools/list` senden.
+
+```bash
+asa mcp-serve
+# Editor-MCP-Client verbindet sich über stdio und sendet z. B.:
+# {"jsonrpc":"2.0","id":1,"method":"tools/list"}
+```
+
+<Callout type="experimental">
+Die Tool-Oberfläche bleibt bewusst klein und kann sich ändern — keine nicht dokumentierte Automation in Produktion ohne feste Asagiri-Version pflegen.
+</Callout>
+
+## Verwandtes
+
+- [Lokale Investigation](/docs/de/cost-performance/local-investigation)
+- [MCP-Sicherheit](/docs/de/mcp/security)

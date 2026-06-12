@@ -1,0 +1,78 @@
+---
+title: Modèle mental
+description: Pipeline, gates work et rôle des commandes CLI quotidiennes.
+---
+
+# Modèle mental
+
+Asagiri se comprend le mieux comme un **pipeline** et quelques **aides read-only** qui indiquent quoi lancer ensuite. Rien ici ne change le comportement du workflow — c’est la carte que l’opérateur utilise au quotidien.
+
+## Pipeline
+
+Le chemin de livraison par défaut est linéaire. Chaque étape a une primitive CLI ; `asa work` enchaîne pour vous avec des jalons humains entre les phases.
+
+```text
+spec → plan → enrich → dev → verify → review
+         ↑ les gates peuvent interrompre entre les étapes
+```
+
+| Étape | Commande typique | Rôle |
+| --- | --- | --- |
+| Spec | `asa spec <feature>` | Capturer ou rafraîchir la spec et les tasks |
+| Plan | `asa plan <feature>` | Découper la spec en tasks exécutables |
+| Enrich | `asa enrich <feature> --task <id>` | Attacher le contexte (RAG, docs) avant le code |
+| Dev | `asa dev <feature> --task <id> --agent <agent>` | Implémenter dans un worktree Git isolé |
+| Verify | `asa verify <feature> --task <id>` | Lancer vos commandes de validation (tests, linters) |
+| Review | `asa review <feature> --task <id> --agent <agent>` | Revue agent ou humaine avant merge |
+
+`asa work "<intention>"` résout le langage naturel vers ce pipeline. Les commandes unitaires restent disponibles quand vous voulez une seule étape — voir [Chemin guidé](/docs/fr/guided-path).
+
+## Gates work
+
+Les **gates** sont des points de contrôle configurables sur le pipeline work. Elles ne remplacent pas vos tests ; elles enregistrent qu’une étape est satisfaite avant de continuer.
+
+Gates courantes (si activées dans `.asagiri/config.yaml`) :
+
+| Gate | Bloque quand |
+| --- | --- |
+| `plan` | Plan manquant ou rejeté |
+| `enrich` | Enrich non satisfait avant `dev` |
+| `verify_evidence` | Preuves de vérification insuffisantes avant `review` |
+| `human_review` | Approbation humaine explicite requise |
+
+Quand une gate bloque une task, Asagiri s’arrête avec une **CLI concrète** — en général `asa gates submit …` puis `asa continue --yes`. `asa next` expose la même recommandation en read-only.
+
+Les gates sont **orthogonales au trust** : le trust résume le risque à partir des checks et de l’historique ; les gates appliquent la politique workflow. L’une ne remplace pas l’autre.
+
+## Commandes quotidiennes comparées
+
+| Commande | Modifie l’état ? | Quand l’utiliser |
+| --- | --- | --- |
+| [`asa work`](/docs/fr/cli/generated/work) | Oui (exécute le pipeline) | Démarrer ou reprendre depuis une instruction ou un slug feature |
+| [`asa continue`](/docs/fr/cli/generated/continue) | Oui | Reprendre la dernière feature active après une gate ou une interruption |
+| [`asa next`](/docs/fr/cli/generated/next) | Non (`--execute` pour lancer) | Voir la primitive recommandée pour la feature active |
+| [`asa trust …`](/docs/fr/cli/generated/trust) | Non | Lire les verdicts de confiance (task, feature ou run) |
+| [`asa doctor`](/docs/fr/cli/generated/doctor) | Non | Vérifier dépôt, config, SQLite, agents et checks onboarding optionnels |
+
+Arbre de décision rapide :
+
+```text
+Nouveau besoin en langage naturel → asa work "<intention>"
+Feature en cours, gate levée        → asa continue --yes
+Quelle commande ensuite ?           → asa next [--feature <nom>]
+Cette task/feature est-elle fiable ?→ asa trust task|feature|run …
+La machine est-elle prête ?         → asa doctor [--full]
+```
+
+## Trust vs verify trust
+
+- **`asa trust`** — rapport **work trust** read-only (verdict, risques, prochaines actions). Présent dans `next`, `status` et après `work`.
+- **`asa verify trust <flow>`** — pipeline complet du **moteur de vérification** (spec-my-B) : checks, scoring, gates de vérification bloquantes. Pour la livraison à risque, pas pour la boucle quotidienne.
+
+Voir [Moteur trust](/docs/fr/concepts/trust-engine).
+
+## Pour aller plus loin
+
+- [Workflow quotidien](/docs/fr/workflows/daily-workflow) — scénarios, blocages gates, lire trust et doctor
+- [Chemin guidé](/docs/fr/guided-path)
+- [Philosophie](/docs/fr/concepts/philosophy)

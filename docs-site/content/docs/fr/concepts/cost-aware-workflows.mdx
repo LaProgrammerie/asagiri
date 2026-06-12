@@ -1,0 +1,49 @@
+---
+title: Workflows conscients des coûts
+description: Estimer jetons et coût avant exécution ; appliquer budgets et routage.
+---
+
+# Workflows conscients des coûts
+
+## Problème
+
+Les runs agent peuvent consommer des jetons de façon difficile à prévoir à partir d'une simple description de tâche. Les équipes ont tout de même besoin de **prévisions** avant exécution, de **plafonds budgétaires** qui échouent fermés, et d'un **routage** qui préfère les chemins d'exécution moins chers quand la tâche ne justifie pas un modèle lourd.
+
+## Approche Asagiri
+
+Asagiri y répond avec quatre mécanismes concrets sous votre config :
+
+1. **Comptage heuristique de jetons** — comptage de caractères par type de contenu, divisé par les ratios `token_estimation` (`token_estimation` dans la config)
+2. **Grille tarifaire** — entrées manuelles `pricing.models` pour les modèles cloud (pas de prix fournisseur codés en dur)
+3. **Budgets** — plafonds par run, par tâche et journaliers, avec seuils de confirmation optionnels
+4. **Routage** — `routing.strategies` associe les classes d'étapes aux agents local, cloud-rapide ou cloud-lourd
+
+Points d'entrée CLI typiques :
+
+```bash
+asa estimate billing-v2 --task task-003 --dry-run
+asa work "develop billing-v2" --estimate-only
+asa work "develop billing-v2" --budget 0.50 --allow-over-budget
+```
+
+<Callout type="cost">
+Les estimations sont **approximatives**. La facturation fournisseur utilise de vrais tokenizers ; Asagiri ne fournit pas encore de compteurs exacts fournisseur.
+</Callout>
+
+## Compromis
+
+| Améliore | Ne résout pas |
+| --- | --- |
+| Surprises détectées avant `dev` | Factures au centime près |
+| Politique via budgets YAML | Découverte automatique des prix cloud |
+| Raisons de routage explicables | Choix optimal de modèle sans votre config |
+
+## Configuration
+
+Branchez budgets, règles de routage et réglages d'estimateur via les pages dédiées : [Budgets](/docs/fr/configuration/budgets), [Routage](/docs/fr/configuration/routing) et [Estimation des jetons](/docs/fr/cost-performance/token-estimation).
+
+## Voir aussi
+
+- [Guide workflow conscient des coûts](/docs/fr/workflows/cost-aware-workflow)
+- [CLI : cost](/docs/fr/cli/generated/cost)
+- [CLI : estimate](/docs/fr/cli/generated/estimate)

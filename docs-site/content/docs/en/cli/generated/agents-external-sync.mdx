@@ -1,0 +1,50 @@
+---
+title: Agents External Sync · Asagiri CLI
+description: Synchroniser les profils provider vers les chemins externes explicites
+---
+
+CLI path: **`asa agents external sync`**
+
+## When to use
+
+Orchestration commands coordinate higher-order Asagiri workloads such as ingestion, syncing, backlog triage, investigative passes, hydrated context payloads, coarse estimates, and workspace-specific automation.
+
+> Original CLI synopsis: Synchroniser les profils provider vers les chemins externes explicites
+
+## Usage
+
+```bash
+asa agents external sync [flags]
+```
+
+## Options
+
+| Flag | Scope | Default | Description |
+| --- | --- | --- | --- |
+| `--agent` | Local | `(empty)` | Synchroniser un seul agent (id) |
+| `--dry-run` | Inherited | `false` | Simuler les exécutions sans lancer d'agent ni commandes externes |
+| `--force` | Local | `false` | Écraser un profil externe modifié |
+| `--json` | Local | `false` | Sortie JSON sur stdout |
+| `--write` | Local | `false` | Écrire les profils provider (dry-run par défaut) |
+
+## Examples
+
+```bash
+asa agents external sync
+  asa agents external sync --write
+  asa agents external sync --write --force --agent dev --json
+```
+
+## What happens internally
+
+- Hydrates contextual services resolved from **$PWD**, coordinating git-bound automation, ingestion pipelines, syncing, backlog triage, investigations, MCP hooks, contextual hydration, coarse estimates, and similar orchestrations for this subtree.
+
+## Failure modes
+
+- Cobra rejects unknown flags or arity mismatches before any repository side effects occur.
+- Asagiri cannot resolve scaffolding when the command is invoked outside an initialised checkout.
+- Downstream automation may fail whenever credentials, network endpoints, or cached prerequisites drift from expectations.
+
+## Related commands
+
+_No sibling commands at this depth (Agents External Sync)._

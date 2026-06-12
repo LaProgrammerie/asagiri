@@ -1,0 +1,59 @@
+---
+title: Philosophie
+description: Orchestration déterministe, validation avant confiance et limites assumées.
+---
+
+# Philosophie
+
+## Le problème d’ingénierie
+
+Les agents de codage IA sont puissants, mais leurs sorties ne sont pas déterministes. Les équipes ont toutefois besoin de workflows **répétables** : étapes connues, branches isolées, validation externe, visibilité des coûts et pistes d’audit — pas des exécutions opaques où personne ne peut expliquer ce qui s’est passé ni pourquoi.
+
+Asagiri existe pour rendre l’orchestration explicite. Vous configurez le pipeline, les commandes de validation et les garde-fous économiques ; l’outil coordonne l’exécution et enregistre ce qui a tourné.
+
+## Comment Asagiri s’y prend
+
+Le modèle mental par défaut est **spec → plan → implémentation → vérification → revue → rapport**. Chaque phase a une place définie dans la machine à états et dans les rapports sous `.asagiri/runs/`.
+
+**L’état explicite** signifie que les exécutions et les tâches sont portées par SQLite avec une machine à états documentée. Vous pouvez inspecter le statut, reprendre une exécution et corréler les rapports avec des identifiants d’exécution plutôt que de deviner à partir de l’historique du terminal.
+
+**L’investigation locale d’abord** exécute grep, des parcours du système de fichiers et l’empaquetage du contexte sur votre machine avant les appels cloud. L’objectif est des prompts plus petits et plus pertinents — pas d’expédier tout le dépôt vers un modèle par commodité.
+
+**La conscience des coûts** applique des estimations heuristiques de jetons et des budgets configurables **avant** l’exécution. Les estimations sont approximatives, mais elles valent mieux que de découvrir la facture seulement après une longue session agent.
+
+**L’isolation par git worktree** retient une tâche, une branche et un arbre de travail. Le travail parallèle reste séparé de votre checkout principal.
+
+**La validation par vos commandes** signifie `go test`, les linters et les scripts en lesquels vous avez confiance — pas l’affirmation de l’agent qu’« tout va bien ». Asagiri planifie ces contrôles ; il ne remplace pas votre suite de tests.
+
+**Les rapports reproductibles** capturent des artefacts Markdown et JSON pour que les opérateurs et les relecteurs puissent auditer une exécution des jours plus tard.
+
+## Ce que nous ne prétendons pas
+
+<Callout type="warning">
+Asagiri ne garantit ni correction, ni sécurité, ni préparation à la production. Il coordonne des outils ; les humains et votre suite de tests restent l’autorité.
+</Callout>
+
+## Compromis à comprendre
+
+| Gain | Coût |
+| --- | --- |
+| Étapes de pipeline prévisibles | Moins de « magie one-shot » qu’un chat agent ad hoc |
+| Estimations de coût en amont | Estimations approximatives (heuristiques caractères / jeton) |
+| Sécurité accrue des worktrees | Disque et complexité git supplémentaires |
+| Agents branchables | Vous devez installer et configurer chaque CLI |
+
+Ces compromis sont intentionnels. Asagiri privilégie le **contrôle et l’auditabilité** à l’illusion d’un codage entièrement autonome.
+
+## Leviers de configuration
+
+Une fois ce modèle accepté, quelques réglages comptent plus que d’autres :
+
+- `work.auto_verify`, `work.auto_review` — équilibre entre automatisation et portillons manuels
+- `policies.require_clean_git` — bloque les arbres de travail « sales » lorsque la politique l’exige
+- `budgets` — garde-fous économiques avant les étapes coûteuses
+
+## Pour aller plus loin
+
+- [Local d’abord](/docs/fr/concepts/local-first)
+- [Workflows conscients des coûts](/docs/fr/concepts/cost-aware-workflows)
+- [Limites](/docs/fr/security/limits)

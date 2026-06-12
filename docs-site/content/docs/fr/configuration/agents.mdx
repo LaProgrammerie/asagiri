@@ -1,0 +1,83 @@
+---
+title: Configuration des agents
+description: Associer profils logiques, providers et rôles work dans config.yaml.
+---
+
+# Configuration des agents
+
+Asagiri orchestre des **agents logiques** (clés `agents:`) exécutés via des **providers** (runtimes externes dans `providers:`). L'adapter est choisi par **`providers.<id>.type`** — jamais par le nom du provider ou de l'agent. Le champ `profile` sur un agent est un hint métier ; il ne sélectionne pas l'adapter.
+
+Plusieurs agents logiques peuvent partager le même provider (ex. `dev` et `architect` → `kiro-cli`).
+
+## Modèle mental
+
+```
+Provider  →  Agent  →  Rôle work  →  Workflow
+```
+
+## Exemple recommandé
+
+```yaml
+providers:
+  kiro-cli:
+    type: kiro-cli
+    command: kiro
+    args: ["--cli"]
+  claude-code:
+    type: claude-code
+    command: claude
+    args: ["--print", "--output-format", "stream-json"]
+  ollama:
+    type: ollama
+    command: ollama
+    args: ["run", "qwen2.5-coder:14b"]
+
+agents:
+  laprogrammerie:
+    provider: kiro-cli
+    profile: laprogrammerie
+  dev:
+    provider: kiro-cli
+  architect:
+    provider: kiro-cli
+  reviewer:
+    provider: claude-code
+  local-rag:
+    provider: ollama
+    endpoint: http://localhost:11434
+    model: qwen2.5-coder:14b
+
+work:
+  default_spec_agent: laprogrammerie
+  default_agent: dev
+  default_reviewer: reviewer
+  default_enricher: local-rag
+```
+
+## Format legacy (toujours supporté)
+
+Sans champ `provider`, l'agent utilise le type implicite **`exec`** :
+
+```yaml
+agents:
+  claude:
+    command: claude
+```
+
+## Défauts dans `work`
+
+```yaml
+work:
+  default_spec_agent: laprogrammerie
+  default_agent: dev
+  default_reviewer: reviewer
+  default_enricher: local-rag
+```
+
+Surcharge par invocation : `asa dev feat --agent dev`.
+
+## Voir aussi
+
+- [Vue d'ensemble des agents](/docs/fr/agents)
+- [Fichier de configuration](/docs/fr/configuration/config-file)
+- [Ollama](/docs/fr/agents/ollama)

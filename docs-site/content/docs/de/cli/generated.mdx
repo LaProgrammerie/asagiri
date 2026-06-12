@@ -1,0 +1,33 @@
+---
+title: Generierter CLI-Index
+description: Aus Cobra automatisch erzeugte Befehlsreferenz.
+---
+
+# Generierte CLI-Referenz
+
+Die Seiten in diesem Bereich entstehen nur über **`asa docs generate-cli`**. Manuelle Korrekturen wären kurzlebig: Der nächste Docgen-Lauf überschreibt sie.
+
+**Generierte Inhalte nicht von Hand pflegen** — Änderungen gehören in den Go-Code oder die Docgen-Pipeline.
+
+## Neu erzeugen
+
+```bash
+go run ./application/cmd/asa docs generate-cli \
+  --output docs-site/content/docs/en/cli/generated
+```
+
+Mit bereits gebauter Binärdatei:
+
+```bash
+./bin/asa docs generate-cli --output docs-site/content/docs/en/cli/generated
+```
+
+## Navigation
+
+In der Sidebar unter **CLI → generiert**. Einstieg dieser Locale: [/docs/de/cli/generated/index](/docs/de/cli/generated/index).
+
+Alle Befehle und vollständige Flag-Listen stehen in der englischen Referenz unter [/docs/cli/generated](/docs/cli/generated); Docgen schreibt weiterhin dorthin die ausführlichste Variante.
+
+## Geschriebene Leitfäden
+
+Für erklärende Texte nutzen Sie [CLI-Überblick](/docs/de/cli), [Erster Workflow](/docs/de/getting-started/first-workflow) und [Workflows](/docs/de/workflows/kiro-to-cursor).

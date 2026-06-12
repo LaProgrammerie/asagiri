@@ -1,0 +1,49 @@
+---
+title: Lokale Investigation
+description: Begrenztes Grep und Dateisystem-Scans vor Aufrufen von Cloud-Agenten.
+---
+
+# Lokale Investigation
+
+Bevor Asagiri Repository-Kontext an einen Cloud-Agent weitergibt, **untersucht das Projekt lokal**. Die Implementierung liegt in `application/internal/investigation`; sie speist `asa investigate` und die V3-Pipeline-Vorbereitung. Das Ziel ist überschaubar, aber wichtig: **Prompt-Größe senken und die relevanten Dateien sichtbar machen** — mit begrenzten, wiederholbaren Mitteln (Grep, Verzeichnisdurchlauf, Heuristiken) statt einem Modell den gesamten Baum zu übergeben.
+
+## Was auf Ihrer Maschine passiert
+
+Zuerst läuft typischerweise **Grep** gegen Feature- oder Task-Muster, mit harten Obergrenzen für die Ausgabegröße, damit pathologische Treffer Ihr Kontextbudget nicht leeren. Ein **Dateisystem-Scan** durchläuft Kandidatenpfade und markiert Dateien oberhalb von `large_file_bytes`, damit große Binärdateien oder Logs nicht versehentlich ins Pack rutschen. **Erkennung sensibler Pfade** nutzt `secret_path_denylist` und konfigurierte Glob-Muster, damit Schlüssel und Credentials seltener Prompts oder Reports erreichen. **Test-Heuristiken** schlagen Tests vor, die zu Kandidaten-Quellpfassen passen — eine Unterstützung für Verify ohne das ganze Repository zu durchmustern.
+
+Diese Artefakte sind Eingaben für Kontext-Pack und Kostenschätzung, keine endgültigen Urteile: Sie ersetzen weder menschliche Scope-Entscheidungen noch ein vollständiges Sicherheitsreview.
+
+## CLI-Befehle
+
+Zum Testen oder Debuggen der Investigation außerhalb eines vollen `work`-Laufs:
+
+```bash
+asa investigate billing-v2
+asa investigate billing-v2 --task task-003
+asa inspect diff
+asa inspect symbol Handler
+asa inspect tests billing-v2
+```
+
+Die `inspect`-Unterbefehle sind gezielt hilfreich, wenn bereits klar ist, ob Diff, Symbol oder Tests im Mittelpunkt stehen.
+
+## Limits und Konfiguration
+
+Investigation respektiert Timeouts und Byte-Obergrenzen aus der Konfiguration. Beispiel mit typischen Defaults:
+
+```yaml
+mcp:
+  investigation:
+    large_file_bytes: 524288
+    max_grep_output_bytes: 262144
+    command_timeout_seconds: 120
+    sensitive_globs: ["*.pem", ".git/*"]
+```
+
+Strengere Werte verbessern oft Sicherheit und Kostenvorhersagbarkeit auf Kosten von Recall. Lockere Limits liefern mehr Kontext, erhöhen aber das Risiko überdimensionierter Prompts und versehentlicher Preisgabe von Geheimnissen.
+
+## Weiterlesen
+
+- [Local-first-Konzepte](/docs/de/concepts/local-first)
+- [CLI: investigate](/docs/de/cli/generated/investigate)
+- [MCP-Tools](/docs/de/mcp/tools) — optional über MCP erreichbar, wenn aktiviert

@@ -1,0 +1,37 @@
+---
+title: Roadmap
+description: Bereits gelieferte Features, Konsolidierungsarbeit und priorisierte nächste Schritte.
+---
+
+# Roadmap
+
+Maßgebende Reihenfolge und Erläuterungen stehen im **[ROADMAP.md](https://github.com/LaProgrammerie/asagiri/blob/main/ROADMAP.md)** neben dem Code; diese Seite ist eine leicht lesbare Spiegelung für die Dokumentationswebsite.
+
+## Geliefert (V1 bis V3)
+
+Die Kern-CLI-Workflows — etwa `init`, `spec`, `plan`, `dev`, `verify` und `review` mit Worktrees und SQLite — die naturalsprachliche Oberfläche (`work`, `continue`, `next`), Notion-Sync sowie Kostendiagnose und Observability rund um `estimate`, `investigate`, `context`, `cost`, MCP, die TUI und Metriken.
+
+## In Arbeit (Konsolidierung)
+
+Laufende Arbeit umfasst Konsolidierungsaudits unter `docs/consolidation/`, diese öffentliche Docs-Site inklusive generierter CLI-Referenz sowie OSS-Vorbereitung (Apache 2.0, `CONTRIBUTING`, kuratierte Beispiele).
+
+## Priorisierte nächsten Schritte
+
+Grobe Prioritäten — die tatsächliche Reihenfolge bleibt in `docs/consolidation/TODO-prioritized.md` diskutierbar.
+
+| Priorität | Thema |
+| --- | --- |
+| P0 | Testabdeckung `workflow` / `intent/executor` über 50 % |
+| P0 | Provider-genauer Tokenizer |
+| P1 | Persistenter Kontext-Pack-Cache zwischen Läufen |
+| P1 | Vollständige GitHub Actions CI (Test, Lint, Release) |
+| P2 | Interaktive bubbletea-TUI |
+| P2 | Vektor-Embeddings für RAG |
+| P3 | Multi-Repo / Remote-State |
+
+Details: `docs/consolidation/TODO-prioritized.md`.
+
+## Verwandtes
+
+- [Mitwirken](/docs/de/contributing)
+- [Grenzen](/docs/de/security/limits)

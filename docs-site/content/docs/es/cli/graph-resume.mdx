@@ -1,0 +1,29 @@
+---
+title: graph resume
+description: Reanudar un grafo de ejecución interrumpido desde su último checkpoint.
+---
+
+# `asa graph resume`
+
+Continúa un grafo pausado, fallido o interrumpido usando checkpoints persistidos (`spec-my-C` §5.5, §15).
+
+## Uso
+
+```bash
+asa graph resume graph-2026-05-29-9307e4be
+asa graph resume graph-2026-05-29-9307e4be --json
+```
+
+## Comportamiento
+
+Carga `execution-graph.yaml` desde `.asagiri/graphs/<graph-id>/`, restaura estados de nodos desde checkpoints y ejecuta nodos listos restantes. Emite eventos `graph.*` durante la reanudación.
+
+Sin **checkpoint** en disco, el comando falla con un error explícito. Ejecute antes [`asa graph run`](/docs/es/cli/graph-run) con `--checkpoint-every node` o `group`.
+
+Con `execution_graph.enabled: false`, los comandos graph (incl. resume) devuelven error.
+
+## Ver también
+
+- Comprobar estado: [`asa graph status`](/docs/es/cli/graph-status)
+- Ejecución inicial: [`asa graph run`](/docs/es/cli/graph-run)
+- Concepto: [Grafo de ejecución](/docs/es/concepts/execution-graph)

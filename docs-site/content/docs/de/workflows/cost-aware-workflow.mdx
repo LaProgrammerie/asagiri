@@ -1,0 +1,55 @@
+---
+title: Kostenbewusster Workflow
+description: Vor der Agentenausführung schätzen, Kontext optimieren und Ausgaben begrenzen.
+---
+
+# Kostenbewusster Workflow
+
+Diese Seite setzt **`spec-doc` §11.4** in konkrete Schritte um: alle genannten Flags und Konfigurationsschlüssel existieren in Asagiri. Der Ablauf führt durch Kostenschätzung, Verdichtung des Kontextpakets, Budgetprüfung und — wo das Routing es erlaubt — **bevorzugte lokale** Ausführung.
+
+## 1. Schätzung pro Aufgabe
+
+```bash
+asa estimate billing-v2 --task task-003 --dry-run
+```
+
+Zeigt heuristische Ein- und Ausgabe-Tokens sowie geschätzte Kosten aus Ihrer `pricing`-Konfiguration.
+
+## 2. Kontextoptimierung
+
+```bash
+asa context billing-v2 --task task-003 --optimize
+```
+
+Erzeugt ein reduziertes Kontextpaket vor großen Agent-Prompts. Reduktion abschalten mit `asa work … --no-context-reduction`.
+
+## 3. Lauf mit Budget
+
+```bash
+asa work "develop billing-v2" --budget 0.50 --estimate-only
+asa work "develop billing-v2" --budget 0.50
+```
+
+Die in YAML definierten Budgets (`budgets.per_run.max_estimated_cost`) gelten, wenn die CLI `--budget` nicht setzt oder null übergibt. Läufe über dem Budget werden blockiert, es sei denn:
+
+- die Bestätigungsaufforderung wird akzeptiert, oder
+- `--yes` nach `BudgetPendingConfirmError`, oder
+- `--allow-over-budget`, wenn `budgets.policies.allow_override_with_flag` `true` ist
+
+## 4. Lokale Präferenz
+
+```bash
+asa work "develop billing-v2" --prefer-local --no-cloud
+```
+
+`--allow-cloud` erlaubt ausdrücklich Cloud-Routing, wenn die Konfiguration oder Flags es sonst sperren würden.
+
+## Nachvollziehbarkeit
+
+`work` und `estimate` geben Kurzfassungen zu Routing, Kontextgröße und Budget aus. Vertiefung: [Token-Schätzung](/docs/de/cost-performance/token-estimation).
+
+## Verwandtes
+
+- [Kostenbewusste Konzepte](/docs/de/concepts/cost-aware-workflows)
+- [Budgets](/docs/de/configuration/budgets)
+- [CLI: cost-report](/docs/de/cli/generated/cost-report)

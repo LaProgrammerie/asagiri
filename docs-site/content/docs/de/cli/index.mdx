@@ -1,0 +1,58 @@
+---
+title: CLI-Überblick
+description: Asagiri-Befehlsfamilien und verlinkte Flag-Referenz (generiert).
+---
+
+# CLI-Überblick
+
+Die **`asa`-Binärdatei (`application/cmd/asa`)** ist die zentrale Oberfläche: Projekt initialisieren, die spezgetriebene Pipeline in konkrete Verben aufteilen, Kost-Artefakte inspizieren und Betriebspflege erledigen. Im Alltag verläuft der Datenstrom oft über **`work`**, wenn natürliche Sprache eine ganze Pipeline abbilden soll, oder über benannte Schritte wie **`plan`**, **`dev`** und **`verify`**, wenn `.kiro/specs/<feature>/` bereits Struktur liefert. Die Gruppierung unten ordnet die Begriffe — verbindliche Flags und der Unterbefehlsbaum stammen aus Cobra und stehen in der **[generierten CLI-Referenz](/docs/de/cli/generated)**; nach strukturellen CLI-Änderungen Docgen ausführen.
+
+## Globales Verhalten
+
+Simulations-Flags verhalten sich über verschachtelte Subbefehle konsistent:
+
+| Flag | Beschreibung |
+| --- | --- |
+| `--dry-run` | Simuliert ohne echte Agents oder Validierungs-Shells |
+| (persistent) | Wird an abgeleitete Befehle vererbt |
+
+Umgebungsvariablen wie `ASA_DRY_RUN=1` und `ASA_YES=1` spiegeln gängige Schalter; die vollständige Liste steht unter [Umgebungsvariablen](/docs/de/reference/environment-variables).
+
+## Befehlsgruppen im Überblick
+
+| Gruppe | Befehle | Typische Nutzung |
+| --- | --- | --- |
+| **Bootstrap** | `init`, `doctor`, `version` | Ersteinrichtung, Gesundheitschecks |
+| **Pipeline** | `spec`, `plan`, `enrich`, `dev`, `verify`, `review`, `pr` | Schritte rund um `.kiro/specs/<feature>/` |
+| **Intent** | `work`, `continue`, `next`, `inbox` | Natürliche Sprache, Fortsetzung, Überblick |
+| **Sources** | `sync`, `index` | Fremdquellen (z. B. Notion), lokaler Index |
+| **Kosten / Kontext** | `estimate`, `investigate`, `context`, `cost`, `cost-report`, `cost-models` | Schätzung, Investigation, Kontextpakete |
+| **Inspect** | `inspect` (diff, symbol, tests) | Gezielte lokale Untersuchung |
+| **Ops** | `status`, `resume`, `report`, `clean` | Lauflebenszyklus und Artefakte |
+| **MCP** | `mcp`, `mcp-serve` | Optionale MCP-Anbindung |
+| **Meta** | `docs`, `help` | Doku-Generierung, eingebaute Hilfe |
+
+Die Tabelle ist eine Orientierung — keine Aussage darüber, welche Befehle nur interaktiv und welche in Skripten gehören.
+
+## Generierte Detailreferenz
+
+Kurzüberblicke und deutschsprachige Stub-Seiten für ausgewählte Befehle liegen unter **[CLI generiert](/docs/de/cli/generated)**. Nach Änderungen an Cobra:
+
+```bash
+go run ./application/cmd/asa docs generate-cli \
+  --output docs-site/content/docs/en/cli/generated
+```
+
+Änderungen an den generierten MDX-Dateien zusammen mit dem Code einreichen; die vollständigste Referenztiefe bleibt auf Englisch unter `/docs/cli/generated`.
+
+## Erste Befehle zum Ausprobieren
+
+Minimaler Check vor dem Anbinden externer Agents:
+
+```bash
+asa init
+asa doctor
+asa work "my feature" --dry-run --plan-only
+```
+
+Danach [Schnellstart](/docs/de/getting-started/quickstart) und bei konfigurierten Hooks [Erster Workflow](/docs/de/getting-started/first-workflow).

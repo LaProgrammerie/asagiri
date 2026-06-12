@@ -1,0 +1,74 @@
+---
+title: Geführter Pfad
+description: Der eine geführte Pfad vom Onboarding über die Arbeit bis zu den Validierungs-Meilensteinen.
+---
+
+# Geführter Pfad
+
+Asagiri stellt einen einzigen geführten Pfad bereit, der Sie von einem frischen Repository zu einem validierten Entwicklungslauf führt: **Onboarding → Arbeit → Validierungs-Meilensteine**. Das ist der empfohlene Einstiegspunkt und bleibt über `asa --help` auffindbar. Jeder unitäre Befehl (`asa spec`, `plan`, `enrich`, `dev`, `verify`, `review`) bleibt eigenständig nutzbar — der geführte Pfad hebt eine Route hervor, ohne etwas zu entfernen.
+
+```bash
+asa onboard                # 1. Repository vorbereiten (Bereit-Zustand)
+asa work "<Ihr Bedarf>"    # 2. beschreiben → erzeugen → an Meilensteinen validieren
+```
+
+## 1. Onboarding
+
+Das Onboarding bringt das Repository in einen Bereit-Zustand, bevor ein Agent läuft. Starten Sie den Assistenten und bestätigen Sie anschließend die Bereitschaft:
+
+```bash
+asa onboard
+asa ready
+```
+
+`onboard` erkennt Ihren Stack und schreibt die Konfiguration, ohne einen bestehenden Bereitschaftswert zu senken. Mit `asa onboard --check-only` bewerten Sie die Bereitschaft, ohne eine Datei zu erstellen, zu ändern oder zu löschen. Fehlt ein erforderliches Werkzeug, eine Konfiguration oder eine Abhängigkeit, hält Asagiri ohne `panic` an, gibt einen Exit-Code ungleich null zurück und benennt das fehlende Element sowie mindestens eine Lösungsaktion — eine unvollständige Konfiguration bleibt nie zurück.
+
+Siehe [Installation](/docs/de/getting-started/installation) und [Schnellstart](/docs/de/getting-started/quickstart) für die zugrunde liegenden Schritte.
+
+## 2. Arbeit
+
+`work` ist der übergeordnete Befehl: Sie beschreiben einen Bedarf in natürlicher Sprache, Asagiri verwandelt ihn in einen ausführbaren Plan und durchläuft dann die Pipeline (Intent auflösen → Kontext planen und anreichern → in einem Worktree entwickeln → verifizieren → optionale Review → Report).
+
+```bash
+asa work "develop billing-v2" --estimate-only   # zuerst das Kosten-Gate
+asa work "develop billing-v2"                    # standardmäßig geführte Bestätigung
+```
+
+Proben Sie gefahrlos, bevor Sie ausgeben: `--dry-run` simuliert jeden Schritt, ohne einen echten Agenten aufzurufen, einen externen Befehl auszuführen oder den persistenten Zustand des Repositories zu ändern. `--plan-only` und `--estimate-only` stoppen jeweils nach Planung bzw. Kostenschätzung.
+
+## 3. Validierungs-Meilensteine
+
+Der geführte Pfad pausiert an menschlichen Validierungs-Meilensteinen, statt unbeaufsichtigt zu laufen. Asagiri verlangt eine ausdrückliche Bestätigung, bevor der Schritt ausgeführt wird, wenn:
+
+- eine **Plan-Bestätigung** erforderlich ist (`work.require_plan_confirmation`),
+- ein Lauf sein **Budget überschreiten** würde,
+- eine **sensible Aktion** betroffen ist (Zahlung, personenbezogene Daten, Authentifizierung, Berechtigungen, Löschung, Export, Datenmigration).
+
+In nicht interaktiven Kontexten (CI oder `--non-interactive`), in denen eine Bestätigung erforderlich ist und `--yes` fehlt, hält Asagiri an, ohne auf Eingabe zu warten, gibt einen Exit-Code ungleich null zurück und benennt das anzugebende Flag.
+
+## Unitäre Befehle bleiben verfügbar
+
+Der geführte Pfad entfernt nie einen Befehl. Wenn Sie einen einzelnen Schritt selbst steuern möchten, läuft jeder unitäre Befehl eigenständig:
+
+```bash
+asa spec my-feature
+asa plan my-feature
+asa enrich my-feature
+asa dev my-feature
+asa verify my-feature
+asa review my-feature
+```
+
+Text- und JSON-Ausgabe bleiben informationsgleich: Die Felder, auf die Sie sich verlassen, hängen nie vom Render-Modus ab.
+
+## Weiterführend
+
+- [Mentales Modell](/docs/de/concepts/mental-model)
+- [Täglicher Workflow](/docs/de/workflows/daily-workflow)
+- [Erster Workflow](/docs/de/getting-started/first-workflow)
+- [CLI-Referenz](/docs/de/cli/generated)
+
+<Callout type="warning">
+  Asagiri beweist keine Korrektheit. Validierung und menschliche Review bleiben
+  für kritische Änderungen Pflicht.
+</Callout>

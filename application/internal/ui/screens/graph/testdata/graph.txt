@@ -1,0 +1,24 @@
+Graph: graph-001
+Flow: onboarding
+Status: running
+View: timeline
+
+Nodes
+  investigate [succeeded] risk=low
+  implement [blocked] risk=high blocked_by=investigate
+Actions
+- open node: Enter/o
+- view logs: l
+- view dependencies: d
+- explain decision: e
+- launch/resume: r
+- export mermaid/json: x
+- switch view: v
+CLI: asa graph visualize graph-001 --format mermaid
+
+Events
+Filter: all  Search: (none)  [live]
+Keys: f filter  / search  p pause  x export  o open  e focus  ↑↓ select
+CLI: asa runtime events --type <filter> --search <query> --export
+  11:00:00  graph.generated
+  11:01:00  graph.blocked

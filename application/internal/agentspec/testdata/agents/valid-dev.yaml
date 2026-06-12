@@ -1,0 +1,18 @@
+id: valid-dev
+version: "1.0.0"
+role: dev
+provider_targets:
+  - kiro-cli
+system_prompt: |
+  Agent de test valide.
+instructions:
+  - instruction a
+constraints:
+  - constraint a
+output_contract:
+  format: asagiri-v1
+  required_fields:
+    - status
+metadata:
+  labels:
+    env: test

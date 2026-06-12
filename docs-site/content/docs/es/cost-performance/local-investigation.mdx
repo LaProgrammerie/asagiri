@@ -1,0 +1,49 @@
+---
+title: Investigación local
+description: Grep acotado y exploración del sistema de ficheros antes de llamadas a agentes cloud.
+---
+
+# Investigación local
+
+Antes de que Asagiri reenvíe el contexto del repositorio a un agente cloud, **investiga el proyecto localmente**. La implementación está en `application/internal/investigation` y alimenta tanto `asa investigate` como el preludio del pipeline V3. La meta ingenieril es estrecha pero importante : **reducir el tamaño del prompt y poner sobre la mesas los ficheros que importan** con herramientas acotadas y repetibles — grep, barridos del árbol, heurísticas — en lugar de pedir a un modelo que ingiera el árbol entero.
+
+## Qué ocurre en su máquina
+
+Por lo habitual la investigación arranca con **grep** contra patrones de función o de tarea, con topes estrictos de bytes en la salida para que coincidencias patológicas no agoten el presupuesto de contexto. Un **barrido del sistema de ficheros** recorre rutas candidatas y marca cualquier cosa por encima de `large_file_bytes`, evitando empaquetar binarios gigantes o logs por error. La **detección de rutas sensibles** aplica `secret_path_denylist` y globs configurados para que llaves u credenciales entren menos a menudo en prompts o informes. Por último, **heurísticas relacionadas con pruebas** proponen pruebas ligadas a rutas fuente candidatas, apoyando pasos verify sin enumerar todo el repo.
+
+Esos artefactos alimentan el empaquetado de contexto y la estimación de costes. Son entradas, no veredictos: no sustituyen el juicio humano sobre alcance o seguridad.
+
+## Comandos CLI
+
+Use estos comandos para ejecutar o depurar la investigación fuera de un `work` completo:
+
+```bash
+asa investigate billing-v2
+asa investigate billing-v2 --task task-003
+asa inspect diff
+asa inspect symbol Handler
+asa inspect tests billing-v2
+```
+
+Los subcomandos `inspect` envuelven utilidades enfocadas cuando ya sabe si le importan el diff, un símbolo o las asociaciones de pruebas.
+
+## Límites y configuración
+
+La investigación respeta tiempos de espera y topes en bytes desde la configuración. Valores ejemplo:
+
+```yaml
+mcp:
+  investigation:
+    large_file_bytes: 524288
+    max_grep_output_bytes: 262144
+    command_timeout_seconds: 120
+    sensitive_globs: ["*.pem", ".git/*"]
+```
+
+Endurecer intercambia recuerdo por seguridad y coste más estable. Aflojar puede mostrar más contexto circundante, pero aumenta el rieso de prompts desmesurados y exposición accidental de secretos.
+
+## Lecturas relacionadas
+
+- [Conceptos local-first](/docs/es/concepts/local-first)
+- [CLI: investigate](/docs/es/cli/generated/investigate)
+- [Herramientas MCP](/docs/es/mcp/tools) (exposición opcional vía MCP si está habilitado)

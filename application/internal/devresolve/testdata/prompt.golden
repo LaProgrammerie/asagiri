@@ -1,0 +1,54 @@
+Tu es exécuté par Asagiri en mode orchestré. Suis strictement le scope, le handoff et les gates actives.
+
+## Agent
+
+id: dev
+role: dev
+version: 1.0.0
+mode: orchestrated
+
+## Run
+
+feature: feat-orchestrate
+task_id: task-snap
+run_id: run-snap
+phase: dev
+
+## System prompt
+
+Agent snapshot fixe.
+
+## Instructions
+
+- instruction fixe
+
+## Constraints
+
+- constraint fixe
+
+## Scope strict
+
+Ne modifie aucun fichier hors périmètre autorisé.
+
+## Gates et handoff
+
+Respecte les gates work déjà évaluées sur la tâche.
+Ne contourne pas human_review, verify_evidence, enrich, governance ni trust.
+Aligne-toi sur docs/ai/active/handoff.md et la spec Kiro active.
+
+## Output contract
+
+format: asagiri-v1
+required_fields:
+  - status
+
+Produis uniquement la sortie attendue ; pas de prose hors format si un format structuré est requis.
+
+## Context files
+
+- a-context.md
+- z-context.md
+
+## Task prompt
+
+Implémente la task task-snap

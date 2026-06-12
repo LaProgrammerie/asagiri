@@ -1,0 +1,60 @@
+---
+title: Ollama
+description: Lokale Modelle für Enrichment, Routing und Intent-Fallback ausführen.
+---
+
+# Ollama
+
+Ollama versorgt die **lokalen** Anteile von Asagiri: Anreicherungsschritte, den Intent-Resolver, wenn `intent.resolver.use_ollama_fallback` aktiv ist, und kostenbewusstes Routing Richtung `work.default_enricher`. Es gibt keine separate Produktintegration im üblichen Sinne — Sie setzen HTTP-Endpunkt und Modell-Tags unter `agents.ollama` und spiegeln dieselben Kennungen in passenden `models`-Einträgen wider.
+
+## Konfiguration
+
+Weisen Sie `endpoint` auf Ihren Daemon, tragen Sie die Chat- und Embedding-Tags ein, die Sie bereits mit `ollama pull` geholt haben, und ordnen Sie dieselbe Modellkennung einem `models`-Profil mit `provider: ollama` und den `usage`-Klassen zu, die lokal abgedeckt werden sollen.
+
+```yaml
+agents:
+  ollama:
+    endpoint: http://localhost:11434
+    model: qwen2.5-coder:14b
+    embedding_model: nomic-embed-text
+    timeout: 300
+
+models:
+  ollama_local_qwen:
+    provider: ollama
+    class: local
+    model: qwen2.5-coder:14b
+    usage: [summarize, classify, pre_review, context_selection]
+```
+
+## Voraussetzungen
+
+Daemon starten, referenzierte Modelle ziehen, anschließend mit `doctor` prüfen, dass Konfiguration und Umgebung zusammenpassen.
+
+```bash
+ollama serve
+ollama pull qwen2.5-coder:14b
+asa doctor
+```
+
+## Nutzung
+
+`enrich` spricht Ollama an, wenn Sie `--agent ollama` setzen. `work --prefer-local` hält alle dafür qualifizierten Schritte auf dem lokalen Profil, das Ihr Routing beschreibt.
+
+```bash
+asa enrich billing-v2 --agent ollama
+asa work "refactor utils" --prefer-local
+```
+
+## Embeddings und RAG
+
+Das Feld `embedding_model` ist für spätere Abrufpfade reserviert. Der heutige Befehl `asa index` legt **Text-Chunks** in SQLite ab — eine vektorbasierte Ähnlichkeitssuche ist in einer Standard-Build nicht zu erwarten.
+
+<Callout type="experimental">
+Vektor-Embeddings und semantisches RAG stehen auf der Roadmap (siehe `ROADMAP.md` im Repository-Root). In Version 1 keine embedding-gestützte Suche erwarten.
+</Callout>
+
+## Siehe auch
+
+- [Lokale Modelle](/docs/de/agents/local-models)
+- [CLI: enrich](/docs/cli/generated/enrich)

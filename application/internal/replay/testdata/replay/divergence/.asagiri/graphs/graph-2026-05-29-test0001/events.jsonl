@@ -1,0 +1,2 @@
+{"event":"graph.node.started","node":"investigate-onboarding"}
+{"event":"agent.completed","node":"verify-onboarding-flow"}

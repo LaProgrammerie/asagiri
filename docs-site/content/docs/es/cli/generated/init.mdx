@@ -1,0 +1,22 @@
+---
+title: init · resumen CLI
+description: Inicializar Asagiri en el repositorio — resumen y enlace a la referencia completa.
+---
+
+# init
+
+CLI: **`asa init`**
+
+## Cuándo usarlo
+
+Los comandos de arranque preparan o reconcilian el árbol de trabajo de Asagiri para que los nodos del workflow resuelvan de forma fiable la configuración y los metadatos del repositorio.
+
+## Modos de fallo
+
+- Cobra rechaza banderas desconocidas o errores de aridad antes de cualquier efecto en el repositorio.
+- Asagiri no puede resolver el arranque si el comando se invoca fuera de un checkout inicializado.
+- La automatización posterior puede fallar cuando credenciales, extremos de red o requisitos en caché dejan de coincidir con lo esperado.
+
+## Referencia completa (inglés)
+
+[Banderas, ejemplos y detalles](/docs/cli/generated/init)

@@ -1,0 +1,32 @@
+---
+title: Schéma screen
+description: Structure framework-agnostic des fichiers .screen.yaml.
+---
+
+# Schéma screen
+
+Chaque `.screen.yaml` décrit un écran indépendamment du framework UI.
+
+## Forme minimale
+
+```yaml
+id: create_workspace
+route: /onboarding/workspace
+title: Create workspace
+layout: centered_form
+components:
+  - id: workspace_name_input
+    type: text_input
+    required: true
+  - id: submit_button
+    type: button
+    action: submit_workspace
+states:
+  loading: true
+  error: true
+  success: true
+```
+
+## Objectif
+
+Rendre les exigences UX auditable sans dépendre des détails React/Vue.

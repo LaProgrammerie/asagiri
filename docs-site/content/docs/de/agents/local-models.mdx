@@ -1,0 +1,40 @@
+---
+title: Lokale Modelle
+description: Wann lokale Agents bevorzugt werden und wie das Routing sie wählt.
+---
+
+# Lokale Modelle
+
+„Lokal“ meint hier **Modelle, die Sie auf derselben Maschine oder im LAN betreiben**, üblicherweise über Ollama. In `models` tragen lokale Profile oft marginale Kosten von null (`input_cost_per_1m_tokens: 0` / `output_cost_per_1m_tokens: 0`), damit kostenbewusstes Routing sie bevorzugen kann, sobald die Strategie und die Schrittklasse das zulassen.
+
+## Wann sich lokale Modelle lohnen
+
+Sie sind stark dort, wo Roundtrips zu einer Cloud-API stören oder wo Sie Ausgaben strikt begrenzen möchten: Absicht und Aufgaben klassifizieren, Specs vor einem schwereren Cloud-`dev` anreichern, kleine Logs einordnen oder ein schnelles Pre-Review fahren. In abgeschotteten Umgebungen sind sie oft die pragmatische Standardwahl — jedes Byte und jede Gebühr außerhalb des LAN zählt dort doppelt.
+
+Typische Einsätze im Überblick: Klassifikation, leichtes Enrichment vor Cloud-Schritten, Loganalyse, Pre-Review sowie Repositories mit strengen Offline- oder Budgetvorgaben.
+
+## Lokal aktivieren
+
+Verdrahten Sie `agents.ollama` (oder ein anderes von Ihnen konfiguriertes lokales Backend), legen Sie unter `models` ein Profil mit `class: local` an und ergänzen Sie bei Bedarf `routing.prefer_local_for` mit den Schrittklassen, die auf der eigenen Infrastruktur bleiben sollen. Für einmalige Einschränkungen ohne YAML-Änderung helfen `--prefer-local` oder `--no-cloud` an `work`.
+
+1. `agents.ollama` und passendes `models`-Profil mit `class: local` konfigurieren
+2. Optional `routing.prefer_local_for` setzen
+3. Bei Bedarf `asa work … --prefer-local` oder `--no-cloud` verwenden
+
+```bash
+asa work "add logging" --prefer-local --estimate-only
+```
+
+## Grenzen
+
+Lokale Gewichte haben typischerweise kürzere Kontextfenster und weniger Spielraum für sehr große Umbauten. Schwere Refactorings oder sicherheitskritische Reviews können weiterhin ein Cloud-Profil erfordern. Wenn `use_cloud_heavy_for` greift und Sie `--allow-cloud` setzen, darf Routing nach den konfigurierten Fehlschwellen eskalieren — prüfen Sie die Strategieparameter, bevor Sie davon ausgehen, der gesamte Lauf sei lokal geblieben.
+
+<Callout type="local-first">
+Local-first senkt Kosten und Datenabfluss; es ersetzt weder Validierung noch menschliche Review auf kritischen Pfaden.
+</Callout>
+
+## Siehe auch
+
+- [Ollama](/docs/de/agents/ollama)
+- [Local-first-Konzepte](/docs/de/concepts/local-first)
+- [Routing](/docs/de/configuration/routing)

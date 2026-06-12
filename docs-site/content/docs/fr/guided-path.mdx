@@ -1,0 +1,98 @@
+---
+title: Chemin guidé
+description: Le chemin guidé unique, de l’onboarding au travail jusqu’aux jalons de validation.
+---
+
+# Chemin guidé
+
+Asagiri expose un chemin guidé unique qui vous mène d’un dépôt vierge à une exécution de développement validée : **onboarding → travail → jalons de validation**. C’est le point d’entrée recommandé et il reste découvrable depuis `asa --help`. Chaque commande unitaire (`asa spec`, `plan`, `enrich`, `dev`, `verify`, `review`) reste utilisable seule — le chemin guidé met en avant un parcours sans rien retirer.
+
+```bash
+asa onboard               # 1. préparer le dépôt (état prêt)
+asa work "<votre besoin>" # 2. décrire → produire → valider aux jalons
+```
+
+## 1. Onboarding
+
+L’onboarding amène le dépôt à un état prêt avant toute exécution d’agent. Lancez l’assistant, puis confirmez la préparation :
+
+```bash
+asa onboard
+asa ready
+```
+
+`onboard` détecte votre stack et écrit la configuration sans abaisser un score de préparation existant. Utilisez `asa onboard --check-only` pour évaluer la préparation sans créer, modifier ni supprimer aucun fichier. Si un outil, une configuration ou une dépendance requis est absent, Asagiri s’arrête sans `panic`, retourne un code de sortie non nul et nomme l’élément manquant ainsi qu’au moins une action de résolution — il ne laisse jamais de configuration partielle.
+
+Voir [Installation](/docs/fr/getting-started/installation) et [Démarrage rapide](/docs/fr/getting-started/quickstart) pour les étapes sous-jacentes.
+
+## 2. Travail
+
+`work` est la commande de haut niveau : vous décrivez un besoin en langage naturel et Asagiri le transforme en un plan exécutable, puis déroule le pipeline (résolution de l’intention → planification et enrichissement du contexte → développement dans un worktree → vérification → revue optionnelle → rapport).
+
+```bash
+asa work "develop billing-v2" --estimate-only   # gate de coût d’abord
+asa work "develop billing-v2"                    # confirmation guidée par défaut
+```
+
+Répétez sans risque avant de dépenser : `--dry-run` simule chaque étape sans invoquer d’agent réel, exécuter de commande externe ni modifier l’état persistant du dépôt. `--plan-only` et `--estimate-only` s’arrêtent respectivement après la planification et l’estimation de coût.
+
+### Routage de scope (Product Layer V1)
+
+Chaque instruction est classée de façon déterministe (sans LLM). Priorité : **technical_task** → **feature_work** → **product_level_intent**. En cas de doute, Asagiri reste en **feature_work** et **ne déclenche pas** le Product Layer.
+
+| Scope | Signal typique | Comportement |
+| --- | --- | --- |
+| `technical_task` | bug, test, refactor, CI, lint | Workflow technique normal |
+| `feature_work` | endpoint, page, export, auth | Workflow technique normal |
+| `product_level_intent` | CRM/SaaS/marketplace greenfield | Préparation Product Layer, puis **arrêt contrôlé** |
+
+Les intentions produit suivent un workflow en **deux temps** (V1). Pas d’**auto-enchaînement** préparation → dev dans la même invocation `asa work`.
+
+```bash
+# Étape 1 — préparer les artefacts produit
+asa work "Créer un CRM pour artisans" --dry-run
+asa work "Créer un CRM pour artisans" --yes
+
+# Étape 2 — implémentation (invocation séparée)
+asa work crm-artisans --yes
+asa next --feature crm-artisans
+```
+
+Voir [Executable Product Layer](/docs/fr/concepts/executable-product-layer) et [Workflow produit vers code](/docs/fr/workflows/product-to-code).
+
+## 3. Jalons de validation
+
+Le chemin guidé s’interrompt à des jalons de validation humaine plutôt que de s’exécuter sans surveillance. Asagiri exige une réponse affirmative explicite avant d’exécuter l’étape lorsque :
+
+- une **confirmation de plan** est requise (`work.require_plan_confirmation`),
+- une exécution **dépasserait son budget**,
+- une **action sensible** est en jeu (paiement, données personnelles, authentification, permissions, suppression, export, migration de données).
+
+En contexte non interactif (CI ou `--non-interactive`) où une confirmation est requise et `--yes` absent, Asagiri s’arrête sans attendre de saisie, retourne un code de sortie non nul et nomme le flag à fournir.
+
+## Les commandes unitaires restent disponibles
+
+Le chemin guidé ne retire jamais de commande. Quand vous voulez piloter vous-même une seule étape, chaque commande unitaire s’exécute de façon autonome :
+
+```bash
+asa spec my-feature
+asa plan my-feature
+asa enrich my-feature
+asa dev my-feature
+asa verify my-feature
+asa review my-feature
+```
+
+Les sorties texte et JSON restent en parité d’information : les champs dont vous dépendez ne sont jamais conditionnés au mode de rendu.
+
+## Pour aller plus loin
+
+- [Modèle mental](/docs/fr/concepts/mental-model)
+- [Workflow quotidien](/docs/fr/workflows/daily-workflow)
+- [Premier workflow](/docs/fr/getting-started/first-workflow)
+- [Référence CLI](/docs/fr/cli/generated)
+
+<Callout type="warning">
+  Asagiri ne prouve pas la correction. La validation et la revue humaine restent
+  obligatoires pour les changements critiques.
+</Callout>

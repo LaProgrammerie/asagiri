@@ -1,0 +1,26 @@
+---
+title: Commandes contracts
+description: Dériver les contrats techniques à partir des flows.
+---
+
+# Commandes contracts
+
+`asa contracts extract` transforme les flows en contrats techniques exploitables.
+
+## Extraire
+
+```bash
+asa contracts extract workspace-saas
+```
+
+Génère :
+
+- `contracts/api.openapi.yaml`
+- `contracts/permissions.yaml`
+- `contracts/events.yaml`
+- `contracts/analytics.yaml`
+- `contracts/observability.yaml`
+
+Le rapport d’extraction signale les incertitudes à traiter avant implémentation.
+
+Validation stricte : la commande échoue maintenant si le couplage métriques/analytics/contracts est incomplet (métriques flow manquantes, métrique/dashboard analytics absent, ou lien observabilité manquant).

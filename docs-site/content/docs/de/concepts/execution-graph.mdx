@@ -1,0 +1,84 @@
+---
+title: Execution-Graph-Planer
+description: Abhängigkeitsbewusste Orchestrierung mit Kosten, Risiko, Checkpoints und Trust-Gates.
+---
+
+# Execution-Graph-Planer
+
+`spec-my-C` — wandelt lineare Task-Listen in einen **gerichteten Execution Graph** mit sicherer Parallelität, Checkpoints und Verifikations-Gates um.
+
+## Prinzipien
+
+- **Local-first** — Pläne liegen unter `.asagiri/graphs/<graph-id>/`; kein Remote-Orchestrator.
+- **Nachvollziehbar** — Export Mermaid/JSON/DOT; `asa plan explain` erklärt Abhängigkeiten.
+- **Konservative Parallelität** — Standard `max_parallel: 2`; nie zwei Tasks parallel, die dieselbe Datei ändern.
+- **Kosten und Risiko sichtbar** — Schätzungen pro Knoten und gesamt vor Agent-Lauf.
+- **Trust-Integration** — Hochrisiko-Knoten können Gates der [Trust Engine](/docs/de/concepts/trust-engine) erfordern.
+
+## Pipeline
+
+```text
+Produkt + Flow
+  → Planner (Abhängigkeitsinferenz, Agent-Zuweisung)
+  → Scheduler (topologische Sortierung, Parallelgruppen)
+  → Repository (execution-graph.yaml, plan.md, metrics.json)
+  → Runner (Dry-Run oder Agents, Checkpoints, Resume)
+  → Trust-Gates + Investigation-Knoten bei Bedarf
+```
+
+## Knoten- und Kantentypen
+
+**Knoten:** investigation, enrichment, implementation, validation, review, trust_verification, documentation, release_check u. a.
+
+**Kanten:** `requires`, `blocks`, `validates`, `produces_context_for`, `must_run_after`, `can_run_after`, `parallel_with`, `rollback_depends_on`.
+
+## Artefakte
+
+Jeder Plan schreibt unter `.asagiri/graphs/<graph-id>/`:
+
+| Datei | Zweck |
+|-------|-------|
+| `execution-graph.yaml` / `.json` | Kanonischer Graph (Knoten, Kanten, Checkpoints, Rollback) |
+| `plan.md` | Menschlich lesbare Planzusammenfassung |
+| `metrics.json` | Kosten, Dauer, Risiko, Parallelgruppen |
+| `events.jsonl` / `timeline.jsonl` | Runtime-Ereignisprotokoll |
+| `report.md` | Bericht nach Ausführung |
+
+## CLI
+
+| Befehl | Zweck |
+|--------|-------|
+| [`asa plan graph`](/docs/de/cli/plan-graph) | Graph ohne Agent-Ausführung erzeugen |
+| [`asa plan explain`](/docs/de/cli/plan-explain) | Abhängigkeiten, Parallelität und Risiko erklären |
+| [`asa graph run`](/docs/de/cli/graph-run) | Graph planen und ausführen (oder simulieren) |
+| [`asa graph status`](/docs/de/cli/graph-status) | Persistierten Graph-Status anzeigen |
+| [`asa graph resume`](/docs/de/cli/graph-resume) | Vom letzten Checkpoint fortsetzen |
+| [`asa graph visualize`](/docs/de/cli/graph-visualize) | Mermaid, JSON, DOT oder Markdown exportieren |
+
+## Konfiguration
+
+Defaults in [`execution_graph`](/docs/de/configuration/config-file#execution_graph) in `.asagiri/config.yaml`.
+
+- **`enabled: false`** — deaktiviert `plan graph` und alle `graph`-Unterbefehle.
+- **`gates`** — steuern Trust-Enrichment und Runner (`trust.Engine`).
+- **`--checkpoint-every`** — `node` oder `group` ; nötig für [`asa graph resume`](/docs/de/cli/graph-resume) (Fehler ohne Checkpoint).
+
+## Code-Layout
+
+```text
+internal/executiongraph/
+  model.go
+  planner.go
+  dependency.go
+  scheduler.go
+  estimator.go
+  risk.go
+  checkpoints.go
+  rollback.go
+  runner.go
+  repository.go
+  renderer.go
+  state_machine.go
+```
+
+Nutzt Produkt-Assets (`.asagiri/products/<id>/flows`, Tasks, Contracts), Trust-Gates und Investigation-Anreicherung.

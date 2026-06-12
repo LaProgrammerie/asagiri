@@ -1,0 +1,216 @@
+---
+title: Daily workflow
+description: Start a feature, unblock gates, and read trust and doctor output.
+---
+
+# Daily workflow
+
+This page walks through a typical day with Asagiri: start work, know what to run next, understand gate blockages, and interpret trust and doctor—without changing pipeline behaviour.
+
+## 1. Start a feature
+
+**Greenfield or new intent** — use `work`:
+
+```bash
+asa onboard          # once per repo
+asa ready
+asa work "add CSV export to billing" --plan-only   # rehearse
+asa work "add CSV export to billing" --yes         # run for real
+```
+
+**Known feature slug** — same command with the slug:
+
+```bash
+asa work billing-v2 --yes
+```
+
+**Product-level intent** (CRM, marketplace, …) is a two-step flow: product preparation in one `work` run, implementation in a separate run. See [Product to code](/docs/workflows/product-to-code).
+
+After `work` completes a real step, a one-line **trust summary** may appear (verdict + `asa trust task …` when relevant). Use `--no-trust` to hide it.
+
+## 2. Know what to do next
+
+**Read-only recommendation:**
+
+```bash
+asa next
+asa next --feature billing-v2
+```
+
+Output includes `Next action`, `Reason`, and `Command:` with the exact primitive (e.g. `asa dev …`, `asa verify …`). A compact **Trust** block follows unless you pass `--no-trust`.
+
+**Run the recommendation:**
+
+```bash
+asa next --execute
+```
+
+**Feature-wide status:**
+
+```bash
+asa status
+```
+
+When in doubt after an interruption, prefer `asa next` before guessing the next primitive.
+
+## 3. Gate blockages
+
+Gates pause the pipeline until you satisfy policy. Messages name the gate and the **next CLI**.
+
+### human_review pending
+
+Plan or enrich completed; a human must approve before dev continues.
+
+```text
+Gate human_review requires action.
+Next step:
+  asa gates submit human_review --task task-003 --verdict pass
+Then:
+  asa continue --yes
+```
+
+`asa next` shows the same `gates submit` command as `Command:`.
+
+### verify_evidence failed
+
+Implementation verified, but evidence gate blocks review until verification is re-run or forced.
+
+```bash
+asa next
+# Command: asa verify billing-v2 --task task-003 --force
+asa verify billing-v2 --task task-003 --force
+asa review billing-v2 --task task-003 --agent reviewer
+```
+
+Reason text: `verify evidence gate not satisfied`.
+
+## 4. Read trust
+
+Trust is **advisory** for daily work (not a workflow gate in V1).
+
+| Scope | Command | When |
+| --- | --- | --- |
+| Task | `asa trust task task-003` | After dev/verify on one task |
+| Feature | `asa trust feature billing-v2` | Overview before merge |
+| Run | `asa trust run run-2026-06-06-abc` | Audit one execution |
+
+Verdicts: **Fiable**, **Acceptable**, **À surveiller**, **Bloqué**. Use `--explain` for dimensions; `--json` for automation.
+
+Harmonized next step from trust reports: `asa next --feature <feature>`.
+
+## 5. Read doctor
+
+Environment and project hygiene—**read-only**, no agents, no network.
+
+```bash
+asa doctor              # repo, config, SQLite, gates summary, next action
+asa doctor --full       # + onboarding checks (gitignore, docs, agents, kiro)
+asa doctor --json       # machine-readable ready / warnings / failures
+asa doctor --full --strict   # CI: fail on warnings too
+```
+
+Exit codes (default):
+
+| Situation | Exit |
+| --- | --- |
+| No blocking FAIL | 0 |
+| At least one FAIL | 1 |
+| WARN only | 0 |
+| WARN + `--strict` | 1 |
+
+Use doctor **before** first `work` on a machine and in CI after `asa init`.
+
+## 6. CI — persistent reports (`--save`)
+
+For pipelines that pipe JSON to `jq` or archive trust/doctor snapshots:
+
+| Stream | Content |
+| --- | --- |
+| **stdout** with `--json` | Exactly one JSON document (pipe-safe) |
+| **stderr** with `--save` | `Rapport enregistré : <path>` (human confirmation) |
+
+```bash
+asa init
+asa doctor --full --strict --json --save 2>/dev/null
+echo $?   # 1 if FAIL or WARN in strict mode
+
+asa trust feature billing-v2 --json --save | jq -e '.score.verdict != "blocked"'
+```
+
+Saved artefacts (written atomically when using `--save`):
+
+```text
+.asagiri/reports/doctor/latest.json
+.asagiri/reports/trust/tasks/<task-id>.json
+.asagiri/reports/trust/features/<feature>.json
+.asagiri/reports/trust/runs/<run-id>.json
+```
+
+`--json` without `--save` leaves stderr empty on success. `--save` never appends human text after JSON on stdout.
+
+## Concrete scenarios
+
+### Healthy feature
+
+Task planned, enriched, implemented, verified; trust acceptable.
+
+```bash
+$ asa next --feature billing-v2
+Feature: billing-v2
+Task:    task-004
+Next action: review
+Reason: verified but review missing
+Command: asa review billing-v2 --task task-004 --agent reviewer
+
+Trust
+  Verdict: Acceptable
+  → asa next --feature billing-v2
+```
+
+### human_review pending
+
+```bash
+$ asa next --feature billing-v2
+Feature: billing-v2
+Task:    task-003
+Next action: human_review
+Gate human_review requires action.
+Next step:
+  asa gates submit human_review --task task-003 --verdict pass
+Then:
+  asa continue --yes
+Command: asa gates submit human_review --task task-003 --verdict pass
+```
+
+### verify_evidence failed
+
+```bash
+$ asa next --feature billing-v2
+Next action: verify
+Reason: verify evidence gate not satisfied
+Command: asa verify billing-v2 --task task-003 --force
+```
+
+### doctor warn-only
+
+Onboarding docs or gitignore incomplete; repo still usable.
+
+```bash
+$ asa doctor --full
+…
+Avertissements
+  ⚠ docs.product: docs/ai/01-product.md encore placeholder
+…
+Asagiri est prêt (avertissements).
+$ echo $?
+0
+```
+
+Fix warnings when convenient; use `--strict` in CI if you want warnings to fail the job.
+
+## Related reading
+
+- [Mental model](/docs/concepts/mental-model)
+- [CI workflow](/docs/workflows/ci-workflow)
+- [CLI: doctor](/docs/cli/generated/doctor)
+- [CLI: next](/docs/cli/generated/next)

@@ -1,0 +1,50 @@
+---
+title: Umgebungsvariablen
+description: Von Asagiri zur Laufzeit gelesene Umgebungsvariablen.
+---
+
+# Umgebungsvariablen
+
+Asagiri liest ein kleines, explizites Set von Umgebungsvariablen. Sie erlauben CI, Shells und Wrappern, globales Verhalten umzuschalten, ohne Konfigurationsdateien neu zu schreiben.
+
+| Variable | Wirkung |
+| --- | --- |
+| `ASA_DRY_RUN` | Bei `1` entspricht das dem globalen `--dry-run` (die Exec-Schicht kann sie ebenfalls setzen) |
+| `ASA_YES` | Bei `1` werden interaktive Bestätigungen automatisch angenommen (`requireConfirm`) |
+| `NOTION_TOKEN` | Standard-Notion-Token, wenn `sources.notion.token_env` den Namen `NOTION_TOKEN` trägt |
+| `NOTION_TEST_PAGE_ID` | Nur für Integrationstests (`source/notion/integration_test.go`) |
+| `UPDATE_GOLDEN` | Bei `1` werden Golden-Testdateien im Package `cost` aktualisiert |
+
+## Legacy-Variablen `AGENTFLOW_*`
+
+`AGENTFLOW_DRY_RUN` und `AGENTFLOW_YES` funktionieren noch, sind aber **veraltet**; Asagiri gibt eine stderr-Warnung aus und liest `ASA_DRY_RUN` / `ASA_YES`, wenn gesetzt. Bevorzugen Sie `ASA_*` in neuen Skripten und CI-Konfigurationen.
+
+## Eigenes Secret für Notion
+
+Wenn Sie die Umgebungsvariable umbenennen, muss `token_env` in der YAML denselben Namen tragen, damit Sync-Befehle und API-Aufrufe dasselbe Credential lesen.
+
+```yaml
+sources:
+  notion:
+    token_env: MY_NOTION_SECRET
+```
+
+```bash
+export MY_NOTION_SECRET="..."
+```
+
+## Einsatz in CI
+
+`ASA_DRY_RUN=1` ist üblich, um Orchestrierung in Pipelines zu üben, ohne konfigurierte Binärdateien der Agents zu starten. `ASA_YES=1` nur gezielt einsetzen, wenn Budget-Bestätigungen nach Prüfung der Schätzungen **bewusst** automatisch akzeptiert werden sollen.
+
+```yaml
+env:
+  ASA_DRY_RUN: "1"
+```
+
+Ohne klare Begründung für automatische Budget-Freigaben von `ASA_YES` absehen.
+
+## Verwandtes
+
+- [Notion-Konfiguration](/docs/de/configuration/notion)
+- [CI-Workflow](/docs/de/workflows/ci-workflow)

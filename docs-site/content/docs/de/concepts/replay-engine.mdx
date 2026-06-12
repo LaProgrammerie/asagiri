@@ -1,0 +1,42 @@
+---
+title: Replay-Engine
+description: Engineering-Workflows erfassen, erneut ausführen, vergleichen und mit festem Kontext auditieren.
+---
+
+# Replay-Engine
+
+`spec-my-F` — erzeugt **Replay-Pakete** unter `.asagiri/replays/`, um Agent-Workflows zu auditieren, Fehler zu reproduzieren und Läufe zu vergleichen — ohne perfekten LLM-Determinismus.
+
+## Prinzipien
+
+- **Praktischer Determinismus** — fixiert Git-Commit, Config, Graph-Zustand und Artefakte; identische LLM-Ausgaben sind nicht garantiert.
+- **Local-first** — Pakete im Repo unter `.asagiri/replays/<replay-id>/`.
+- **Geheimnisse** — `redact_secrets` und Pfad-Ausschlüsse; keine Roh-Tokens oder komplette `.env`.
+- **Getrennt von Trust-Replay** — `asa trust replay` spielt eine **Verifikation** aus `.asagiri/trust/<id>/` ; `asa replay` erfasst **komplette Engineering-Workflows**.
+
+## Pipeline
+
+```text
+run / execution graph / investigation
+  → asa replay create
+  → replay.yaml + graph/ trust/ investigations/ runtime/ …
+  → asa replay run (--offline | --simulation | --strict)
+  → compare / explain (Abweichungen)
+  → snapshot --name
+```
+
+## Modi
+
+| Modus | CLI | Verhalten |
+|-------|-----|-----------|
+| Full | Standard `replay run` | Workflow erneut (Agenten außer offline) |
+| Simulation | `--simulation` | Graph/Events/Outputs ohne Agenten |
+| Offline | `--offline` oder Config | Keine Cloud-/Extern-APIs |
+| Compare | `replay compare` oder `run --compare` | Strukturierter Diff |
+| Audit | Validierung | Paketintegrität und Provenance |
+
+## Abweichungen
+
+`replay compare` und `replay explain` melden Trust-Deltas, fehlende Validierungen, Graph-Änderungen, fehlende Artefakte und stale-Knowledge-Hinweise.
+
+Siehe [Konfiguration — `replay`](/docs/de/configuration/config-file#replay) und [`asa replay`](/docs/de/cli/replay).

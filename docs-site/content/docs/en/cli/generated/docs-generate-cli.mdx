@@ -1,0 +1,51 @@
+---
+title: Docs Generate-cli · Asagiri CLI
+description: The generator walks every command except the root binary and writes one deterministic MDX file per reachable node.
+---
+
+CLI path: **`asa docs generate-cli`**
+
+## When to use
+
+Use **docs** commands when refreshing machine-generated reference material—for example, syncing this MDX corpus with shipping CLI behaviour ahead of docs-site releases.
+
+**generate-cli** is safe to run repeatedly; outputs are regenerated wholesale under the **--output** directory.
+
+> Original CLI synopsis: Render MDX reference pages derived from this CLI's cobra tree
+
+## Usage
+
+```bash
+asa docs generate-cli [flags]
+```
+
+## Options
+
+| Flag | Scope | Default | Description |
+| --- | --- | --- | --- |
+| `--dry-run` | Inherited | `false` | Simuler les exécutions sans lancer d'agent ni commandes externes |
+| `--output` | Local | `docs-site/content/docs/en/cli/generated` | Directory receiving generated MDX files |
+
+## Examples
+
+```bash
+asa docs generate-cli
+```
+
+> Wire richer samples through **cobra.Command.Example** when the happy path warrants copy/paste-friendly automation beyond this scaffold.
+
+## What happens internally
+
+- Traverses the live **cobra.Command** tree returned by **cli.RootCommand()** depth-first while sorting immediate children alphabetically by name for reproducible filenames.
+- Renders deterministic MDX with YAML frontmatter and tables sourced from cobra metadata plus conservative narration heuristics.
+- Writes only underneath the caller-provided **--output** destination; callers should ensure the folder is writable and version-controlled intentionally.
+
+## Failure modes
+
+- Cobra rejects unknown flags or arity mismatches before any repository side effects occur.
+- Asagiri cannot resolve scaffolding when the command is invoked outside an initialised checkout.
+- Filesystem ACLs can deny writes under **--output**, leaving partial artefacts if interrupted mid-write.
+
+## Related commands
+
+_No sibling commands at this depth (Docs Generate-cli)._
