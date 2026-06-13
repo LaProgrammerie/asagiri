@@ -15,6 +15,8 @@ Asagiri turns a spec into auditable, cost-aware development runs — using local
 
 No La Programmerie account, no quota, no mandatory cloud, no automatic upload of your runs. Optional integrations (e.g. Notion) are opt-in.
 
+**Team Cloud (opt-in V0):** `asagiri cloud login|status|link|push` — sync ledger metadata to [Asagiri Cloud](https://github.com/LaProgrammerie/asagiri-cloud). Disabled by default (`cloud.enabled: false`). See `docs/ai/active/cloud-integration-v0.md`.
+
 ---
 
 ## Quick Start

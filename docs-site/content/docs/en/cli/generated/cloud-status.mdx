@@ -1,0 +1,49 @@
+---
+title: Cloud Status · Asagiri CLI
+description: État cloud (config, token, API)
+---
+
+CLI path: **`asa cloud status`**
+
+## When to use
+
+Orchestration commands coordinate higher-order Asagiri workloads such as ingestion, syncing, backlog triage, investigative passes, hydrated context payloads, coarse estimates, and workspace-specific automation.
+
+> Original CLI synopsis: État cloud (config, token, API)
+
+## Usage
+
+```bash
+asa cloud status [flags]
+```
+
+## Options
+
+| Flag | Scope | Default | Description |
+| --- | --- | --- | --- |
+| `--dry-run` | Inherited | `false` | Simuler les exécutions sans lancer d'agent ni commandes externes |
+| `--json` | Local | `false` | Sortie JSON sur stdout |
+
+## Examples
+
+```bash
+asa cloud status
+  asa cloud status --json
+```
+
+## What happens internally
+
+- Hydrates contextual services resolved from **$PWD**, coordinating git-bound automation, ingestion pipelines, syncing, backlog triage, investigations, MCP hooks, contextual hydration, coarse estimates, and similar orchestrations for this subtree.
+
+## Failure modes
+
+- Cobra rejects unknown flags or arity mismatches before any repository side effects occur.
+- Asagiri cannot resolve scaffolding when the command is invoked outside an initialised checkout.
+- Downstream automation may fail whenever credentials, network endpoints, or cached prerequisites drift from expectations.
+
+## Related commands
+
+- [Cloud Link](./cloud-link.mdx)
+- [Cloud Login](./cloud-login.mdx)
+- [Cloud Logout](./cloud-logout.mdx)
+- [Cloud Push](./cloud-push.mdx)

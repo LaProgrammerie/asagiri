@@ -6,6 +6,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/LaProgrammerie/asagiri/application/internal/cloudcli"
 	"github.com/LaProgrammerie/asagiri/application/internal/config"
 	"github.com/LaProgrammerie/asagiri/application/internal/investigation"
 	"github.com/LaProgrammerie/asagiri/application/internal/trustcli"
@@ -109,6 +110,7 @@ func newRootCmd() *cobra.Command {
 		newDashboardCmd(&dryRun),
 		newRunsCmd(&dryRun),
 		newAgentsCmd(&dryRun),
+		cloudcli.RootCommand(),
 		newFlowCmd(&dryRun),
 		newExplainCmd(&dryRun),
 		versionCmd,

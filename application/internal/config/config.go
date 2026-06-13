@@ -19,6 +19,8 @@ const (
 	DefaultStatePath     = ".asagiri/state.sqlite"
 	DefaultWorktreesPath = ".asagiri/worktrees"
 	DefaultBranchPrefix  = "asagiri"
+	DefaultCloudBaseURL  = "http://localhost"
+	DefaultCloudTokenRel = "~/.config/asagiri/cloud/token"
 )
 
 var legacyConfigWarned sync.Map
@@ -49,6 +51,15 @@ type Config struct {
 	Coordination   CoordinationConfig        `yaml:"coordination"`
 	Knowledge      KnowledgeConfig           `yaml:"knowledge"`
 	Replay         ReplayConfig              `yaml:"replay"`
+	Cloud          CloudConfig               `yaml:"cloud"`
+}
+
+// CloudConfig holds optional Team Cloud sync settings (ADR-039, cloud V0).
+type CloudConfig struct {
+	Enabled   bool   `yaml:"enabled"`
+	BaseURL   string `yaml:"base_url"`
+	TokenPath string `yaml:"token_path"`
+	ProjectID string `yaml:"project_id"`
 }
 
 // KnowledgeConfig holds engineering knowledge graph defaults (spec-my-E, ADR-024).
@@ -483,6 +494,16 @@ func (c *Config) applyDefaults(repoDirName string) {
 	c.applyCoordinationDefaults()
 	c.applyKnowledgeDefaults()
 	c.applyReplayDefaults()
+	c.applyCloudDefaults()
+}
+
+func (c *Config) applyCloudDefaults() {
+	if c.Cloud.BaseURL == "" {
+		c.Cloud.BaseURL = DefaultCloudBaseURL
+	}
+	if c.Cloud.TokenPath == "" {
+		c.Cloud.TokenPath = DefaultCloudTokenRel
+	}
 }
 
 func (c *Config) applyReplayDefaults() {

@@ -1,0 +1,52 @@
+---
+title: Cloud Push · Asagiri CLI
+description: Pousser des runs ledger vers le cloud
+---
+
+CLI path: **`asa cloud push`**
+
+## When to use
+
+Orchestration commands coordinate higher-order Asagiri workloads such as ingestion, syncing, backlog triage, investigative passes, hydrated context payloads, coarse estimates, and workspace-specific automation.
+
+> Original CLI synopsis: Pousser des runs ledger vers le cloud
+
+## Usage
+
+```bash
+asa cloud push [flags]
+```
+
+## Options
+
+| Flag | Scope | Default | Description |
+| --- | --- | --- | --- |
+| `--all` | Local | `false` | Pousser tous les runs du ledger |
+| `--dry-run` | Local | `true` | Simuler sans appeler l'API (défaut) |
+| `--json` | Local | `false` | Sortie JSON sur stdout |
+| `--run` | Local | `(empty)` | Run ledger local à pousser |
+
+## Examples
+
+```bash
+asa cloud push --dry-run --all
+  asa cloud push --run run-abc
+  asa cloud push --all
+```
+
+## What happens internally
+
+- Hydrates contextual services resolved from **$PWD**, coordinating git-bound automation, ingestion pipelines, syncing, backlog triage, investigations, MCP hooks, contextual hydration, coarse estimates, and similar orchestrations for this subtree.
+
+## Failure modes
+
+- Cobra rejects unknown flags or arity mismatches before any repository side effects occur.
+- Asagiri cannot resolve scaffolding when the command is invoked outside an initialised checkout.
+- Downstream automation may fail whenever credentials, network endpoints, or cached prerequisites drift from expectations.
+
+## Related commands
+
+- [Cloud Link](./cloud-link.mdx)
+- [Cloud Login](./cloud-login.mdx)
+- [Cloud Logout](./cloud-logout.mdx)
+- [Cloud Status](./cloud-status.mdx)
