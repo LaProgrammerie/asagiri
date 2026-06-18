@@ -1,6 +1,7 @@
 package onboarding
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -63,6 +64,17 @@ func Onboard(startDir string, opts Options, in io.Reader, out io.Writer) (Result
 	}
 
 	merged, skipped := MergeConfig(cfg, patch, filepath.Base(repoRoot))
+	MergeCloudPatch(merged, st.Answers)
+	if CloudConnect(st.Answers.CloudMode) {
+		probeForm := Form{Answers: st.Answers}
+		if errs := ValidateCloudStep(context.Background(), repoRoot, &probeForm, true); len(errs) > 0 {
+			return Result{}, fmt.Errorf("cloud: %s", firstMapValue(errs))
+		}
+		st.Answers = probeForm.Answers
+	}
+	if err := ApplyCloudAnswers(repoRoot, merged, st.Answers); err != nil {
+		return Result{}, err
+	}
 	var planned []PlannedChange
 	planned = append(planned, PlannedChange{Path: config.DefaultConfigRel, Action: "update", Summary: "merge config"})
 

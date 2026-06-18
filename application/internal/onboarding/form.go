@@ -1,6 +1,7 @@
 package onboarding
 
 import (
+	"context"
 	"fmt"
 	"path/filepath"
 	"strconv"
@@ -31,6 +32,8 @@ type Form struct {
 	Errors            map[string]string
 	SkippedFields     []string
 	HasAsagiriConfig  bool // true when a real .asagiri/config.yaml was loaded
+	CloudProjectChoices []string
+	CloudProbed         bool
 }
 
 // TUIStepOrder is the interactive wizard flow (review then apply via command).
@@ -40,6 +43,7 @@ var TUIStepOrder = []WizardStep{
 	StepStack,
 	StepProviders,
 	StepAgents,
+	StepCloud,
 	StepDocs,
 	StepFeature,
 	StepReview,
@@ -105,6 +109,16 @@ func overlayConfig(form Form, cfg *config.Config) Form {
 	if cfg.Work.DefaultEnricher != "" {
 		form.Answers.DefaultEnricher = cfg.Work.DefaultEnricher
 	}
+	if cfg.Cloud.Enabled {
+		form.Answers.CloudMode = "connect"
+		form.Answers.CloudBaseURL = cfg.Cloud.BaseURL
+		form.Answers.CloudProjectID = cfg.Cloud.ProjectID
+	} else if form.Answers.CloudMode == "" {
+		form.Answers.CloudMode = "local"
+	}
+	if strings.TrimSpace(form.Answers.CloudBaseURL) == "" && CloudConnect(form.Answers.CloudMode) {
+		form.Answers.CloudBaseURL = DefaultCloudOnboardBaseURL()
+	}
 	form.KnownAgentKeys = AgentKeys(cfg)
 	return form
 }
@@ -143,6 +157,15 @@ func (f Form) FieldsMap() map[string]string {
 		"product_one_liner":  f.Answers.ProductOneLiner,
 		"feature_slug":       f.Answers.FeatureSlug,
 		"enabled_providers":  f.Answers.EnabledProviders,
+		"cloud_mode":         f.Answers.CloudMode,
+		"cloud_base_url":     f.Answers.CloudBaseURL,
+		"cloud_token":        f.Answers.CloudToken,
+		"cloud_project_id":        f.Answers.CloudProjectID,
+		"cloud_connected_email":   f.Answers.CloudConnectedEmail,
+		"cloud_project_options":   f.Answers.CloudProjectOptions,
+	}
+	if f.CloudProbed {
+		m["cloud_probed"] = "true"
 	}
 	if len(f.KnownAgentKeys) > 0 {
 		m["agents_available"] = strings.Join(f.KnownAgentKeys, ", ")
@@ -180,6 +203,15 @@ func FormFromMaps(step WizardStep, fields, advanced map[string]string) Form {
 		ProductOneLiner:  strings.TrimSpace(fields["product_one_liner"]),
 		FeatureSlug:      strings.TrimSpace(fields["feature_slug"]),
 		EnabledProviders: strings.TrimSpace(fields["enabled_providers"]),
+		CloudMode:        strings.TrimSpace(fields["cloud_mode"]),
+		CloudBaseURL:     strings.TrimSpace(fields["cloud_base_url"]),
+		CloudToken:       strings.TrimSpace(fields["cloud_token"]),
+		CloudProjectID:      strings.TrimSpace(fields["cloud_project_id"]),
+		CloudConnectedEmail: strings.TrimSpace(fields["cloud_connected_email"]),
+		CloudProjectOptions: strings.TrimSpace(fields["cloud_project_options"]),
+	}
+	if strings.TrimSpace(fields["cloud_probed"]) == "true" {
+		f.CloudProbed = true
 	}
 	if v := strings.TrimSpace(fields["agents_available"]); v != "" {
 		f.KnownAgentKeys = strings.Split(v, ", ")
@@ -208,11 +240,11 @@ func ValidateStep(step WizardStep, f Form) map[string]string {
 		}
 	case StepStack:
 		if strings.TrimSpace(f.Answers.Stack) == "" {
-			errors["stack"] = "stack requise (go, castor, node…)"
+			errors["stack"] = "technologie requise"
 		}
 	case StepProviders:
 		if len(parseEnabledProvidersCSV(f.Answers.EnabledProviders)) == 0 {
-			errors["enabled_providers"] = "au moins un provider (ex. kiro-cli, ollama)"
+			errors["enabled_providers"] = "indiquez au moins un outil (ex. kiro-cli, ollama)"
 		}
 	case StepAgents:
 		known := f.KnownAgentKeys
@@ -232,7 +264,7 @@ func ValidateStep(step WizardStep, f Form) map[string]string {
 	case StepFeature:
 		slug := SlugFromName(f.Answers.FeatureSlug)
 		if slug == "" {
-			errors["feature_slug"] = "slug invalide"
+			errors["feature_slug"] = "nom de chantier invalide"
 		}
 	}
 	if advErrs := validateAdvanced(f.Advanced); len(advErrs) > 0 {
@@ -262,7 +294,7 @@ func validateAdvanced(adv AdvancedFields) map[string]string {
 }
 
 // AdvanceTUIStep moves the wizard forward/back in the TUI flow with optional validation.
-func AdvanceTUIStep(f Form, direction string, validate bool) (Form, error) {
+func AdvanceTUIStep(repoRoot string, f Form, direction string, validate bool) (Form, error) {
 	idx := tuiStepIndex(f.Step)
 	if idx < 0 {
 		f.Step = StepWelcome
@@ -272,6 +304,12 @@ func AdvanceTUIStep(f Form, direction string, validate bool) (Form, error) {
 		if errs := ValidateStep(f.Step, f); len(errs) > 0 {
 			f.Errors = errs
 			return f, fmt.Errorf("validation step %s", f.Step)
+		}
+		if f.Step == StepCloud && CloudConnect(f.Answers.CloudMode) {
+			if errs := ValidateCloudContinue(repoRoot, &f); len(errs) > 0 {
+				f.Errors = errs
+				return f, fmt.Errorf("validation step %s", f.Step)
+			}
 		}
 	}
 	switch direction {
@@ -328,6 +366,10 @@ func OptionsFromForm(f Form) Options {
 		DefaultEnricher:  f.Answers.DefaultEnricher,
 		FeatureSlug:      f.Answers.FeatureSlug,
 		ProductOneLiner:  f.Answers.ProductOneLiner,
+		CloudMode:        f.Answers.CloudMode,
+		CloudBaseURL:     f.Answers.CloudBaseURL,
+		CloudToken:       f.Answers.CloudToken,
+		CloudProjectID:   f.Answers.CloudProjectID,
 	}
 }
 
@@ -393,7 +435,18 @@ func ApplyForm(repoRoot string, f Form) (Result, error) {
 	}
 
 	merged, skipped := MergeConfig(cfg, patch, filepath.Base(repoRoot))
+	MergeCloudPatch(merged, st.Answers)
 	ApplyAdvancedPatch(merged, f.Advanced)
+	if CloudConnect(st.Answers.CloudMode) {
+		probeForm := Form{Answers: st.Answers}
+		if errs := ValidateCloudStep(context.Background(), repoRoot, &probeForm, true); len(errs) > 0 {
+			return Result{}, fmt.Errorf("cloud: %s", firstMapValue(errs))
+		}
+		st.Answers = probeForm.Answers
+	}
+	if err := ApplyCloudAnswers(repoRoot, merged, st.Answers); err != nil {
+		return Result{}, err
+	}
 
 	planned := []PlannedChange{{Path: config.DefaultConfigRel, Action: "update", Summary: "merge config"}}
 	docPlanned, docErr := BootstrapDocs(repoRoot, st.Answers, false, false)

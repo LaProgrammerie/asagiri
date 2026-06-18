@@ -1,5 +1,7 @@
 package cloud
 
+import "encoding/json"
+
 const (
 	ReportVersionStatus = "cloud-status-v1"
 	ReportVersionPush   = "cloud-push-v1"
@@ -23,14 +25,17 @@ type Project struct {
 
 // RunCreateRequest is POST /api/v1/runs body.
 type RunCreateRequest struct {
-	Project      string  `json:"project"`
-	LocalRunID   string  `json:"localRunId"`
-	Feature      string  `json:"feature,omitempty"`
-	Status       string  `json:"status"`
-	StartedAt    string  `json:"startedAt,omitempty"`
-	EndedAt      string  `json:"endedAt,omitempty"`
-	DurationMs   int64   `json:"durationMs,omitempty"`
-	TrustVerdict string  `json:"trustVerdict,omitempty"`
+	Project              string `json:"project"`
+	LocalRunID           string `json:"localRunId"`
+	TaskID               string `json:"taskId,omitempty"`
+	Feature              string `json:"feature,omitempty"`
+	Status               string `json:"status"`
+	StartedAt            string `json:"startedAt,omitempty"`
+	EndedAt              string `json:"endedAt,omitempty"`
+	DurationMs           int64  `json:"durationMs,omitempty"`
+	TrustVerdict         string `json:"trustVerdict,omitempty"`
+	ConfigReleaseVersion *int   `json:"configReleaseVersion,omitempty"`
+	ConfigContentHash    string `json:"configContentHash,omitempty"`
 }
 
 // RunResponse is the created run resource.
@@ -41,19 +46,29 @@ type RunResponse struct {
 
 // LedgerCreateRequest is POST /api/v1/ledger-entries body.
 type LedgerCreateRequest struct {
-	Run           string         `json:"run"`
-	AgentID       string         `json:"agentId"`
-	Phase         string         `json:"phase,omitempty"`
-	StartedAt     string         `json:"startedAt,omitempty"`
-	EndedAt       string         `json:"endedAt,omitempty"`
-	DurationMs    int64          `json:"durationMs,omitempty"`
-	ExitCode      int            `json:"exitCode,omitempty"`
-	PromptHash    string         `json:"promptHash,omitempty"`
-	ContextHash   string         `json:"contextHash,omitempty"`
-	OutputHash    string         `json:"outputHash,omitempty"`
-	ContractValid *bool          `json:"contractValid,omitempty"`
-	LogDir        string         `json:"logDir,omitempty"`
-	RawPayload    map[string]any `json:"rawPayload,omitempty"`
+	Run                  string          `json:"run"`
+	LocalEntryID         string          `json:"localEntryId,omitempty"`
+	AgentID              string          `json:"agentId"`
+	Provider             string          `json:"provider,omitempty"`
+	Model                string          `json:"model,omitempty"`
+	InputTokens          *int            `json:"inputTokens,omitempty"`
+	OutputTokens         *int            `json:"outputTokens,omitempty"`
+	CostUsd              *float64        `json:"costUsd,omitempty"`
+	Phase                string          `json:"phase,omitempty"`
+	StartedAt            string          `json:"startedAt,omitempty"`
+	EndedAt              string          `json:"endedAt,omitempty"`
+	DurationMs           int64           `json:"durationMs,omitempty"`
+	ExitCode             int             `json:"exitCode,omitempty"`
+	PromptHash           string          `json:"promptHash,omitempty"`
+	ContextHash          string          `json:"contextHash,omitempty"`
+	OutputHash           string          `json:"outputHash,omitempty"`
+	ContractValid        *bool           `json:"contractValid,omitempty"`
+	LogDir               string          `json:"logDir,omitempty"`
+	RegistryAgentVersion *int            `json:"registryAgentVersion,omitempty"`
+	ResolutionSource     string          `json:"resolutionSource,omitempty"`
+	ConfigReleaseVersion *int            `json:"configReleaseVersion,omitempty"`
+	ConfigContentHash    string          `json:"configContentHash,omitempty"`
+	RawPayload           json.RawMessage `json:"rawPayload,omitempty"`
 }
 
 // StatusReport is returned by cloud status.

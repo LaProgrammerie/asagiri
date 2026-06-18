@@ -25,7 +25,7 @@ type ShellContext struct {
 // the step pill. The step name is not repeated here (FR-5.3: pill only).
 func renderEOSCenterHeader(st theme.Styles, _ onbdomain.WizardStep, idx, total, innerW int) string {
 	brand := st.Brand.Render("ASAGIRI")
-	subtitle := st.Muted.Render("Project Onboarding")
+	subtitle := st.Muted.Render("Configuration du projet")
 	left := brand + "  " + subtitle
 	pill := st.RenderBadge(fmt.Sprintf("Étape %d / %d", idx, total))
 	gap := innerW - lipgloss.Width(left) - lipgloss.Width(pill)
@@ -49,12 +49,13 @@ func renderEOSStepContent(vm ViewModel, st theme.Styles, boxW int) string {
 
 func welcomeChecklist() []string {
 	return []string{
-		"Configurer la stack détectée",
-		"Créer config.yaml et validation",
-		"Initialiser docs/ai/",
-		"Configurer les agents IA",
-		"Créer spec Kiro initiale",
-		"Évaluer la readiness",
+		"Nommer le projet et la branche",
+		"Choisir la technologie",
+		"Indiquer vos outils IA",
+		"Répartir les étapes de travail",
+		"Optionnel : lier Asagiri Cloud",
+		"Décrire le produit en une phrase",
+		"Créer le premier chantier",
 	}
 }
 
@@ -66,6 +67,9 @@ func renderEOSFooter(m Model, st theme.Styles, w int) string {
 		prev = st.RenderButton("← Précédent", m.FocusFooter == FooterPrev)
 	}
 	nextLabel := "Suivant →"
+	if m.Step == onbdomain.StepCloud {
+		nextLabel = "Continuer →"
+	}
 	nextFocused := m.FocusFooter == FooterNext
 	if m.canApply() {
 		nextLabel = "Appliquer"

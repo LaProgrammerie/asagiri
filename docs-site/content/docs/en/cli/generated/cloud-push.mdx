@@ -23,15 +23,16 @@ asa cloud push [flags]
 | --- | --- | --- | --- |
 | `--all` | Local | `false` | Pousser tous les runs du ledger |
 | `--dry-run` | Local | `true` | Simuler sans appeler l'API (défaut) |
+| `--execute` | Local | `false` | Envoyer réellement vers le cloud (désactive le dry-run) |
 | `--json` | Local | `false` | Sortie JSON sur stdout |
 | `--run` | Local | `(empty)` | Run ledger local à pousser |
 
 ## Examples
 
 ```bash
-asa cloud push --dry-run --all
+asa cloud push --all
+  asa cloud push --all --execute
   asa cloud push --run run-abc
-  asa cloud push --all
 ```
 
 ## What happens internally

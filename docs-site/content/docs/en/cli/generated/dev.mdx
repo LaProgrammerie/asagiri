@@ -23,7 +23,7 @@ asa dev [flags]
 | --- | --- | --- | --- |
 | `--agent` | Local | `dev` | Agent d'implémentation |
 | `--dry-run` | Inherited | `false` | Simuler les exécutions sans lancer d'agent ni commandes externes |
-| `--force` | Local | `false` | Relancer une étape déjà réussie |
+| `--force` | Local | `false` | Relancer une tâche échouée ou une étape déjà réussie |
 | `--task` | Local | `(empty)` | ID de tâche à implémenter |
 
 ## Examples
@@ -53,6 +53,7 @@ asa dev
 - [Clean](./clean.mdx)
 - [Cloud](./cloud.mdx)
 - [Completion](./completion.mdx)
+- [Config](./config.mdx)
 - [Context](./context.mdx)
 - [Continue](./continue.mdx)
 - [Contracts](./contracts.mdx)

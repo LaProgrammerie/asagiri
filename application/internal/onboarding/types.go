@@ -71,6 +71,10 @@ type Options struct {
 	FeatureSlug      string
 	ProductOneLiner  string
 	ProductUsers     string
+	CloudMode        string
+	CloudBaseURL     string
+	CloudToken       string
+	CloudProjectID   string
 }
 
 // Answers collects wizard inputs persisted in state.
@@ -87,6 +91,13 @@ type Answers struct {
 	ProductOneLiner  string `json:"product_one_liner,omitempty"`
 	ProductUsers     string `json:"product_users,omitempty"`
 	EnabledProviders string `json:"enabled_providers,omitempty"` // comma-separated provider ids
+	CloudMode        string `json:"cloud_mode,omitempty"`        // local | connect
+	CloudBaseURL     string `json:"cloud_base_url,omitempty"`
+	CloudProjectID   string `json:"cloud_project_id,omitempty"`
+	CloudProjectName    string `json:"cloud_project_name,omitempty"`
+	CloudConnectedEmail string `json:"cloud_connected_email,omitempty"`
+	CloudProjectOptions string `json:"cloud_project_options,omitempty"` // id|label pairs for TUI
+	CloudToken          string `json:"-"` // never persisted — written to token_path on apply
 }
 
 // PlannedChange describes one file write during dry-run.

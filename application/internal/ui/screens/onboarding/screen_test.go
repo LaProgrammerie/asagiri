@@ -231,8 +231,8 @@ func TestStackStepShowsCapabilities(t *testing.T) {
 		Answers:           onbdomain.Answers{Stack: "go"},
 	}, false)
 	got := onboarding.Render(onboarding.ViewModel{Model: m, WizardMode: true, FullScreen: true, Width: 120, Height: 40, Theme: theme.Default()})
-	require.Contains(t, got, "VALIDATIONS ACTIVÉES")
-	require.Contains(t, got, "CAPACITÉS ACTIVÉES")
+	require.Contains(t, got, "CONTRÔLES AUTOMATIQUES")
+	require.Contains(t, got, "ÉTAPES DISPONIBLES")
 }
 
 func TestAgentsStepShowsPipeline(t *testing.T) {
@@ -246,7 +246,7 @@ func TestAgentsStepShowsPipeline(t *testing.T) {
 		},
 	}, false)
 	got := onboarding.Render(onboarding.ViewModel{Model: m, WizardMode: true, FullScreen: true, Width: 120, Height: 40, Theme: theme.Default()})
-	require.Contains(t, got, "PIPELINE GÉNÉRÉ")
+	require.Contains(t, got, "ÉTAPES DU TRAVAIL")
 	require.Contains(t, got, "kiro")
 	require.Contains(t, got, "cursor")
 }

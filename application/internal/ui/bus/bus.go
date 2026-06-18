@@ -480,6 +480,7 @@ type OnboardingWizardResult struct {
 	Errors            map[string]string
 	SkippedFields     []string
 	HasAsagiriConfig  bool
+	CloudProjectChoices []string
 }
 
 // GetReadinessQuery loads project readiness report.
@@ -515,6 +516,25 @@ type ValidateOnboardingStepResult struct {
 }
 
 func (ValidateOnboardingStepResult) isQueryResult() {}
+
+// TestOnboardingCloudConnectionQuery probes cloud API with draft wizard fields.
+type TestOnboardingCloudConnectionQuery struct {
+	Fields   map[string]string
+	Advanced map[string]string
+}
+
+func (TestOnboardingCloudConnectionQuery) Name() string { return "TestOnboardingCloudConnection" }
+
+// TestOnboardingCloudConnectionResult returns updated fields after a cloud probe.
+type TestOnboardingCloudConnectionResult struct {
+	Fields              map[string]string
+	Errors              map[string]string
+	CloudProjectChoices []string
+	Valid               bool
+	Message             string
+}
+
+func (TestOnboardingCloudConnectionResult) isQueryResult() {}
 
 // RunOnboardingStepCommand advances or runs one wizard step.
 type RunOnboardingStepCommand struct {

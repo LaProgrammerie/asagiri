@@ -33,6 +33,23 @@ func TestTransitionTaskImplementedToRunning(t *testing.T) {
 	}
 }
 
+func TestTransitionTaskFailedToRunningRequiresForce(t *testing.T) {
+	err := TransitionTask(asagiri.StatusFailed, asagiri.StatusRunning, false)
+	if !errors.Is(err, ErrInvalidTransition) {
+		t.Fatalf("without force: got %v", err)
+	}
+	if err := TransitionTask(asagiri.StatusFailed, asagiri.StatusRunning, true); err != nil {
+		t.Fatalf("failed -> running with force: %v", err)
+	}
+}
+
+func TestTransitionTaskFailedToVerifiedBlockedWithForce(t *testing.T) {
+	err := TransitionTask(asagiri.StatusFailed, asagiri.StatusVerified, true)
+	if !errors.Is(err, ErrInvalidTransition) {
+		t.Fatalf("got %v", err)
+	}
+}
+
 func TestNextWorkflowStep(t *testing.T) {
 	if got := NextWorkflowStep([]string{asagiri.StatusPlanned}); got != "enrich" {
 		t.Fatalf("got %q", got)

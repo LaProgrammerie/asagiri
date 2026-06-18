@@ -11,6 +11,7 @@ import (
 	"github.com/LaProgrammerie/asagiri/application/internal/agentobservability"
 	"github.com/LaProgrammerie/asagiri/application/internal/devresolve"
 	"github.com/LaProgrammerie/asagiri/application/internal/gates"
+	"github.com/LaProgrammerie/asagiri/application/internal/runtime/resolve"
 	"github.com/LaProgrammerie/asagiri/application/internal/store/sqlite"
 	"github.com/LaProgrammerie/asagiri/application/pkg/asagiri"
 )
@@ -102,7 +103,7 @@ func (s *Service) devOneTask(ctx context.Context, run *sqlite.Run, feature strin
 		valid := contract.Valid
 		contractValid = &valid
 	}
-	if err := obs.RecordLedger(agentledger.Params{
+	ledgerParams := agentledger.Params{
 		TaskID:        task.ID,
 		RunID:         run.ID,
 		Feature:       feature,
@@ -116,7 +117,9 @@ func (s *Service) devOneTask(ctx context.Context, run *sqlite.Run, feature strin
 		ContractValid: contractValid,
 		LogDir:        resolved.LogDir,
 		Result:        res,
-	}); err != nil {
+	}
+	resolve.EnrichLedgerParams(s.repoRoot, s.cfg, a.Name(), &ledgerParams)
+	if err := obs.RecordLedger(ledgerParams); err != nil {
 		_ = s.transitionTask(task, asagiri.StatusFailed, true)
 		return task, err
 	}

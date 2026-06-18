@@ -22,21 +22,21 @@ func TestValidateStepProject(t *testing.T) {
 
 func TestAdvanceTUIStepValidation(t *testing.T) {
 	form := onboarding.Form{Step: onboarding.StepProject, Errors: map[string]string{}}
-	next, err := onboarding.AdvanceTUIStep(form, "next", true)
+	next, err := onboarding.AdvanceTUIStep("", form, "next", true)
 	require.Error(t, err)
 	require.Equal(t, onboarding.StepProject, next.Step)
 	require.NotEmpty(t, next.Errors)
 
 	form.Answers.ProjectName = "chatbot"
 	form.Answers.DefaultBranch = "main"
-	next, err = onboarding.AdvanceTUIStep(form, "next", true)
+	next, err = onboarding.AdvanceTUIStep("", form, "next", true)
 	require.NoError(t, err)
 	require.Equal(t, onboarding.StepStack, next.Step)
 }
 
 func TestAdvanceTUIStepPrev(t *testing.T) {
 	form := onboarding.Form{Step: onboarding.StepStack}
-	prev, err := onboarding.AdvanceTUIStep(form, "prev", false)
+	prev, err := onboarding.AdvanceTUIStep("", form, "prev", false)
 	require.NoError(t, err)
 	require.Equal(t, onboarding.StepProject, prev.Step)
 }
@@ -52,7 +52,10 @@ func TestAdvanceTUIStepPrefillsProductFromTagline(t *testing.T) {
 			Tagline:          "Assistant conversationnel pour le support",
 		},
 	}
-	next, err := onboarding.AdvanceTUIStep(form, "next", false)
+	next, err := onboarding.AdvanceTUIStep("", form, "next", false)
+	require.NoError(t, err)
+	require.Equal(t, onboarding.StepCloud, next.Step)
+	next, err = onboarding.AdvanceTUIStep("", next, "next", false)
 	require.NoError(t, err)
 	require.Equal(t, onboarding.StepDocs, next.Step)
 	require.Equal(t, "Assistant conversationnel pour le support", next.Answers.ProductOneLiner)

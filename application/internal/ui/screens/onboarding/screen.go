@@ -134,6 +134,12 @@ func renderWizardPanelBody(vm ViewModel, st theme.Styles) string {
 			focused := m.FocusFooter < 0 && i == m.FocusField
 			body.WriteString(st.RenderField(row.Label, m.fieldValue(row.Key), focused) + "\n")
 		}
+	case onbdomain.StepCloud:
+		body.WriteString(st.Muted.Render("Optionnel — testez la connexion API au clic Suivant.") + "\n\n")
+		for i, row := range m.fieldRows {
+			focused := m.FocusFooter < 0 && i == m.FocusField
+			body.WriteString(st.RenderField(row.Label, m.fieldValue(row.Key), focused) + "\n")
+		}
 	case onbdomain.StepDocs:
 		body.WriteString(st.Muted.Render("Cette phrase sera écrite dans docs/ai/01-product.md — pas le nom saisi à l'étape Projet.") + "\n\n")
 		body.WriteString(st.SectionHead.Render("FICHIERS QUI SERONT CRÉÉS") + "\n")
@@ -327,15 +333,17 @@ func tabShortLabel(step onbdomain.WizardStep) string {
 	case onbdomain.StepProject:
 		return "Project"
 	case onbdomain.StepStack:
-		return "Stack"
+		return "Tech"
 	case onbdomain.StepProviders:
-		return "Providers"
+		return "Outils"
 	case onbdomain.StepAgents:
-		return "Agents"
+		return "Répartition"
+	case onbdomain.StepCloud:
+		return "Cloud"
 	case onbdomain.StepDocs:
-		return "Docs"
+		return "Produit"
 	case onbdomain.StepFeature:
-		return firstFeatureStepLabel()
+		return "Chantier"
 	case onbdomain.StepReview:
 		return "Review"
 	default:

@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/LaProgrammerie/asagiri/application/internal/config"
 	onbdomain "github.com/LaProgrammerie/asagiri/application/internal/onboarding"
 	"github.com/LaProgrammerie/asagiri/application/internal/ui/theme"
 	"github.com/charmbracelet/lipgloss"
@@ -25,7 +24,7 @@ func renderWelcomePanel(vm ViewModel, st theme.Styles, boxW int) string {
 	if m.ExistingConfig {
 		b.WriteString(center(st.Success.Render("✓ Configuration existante détectée — mode vérification et complétion")) + "\n\n")
 	} else {
-		b.WriteString(center(st.Muted.Render("Configurez votre projet et générez votre première spec Kiro.")) + "\n\n")
+		b.WriteString(center(st.Muted.Render("Configurez votre projet en quelques étapes guidées.")) + "\n\n")
 	}
 
 	b.WriteString(st.SectionHead.Render("CE QUE NOUS ALLONS FAIRE") + "\n")
@@ -57,6 +56,11 @@ func renderStepPanel(vm ViewModel, st theme.Styles, boxW int) string {
 		rows = append(rows, renderAgentPipeline(m, st)...)
 		rows = append(rows, "")
 
+	case onbdomain.StepCloud:
+		rows = append(rows, st.SectionHead.Render("CLOUD (OPTIONNEL)"))
+		rows = append(rows, st.Muted.Render("Tout fonctionne en local. Connectez-vous seulement pour synchroniser avec votre équipe."))
+		rows = append(rows, "")
+
 	case onbdomain.StepDocs:
 		rows = append(rows, st.Muted.Render("Cette phrase sera écrite dans docs/ai/01-product.md — pas le nom saisi à l'étape Projet."))
 		rows = append(rows, "")
@@ -69,16 +73,15 @@ func renderStepPanel(vm ViewModel, st theme.Styles, boxW int) string {
 	case onbdomain.StepFeature:
 		slug := strings.TrimSpace(m.Fields["feature_slug"])
 		if slug != "" {
-			rows = append(rows, st.SectionHead.Render("SPEC QUI SERA CRÉÉE"))
+			rows = append(rows, st.SectionHead.Render("DOSSIER QUI SERA CRÉÉ"))
 			rows = append(rows, st.Success.Render("✓")+" "+st.Muted.Render(".kiro/specs/"+slug+"/"))
-			rows = append(rows, st.Success.Render("✓")+" "+st.Muted.Render(".kiro/specs/"+slug+"/requirements.md"))
 			rows = append(rows, "")
-			rows = append(rows, st.SectionHead.Render("WORKFLOW SUIVANT"))
+			rows = append(rows, st.SectionHead.Render("ENSUITE"))
 			for _, step := range nextWorkflowSteps(slug) {
 				rows = append(rows, st.Muted.Render("  $ "+step))
 			}
 		} else {
-			rows = append(rows, st.Muted.Render("Première spec à développer — crée .kiro/specs/<slug>/"))
+			rows = append(rows, st.Muted.Render("Un dossier de travail sera créé pour ce chantier."))
 		}
 		rows = append(rows, "")
 	}
@@ -96,7 +99,17 @@ func renderStepPanel(vm ViewModel, st theme.Styles, boxW int) string {
 			value = validationName(value)
 		}
 		if row.Kind == FieldSelect {
-			value = formatSelectDisplay(value, row.Choices, focused)
+			if row.Key == "cloud_mode" || row.Key == "cloud_project_id" {
+				value = m.fieldValue(row.Key)
+			} else {
+				value = formatSelectDisplay(value, row.Choices, focused)
+			}
+		}
+		if row.Kind == FieldAction {
+			value = m.fieldValue(row.Key)
+			if focused {
+				value = "› " + value + " ‹"
+			}
 		}
 		rows = append(rows, st.RenderEOSFieldGrid(icon, label, value, focused, pill, managed))
 		if errMsg := m.Errors[row.Key]; errMsg != "" {
@@ -153,7 +166,7 @@ func renderStackDetection(m Model, st theme.Styles) []string {
 	var rows []string
 
 	if len(m.ValidationPreview) > 0 {
-		rows = append(rows, st.SectionHead.Render("VALIDATIONS ACTIVÉES"))
+		rows = append(rows, st.SectionHead.Render("CONTRÔLES AUTOMATIQUES"))
 		for _, v := range m.ValidationPreview {
 			rows = append(rows, st.Success.Render("✓")+" "+st.Muted.Render(validationName(v)))
 		}
@@ -162,7 +175,7 @@ func renderStackDetection(m Model, st theme.Styles) []string {
 
 	capabilities := stackCapabilities(m.Fields["stack"])
 	if len(capabilities) > 0 {
-		rows = append(rows, st.SectionHead.Render("CAPACITÉS ACTIVÉES"))
+		rows = append(rows, st.SectionHead.Render("ÉTAPES DISPONIBLES"))
 		for _, cap := range capabilities {
 			rows = append(rows, st.RenderBadgeMuted(cap))
 		}
@@ -172,13 +185,11 @@ func renderStackDetection(m Model, st theme.Styles) []string {
 	return rows
 }
 
-// renderProviderCatalog lists external runtimes for the providers onboarding step.
+// renderProviderCatalog lists suggested AI tools for the providers onboarding step.
 func renderProviderCatalog(m Model, st theme.Styles) []string {
 	var rows []string
-	rows = append(rows, st.SectionHead.Render("PROVIDERS DISPONIBLES"))
-	for _, p := range onbdomain.ProviderCatalog() {
-		rows = append(rows, st.Muted.Render("  • ")+st.Fg.Render(p.Label)+" "+st.Muted.Render("("+p.ID+")"))
-	}
+	rows = append(rows, st.SectionHead.Render("OUTILS COURANTS"))
+	rows = append(rows, st.Muted.Render("  • Kiro CLI, Cursor, Claude Code, Ollama…"))
 	enabled := strings.TrimSpace(m.Fields["enabled_providers"])
 	if enabled != "" {
 		rows = append(rows, "")
@@ -196,31 +207,23 @@ func renderAgentPipeline(m Model, st theme.Styles) []string {
 		fixed bool // managed by Asagiri (not configurable)
 	}
 	pipeline := []step{
-		{"Spec", "default_spec_agent", false},
+		{"Rédaction", "default_spec_agent", false},
 		{"Plan", "", true},
-		{"Enrich", "default_enricher", false},
-		{"Dev", "default_agent", false},
-		{"Verify", "", true},
-		{"Review", "default_reviewer", false},
+		{"Enrichissement", "default_enricher", false},
+		{"Développement", "default_agent", false},
+		{"Vérification", "", true},
+		{"Relecture", "default_reviewer", false},
 	}
 
 	var rows []string
-	rows = append(rows, st.SectionHead.Render("PIPELINE GÉNÉRÉ"))
+	rows = append(rows, st.SectionHead.Render("ÉTAPES DU TRAVAIL"))
 
-	activeAgents := 0
 	for i, s := range pipeline {
-		var agent, indicator string
+		var agent string
 		if s.fixed {
 			agent = "Asagiri"
-			indicator = st.Muted.Render("(local)")
 		} else {
 			agent = fallbackStr(m.Fields[s.key], s.key)
-			if isLocalAgentName(agent) {
-				indicator = st.Muted.Render("(local)")
-			} else {
-				indicator = st.Muted.Render("(cloud)")
-				activeAgents++
-			}
 		}
 		arrow := "  →  "
 		if i == 0 {
@@ -229,13 +232,8 @@ func renderAgentPipeline(m Model, st theme.Styles) []string {
 		rows = append(rows,
 			st.Muted.Render(arrow)+
 				st.Fg.Render(fmt.Sprintf("%-8s", s.label))+"  "+
-				st.Success.Render(agent)+"  "+indicator,
+				st.Success.Render(agent),
 		)
-	}
-
-	if activeAgents > 0 {
-		rows = append(rows, "")
-		rows = append(rows, st.Muted.Render(fmt.Sprintf("  %d agent(s) cloud actif(s)", activeAgents)))
 	}
 
 	return rows
@@ -257,15 +255,6 @@ func renderArtefactsSection(m Model, st theme.Styles) []string {
 	rows = append(rows, "")
 	rows = append(rows, st.Muted.Render("Aucune modification destructive — fichiers existants préservés."))
 	return rows
-}
-
-// isLocalAgentName reports whether an agent name suggests a local backend.
-func isLocalAgentName(name string) bool {
-	switch strings.ToLower(name) {
-	case config.DefaultAgentEnrich, "local":
-		return true
-	}
-	return false
 }
 
 // stackCapabilities returns the workflow capabilities unlocked by a stack.
@@ -306,7 +295,7 @@ func fieldIconForKey(key, _ string) string {
 func rowLabel(row FieldDef) string {
 	switch row.Key {
 	case "stack":
-		return "Stack"
+		return "Technologie"
 	case "detected_stacks":
 		return "Détecté"
 	case "project_name":
@@ -316,17 +305,17 @@ func rowLabel(row FieldDef) string {
 	case "tagline":
 		return "Tagline"
 	case "default_spec_agent":
-		return "Spec"
+		return "Rédaction spec"
 	case "default_enricher":
-		return "Enrich"
+		return "Enrichissement"
 	case "default_agent":
-		return "Dev"
+		return "Développement"
 	case "default_reviewer":
-		return "Review"
+		return "Relecture"
 	case "pipeline_plan":
 		return "Plan"
 	case "pipeline_verify":
-		return "Verify"
+		return "Vérification"
 	case "product_one_liner":
 		return "Phrase produit"
 	case "feature_slug":

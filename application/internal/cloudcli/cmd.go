@@ -248,12 +248,13 @@ func newPushCmd() *cobra.Command {
 		runID   string
 		all     bool
 		dryRun  bool
+		execute bool
 		jsonOut bool
 	)
 	cmd := &cobra.Command{
 		Use:     "push",
 		Short:   "Pousser des runs ledger vers le cloud",
-		Example: "  asa cloud push --dry-run --all\n  asa cloud push --run run-abc\n  asa cloud push --all",
+		Example: "  asa cloud push --all\n  asa cloud push --all --execute\n  asa cloud push --run run-abc",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			repoRoot, cfg, err := loadRepoConfig()
 			if err != nil {
@@ -264,13 +265,18 @@ func newPushCmd() *cobra.Command {
 				return err
 			}
 
+			effectiveDryRun := dryRun
+			if execute {
+				effectiveDryRun = false
+			}
+
 			report, err := cloud.Push(context.Background(), cloud.PushOptions{
 				RepoRoot: repoRoot,
 				Config:   cfg,
 				Token:    token,
 				RunID:    runID,
 				All:      all,
-				DryRun:     dryRun,
+				DryRun:   effectiveDryRun,
 			})
 			if err != nil {
 				return err
@@ -282,7 +288,7 @@ func newPushCmd() *cobra.Command {
 				if err := cloud.FormatPushJSON(out, report); err != nil {
 					return err
 				}
-				if h := report.Hint; h != "" && dryRun {
+				if h := report.Hint; h != "" && effectiveDryRun {
 					_, _ = fmt.Fprintln(errOut, "→", h)
 				}
 				return pushExitFromReport(report)
@@ -296,6 +302,7 @@ func newPushCmd() *cobra.Command {
 	cmd.Flags().StringVar(&runID, "run", "", "Run ledger local à pousser")
 	cmd.Flags().BoolVar(&all, "all", false, "Pousser tous les runs du ledger")
 	cmd.Flags().BoolVar(&dryRun, "dry-run", true, "Simuler sans appeler l'API (défaut)")
+	cmd.Flags().BoolVar(&execute, "execute", false, "Envoyer réellement vers le cloud (désactive le dry-run)")
 	cmd.Flags().BoolVar(&jsonOut, "json", false, "Sortie JSON sur stdout")
 	cmd.SilenceUsage = true
 	cmd.SilenceErrors = true

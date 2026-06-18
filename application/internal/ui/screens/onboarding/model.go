@@ -24,6 +24,7 @@ const (
 	FieldText FieldKind = iota
 	FieldSelect
 	FieldManaged // workflow step owned by Asagiri; not editable
+	FieldAction  // explicit button (e.g. test connection)
 )
 
 // FieldDef describes one editable wizard field row.
@@ -53,6 +54,7 @@ type Model struct {
 	MouseEnabled      bool
 	Initialized       bool
 	AgentChoices      []string
+	CloudProjectChoices []string
 	ExistingConfig    bool     // true when .asagiri/config.yaml already exists
 	ArtefactsPreview  []string // files that will be created on Apply
 	fieldRows         []FieldDef
@@ -82,6 +84,7 @@ func NewModelFromForm(form onbdomain.Form, mouseEnabled bool) Model {
 	m.MouseEnabled = mouseEnabled
 	m.Initialized = true
 	m.AgentChoices = append([]string(nil), form.KnownAgentKeys...)
+	m.CloudProjectChoices = append([]string(nil), form.CloudProjectChoices...)
 	m.ExistingConfig = form.HasAsagiriConfig
 	m.ArtefactsPreview = defaultArtefactsPreview(form.Answers.FeatureSlug)
 	m.RefreshFieldRows()
@@ -100,6 +103,7 @@ func (m *Model) SyncForm(form onbdomain.Form) {
 		m.Errors = form.Errors
 	}
 	m.AgentChoices = append([]string(nil), form.KnownAgentKeys...)
+	m.CloudProjectChoices = append([]string(nil), form.CloudProjectChoices...)
 	m.ExistingConfig = form.HasAsagiriConfig
 	m.ArtefactsPreview = defaultArtefactsPreview(form.Answers.FeatureSlug)
 	m.RefreshFieldRows()
@@ -112,6 +116,10 @@ func (m Model) CurrentForm() onbdomain.Form {
 	form.DetectedStacks = append([]string(nil), m.DetectedStacks...)
 	form.SkippedFields = append([]string(nil), m.SkippedFields...)
 	form.Errors = m.Errors
+	form.CloudProjectChoices = append([]string(nil), m.CloudProjectChoices...)
+	if strings.TrimSpace(m.Fields["cloud_probed"]) == "true" {
+		form.CloudProbed = true
+	}
 	return form
 }
 
@@ -171,6 +179,23 @@ func (m Model) updateKey(v tea.KeyMsg) (Model, tea.Cmd) {
 	}
 
 	if m.editingField() {
+		row := m.fieldRows[m.FocusField]
+		if row.Kind == FieldAction {
+			switch key {
+			case "enter", " ":
+				m.Message = "Test de connexion en cours…"
+				return m, m.TestCloudActionCmd()
+			case "tab", "down":
+				m.cycleFocus(1)
+			case "shift+tab", "up":
+				m.cycleFocus(-1)
+			case "left", "h", "esc":
+				m.cycleFocus(-1)
+			case "right", "l":
+				m.cycleFocus(1)
+			}
+			return m, nil
+		}
 		if m.focusedSelect() {
 			switch key {
 			case "tab", "down":
@@ -233,6 +258,13 @@ func (m Model) updateKey(v tea.KeyMsg) (Model, tea.Cmd) {
 	case "esc":
 		m.FocusFooter = FooterNext
 	case "enter", " ":
+		if len(m.fieldRows) > 0 && m.FocusField >= 0 && m.FocusField < len(m.fieldRows) {
+			row := m.fieldRows[m.FocusField]
+			if row.Kind == FieldAction {
+				m.Message = "Test de connexion en cours…"
+				return m, m.TestCloudActionCmd()
+			}
+		}
 		return m, m.FooterActionCmd(FooterNext)
 	default:
 		if v.Type == tea.KeyRunes && len(v.Runes) > 0 && !m.focusedReadOnly() {
@@ -281,7 +313,7 @@ func (m Model) editingField() bool {
 		return false
 	}
 	row := rows[m.FocusField]
-	return row.Kind == FieldSelect || (!row.ReadOnly && row.Kind == FieldText)
+	return row.Kind == FieldSelect || row.Kind == FieldAction || (!row.ReadOnly && row.Kind == FieldText)
 }
 
 func (m Model) focusedSelect() bool {
@@ -320,6 +352,19 @@ func (m *Model) cycleSelectField(dir int) {
 		idx += len(choices)
 	}
 	idx %= len(choices)
+	if key == "cloud_mode" {
+		m.Fields[key] = choices[idx]
+		if onbdomain.CloudConnect(choices[idx]) && strings.TrimSpace(m.Fields["cloud_base_url"]) == "" {
+			m.Fields["cloud_base_url"] = onbdomain.DefaultCloudOnboardBaseURL()
+		}
+		m.RefreshFieldRows()
+		return
+	}
+	if key == "cloud_project_id" {
+		m.Fields[key] = onbdomain.ProjectIDForLabel(m.Fields["cloud_project_options"], choices[idx])
+		m.Fields["cloud_project_name"] = choices[idx]
+		return
+	}
 	m.Fields[key] = choices[idx]
 }
 
@@ -352,6 +397,10 @@ func (m Model) updateMouse(v tea.MouseMsg) (Model, tea.Cmd) {
 		if v.Y >= baseY+i && v.Y < baseY+i+1 {
 			m.FocusField = i
 			m.FocusFooter = -1
+			if rows[i].Kind == FieldAction {
+				m.Message = "Test de connexion en cours…"
+				return m, m.TestCloudActionCmd()
+			}
 			return m, nil
 		}
 	}
@@ -419,15 +468,27 @@ func isAdvancedKey(key string) bool {
 	}
 }
 
+// FocusFieldByKey moves focus to the first row with the given key.
+func (m *Model) FocusFieldByKey(key string) bool {
+	for i, row := range m.fieldRows {
+		if row.Key == key {
+			m.FocusField = i
+			m.FocusFooter = -1
+			return true
+		}
+	}
+	return false
+}
+
 // RefreshFieldRows rebuilds visible field rows for the current step.
 func (m *Model) RefreshFieldRows() {
-	m.fieldRows = stepFields(m.Step, m.ShowAdvanced, m.ValidationPreview, m.DetectedStacks, m.AgentChoices)
+	m.fieldRows = stepFields(m.Step, m.ShowAdvanced, m.ValidationPreview, m.DetectedStacks, m.AgentChoices, m.Fields["cloud_mode"], m.CloudProjectChoices)
 	if m.FocusField >= len(m.fieldRows) {
 		m.FocusField = max(0, len(m.fieldRows)-1)
 	}
 }
 
-func stepFields(step onbdomain.WizardStep, advanced bool, preview, stacks, agentChoices []string) []FieldDef {
+func stepFields(step onbdomain.WizardStep, advanced bool, preview, stacks, agentChoices []string, cloudMode string, cloudProjectChoices []string) []FieldDef {
 	choices := agentChoices
 	if len(choices) == 0 {
 		choices = defaultAgentChoices()
@@ -444,7 +505,7 @@ func stepFields(step onbdomain.WizardStep, advanced bool, preview, stacks, agent
 		}
 	case onbdomain.StepStack:
 		rows = []FieldDef{
-			{Key: "stack", Label: "Stack", Kind: FieldSelect, Choices: defaultStackChoices()},
+			{Key: "stack", Label: "Technologie", Kind: FieldSelect, Choices: defaultStackChoices()},
 		}
 		if len(stacks) > 0 {
 			rows = append(rows, FieldDef{
@@ -458,33 +519,53 @@ func stepFields(step onbdomain.WizardStep, advanced bool, preview, stacks, agent
 		}
 	case onbdomain.StepProviders:
 		rows = []FieldDef{
-			{Key: "enabled_providers", Label: "Providers activés (csv)", Kind: FieldText},
+			{Key: "enabled_providers", Label: "Outils IA installés (séparés par des virgules)", Kind: FieldText},
 			{Key: "provider_hint", Label: "Exemples", Kind: FieldManaged, ReadOnly: true},
 		}
 	case onbdomain.StepAgents:
 		rows = []FieldDef{
-			{Key: "default_spec_agent", Label: "Spec", Kind: FieldSelect, Choices: choices},
-			{Key: "pipeline_plan", Label: "Plan", Kind: FieldManaged, ReadOnly: true},
-			{Key: "default_enricher", Label: "Enrich", Kind: FieldSelect, Choices: choices},
-			{Key: "default_agent", Label: "Dev", Kind: FieldSelect, Choices: choices},
-			{Key: "pipeline_verify", Label: "Verify", Kind: FieldManaged, ReadOnly: true},
-			{Key: "default_reviewer", Label: "Review", Kind: FieldSelect, Choices: choices},
+			{Key: "default_spec_agent", Label: "Rédaction de la spec", Kind: FieldSelect, Choices: choices},
+			{Key: "pipeline_plan", Label: "Planification", Kind: FieldManaged, ReadOnly: true},
+			{Key: "default_enricher", Label: "Enrichissement", Kind: FieldSelect, Choices: choices},
+			{Key: "default_agent", Label: "Développement", Kind: FieldSelect, Choices: choices},
+			{Key: "pipeline_verify", Label: "Vérification", Kind: FieldManaged, ReadOnly: true},
+			{Key: "default_reviewer", Label: "Relecture", Kind: FieldSelect, Choices: choices},
+		}
+	case onbdomain.StepCloud:
+		rows = []FieldDef{
+			{Key: "cloud_mode", Label: "Cloud (optionnel)", Kind: FieldSelect, Choices: []string{"local", "connect"}},
+		}
+		if onbdomain.CloudConnect(cloudMode) {
+			rows = append(rows,
+				FieldDef{Key: "cloud_base_url", Label: "URL"},
+				FieldDef{Key: "cloud_token", Label: "Token"},
+				FieldDef{Key: "cloud_test", Label: "Tester la connexion", Kind: FieldAction},
+				FieldDef{Key: "cloud_status", Label: "Statut", Kind: FieldManaged, ReadOnly: true},
+			)
+			projectChoices := cloudProjectChoices
+			if len(projectChoices) == 0 {
+				projectChoices = []string{"(testez la connexion d'abord)"}
+			}
+			rows = append(rows, FieldDef{
+				Key: "cloud_project_id", Label: "Projet", Kind: FieldSelect, Choices: projectChoices,
+			})
 		}
 	case onbdomain.StepDocs:
 		rows = []FieldDef{{Key: "product_one_liner", Label: productOneLinerFieldLabel()}}
 	case onbdomain.StepFeature:
-		rows = []FieldDef{{Key: "feature_slug", Label: firstFeatureSlugFieldLabel()}}
+		rows = []FieldDef{{Key: "feature_slug", Label: "Nom du premier chantier (ex. auth-mvp)"}}
 	case onbdomain.StepReview:
 		rows = []FieldDef{
 			{Key: "project_name", Label: "Projet", ReadOnly: true},
 			{Key: "default_branch", Label: "Branche", ReadOnly: true},
-			{Key: "stack", Label: "Stack", ReadOnly: true},
-			{Key: "default_spec_agent", Label: "Spec", ReadOnly: true},
-			{Key: "default_enricher", Label: "Enrich", ReadOnly: true},
-			{Key: "default_agent", Label: "Dev", ReadOnly: true},
-			{Key: "default_reviewer", Label: "Review", ReadOnly: true},
+			{Key: "stack", Label: "Technologie", ReadOnly: true},
+			{Key: "default_spec_agent", Label: "Rédaction spec", ReadOnly: true},
+			{Key: "default_enricher", Label: "Enrichissement", ReadOnly: true},
+			{Key: "default_agent", Label: "Développement", ReadOnly: true},
+			{Key: "default_reviewer", Label: "Relecture", ReadOnly: true},
 			{Key: "product_one_liner", Label: productOneLinerFieldLabel(), ReadOnly: true},
-			{Key: "feature_slug", Label: firstFeatureStepLabel(), ReadOnly: true},
+			{Key: "feature_slug", Label: "Premier chantier", ReadOnly: true},
+			{Key: "cloud_mode", Label: "Cloud", ReadOnly: true},
 		}
 	}
 	if advanced {
@@ -519,9 +600,53 @@ func (m Model) fieldValue(key string) string {
 		return "Géré par Asagiri"
 	case "provider_hint":
 		return "kiro-cli, cursor-cli, claude-code, ollama"
+	case "cloud_mode":
+		mode := strings.TrimSpace(m.Fields["cloud_mode"])
+		if onbdomain.CloudSkipped(mode) {
+			return "Local uniquement"
+		}
+		return "Connecter Asagiri Cloud"
+	case "cloud_status":
+		if onbdomain.CloudSkipped(m.Fields["cloud_mode"]) {
+			return ""
+		}
+		if strings.TrimSpace(m.Fields["cloud_probed"]) == "true" {
+			email := strings.TrimSpace(m.Fields["cloud_connected_email"])
+			if email != "" {
+				return "✓ Connecté : " + email
+			}
+			return "✓ Connecté"
+		}
+		return "Non connecté"
+	case "cloud_test":
+		return "[ Tester la connexion ]"
+	case "cloud_project_id":
+		if name := strings.TrimSpace(m.Fields["cloud_project_name"]); name != "" {
+			return name
+		}
+		id := strings.TrimSpace(m.Fields["cloud_project_id"])
+		if id == "" {
+			return ""
+		}
+		for label, pid := range onbdomain.DecodeCloudProjectOptions(m.Fields["cloud_project_options"]) {
+			if pid == id {
+				return label
+			}
+		}
+		return id
 	}
 	if isAdvancedKey(key) {
 		return m.Advanced[key]
+	}
+	if key == "cloud_token" {
+		val := m.Fields[key]
+		if val != "" && (m.FocusFooter >= 0 || !m.editingField() || m.fieldRows[m.FocusField].Key != "cloud_token") {
+			n := len(val)
+			if n > 16 {
+				n = 16
+			}
+			return strings.Repeat("*", n)
+		}
 	}
 	return m.Fields[key]
 }
@@ -551,10 +676,29 @@ func (m Model) hasAutofixOffers() bool {
 	return len(m.Readiness.AutofixOffers) > 0 && !m.Readiness.Ready
 }
 
+// OnboardingTestCloudRequestMsg asks the app shell to probe cloud connectivity.
+type OnboardingTestCloudRequestMsg struct {
+	Form onbdomain.Form
+}
+
+// TestCloudActionCmd returns a message for the app shell to probe cloud API.
+func (m Model) TestCloudActionCmd() tea.Cmd {
+	return func() tea.Msg {
+		return OnboardingTestCloudRequestMsg{Form: m.CurrentForm()}
+	}
+}
+
 // OnboardingFooterMsg is handled by the app shell to dispatch bus commands.
 type OnboardingFooterMsg struct {
 	Button int
 	Form   onbdomain.Form
+}
+
+// OnboardingTestCloudMsg delivers cloud probe results to the wizard.
+type OnboardingTestCloudMsg struct {
+	Form onbdomain.Form
+	Err  error
+	Msg  string
 }
 
 func defaultAgentChoices() []string {
@@ -574,7 +718,7 @@ func firstFeatureStepLabel() string {
 }
 
 func firstFeatureSlugFieldLabel() string {
-	return "Slug Kiro (dossier .kiro/specs/<slug>/)"
+	return "Nom du premier chantier (ex. auth-mvp)"
 }
 
 func max(a, b int) int {
@@ -592,15 +736,17 @@ func StepLabel(step onbdomain.WizardStep) string {
 	case onbdomain.StepProject:
 		return "Projet"
 	case onbdomain.StepStack:
-		return "Stack"
+		return "Technologie"
 	case onbdomain.StepProviders:
-		return "Providers"
+		return "Outils IA"
 	case onbdomain.StepAgents:
-		return "Agents logiques"
+		return "Répartition"
+	case onbdomain.StepCloud:
+		return "Cloud (optionnel)"
 	case onbdomain.StepDocs:
-		return "Docs"
+		return "Description"
 	case onbdomain.StepFeature:
-		return firstFeatureStepLabel()
+		return "Premier chantier"
 	case onbdomain.StepReview:
 		return "Récap"
 	default:

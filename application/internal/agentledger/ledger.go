@@ -28,7 +28,11 @@ type Entry struct {
 	Feature       string `json:"feature"`
 	AgentID       string `json:"agent_id"`
 	Role          string `json:"role,omitempty"`
-	Provider      string `json:"provider,omitempty"`
+	Provider      string  `json:"provider,omitempty"`
+	Model         string  `json:"model,omitempty"`
+	InputTokens     int     `json:"input_tokens,omitempty"`
+	OutputTokens    int     `json:"output_tokens,omitempty"`
+	CostUSD         float64 `json:"cost_usd,omitempty"`
 	Phase         string `json:"phase,omitempty"`
 	StartedAt     string `json:"started_at"`
 	EndedAt       string `json:"ended_at"`
@@ -38,8 +42,12 @@ type Entry struct {
 	ContextHash   string `json:"context_hash,omitempty"`
 	OutputHash    string `json:"output_hash"`
 	ContractValid *bool  `json:"contract_valid,omitempty"`
-	LogDir        string `json:"log_dir"`
-	DryRun        bool   `json:"dry_run,omitempty"`
+	LogDir               string `json:"log_dir"`
+	DryRun               bool   `json:"dry_run,omitempty"`
+	RegistryAgentVersion int    `json:"registry_agent_version,omitempty"`
+	ResolutionSource     string `json:"resolution_source,omitempty"`
+	ConfigReleaseVersion int    `json:"config_release_version,omitempty"`
+	ConfigContentHash    string `json:"config_content_hash,omitempty"`
 }
 
 // Params carries inputs to record one agent run.
@@ -51,12 +59,20 @@ type Params struct {
 	AgentID       string
 	Role          string
 	Provider      string
+	Model         string
+	InputTokens   int
+	OutputTokens  int
+	CostUSD       float64
 	Phase         string
 	Prompt        string
 	ContextHash   string
 	ContractValid *bool
-	LogDir        string
-	Result        agent.RunResult
+	LogDir               string
+	Result               agent.RunResult
+	RegistryAgentVersion int
+	ResolutionSource     string
+	ConfigReleaseVersion int
+	ConfigContentHash    string
 }
 
 // Report is the read model for `asa agents runs`.
@@ -126,6 +142,10 @@ func EntryFromParams(p Params) Entry {
 		AgentID:       agentID,
 		Role:          strings.TrimSpace(p.Role),
 		Provider:      strings.TrimSpace(p.Provider),
+		Model:         strings.TrimSpace(p.Model),
+		InputTokens:   p.InputTokens,
+		OutputTokens:  p.OutputTokens,
+		CostUSD:       p.CostUSD,
 		Phase:         strings.TrimSpace(p.Phase),
 		StartedAt:     strings.TrimSpace(p.Result.StartedAt),
 		EndedAt:       strings.TrimSpace(p.Result.EndedAt),
@@ -135,8 +155,12 @@ func EntryFromParams(p Params) Entry {
 		ContextHash:   strings.TrimSpace(p.ContextHash),
 		OutputHash:    HashText(p.Result.Stdout),
 		ContractValid: p.ContractValid,
-		LogDir:        filepath.ToSlash(strings.TrimSpace(p.LogDir)),
-		DryRun:        p.Result.DryRun,
+		LogDir:               filepath.ToSlash(strings.TrimSpace(p.LogDir)),
+		DryRun:               p.Result.DryRun,
+		RegistryAgentVersion: p.RegistryAgentVersion,
+		ResolutionSource:     strings.TrimSpace(p.ResolutionSource),
+		ConfigReleaseVersion: p.ConfigReleaseVersion,
+		ConfigContentHash:    strings.TrimSpace(p.ConfigContentHash),
 	}
 }
 

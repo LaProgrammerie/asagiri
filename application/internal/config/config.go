@@ -56,10 +56,14 @@ type Config struct {
 
 // CloudConfig holds optional Team Cloud sync settings (ADR-039, cloud V0).
 type CloudConfig struct {
-	Enabled   bool   `yaml:"enabled"`
-	BaseURL   string `yaml:"base_url"`
-	TokenPath string `yaml:"token_path"`
-	ProjectID string `yaml:"project_id"`
+	Enabled            bool   `yaml:"enabled"`
+	BaseURL            string `yaml:"base_url"`
+	TokenPath          string `yaml:"token_path"`
+	ProjectID          string `yaml:"project_id"`
+	Project            string `yaml:"project"`
+	RegistryFallback   bool   `yaml:"registry_fallback"`
+	RegistryPinRelease *int   `yaml:"registry_pin_release"`
+	RegistryCacheMaxAge string `yaml:"registry_cache_max_age"`
 }
 
 // KnowledgeConfig holds engineering knowledge graph defaults (spec-my-E, ADR-024).
@@ -503,6 +507,9 @@ func (c *Config) applyCloudDefaults() {
 	}
 	if c.Cloud.TokenPath == "" {
 		c.Cloud.TokenPath = DefaultCloudTokenRel
+	}
+	if c.Cloud.RegistryCacheMaxAge == "" {
+		c.Cloud.RegistryCacheMaxAge = "24h"
 	}
 }
 

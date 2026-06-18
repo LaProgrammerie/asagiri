@@ -89,6 +89,46 @@ func (c *Client) do(ctx context.Context, method, path string, body any, out any)
 	return resp.StatusCode, raw, nil
 }
 
+func (c *Client) doWithHeaders(ctx context.Context, method, path string, body any) (int, []byte, http.Header, error) {
+	var rdr io.Reader
+	if body != nil {
+		raw, err := json.Marshal(body)
+		if err != nil {
+			return 0, nil, nil, err
+		}
+		rdr = bytes.NewReader(raw)
+	}
+	url := c.baseURL + path
+	req, err := http.NewRequestWithContext(ctx, method, url, rdr)
+	if err != nil {
+		return 0, nil, nil, err
+	}
+	if body != nil {
+		req.Header.Set("Content-Type", "application/json")
+	}
+	req.Header.Set("Accept", "application/json")
+	if c.token != "" {
+		req.Header.Set("Authorization", "Bearer "+c.token)
+	}
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return 0, nil, nil, err
+	}
+	defer func() { _ = resp.Body.Close() }()
+	raw, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return resp.StatusCode, nil, resp.Header, err
+	}
+	if resp.StatusCode >= 300 {
+		msg := strings.TrimSpace(string(raw))
+		if msg == "" {
+			msg = resp.Status
+		}
+		return resp.StatusCode, raw, resp.Header, fmt.Errorf("cloud api %s %s: %s", method, path, RedactError(fmt.Errorf("%s", msg)))
+	}
+	return resp.StatusCode, raw, resp.Header, nil
+}
+
 // Me calls GET /api/v1/me.
 func (c *Client) Me(ctx context.Context) (MeResponse, error) {
 	var me MeResponse

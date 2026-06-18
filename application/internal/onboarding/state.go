@@ -19,6 +19,7 @@ const (
 	StepStack     WizardStep = "stack"
 	StepProviders WizardStep = "providers"
 	StepAgents    WizardStep = "agents"
+	StepCloud     WizardStep = "cloud"
 	StepSources   WizardStep = "sources"
 	StepDocs      WizardStep = "docs"
 	StepFeature   WizardStep = "feature"
@@ -32,6 +33,7 @@ var stepOrder = []WizardStep{
 	StepStack,
 	StepProviders,
 	StepAgents,
+	StepCloud,
 	StepSources,
 	StepDocs,
 	StepFeature,
@@ -100,10 +102,10 @@ func StepIndex(step WizardStep) int {
 // ParseStep validates a step name from CLI.
 func ParseStep(name string) (WizardStep, error) {
 	switch WizardStep(name) {
-	case StepWelcome, StepProject, StepStack, StepProviders, StepAgents, StepSources, StepDocs, StepFeature, StepReview, StepValidate:
+	case StepWelcome, StepProject, StepStack, StepProviders, StepAgents, StepCloud, StepSources, StepDocs, StepFeature, StepReview, StepValidate:
 		return WizardStep(name), nil
 	default:
-		return "", fmt.Errorf("step inconnu %q (project|stack|providers|agents|docs|feature|validate)", name)
+		return "", fmt.Errorf("step inconnu %q (project|stack|providers|agents|cloud|docs|feature|validate)", name)
 	}
 }
 
@@ -161,6 +163,26 @@ func MergeAnswers(st State, opts Options, repoRoot string) State {
 	}
 	if opts.FeatureSlug != "" {
 		a.FeatureSlug = opts.FeatureSlug
+	}
+	if opts.CloudMode != "" {
+		a.CloudMode = opts.CloudMode
+	} else if a.CloudMode == "" {
+		a.CloudMode = "local"
+	}
+	if a.CloudMode == "skip" {
+		a.CloudMode = "local"
+	}
+	if a.CloudBaseURL == "" && CloudConnect(a.CloudMode) {
+		a.CloudBaseURL = DefaultCloudOnboardBaseURL()
+	}
+	if opts.CloudBaseURL != "" {
+		a.CloudBaseURL = opts.CloudBaseURL
+	}
+	if opts.CloudToken != "" {
+		a.CloudToken = opts.CloudToken
+	}
+	if opts.CloudProjectID != "" {
+		a.CloudProjectID = opts.CloudProjectID
 	}
 	if opts.ProductOneLiner != "" {
 		a.ProductOneLiner = opts.ProductOneLiner

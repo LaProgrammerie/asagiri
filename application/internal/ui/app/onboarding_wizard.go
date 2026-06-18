@@ -83,7 +83,20 @@ func wizardFromResult(res bus.OnboardingWizardResult, mouse bool) onboardscreen.
 	form.SkippedFields = res.SkippedFields
 	form.Errors = res.Errors
 	form.HasAsagiriConfig = res.HasAsagiriConfig
+	form.CloudProjectChoices = append([]string(nil), res.CloudProjectChoices...)
 	return onboardscreen.NewModelFromForm(form, mouse)
+}
+
+func formFromWizardResult(res bus.OnboardingWizardResult) onbdomain.Form {
+	step := onbdomain.WizardStep(res.CurrentStep)
+	form := onbdomain.FormFromMaps(step, res.Fields, res.Advanced)
+	form.ValidationPreview = res.ValidationPreview
+	form.DetectedStacks = res.DetectedStacks
+	form.SkippedFields = res.SkippedFields
+	form.Errors = res.Errors
+	form.HasAsagiriConfig = res.HasAsagiriConfig
+	form.CloudProjectChoices = append([]string(nil), res.CloudProjectChoices...)
+	return form
 }
 
 func (m *model) updateOnboardingKey(v tea.KeyMsg) (tea.Model, tea.Cmd) {
@@ -101,6 +114,18 @@ func (m *model) updateOnboardingMouse(v tea.MouseMsg) (tea.Model, tea.Cmd) {
 	next, cmd := m.onboardingWizard.Update(v)
 	m.onboardingWizard = next
 	return m, cmd
+}
+
+func (m model) handleOnboardingTestCloud(msg onboardscreen.OnboardingTestCloudMsg) (tea.Model, tea.Cmd) {
+	m.onboardingWizard.SyncForm(msg.Form)
+	if msg.Err != nil {
+		m.onboardingWizard.Message = msg.Err.Error()
+		m.lastError = msg.Err.Error()
+		return m, nil
+	}
+	m.onboardingWizard.Message = msg.Msg
+	m.lastError = ""
+	return m, nil
 }
 
 func (m model) handleOnboardingFooter(msg onboardscreen.OnboardingFooterMsg) (tea.Model, tea.Cmd) {
@@ -149,11 +174,46 @@ func (m model) advanceOnboardingCmd(direction string, form onbdomain.Form, valid
 		if err != nil {
 			return onboardingAdvanceMsg{form: form, err: err}
 		}
-		next, advErr := onbdomain.AdvanceTUIStep(form, direction, validate)
-		if advErr != nil {
-			return onboardingAdvanceMsg{form: next, err: advErr}
+		if m.queryBus == nil {
+			return onboardingAdvanceMsg{form: form, message: "Étape avancée"}
 		}
-		return onboardingAdvanceMsg{form: next}
+		res, qErr := m.queryBus.Query(m.ctx, bus.GetOnboardingWizardQuery{})
+		if qErr != nil {
+			return onboardingAdvanceMsg{form: form, err: qErr}
+		}
+		if typed, ok := res.(bus.OnboardingWizardResult); ok {
+			return onboardingAdvanceMsg{form: formFromWizardResult(typed)}
+		}
+		return onboardingAdvanceMsg{form: form}
+	}
+}
+
+func (m model) testOnboardingCloudCmd(form onbdomain.Form) tea.Cmd {
+	return func() tea.Msg {
+		if m.queryBus == nil {
+			return onboardscreen.OnboardingTestCloudMsg{Form: form, Err: fmt.Errorf("query bus unavailable")}
+		}
+		res, err := m.queryBus.Query(m.ctx, bus.TestOnboardingCloudConnectionQuery{
+			Fields:   form.FieldsMap(),
+			Advanced: form.AdvancedMap(),
+		})
+		if err != nil {
+			return onboardscreen.OnboardingTestCloudMsg{Form: form, Err: err}
+		}
+		typed, ok := res.(bus.TestOnboardingCloudConnectionResult)
+		if !ok {
+			return onboardscreen.OnboardingTestCloudMsg{Form: form, Err: fmt.Errorf("invalid cloud test result")}
+		}
+		updated := onbdomain.FormFromMaps(onbdomain.StepCloud, typed.Fields, form.AdvancedMap())
+		updated.Step = onbdomain.StepCloud
+		updated.ValidationPreview = form.ValidationPreview
+		updated.DetectedStacks = form.DetectedStacks
+		updated.CloudProjectChoices = append([]string(nil), typed.CloudProjectChoices...)
+		updated.Errors = typed.Errors
+		if !typed.Valid {
+			return onboardscreen.OnboardingTestCloudMsg{Form: updated, Err: fmt.Errorf("%s", typed.Message)}
+		}
+		return onboardscreen.OnboardingTestCloudMsg{Form: updated, Msg: typed.Message}
 	}
 }
 

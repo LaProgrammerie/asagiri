@@ -16,6 +16,11 @@ var (
 	ErrResumeGateBlocked      = errors.New("resume: step blocked by gate")
 )
 
+// forceOnlyTransitions are allowed only when force=true (retries, not normal flow).
+var forceOnlyTransitions = map[string][]string{
+	asagiri.StatusFailed: {asagiri.StatusRunning},
+}
+
 // allowedTransitions maps from-status to permitted next statuses (spec §12).
 var allowedTransitions = map[string][]string{
 	asagiri.StatusPending:  {asagiri.StatusPlanned, asagiri.StatusAborted},
@@ -42,6 +47,9 @@ func TransitionTask(from, to string, force bool) error {
 		return fmt.Errorf("%w: %s", ErrStepAlreadyDone, from)
 	}
 	if !canTransition(from, to) {
+		if force && canForceTransition(from, to) {
+			return nil
+		}
 		return fmt.Errorf("%w: %s -> %s", ErrInvalidTransition, from, to)
 	}
 	return nil
@@ -60,6 +68,19 @@ func normalizeStatus(s string) string {
 
 func canTransition(from, to string) bool {
 	next, ok := allowedTransitions[from]
+	if !ok {
+		return false
+	}
+	for _, n := range next {
+		if n == to {
+			return true
+		}
+	}
+	return false
+}
+
+func canForceTransition(from, to string) bool {
+	next, ok := forceOnlyTransitions[from]
 	if !ok {
 		return false
 	}

@@ -249,6 +249,11 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m.handleOnboardingWizardLoaded(v)
 	case onboarding.OnboardingFooterMsg:
 		return m.handleOnboardingFooter(v)
+	case onboarding.OnboardingTestCloudRequestMsg:
+		m.onboardingWizard.Message = "Test de connexion en cours…"
+		return m, m.testOnboardingCloudCmd(v.Form)
+	case onboarding.OnboardingTestCloudMsg:
+		return m.handleOnboardingTestCloud(v)
 	case onboardingAdvanceMsg:
 		return m.handleOnboardingAdvance(v)
 	case onboardingApplyMsg:

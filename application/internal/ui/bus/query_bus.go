@@ -74,6 +74,8 @@ func (b *queryBus) Query(ctx context.Context, query Query) (QueryResult, error) 
 		return b.handleGetOnboardingState(ctx, q)
 	case GetOnboardingWizardQuery:
 		return b.handleGetOnboardingWizard(ctx, q)
+	case TestOnboardingCloudConnectionQuery:
+		return b.handleTestOnboardingCloudConnection(ctx, q)
 	case ValidateOnboardingStepQuery:
 		return b.handleValidateOnboardingStep(ctx, q)
 	default:

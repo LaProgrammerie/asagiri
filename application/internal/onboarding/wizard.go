@@ -2,6 +2,7 @@ package onboarding
 
 import (
 	"bufio"
+	"context"
 	"fmt"
 	"io"
 	"os"
@@ -12,7 +13,6 @@ import (
 	"github.com/LaProgrammerie/asagiri/application/internal/onboarding/detect"
 )
 
-// RunWizard executes onboarding steps; non-interactive mode uses defaults only.
 func RunWizard(repoRoot string, st State, opts Options, in io.Reader, out io.Writer) (State, error) {
 	st = MergeAnswers(st, opts, repoRoot)
 
@@ -114,6 +114,65 @@ func runStep(repoRoot string, st *State, opts Options, interactive bool, in io.R
 				_, _ = fmt.Fprintf(out, "  → %s\n", report.Hint)
 			}
 		}
+	case StepCloud:
+		if st.Answers.CloudMode == "" {
+			if interactive {
+				choice := promptString(in, out, "Cloud (optionnel) — local ou connecter ? (local/connect)", "local")
+				if CloudConnect(choice) {
+					st.Answers.CloudMode = "connect"
+				} else {
+					st.Answers.CloudMode = "local"
+				}
+			} else {
+				st.Answers.CloudMode = "local"
+			}
+		}
+		if CloudSkipped(st.Answers.CloudMode) {
+			return nil
+		}
+		if st.Answers.CloudBaseURL == "" {
+			st.Answers.CloudBaseURL = DefaultCloudBaseURL()
+		}
+		if interactive {
+			st.Answers.CloudBaseURL = promptString(in, out, "URL Asagiri Cloud", st.Answers.CloudBaseURL)
+			if strings.TrimSpace(st.Answers.CloudToken) == "" {
+				st.Answers.CloudToken = promptString(in, out, "Token", "")
+			}
+			_, _ = fmt.Fprintln(out, "Test de connexion…")
+		}
+		if strings.TrimSpace(st.Answers.CloudToken) == "" && !interactive {
+			return fmt.Errorf("cloud: token requis (cloud_mode=connect)")
+		}
+		result, err := ProbeCloud(context.Background(), st.Answers.CloudBaseURL, st.Answers.CloudToken)
+		if err != nil {
+			return err
+		}
+		if interactive {
+			_, _ = fmt.Fprintf(out, "✓ Connecté : %s — %d projet(s)\n", result.Email, len(result.Projects))
+		}
+		if st.Answers.CloudProjectID == "" {
+			if len(result.Projects) == 1 {
+				st.Answers.CloudProjectID = result.Projects[0].ID
+				st.Answers.CloudProjectName = ProjectLabel(result.Projects[0])
+			} else if interactive {
+				def := ""
+				if len(result.Projects) > 0 {
+					def = result.Projects[0].ID
+				}
+				picked, pickErr := PickProjectInteractive(result.Projects, in, out, def)
+				if pickErr != nil {
+					return pickErr
+				}
+				st.Answers.CloudProjectID = picked.ID
+				st.Answers.CloudProjectName = ProjectLabel(picked)
+			} else if opts.CloudProjectID != "" {
+				st.Answers.CloudProjectID = opts.CloudProjectID
+			} else {
+				return fmt.Errorf("cloud: project_id requis (cloud_mode=connect)")
+			}
+		} else if _, ok := FindProject(result.Projects, st.Answers.CloudProjectID); !ok {
+			return fmt.Errorf("cloud: projet %q introuvable ou inaccessible", st.Answers.CloudProjectID)
+		}
 	case StepSources, StepDocs:
 		// defaults from MergeAnswers
 	case StepFeature:
@@ -121,7 +180,7 @@ func runStep(repoRoot string, st *State, opts Options, interactive bool, in io.R
 			st.Answers.FeatureSlug = SlugFromName(st.Answers.ProjectName) + "-mvp"
 		}
 		if interactive {
-			st.Answers.FeatureSlug = promptString(in, out, "Slug première feature Kiro", st.Answers.FeatureSlug)
+			st.Answers.FeatureSlug = promptString(in, out, "Nom du premier chantier", st.Answers.FeatureSlug)
 		}
 	case StepReview:
 		if interactive {

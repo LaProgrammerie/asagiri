@@ -2,7 +2,6 @@ package cloud
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"sort"
 	"strings"
@@ -60,7 +59,7 @@ func Push(ctx context.Context, opts PushOptions) (PushReport, error) {
 		Items:         make([]PushItem, 0, len(groups)),
 	}
 	if opts.DryRun {
-		report.Hint = "Relancer sans --dry-run pour envoyer vers le cloud"
+		report.Hint = "Relancer avec --execute pour envoyer vers le cloud"
 	}
 
 	client := NewClient(ClientOptions{
@@ -82,15 +81,7 @@ func Push(ctx context.Context, opts PushOptions) (PushReport, error) {
 			continue
 		}
 
-		runReq := RunCreateRequest{
-			Project:    projectIRI,
-			LocalRunID: g.runID,
-			Feature:    g.feature,
-			Status:     g.status,
-			StartedAt:  g.startedAt,
-			EndedAt:    g.endedAt,
-			DurationMs: g.durationMs,
-		}
+		runReq := BuildRunCreateRequest(projectIRI, g)
 		runRes, err := client.CreateRun(ctx, runReq)
 		if err != nil {
 			item.Error = RedactError(err)
@@ -102,7 +93,7 @@ func Push(ctx context.Context, opts PushOptions) (PushReport, error) {
 
 		var firstErr error
 		for _, entry := range g.entries {
-			req := ledgerRequestFromEntry(runIRI, entry)
+			req := BuildLedgerCreateRequest(runIRI, entry)
 			if err := client.CreateLedgerEntry(ctx, req); err != nil {
 				firstErr = err
 				break
@@ -118,13 +109,16 @@ func Push(ctx context.Context, opts PushOptions) (PushReport, error) {
 }
 
 type runGroup struct {
-	runID      string
-	feature    string
-	status     string
-	startedAt  string
-	endedAt    string
-	durationMs int64
-	entries    []agentledger.Entry
+	runID                string
+	taskID               string
+	feature              string
+	status               string
+	startedAt            string
+	endedAt              string
+	durationMs           int64
+	configReleaseVersion int
+	configContentHash    string
+	entries              []agentledger.Entry
 }
 
 func groupEntriesByRun(entries []agentledger.Entry, runFilter string, all bool) []runGroup {
@@ -160,6 +154,9 @@ func summarizeRunGroup(runID string, entries []agentledger.Entry) runGroup {
 		status:  runStatusCompleted,
 	}
 	for _, e := range entries {
+		if g.taskID == "" && strings.TrimSpace(e.TaskID) != "" {
+			g.taskID = strings.TrimSpace(e.TaskID)
+		}
 		if g.feature == "" && strings.TrimSpace(e.Feature) != "" {
 			g.feature = e.Feature
 		}
@@ -173,27 +170,12 @@ func summarizeRunGroup(runID string, entries []agentledger.Entry) runGroup {
 			g.endedAt = e.EndedAt
 		}
 		g.durationMs += e.DurationMS
+		if g.configReleaseVersion == 0 && e.ConfigReleaseVersion > 0 {
+			g.configReleaseVersion = e.ConfigReleaseVersion
+		}
+		if g.configContentHash == "" && strings.TrimSpace(e.ConfigContentHash) != "" {
+			g.configContentHash = strings.TrimSpace(e.ConfigContentHash)
+		}
 	}
 	return g
-}
-
-func ledgerRequestFromEntry(runIRI string, e agentledger.Entry) LedgerCreateRequest {
-	raw, _ := json.Marshal(e)
-	var payload map[string]any
-	_ = json.Unmarshal(raw, &payload)
-	return LedgerCreateRequest{
-		Run:           runIRI,
-		AgentID:       e.AgentID,
-		Phase:         e.Phase,
-		StartedAt:     e.StartedAt,
-		EndedAt:       e.EndedAt,
-		DurationMs:    e.DurationMS,
-		ExitCode:      e.ExitCode,
-		PromptHash:    e.PromptHash,
-		ContextHash:   e.ContextHash,
-		OutputHash:    e.OutputHash,
-		ContractValid: e.ContractValid,
-		LogDir:        e.LogDir,
-		RawPayload:    payload,
-	}
 }

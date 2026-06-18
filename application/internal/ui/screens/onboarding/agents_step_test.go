@@ -31,7 +31,7 @@ func TestAgentsStepShowsManagedPipelineRows(t *testing.T) {
 	})
 	require.Contains(t, got, "Géré par Asagiri")
 	require.Contains(t, got, "Plan")
-	require.Contains(t, got, "Verify")
+	require.Contains(t, got, "Vérification")
 	require.Contains(t, got, "▾")
 }
 

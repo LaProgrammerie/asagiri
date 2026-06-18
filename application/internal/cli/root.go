@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/LaProgrammerie/asagiri/application/internal/cloudcli"
+	"github.com/LaProgrammerie/asagiri/application/internal/configcli"
 	"github.com/LaProgrammerie/asagiri/application/internal/config"
 	"github.com/LaProgrammerie/asagiri/application/internal/investigation"
 	"github.com/LaProgrammerie/asagiri/application/internal/trustcli"
@@ -111,6 +112,7 @@ func newRootCmd() *cobra.Command {
 		newRunsCmd(&dryRun),
 		newAgentsCmd(&dryRun),
 		cloudcli.RootCommand(),
+		configcli.RootCommand(),
 		newFlowCmd(&dryRun),
 		newExplainCmd(&dryRun),
 		versionCmd,
@@ -238,7 +240,7 @@ func newDevCmd(dryRun *bool) *cobra.Command {
 	}
 	cmd.Flags().StringVar(&taskID, "task", "", "ID de tâche à implémenter")
 	cmd.Flags().StringVar(&agentName, "agent", config.DefaultAgentDev, "Agent d'implémentation")
-	cmd.Flags().BoolVar(&force, "force", false, "Relancer une étape déjà réussie")
+	cmd.Flags().BoolVar(&force, "force", false, "Relancer une tâche échouée ou une étape déjà réussie")
 	return cmd
 }
 
